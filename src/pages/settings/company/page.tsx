@@ -1,33 +1,29 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb"
 import ReusableTabs from "@/components/reusable/partials/tabs"
 import { GeneralInfo } from "./_components/general-info"
+import { NotificationInfo } from "./_components/notification-info"
 
 const breadcrumbItems = [
   { name: "settings", label: "Settings", link: "/settings" },
-  { name: "company", label: "Company" },
+  { name: "company", label: "Company Information" },
 ]
 
   const tabs = [
     {
-      label: "General Information",
+      label: "General",
       value: "general-info",
       content: <GeneralInfo />,
     },
     {
-      label: "Address Information",
-      value: "address-info",
-      content: <div>Company Address Content</div>,
+      label: "Banking",
+      value: "banking-info",
+      content: <NotificationInfo />,
     },
-    // {
-    //   label: "Banking Information",
-    //   value: "banking-info",
-    //   content: <div>Company Banking Content</div>,
-    // },
-    //     {
-    //   label: "Telegram Notification",
-    //   value: "telegram-notification",
-    //   content: <div>Company Telegram Notification Content</div>,
-    // },
+    {
+      label: "Notification",
+      value: "notification-info",
+      content: <NotificationInfo />,
+    },
   ]
 
 const Company = () => {

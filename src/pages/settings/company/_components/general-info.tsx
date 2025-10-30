@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
-
+import { AddressInfo } from "./address-info"
 
 type DetailItemProps = {
   label: string
@@ -51,6 +51,7 @@ export function GeneralInfo() {
       {isEditing && (
         <GeneralInfoForm onCancel={() => setIsEditing(false)} />
       )}
+      <AddressInfo />
     </div>
   )
 }
