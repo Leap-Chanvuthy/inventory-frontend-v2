@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @layer base {
-:root {
+/* :root {
   --background: 223.8136 -172.5242% 100.0000%;
   --foreground: 223.8136 0.0000% 3.9388%;
   --card: 223.8136 -172.5242% 100.0000%;
@@ -91,6 +91,118 @@
   --sidebar-border: 223.8136 0.0000% 15.5096%;
   --sidebar-ring: 223.8136 0.0000% 32.1993%;
   --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: Fira Code, ui-monospace, monospace;
+  --radius: 0.625rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: oklch(0 0 0);
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+body {
+  letter-spacing: var(--tracking-normal);
+} */
+
+:root {
+  --background: 223.8136 -172.5242% 100.0000%;
+  --foreground: 223.8136 0.0000% 3.9388%;
+  --card: 223.8136 -172.5242% 100.0000%;
+  --card-foreground: 223.8136 0.0000% 3.9388%;
+  --popover: 223.8136 -172.5242% 100.0000%;
+  --popover-foreground: 223.8136 0.0000% 3.9388%;
+  --primary: 249.2308 58.5586% 56.4706%;
+  --primary-foreground: 223.8136 0.0004% 98.0256%;
+  --secondary: 0 0% 100%;
+  --secondary-foreground: 223.8136 0.0000% 9.0527%;
+  --muted: 223.8136 0.0002% 96.0587%;
+  --muted-foreground: 223.8136 0.0000% 45.1519%;
+  --accent: 223.8136 0.0002% 96.0587%;
+  --accent-foreground: 223.8136 0.0000% 9.0527%;
+  --destructive: 351.7303 123.6748% 40.5257%;
+  --destructive-foreground: 223.8136 -172.5242% 100.0000%;
+  --border: 223.8136 0.0001% 89.8161%;
+  --input: 223.8136 0.0001% 89.8161%;
+  --ring: 223.8136 0.0000% 63.0163%;
+  --chart-1: rgb(99, 79, 209);
+  --chart-2: rgb(255, 107, 107);
+  --chart-3: rgb(79, 209, 197);
+  --chart-4: rgb(246, 201, 77);
+  --chart-5: rgb(155, 107, 240);
+  --sidebar: 223.8136 0.0004% 98.0256%;
+  --sidebar-foreground: 223.8136 0.0000% 3.9388%;
+  --sidebar-primary: 223.8136 0.0000% 9.0527%;
+  --sidebar-primary-foreground: 223.8136 0.0004% 98.0256%;
+  --sidebar-accent: 223.8136 0.0002% 96.0587%;
+  --sidebar-accent-foreground: 223.8136 0.0000% 9.0527%;
+  --sidebar-border: 223.8136 0.0001% 89.8161%;
+  --sidebar-ring: 223.8136 0.0000% 63.0163%;
+  --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: Fira Code, ui-monospace, monospace;
+  --radius: 0.625rem;
+  --shadow-x: 0;
+  --shadow-y: 1px;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0.1;
+  --shadow-color: oklch(0 0 0);
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --tracking-normal: 0.025em;
+  --spacing: 0.25rem;
+}
+
+.dark {
+  --background: 223.8136 0.0000% 3.9388%;
+  --foreground: 223.8136 0.0004% 98.0256%;
+  --card: 223.8136 0.0000% 9.0527%;
+  --card-foreground: 223.8136 0.0004% 98.0256%;
+  --popover: 223.8136 0.0000% 14.9382%;
+  --popover-foreground: 223.8136 0.0004% 98.0256%;
+  --primary: 249.2308 58.5586% 56.4706%;
+  --primary-foreground: #fffff;
+  --secondary: 249.2308 58.5586% 56.4706%;
+  --secondary-foreground: #fffff;
+  --muted: 223.8136 0.0000% 14.9382%;
+  --muted-foreground: 223.8136 0.0000% 63.0163%;
+  --accent: 223.8136 0.0000% 25.0471%;
+  --accent-foreground: 223.8136 0.0004% 98.0256%;
+  --destructive: 358.7594 101.8439% 69.8357%;
+  --destructive-foreground: 223.8136 0.0004% 98.0256%;
+  --border: 223.8136 0.0000% 15.5096%;
+  --input: 223.8136 0.0000% 20.3885%;
+  --ring: 223.8136 0.0000% 45.1519%;
+  --chart-1: rgb(145, 197, 255);
+  --chart-2: rgb(58, 129, 246);
+  --chart-3: rgb(37, 99, 239);
+  --chart-4: rgb(26, 78, 218);
+  --chart-5: rgb(31, 63, 173);
+  --sidebar: 223.8136 0.0000% 9.0527%;
+  --sidebar-foreground: 223.8136 0.0004% 98.0256%;
+  --sidebar-primary: 225.3451 84.0953% 48.9841%;
+  --sidebar-primary-foreground: 223.8136 0.0004% 98.0256%;
+  --sidebar-accent: 223.8136 0.0000% 14.9382%;
+  --sidebar-accent-foreground: 223.8136 0.0004% 98.0256%;
+  --sidebar-border: 223.8136 0.0000% 15.5096%;
+  --sidebar-ring: 223.8136 0.0000% 32.1993%;
+  --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: Fira Code, ui-monospace, monospace;
   --radius: 0.625rem;
