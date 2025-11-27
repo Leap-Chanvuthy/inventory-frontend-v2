@@ -24,7 +24,6 @@ const applicationMenu = [
 
 const settingMenu = [
   { title: "Settings", url: "/settings", icon: Settings },
-  { title: "Company Info", url: "/company-info", icon: User },
   { title: "Profile", url: "/profile", icon: User },
 ];
 
@@ -33,6 +32,7 @@ const settingMenu = [
 // Single menu items (no group)
 const singleMenu = [
   { title: "Help", url: "/help", icon: HelpCircle },
+    { title: "Company Info", url: "/company-info", icon: User },
 ];
 
 export function AppSidebar() {
