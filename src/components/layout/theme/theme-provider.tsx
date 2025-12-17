@@ -1,22 +1,12 @@
-import React, { useEffect, useState } from "react";
-
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import type { RootState } from '../../../redux/store';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
+  const theme = useSelector((state: RootState) => state.theme.mode)
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove(theme === 'dark' ? 'light' : 'dark');
-    root.classList.add(theme);
-  }, [theme]);
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+    const root = document.documentElement
+    root.classList.remove(theme === 'dark' ? 'light' : 'dark')
+    root.classList.add(theme)
+  }, [theme])
+  return <>{children}</>
 }
-
-export const ThemeContext = React.createContext<{
-  theme: 'light' | 'dark';
-  setTheme: (theme: 'light' | 'dark') => void;
-}>({ theme: 'light', setTheme: () => {} });
