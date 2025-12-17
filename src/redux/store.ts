@@ -1,8 +1,7 @@
 // store.ts
 import { persistStore, persistReducer } from 'redux-persist'
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
-import { combineReducers } from 'redux'
 
 import themeReducer from './slices/theme-slice'
 
@@ -16,7 +15,12 @@ const rootReducer = combineReducers({
   theme: themeReducer,
 })
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+export type RootReducerState = ReturnType<typeof rootReducer>
+
+const persistedReducer = persistReducer<RootReducerState>(
+  persistConfig,
+  rootReducer
+)
 
 export const store = configureStore({
   reducer: persistedReducer,
