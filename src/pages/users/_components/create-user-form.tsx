@@ -1,7 +1,7 @@
-
+import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextAreaInput, TextInput } from "@/components/reusable/partials/input";
-import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
 import { useState } from "react";
 
 const USER_ROLES = [
@@ -16,7 +16,11 @@ export const CreateUserForm = () => {
   const formData = new FormData();
   if (profileFile) formData.append("profile_picture", profileFile);
 
-  console.log("Profile File:", profileFile);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission logic here
+  }
+
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
@@ -27,12 +31,15 @@ export const CreateUserForm = () => {
 
           <h2 className="text-xl font-bold mb-6">Create a New User</h2>
 
-          <div className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* Top Row: File Upload and Basic Info */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Col: Upload */}
               <div className="lg:col-span-1">
                 <ImageUpload label="Profile Picture" onChange={setProfileFile} />
+                <div className="my-5 flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+                  <Info /> After creating the user, an email will be sent to them to set up their password.
+                </div>
               </div>
 
               {/* Right Col: Basic Info */}
@@ -53,23 +60,12 @@ export const CreateUserForm = () => {
                 <TextAreaInput label="About This User" id="about" placeholder="Enter about this user" />
               </div>
             </div>
-
-          </div>
+            <FormFooterActions />
+          </form>
 
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-50 dark:border-gray-700 flex flex-col-reverse sm:flex-row justify-end gap-3 rounded-b-2xl">
-          <Button variant="outline" className="w-full sm:w-auto">
-            Cancel
-          </Button>
-          <Button variant="primary" className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto">
-            Save & Close
-          </Button>
-          <Button variant="primary" className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto">
-            Save
-          </Button>
-        </div>
+
       </div>
     </div>
   );
