@@ -26,9 +26,6 @@ const users = [
     { id: 1, name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", lastLogin: "10 days ago", avatar: "https://i.pravatar.cc/150?u=1" },
   { id: 2, name: "Bob Williams", email: "bob.w@example.com", role: "Vender", lastLogin: "2 days ago", avatar: "https://i.pravatar.cc/150?u=2" },
   { id: 3, name: "Charlie Davis", email: "charlie.d@example.com", role: "Stock Controller", lastLogin: "5 minutes ago", avatar: "https://i.pravatar.cc/150?u=3" },
-  { id: 4, name: "Diana Miller", email: "diana.m@example.com", role: "Admin", lastLogin: "10 seconds ago", avatar: "https://i.pravatar.cc/150?u=4" },
-  { id: 5, name: "Eve Brown", email: "eve.b@example.com", role: "Admin", lastLogin: "4 days ago", avatar: "https://i.pravatar.cc/150?u=5" },
-  { id: 6, name: "Frank White", email: "frank.w@example.com", role: "Vender", lastLogin: "20 minutes ago", avatar: "https://i.pravatar.cc/150?u=6" },
 ]
 
 
@@ -54,11 +51,26 @@ export default function UserManagement() {
     <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Toolbar */}
+        
         <TableToolbar
-          onSearch={(e) => setSearchTerm(e.target.value)}
-          onCreate={() => console.log("Create user")}
-          href="/users/create"
+          searchPlaceholder="Search users..."
+          onSearch={(val) => console.log("Search:", val)}
+          sortOptions={[
+            { value: "name", label: "Name" },
+            { value: "email", label: "Email" },
+            { value: "role", label: "Role" },
+          ]}
+          onSortChange={(values) => console.log("Sort selected:", values)}
+          filterOptions={[
+            { value: "admin", label: "Admin" },
+            { value: "vender", label: "Vender" },
+          ]}
+          onFilterChange={(val) => console.log("Filter selected:", val)}
+          createHref="/users/create"
+          onCreate={() => console.log("Create clicked")}
+          onExport={() => console.log("Export clicked")}
         />
+
 
         {/* Table */}
         <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
