@@ -1,6 +1,3 @@
-import { useState } from "react"
-
-
 import {
   Table,
   TableBody,
@@ -45,7 +42,7 @@ const RoleBadge = ({ role }: { role: string }) => {
 
 
 export default function UserManagement() {
-  const [searchTerm, setSearchTerm] = useState("")
+  // const [searchTerm, setSearchTerm] = useState("")
 
   return (
     <div className="min-h-screen w-full p-4 sm:p-6 bg-background">

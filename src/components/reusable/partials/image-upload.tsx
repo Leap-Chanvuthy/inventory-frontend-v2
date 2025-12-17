@@ -186,7 +186,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
           <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
         </div>
       ) : (
-        <div className="relative flex flex-col lg:flex-row items-start gap-4 p-4 border rounded-xl border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
+        <div className=" flex-row items-start gap-4 p-4 border rounded-xl border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
           <div className={`relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border ${getPreviewAspectClass()}`}>
             {preview && (
               <div
@@ -204,7 +204,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
             )}
           </div>
 
-          <div className="flex-1 min-w-0 pt-1">
+          <div className="flex-1 min-w-0 pt-1 my-5">
             <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{file?.name}</h4>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{file ? (file.size / 1024).toFixed(0) : 0} KB • Image</p>
 
