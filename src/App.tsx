@@ -54,7 +54,7 @@ import Product from "./pages/products/page";
 import Users from "./pages/users/page";
 import CreateUser from "./pages/users/create/page";
 import Setting from "./pages/settings/page";
-import Company from "./pages/settings/company/page";
+import Company from "./pages/company/page";
 import { ROLES } from "./consts/role";
 
 

@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser, logoutUser } from "@/services/auth.service";
 import { login, logout } from "@/redux/slices/auth-slice";
+import { RootState } from "@/redux/store";
 
 export const useLogin = () => {
   const dispatch = useDispatch();
@@ -25,3 +26,11 @@ export const useLogout = () => {
     },
   });
 };
+
+
+export const useAuth = () => {
+  const {user , token} = useSelector((state: RootState) => state.auth);
+
+  return { user, token, isAuthenticated: !!token , role: user?.role || null };
+
+}
