@@ -1,4 +1,7 @@
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -6,120 +9,150 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { User, Eye, Star } from "lucide-react"
+} from "@/components/ui/card";
+import { User, Star } from "lucide-react";
+import { TextInput } from "@/components/reusable/partials/input";
+import { AxiosError } from "axios";
+import { LoginValidationErrors } from "@/types/response/login";
 
-export function Login() {
+function Login() {
+    const navigate = useNavigate();
+    const [values, setValues] = useState({
+        email: "",
+        password: "",
+    });
+
+    const loginMutation = useLogin();
+
+    const error = loginMutation.error as AxiosError<LoginValidationErrors> | null;
+    const fieldErrors = error?.response?.data?.errors;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setValues((prev) => ({
+            ...prev,
+            [id]: value,
+        }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        loginMutation.mutate(
+            {
+                email: values.email,
+                password: values.password,
+            },
+            {
+                onSuccess: () => {
+                    navigate("/");
+                },
+            }
+        );
+    };
+
     return (
-        // Main container: full-screen, two-column layout on large screens
-        <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-            
-            {/* Left Column (Branding & Image) - Hidden on mobile */}
-            <div className="hidden bg-gray-100 lg:flex lg:flex-col lg:items-start lg:justify-center p-12 space-y-6">
+        <div className="min-h-screen w-full lg:grid lg:grid-cols-2 bg-white dark:bg-gray-950">
+            {/* Left Column */}
+            <div className="hidden lg:flex lg:flex-col lg:items-start lg:justify-center p-12 space-y-6 bg-gray-100 dark:bg-gray-900">
                 <div className="flex items-center gap-2">
-                    <Star className="h-8 w-8 text-purple-600" fill="currentColor" />
-                    <span className="text-3xl font-bold text-purple-600">Inventory</span>
+                    <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" fill="currentColor" />
+                    <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                        Inventory
+                    </span>
                 </div>
-                <h1 className="text-4xl font-bold text-gray-900">
+
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
                     Manage your Inventory
                 </h1>
-                <p className="text-gray-600 text-lg">
+
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
                     តាមដាន និង វិភាគទិន្នន័យលក់តាមរយៈ: trends, ត្រួតពិនិត្យ និង
                     រាយការណ៍ងាយៗដើម្បីបង្កើនប្រសិទ្ធភាពការលក់។
                 </p>
-                <div>
-                    <img 
-                        src="/placeholder-dashboard.png" // <-- REPLACE THIS
-                        alt="Inventory Dashboard Illustration"
-                        width={600}
-                        height={400}
-                        className="object-contain"
-                    />
-                     {/*  */}
-                </div>
+
+                <img
+                    src="/placeholder-dashboard.png"
+                    alt="Inventory Dashboard"
+                    width={600}
+                    height={400}
+                    className="object-contain"
+                />
             </div>
 
-            {/* Right Column (Login Form) */}
+            {/* Right Column */}
             <div className="flex items-center justify-center p-6 sm:p-12">
-                <Card className="w-full max-w-md border-none shadow-none">
-                    <CardHeader className="text-center">
-                        <CardTitle className="text-3xl font-bold">
+                <Card className="w-full max-w-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm">
+                    <CardHeader className="text-center space-y-3">
+                        <CardTitle className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                             Login to your account
                         </CardTitle>
-                        <CardDescription>
+
+                        <CardDescription className="text-gray-600 dark:text-gray-400">
                             Login to your inventory system from following form.
                         </CardDescription>
-                        
-                        {/* Account Information Icon */}
+
                         <div className="flex flex-col items-center pt-4">
-                            <div className="bg-purple-100 text-purple-600 p-3 rounded-full">
+                            <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-3 rounded-full">
                                 <User className="h-6 w-6" />
                             </div>
-                            <p className="mt-2 text-sm font-medium text-gray-700">
+                            <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Account Information
                             </p>
                         </div>
                     </CardHeader>
-                    
+
                     <CardContent>
-                        <form>
-                            <div className="flex flex-col gap-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="email" className="font-semibold">
-                                        Your Email
-                                    </Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="Please fill your email"
-                                        required
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password" className="font-semibold">
-                                        Your Password
-                                    </Label>
-                                    {/* We add a relative container to position
-                                      the 'eye' icon inside the input.
-                                    */}
-                                    <div className="relative">
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            placeholder="Enter your password"
-                                            required
-                                        />
-                                        <Eye className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 cursor-pointer" />
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Note: The <form> tag should ideally wrap the
-                              submit button. I'm placing the buttons in the
-                              footer as per your original structure.
-                              For a real form, you'd wrap the <Button type="submit">
-                              inside the <form>.
-                            */}
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                            <TextInput
+                                id="email"
+                                label="Your Email"
+                                type="email"
+                                placeholder="Please fill your email"
+                                value={values.email}
+                                error={fieldErrors?.email?.[0]}
+                                onChange={handleChange}
+                            />
+
+                            <TextInput
+                                id="password"
+                                label="Your Password"
+                                type="password"
+                                value={values.password}
+                                error={fieldErrors?.password?.[0]}
+                                onChange={handleChange}
+                            />
+
+                            <Button
+                                type="submit"
+                                disabled={loginMutation.isPending}
+                                className="w-full
+                           
+                           text-white flex items-center justify-center gap-2"
+                            >
+                                {loginMutation.isPending && (
+                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                )}
+                                {loginMutation.isPending ? "Logging in..." : "Login to your account"}
+                            </Button>
                         </form>
                     </CardContent>
-                    
+
                     <CardFooter className="flex-col gap-4">
-                        {/* We apply purple background and hover styles
-                          to the primary login button.
-                        */}
-                        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                            Login to your account
+                        <Button
+                            variant="outline"
+                            className="w-full border-gray-300 dark:border-gray-700
+                         text-gray-800 dark:text-gray-200
+                         hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                            Login with Google
                         </Button>
-                        <Button variant="outline" className="w-full">
-                            Login with google
-                        </Button>
-                        
-                        {/* Forgot password link at the bottom */}
+
                         <a
                             href="#"
-                            className="mt-2 inline-block text-sm text-purple-600 hover:underline"
+                            className="mt-2 inline-block text-sm
+                         text-purple-600 dark:text-purple-400
+                         hover:underline"
                         >
                             Forget your password?
                         </a>
@@ -127,5 +160,7 @@ export function Login() {
                 </Card>
             </div>
         </div>
-    )
+    );
 }
+
+export default Login;

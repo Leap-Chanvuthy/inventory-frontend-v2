@@ -4,15 +4,17 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
 
 import themeReducer from './slices/theme-slice'
+import authReducer from './slices/auth-slice'
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['theme'],
+  whitelist: ['theme' , 'auth'],
 }
 
 const rootReducer = combineReducers({
   theme: themeReducer,
+  auth: authReducer,
 })
 
 export type RootReducerState = ReturnType<typeof rootReducer>

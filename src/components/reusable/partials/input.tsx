@@ -12,6 +12,8 @@ type TextInputProps = {
     placeholder?: string
     error?: string
     label?: string
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 type TextAreaInputProps = {
@@ -35,6 +37,8 @@ export const TextInput = ({
     placeholder,
     error,
     label,
+    value,
+    onChange,
 }: TextInputProps) => {
     const [showPassword, setShowPassword] = React.useState(false)
 
@@ -56,6 +60,8 @@ export const TextInput = ({
                     id={id}
                     type={isPassword && showPassword ? "text" : type}
                     placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
                     className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
 
