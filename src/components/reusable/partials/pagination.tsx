@@ -1,131 +1,82 @@
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
-export function GlobalPagination() {
+interface GlobalPaginationProps {
+  currentPage: number;
+  lastPage: number;
+  onPageChange: (page: number) => void;
+}
+
+export function GlobalPagination({ currentPage, lastPage, onPageChange }: GlobalPaginationProps) {
+  const getPages = () => {
+    const pages: (number | string)[] = [];
+    for (let i = 1; i <= lastPage; i++) {
+      // Show all pages if lastPage <= 5
+      if (lastPage <= 5) {
+        pages.push(i);
+      } else {
+        // Always show first, last, current, and neighbors
+        if (i === 1 || i === lastPage || Math.abs(i - currentPage) <= 1) {
+          pages.push(i);
+        } else if (pages[pages.length - 1] !== "...") {
+          pages.push("...");
+        }
+      }
+    }
+    return pages;
+  };
+
+  const pages = getPages();
+
   return (
     <Pagination>
       <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious href="#" />
+        <PaginationItem >
+          <PaginationPrevious
+            onClick={(e) => {
+              e.preventDefault();
+              onPageChange(Math.max(currentPage - 1, 1));
+            }}
+          />
         </PaginationItem>
+
+        {pages.map((page, idx) =>
+          page === "..." ? (
+            <PaginationItem key={idx}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={idx}>
+              <PaginationLink
+                href="#"
+                isActive={page === currentPage}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(Number(page));
+                }}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        )}
+
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#" isActive>
-            2
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationEllipsis />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext
+            onClick={(e) => {
+              e.preventDefault();
+              onPageChange(Math.min(currentPage + 1, lastPage));
+            }}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
-  )
+  );
 }
-
-
-
-// import {
-//   Pagination,
-//   PaginationContent,
-//   PaginationEllipsis,
-//   PaginationItem,
-//   PaginationLink,
-//   PaginationNext,
-//   PaginationPrevious,
-// } from "@/components/ui/pagination"
-
-// type LaravelPaginationMeta = {
-//   current_page: number
-//   last_page: number
-//   per_page: number
-//   total: number
-// }
-
-// interface GlobalPaginationProps {
-//   meta: LaravelPaginationMeta
-//   onPageChange: (page: number) => void
-// }
-
-// export const GlobalPagination = ({ meta, onPageChange }: GlobalPaginationProps) => {
-//   const { current_page, last_page } = meta
-
-//   if (last_page <= 1) return null
-
-//   const getPages = () => {
-//     const pages: (number | "ellipsis")[] = []
-
-//     for (let i = 1; i <= last_page; i++) {
-//       if (
-//         i === 1 ||
-//         i === last_page ||
-//         (i >= current_page - 1 && i <= current_page + 1)
-//       ) {
-//         pages.push(i)
-//       } else if (
-//         i === current_page - 2 ||
-//         i === current_page + 2
-//       ) {
-//         pages.push("ellipsis")
-//       }
-//     }
-
-//     return pages.filter(
-//       (item, index, arr) => item !== "ellipsis" || arr[index - 1] !== "ellipsis"
-//     )
-//   }
-
-//   return (
-//     <Pagination>
-//       <PaginationContent>
-//         {/* Previous */}
-//         <PaginationItem>
-//           <PaginationPrevious
-//             onClick={() => onPageChange(current_page - 1)}
-//             aria-disabled={current_page === 1}
-//             className={current_page === 1 ? "pointer-events-none opacity-50" : ""}
-//           />
-//         </PaginationItem>
-
-//         {/* Page Numbers */}
-//         {getPages().map((page, index) => (
-//           <PaginationItem key={index}>
-//             {page === "ellipsis" ? (
-//               <PaginationEllipsis />
-//             ) : (
-//               <PaginationLink
-//                 isActive={page === current_page}
-//                 onClick={() => onPageChange(page)}
-//               >
-//                 {page}
-//               </PaginationLink>
-//             )}
-//           </PaginationItem>
-//         ))}
-
-//         {/* Next */}
-//         <PaginationItem>
-//           <PaginationNext
-//             onClick={() => onPageChange(current_page + 1)}
-//             aria-disabled={current_page === last_page}
-//             className={current_page === last_page ? "pointer-events-none opacity-50" : ""}
-//           />
-//         </PaginationItem>
-//       </PaginationContent>
-//     </Pagination>
-//   )
-// }

@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -5,69 +6,76 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
-
-import { Badge } from "@/components/ui/badge"
-import { GlobalPagination } from "@/components/reusable/partials/pagination"
-import { TableToolbar } from "@/components/reusable/partials/table-toolbar"
-
-
-const users = [
-  { id: 1, name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", lastLogin: "10 days ago", avatar: "https://i.pravatar.cc/150?u=1" },
-  { id: 2, name: "Bob Williams", email: "bob.w@example.com", role: "Vender", lastLogin: "2 days ago", avatar: "https://i.pravatar.cc/150?u=2" },
-  { id: 3, name: "Charlie Davis", email: "charlie.d@example.com", role: "Stock Controller", lastLogin: "5 minutes ago", avatar: "https://i.pravatar.cc/150?u=3" },
-  { id: 4, name: "Diana Miller", email: "diana.m@example.com", role: "Admin", lastLogin: "10 seconds ago", avatar: "https://i.pravatar.cc/150?u=4" },
-  { id: 5, name: "Eve Brown", email: "eve.b@example.com", role: "Admin", lastLogin: "4 days ago", avatar: "https://i.pravatar.cc/150?u=5" },
-  { id: 6, name: "Frank White", email: "frank.w@example.com", role: "Vender", lastLogin: "20 minutes ago", avatar: "https://i.pravatar.cc/150?u=6" },
-    { id: 1, name: "Alice Johnson", email: "alice.j@example.com", role: "Admin", lastLogin: "10 days ago", avatar: "https://i.pravatar.cc/150?u=1" },
-  { id: 2, name: "Bob Williams", email: "bob.w@example.com", role: "Vender", lastLogin: "2 days ago", avatar: "https://i.pravatar.cc/150?u=2" },
-  { id: 3, name: "Charlie Davis", email: "charlie.d@example.com", role: "Stock Controller", lastLogin: "5 minutes ago", avatar: "https://i.pravatar.cc/150?u=3" },
-]
-
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { GlobalPagination } from "@/components/reusable/partials/pagination";
+import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
+import { useUsers } from "@/api/users/user.query";
+import { User } from "@/api/users/user.types";
 
 const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
-    Admin: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    Vender: "bg-red-500/10 text-red-600 dark:text-red-400",
-    "Stock Controller": "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    ADMIN: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    VENDER: "bg-red-500/10 text-red-600 dark:text-red-400",
+    STOCK_CONTROLLER: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  };
+
+  return <Badge variant="secondary" className={map[role]}>{role}</Badge>;
+};
+
+const FILTER_OPTIONS = [
+  { value: " ", label: "All" },
+  { value: "ADMIN", label: "Admin" },
+  { value: "VENDER", label: "Vender" },
+  { value: "STOCK_CONTROLLER", label: "Stock Controller" },
+];
+
+const SORT_OPTIONS = [
+  { value: "name", label: "Name" },
+  { value: "email", label: "Email" },
+  { value: "-created_at", label: "Newest" },
+];
+
+
+
+export default function UserList() {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string | undefined>();
+  const [sort, setSort] = useState<string | undefined>();
+
+  const params = useMemo(() => ({
+    page,
+    "filter[search]": search || undefined,
+    "filter[role]": roleFilter,
+    sort,
+  }), [page, search, roleFilter, sort]);
+
+  const { data, isLoading, isError } = useUsers(params);
+
+  if (isError) {
+    return (
+      <div>
+        <p className="text-center text-red-500 py-4">Error loading users. Please try again later.</p>
+      </div>
+    )
   }
-
-  return (
-    <Badge variant="secondary" className={map[role]}>
-      {role}
-    </Badge>
-  )
-}
-
-
-export default function UserManagement() {
-  // const [searchTerm, setSearchTerm] = useState("")
 
   return (
     <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Toolbar */}
-        
         <TableToolbar
           searchPlaceholder="Search users..."
-          onSearch={(val) => console.log("Search:", val)}
-          sortOptions={[
-            { value: "name", label: "Name" },
-            { value: "email", label: "Email" },
-            { value: "role", label: "Role" },
-          ]}
-          onSortChange={(values) => console.log("Sort selected:", values)}
-          filterOptions={[
-            { value: "admin", label: "Admin" },
-            { value: "vender", label: "Vender" },
-          ]}
-          onFilterChange={(val) => console.log("Filter selected:", val)}
+          onSearch={setSearch}
+          sortOptions={SORT_OPTIONS}
+          onSortChange={(values) => setSort(values[0])}
+          filterOptions={FILTER_OPTIONS}
+          onFilterChange={(val) => setRoleFilter(val || undefined)}
           createHref="/users/create"
           onCreate={() => console.log("Create clicked")}
           onExport={() => console.log("Export clicked")}
         />
-
 
         {/* Table */}
         <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
@@ -76,35 +84,44 @@ export default function UserManagement() {
               <TableRow>
                 <TableHead className="w-[80px] whitespace-nowrap">Avatar</TableHead>
                 <TableHead className="whitespace-nowrap">Name</TableHead>
-                <TableHead className="whitespace-nowrap">Last Login</TableHead>
+                <TableHead className="whitespace-nowrap">Last Activity</TableHead>
                 <TableHead className="whitespace-nowrap">Email</TableHead>
                 <TableHead className="whitespace-nowrap">Role</TableHead>
-                <TableHead className="w-0">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="whitespace-nowrap">
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-10 w-10 rounded-full border border-border"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium whitespace-nowrap">
-                    {user.name}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">{user.lastLogin}</TableCell>
-                  <TableCell className="text-muted-foreground whitespace-nowrap">
-                    {user.email}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <RoleBadge role={user.role} />
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-4">
+                    Loading...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : data?.data.length ? (
+                data.data.map((user: User, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>
+                      <img
+                        src={user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`}
+                        alt={user.name}
+                        className="h-10 w-10 rounded-full border border-border"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.last_activity || "-"}</TableCell>
+                    <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                    <TableCell>
+                      <RoleBadge role={user.role} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-4">
+                    No users found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -112,10 +129,14 @@ export default function UserManagement() {
         {/* Pagination */}
         <div className="flex justify-center mt-6">
           <div className="flex items-center gap-1 border border-border rounded-lg p-1">
-             <GlobalPagination />
+            <GlobalPagination
+              currentPage={data?.current_page || 1}
+              lastPage={data?.last_page || 1}
+              onPageChange={setPage}
+            />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
