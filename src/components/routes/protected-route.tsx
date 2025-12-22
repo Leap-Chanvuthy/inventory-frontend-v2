@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  // const { token, user } = useSelector((state: RootState) => state.auth);
+  const {user , token} = useAuth();
 
   // 1️⃣ Not logged in
   if (!token) {
