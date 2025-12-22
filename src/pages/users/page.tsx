@@ -1,5 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb"
 import UsersList from "./_components/user-list"
+import UserStat from "./_components/user-state"
 
 const Users = () => {
 
@@ -10,10 +11,10 @@ const Users = () => {
   ]
   return (
     <div>
-      <div className="mb-5">
+      <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-
+      <UserStat />
       <UsersList />
     </div>
   )

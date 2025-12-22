@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, Plus, ArrowUpDown, Download } from "lucide-react";
+import { Search, Plus, ArrowUpDown, Download, X } from "lucide-react";
 
 /* ===================== Types ===================== */
 
@@ -105,6 +105,13 @@ export const TableToolbar = ({
     onFilterChange?.(value);
   };
 
+  const clearShortAndFilter = () => {
+    setFilterValue("");
+    setSortValues([]);
+    onSortChange?.([]);
+    onFilterChange?.("");
+  }
+
   return (
     <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
       {/* LEFT */}
@@ -118,6 +125,9 @@ export const TableToolbar = ({
             placeholder={searchPlaceholder}
             className="pl-9"
           />
+          {searchValue && (
+            <X className="text-red-500 absolute right-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer" onClick={() => setSearchValue("")} />
+          )}
         </div>
 
         {/* Actions */}
@@ -166,6 +176,16 @@ export const TableToolbar = ({
                 ))}
               </SelectContent>
             </Select>
+          )}
+          {(filterValue || sortValues.length > 0) && (
+            <Button
+              variant="outline"
+              className="text-red-500"
+              size="sm"
+              onClick={clearShortAndFilter}
+            >
+              Clear Filter
+            </Button>
           )}
 
           {/* Export */}

@@ -5,6 +5,8 @@ import {
   Search,
   Settings,
   User,
+  Boxes,
+  Warehouse,
   HelpCircle,
 } from "lucide-react";
 import { ROLES , Role } from "./role";
@@ -39,6 +41,23 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/users",
         icon: User,
         roles: [ROLES.ADMIN], // ⛔ ADMIN ONLY
+      },
+    ],
+  },
+  {
+    label: "Catalogs",
+    items: [
+      {
+        title: "Multi Warehouses",
+        url: "/multi-warehouses",
+        icon: Warehouse,
+        roles: [ROLES.ADMIN],
+      },
+      {
+        title: "Categories",
+        url: "/categories",
+        icon: Boxes,
+        roles: [ROLES.ADMIN],
       },
     ],
   },

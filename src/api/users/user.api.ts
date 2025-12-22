@@ -1,4 +1,4 @@
-import { GetUsersParams, GetUsersResponse , User } from "./user.types";
+import { CreateUserPayload, GetUsersParams, GetUsersResponse , User } from "./user.types";
 import { apiClient } from "../client";
 import { BASE_API_URL } from "@/consts/endpoints";
 
@@ -8,7 +8,7 @@ export const getUsers = async (params: GetUsersParams): Promise<GetUsersResponse
   return data.data;
 };
 
-export const createUser = async (payload: FormData): Promise<User> => {
+export const createUser = async (payload: CreateUserPayload): Promise<User> => {
   const { data } = await apiClient.post(
     `${BASE_API_URL}/users`,
     payload,

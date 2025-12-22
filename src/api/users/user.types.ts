@@ -7,6 +7,9 @@ export interface User {
   last_activity: string | null;
   created_at: string;
   updated_at: string;
+  email_verified_at: string | null;
+  ip_address: string | null;
+  devices: number;
 }
 
 export interface GetUsersResponse {
@@ -32,9 +35,9 @@ export interface CreateUserPayload {
     email: string;
     password: string;
     password_confirmation: string;
-    role: 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
-    phone_number?: string;
-    profile_picture?: string;
+    role: string | 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
+    phone_number: string;
+    profile_picture: File | null,
 }
 
 
