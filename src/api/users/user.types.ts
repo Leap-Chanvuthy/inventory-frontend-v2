@@ -24,3 +24,21 @@ export interface GetUsersParams {
   "filter[search]"?: string;
   sort?: string;
 }
+
+
+
+export interface CreateUserPayload {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    role: 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
+    phone_number?: string;
+    profile_picture?: string;
+}
+
+
+export interface CreateUserValidationErrors {
+  message: string;
+  errors?: Record<string, string[]>;
+}

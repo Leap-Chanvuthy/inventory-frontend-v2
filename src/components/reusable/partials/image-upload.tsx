@@ -209,10 +209,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{file ? (file.size / 1024).toFixed(0) : 0} KB • Image</p>
 
             <div className="flex gap-2 mt-4 flex-wrap">
-              <Button variant="outline" size="sm" onClick={() => { setTempPreview(preview); setIsEditModalOpen(true); }} className="flex items-center gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => { setTempPreview(preview); setIsEditModalOpen(true); }} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" /> Edit Image
               </Button>
-              <Button variant="destructive" size="sm" onClick={handleRemove} className="flex items-center gap-2">
+              <Button type="button" variant="destructive" size="sm" onClick={handleRemove} className="flex items-center gap-2">
                 <Trash2 className="w-4 h-4" /> Remove
               </Button>
             </div>
@@ -307,11 +307,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
 
               {/* Footer */}
               <div className="p-4 sm:p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 grid grid-cols-3 gap-2">
-                <Button variant="failure" size="sm" onClick={handleReset} className="flex items-center gap-2">
+                <Button type="button" variant="failure" size="sm" onClick={handleReset} className="flex items-center gap-2">
                   <RotateCw className="w-4 h-4" /> Reset
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-                <Button variant="primary" size="sm" onClick={handleApply} className="flex items-center gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+                <Button type="button" variant="primary" size="sm" onClick={handleApply} className="flex items-center gap-2">
                   <Check className="w-4 h-4" /> Apply
                 </Button>
               </div>
