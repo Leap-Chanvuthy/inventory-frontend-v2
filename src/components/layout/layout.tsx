@@ -3,6 +3,7 @@ import { AppSidebar } from "./app-sidebar";
 import { Outlet } from "react-router-dom";
 import Header from "./header";
 import { ThemeProvider } from "./theme/theme-provider";
+import { Toaster } from "../ui/sonner";
 
 export default function Layout() {
   return (
@@ -13,6 +14,7 @@ export default function Layout() {
         <Header />
         <main className="flex-1 p-5 overflow-y-auto bg-background dark:bg-background-dark">
           <Outlet />
+          <Toaster />
         </main>
       </div>
     </SidebarProvider>

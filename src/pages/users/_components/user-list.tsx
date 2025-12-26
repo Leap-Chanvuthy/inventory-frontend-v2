@@ -12,7 +12,8 @@ import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, SquarePen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -35,6 +36,7 @@ const SORT_OPTIONS = [
   { value: "name", label: "Name" },
   { value: "email", label: "Email" },
   { value: "-created_at", label: "Newest" },
+  { value: "created_at", label: "Oldest" },
 ];
 
 
@@ -109,7 +111,9 @@ export default function UserList() {
                         className="h-10 w-10 rounded-full border border-border"
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell className="font-medium underline">
+                      <Link to={`/users/update/${user.id}`}>{user.name}</Link>
+                    </TableCell>
                     <TableCell>{user.last_activity || "-"}</TableCell>
                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
                     <TableCell>
@@ -120,7 +124,16 @@ export default function UserList() {
                     <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(user.updated_at).toLocaleDateString()}</TableCell>
                     <TableCell>{user.email_verified_at ? <BadgeCheck className="text-blue-400 w-4 h-4" /> : "-"}</TableCell>
-                    <TableCell>{user.email_verified_at ? <BadgeCheck className="text-blue-400 w-4 h-4" /> : "-"}</TableCell>
+                    <TableCell>
+                      <div>
+                        <Link
+                          to={`/users/update/${user.id}`}
+                          className="text-sm"
+                        >
+                          <SquarePen size="15" />
+                        </Link>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (

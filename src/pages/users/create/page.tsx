@@ -4,8 +4,8 @@ import { CreateUserForm } from "../_components/create-user-form"
 const CreateUser = () => {
 
   const breadcrumbItems = [
-    { name: "applications", label: "Applications", link: "/applications" },
-    { name: "users", label: "Users", link: "/applications/users" },
+    { name: "managements", label: "Managements", link: "" },
+    { name: "users", label: "Users", link: "/users" },
     { name: "create-user", label: "Create New User" },
   ]
 

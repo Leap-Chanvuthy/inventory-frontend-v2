@@ -16,6 +16,7 @@ import CreateUser from "./pages/users/create/page";
 import Setting from "./pages/settings/page";
 import Company from "./pages/company/page";
 import { ROLES } from "./consts/role";
+import UpdateUser from "./pages/users/update/page";
 
 
 export default function App() {
@@ -40,8 +41,13 @@ export default function App() {
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
+
+                {/* User Routes */}
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
+                <Route path="/users/update/:id" element={<UpdateUser />} />
+
+
                 <Route path="/settings" element={<Setting />} />
                 <Route path="/company-info" element={<Company />} />
               </Route>

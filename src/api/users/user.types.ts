@@ -1,4 +1,5 @@
 export interface User {
+  id: number;
   name: string;
   phone_number: string | null;
   profile_picture: string | null;
@@ -38,6 +39,14 @@ export interface CreateUserPayload {
     role: string | 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
     phone_number: string;
     profile_picture: File | null,
+}
+
+export interface UpdateUserPayload {
+    name: string;
+    email: string;
+    role: string | 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
+    phone_number: string;
+    profile_picture: File | string | null,
 }
 
 

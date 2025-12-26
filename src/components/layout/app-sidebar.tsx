@@ -4,7 +4,7 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { SIDEBAR_CONFIG } from "../../consts/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarMenuGroup } from "./sidebar-menu";
@@ -13,6 +13,7 @@ import { logout } from "@/redux/slices/auth-slice";
 
 export function AppSidebar() {
   const { user, role } = useAuth();
+  console.log("sidebar user:", user);
   const dispatch = useDispatch();
 
   return (
@@ -52,7 +53,8 @@ export function AppSidebar() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-              <User size={14} />
+              {/* <User size={14} /> */}
+              <img src={user?.profile_picture || ''} alt={user?.name} className="h-8 w-8 rounded-full" />
             </div>
             <div className="text-xs">
               <div className="font-medium">{user?.name}</div>

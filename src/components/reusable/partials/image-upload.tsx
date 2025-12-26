@@ -14,6 +14,7 @@ interface ImageUploadProps {
 export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, onChange }) => {
   const [file, setFile] = useState<File | null>(null); // original uploaded file
   const [preview, setPreview] = useState<string | null>(defaultImage || null); // displayed image
+  const [hasRemovedDefault, setHasRemovedDefault] = useState(false);
   const [tempPreview, setTempPreview] = useState<string | null>(null); // modal temp
   const [isDragging, setIsDragging] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -26,19 +27,46 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+
+  // Preview state
+  useEffect(() => {
+  if (defaultImage && !file && !hasRemovedDefault) {
+    setPreview(defaultImage);
+  }
+}, [defaultImage, file, hasRemovedDefault]);
+
   /* --- Handlers --- */
+  // const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const selectedFile = e.target.files?.[0];
+  //   if (!selectedFile) return;
+  //   setFile(selectedFile);
+  //   const objectUrl = URL.createObjectURL(selectedFile);
+  //   setPreview(objectUrl);
+  //   setTempPreview(objectUrl); // modal temp
+  //   setZoom(1);
+  //   setPosition({ x: 0, y: 0 });
+  //   setIsEditModalOpen(true); // open modal immediately
+  //   if (onChange) onChange(selectedFile);
+  // };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-    setFile(selectedFile);
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-    setTempPreview(objectUrl); // modal temp
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
-    setIsEditModalOpen(true); // open modal immediately
-    if (onChange) onChange(selectedFile);
-  };
+  const selectedFile = e.target.files?.[0];
+  if (!selectedFile) return;
+
+  setHasRemovedDefault(false);
+  setFile(selectedFile);
+
+  const objectUrl = URL.createObjectURL(selectedFile);
+  setPreview(objectUrl);
+  setTempPreview(objectUrl);
+
+  setZoom(1);
+  setPosition({ x: 0, y: 0 });
+  setIsEditModalOpen(true);
+
+  onChange?.(selectedFile);
+};
+
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -55,15 +83,31 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
     if (onChange) onChange(droppedFile);
   };
 
+  // const handleRemove = () => {
+  //   setFile(null);
+  //   setPreview(defaultImage || null);
+  //   setTempPreview(defaultImage || null);
+  //   setZoom(1);
+  //   setPosition({ x: 0, y: 0 });
+  //   if (fileInputRef.current) fileInputRef.current.value = "";
+  //   if (onChange) onChange(null);
+  // };
   const handleRemove = () => {
-    setFile(null);
-    setPreview(defaultImage || null);
-    setTempPreview(defaultImage || null);
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    if (onChange) onChange(null);
-  };
+  setFile(null);
+  setPreview(null);
+  setTempPreview(null);
+  setHasRemovedDefault(true);
+
+  setZoom(1);
+  setPosition({ x: 0, y: 0 });
+
+  if (fileInputRef.current) {
+    fileInputRef.current.value = "";
+  }
+
+  onChange?.(null);
+};
+
 
   const handleReset = () => {
     setZoom(1);
@@ -208,7 +252,22 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
             <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{file?.name}</h4>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{file ? (file.size / 1024).toFixed(0) : 0} KB • Image</p>
 
-            <div className="flex gap-2 mt-4 flex-wrap">
+            {/* <div className="flex gap-2 mt-4 flex-wrap">
+              <Button type="button" variant="outline" size="sm" onClick={() => { setTempPreview(preview); setIsEditModalOpen(true); }} className="flex items-center gap-2">
+                <Edit className="w-4 h-4" /> Edit Image
+              </Button>
+              <Button type="button" variant="destructive" size="sm" onClick={handleRemove} className="flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Remove
+              </Button>
+            </div> */}
+            {defaultImage ? (
+                          <div className="flex gap-2 mt-4 flex-wrap">
+              <Button type="button" variant="destructive" size="sm" onClick={handleRemove} className="flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Remove
+              </Button>
+            </div>
+            ) : (
+                          <div className="flex gap-2 mt-4 flex-wrap">
               <Button type="button" variant="outline" size="sm" onClick={() => { setTempPreview(preview); setIsEditModalOpen(true); }} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" /> Edit Image
               </Button>
@@ -216,6 +275,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
                 <Trash2 className="w-4 h-4" /> Remove
               </Button>
             </div>
+            )}
           </div>
         </div>
       )}
@@ -294,9 +354,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
                     <Crop className="w-4 h-4 text-gray-400 dark:text-gray-300" /> Aspect
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    <Button variant={aspect === "avatar" ? "default" : "outline"} size="sm" onClick={() => setAspect("avatar")}>Avatar</Button>
-                    <Button variant={aspect === "landscape" ? "default" : "outline"} size="sm" onClick={() => setAspect("landscape")}>Landscape</Button>
-                    <Button variant={aspect === "portrait" ? "default" : "outline"} size="sm" onClick={() => setAspect("portrait")}>Portrait</Button>
+                    <Button type="button" variant={aspect === "avatar" ? "default" : "outline"} size="sm" onClick={() => setAspect("avatar")}>Avatar</Button>
+                    <Button type="button" variant={aspect === "landscape" ? "default" : "outline"} size="sm" onClick={() => setAspect("landscape")}>Landscape</Button>
+                    <Button type="button" variant={aspect === "portrait" ? "default" : "outline"} size="sm" onClick={() => setAspect("portrait")}>Portrait</Button>
                   </div>
                 </div>
 
