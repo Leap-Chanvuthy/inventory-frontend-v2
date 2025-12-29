@@ -22,7 +22,11 @@ const RoleBadge = ({ role }: { role: string }) => {
     STOCK_CONTROLLER: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
   };
 
-  return <Badge variant="secondary" className={map[role]}>{role}</Badge>;
+  return (
+    <Badge variant="secondary" className={map[role]}>
+      {role}
+    </Badge>
+  );
 };
 
 const FILTER_OPTIONS = [
@@ -38,8 +42,6 @@ const SORT_OPTIONS = [
   { value: "-created_at", label: "Newest" },
   { value: "created_at", label: "Oldest" },
 ];
-
-
 
 export default function UserList() {
   const {
@@ -69,9 +71,9 @@ export default function UserList() {
           searchPlaceholder="Search users..."
           onSearch={setSearch}
           sortOptions={SORT_OPTIONS}
-          onSortChange={(values) => setSort(values[0])}
+          onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
-          onFilterChange={(val) => setFilter(val || undefined)}
+          onFilterChange={val => setFilter(val || undefined)}
           createHref="/users/create"
         />
 
@@ -79,17 +81,23 @@ export default function UserList() {
         <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px] whitespace-nowrap">Avatar</TableHead>
-                <TableHead className="whitespace-nowrap">Name</TableHead>
-                <TableHead className="whitespace-nowrap">Last Activity</TableHead>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="w-[80px] whitespace-nowrap">
+                  Avatar
+                </TableHead>
+                <TableHead className="whitespace-nowrap py-4">Name</TableHead>
+                <TableHead className="whitespace-nowrap">
+                  Last Activity
+                </TableHead>
                 <TableHead className="whitespace-nowrap">Email</TableHead>
                 <TableHead className="whitespace-nowrap">Role</TableHead>
                 <TableHead className="whitespace-nowrap">IP Address</TableHead>
                 <TableHead className="whitespace-nowrap">Devices</TableHead>
                 <TableHead className="whitespace-nowrap">Created At</TableHead>
                 <TableHead className="whitespace-nowrap">Updated At</TableHead>
-                <TableHead className="whitespace-nowrap">Email Verified</TableHead>
+                <TableHead className="whitespace-nowrap">
+                  Email Verified
+                </TableHead>
                 <TableHead className="whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -106,7 +114,10 @@ export default function UserList() {
                   <TableRow key={idx}>
                     <TableCell>
                       <img
-                        src={user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`}
+                        src={
+                          user.profile_picture ||
+                          `https://i.pravatar.cc/150?u=${user.email}`
+                        }
                         alt={user.name}
                         className="h-10 w-10 rounded-full border border-border"
                       />
@@ -115,15 +126,27 @@ export default function UserList() {
                       <Link to={`/users/update/${user.id}`}>{user.name}</Link>
                     </TableCell>
                     <TableCell>{user.last_activity || "-"}</TableCell>
-                    <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {user.email}
+                    </TableCell>
                     <TableCell>
                       <RoleBadge role={user.role} />
                     </TableCell>
                     <TableCell>{user.ip_address || "-"}</TableCell>
                     <TableCell>{user.devices}</TableCell>
-                    <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(user.updated_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{user.email_verified_at ? <BadgeCheck className="text-blue-400 w-4 h-4" /> : "-"}</TableCell>
+                    <TableCell>
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(user.updated_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {user.email_verified_at ? (
+                        <BadgeCheck className="text-blue-400 w-4 h-4" />
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div>
                         <Link
