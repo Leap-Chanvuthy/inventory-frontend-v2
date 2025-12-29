@@ -1,19 +1,20 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { BadgeCheck, SquarePen } from "lucide-react";
+import { BadgeCheck, SquarePen, Table } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable } from "@/components/reusable/data-table/data-table";
+import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -81,11 +82,11 @@ export default function UserList() {
         <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableRow>
                 <TableHead className="w-[80px] whitespace-nowrap">
                   Avatar
                 </TableHead>
-                <TableHead className="whitespace-nowrap py-4">Name</TableHead>
+                <TableHead className="whitespace-nowrap">Name</TableHead>
                 <TableHead className="whitespace-nowrap">
                   Last Activity
                 </TableHead>
