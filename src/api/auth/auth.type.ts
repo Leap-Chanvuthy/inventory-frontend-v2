@@ -34,3 +34,22 @@ export type LoginValidationErrors = {
   message: string;
   errors?: Record<string, string[]>;
 };
+
+
+
+export interface VerifyEmailPayload {
+    token: string;
+}
+
+
+export interface VerifyEmailSuccessResponse {
+    status: boolean,
+    message: string,
+    data?: null,
+}
+
+export interface VerifyEmailErrorResponse {
+    status: boolean,
+    message: string,
+    errors?: string,
+}

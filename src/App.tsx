@@ -17,6 +17,7 @@ import Setting from "./pages/settings/page";
 import Company from "./pages/company/page";
 import { ROLES } from "./consts/role";
 import UpdateUser from "./pages/users/update/page";
+import VerifyEmail from "./pages/auth/verify-email";
 
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
           
           <Route element={<UnauthicatedRoute />}>
             <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/verify-email" element={<VerifyEmail />} />
           </Route>
 
           {/* Protected Routes (Authenticated Users) */}

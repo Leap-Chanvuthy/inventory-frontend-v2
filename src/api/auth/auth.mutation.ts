@@ -1,9 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser , logoutUser } from "./auth.api";
+import { useDispatch } from "react-redux";
+import { loginUser , logoutUser, verifyEmail } from "./auth.api";
 import { login, logout } from "@/redux/slices/auth-slice";
-import { RootState } from "@/redux/store";
-import { LoginPayload } from "./auth.type";
+import { LoginPayload, VerifyEmailPayload } from "./auth.type";
 
 export const useLogin = () => {
   const dispatch = useDispatch();
@@ -29,9 +28,14 @@ export const useLogout = () => {
 };
 
 
-export const useAuth = () => {
-  const {user , token} = useSelector((state: RootState) => state.auth);
+export const useVerifyEmail = () => {
+  const dispatch = useDispatch();
 
-  return { user, token, isAuthenticated: !!token , role: user?.role || null };
-
+  return useMutation({
+    mutationFn: (payload: VerifyEmailPayload) => {
+      dispatch(logout());
+      return verifyEmail(payload);
+    },
+  });
 }
+
