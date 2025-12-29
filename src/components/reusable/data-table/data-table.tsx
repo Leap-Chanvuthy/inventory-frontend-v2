@@ -81,7 +81,7 @@ export function DataTable<T>({
                 <TableHeader>
                     <TableRow>
                         {hasSelection && (
-                            <TableHead className="w-[40px]">
+                            <TableHead className="w-[40px] whitespace-nowrap">
                                 {isMultiple && (
                                     <Checkbox
                                         checked={!!allSelected}
@@ -92,7 +92,7 @@ export function DataTable<T>({
                         )}
 
                         {columns.map((col) => (
-                            <TableHead key={col.key} className={col.className}>
+                            <TableHead key={col.key} className={`${col.className} whitespace-nowrap`}>
                                 {col.header}
                             </TableHead>
                         ))}

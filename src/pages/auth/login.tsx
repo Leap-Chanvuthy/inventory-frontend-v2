@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin } from "@/api/auth/auth.mutation";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,7 +13,7 @@ import {
 import { User, Star } from "lucide-react";
 import { TextInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
-import { LoginValidationErrors } from "@/types/response/login";
+import { LoginValidationErrors } from "@/api/auth/auth.type";
 
 function Login() {
     const navigate = useNavigate();

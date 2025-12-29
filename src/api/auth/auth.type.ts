@@ -1,6 +1,3 @@
-import { BASE_API_URL } from "@/consts/endpoints";
-import { apiClient } from "./client";
-
 export interface User {
   name: string;
   phone_number: string | null;
@@ -15,6 +12,11 @@ export interface User {
   updated_at: string;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   status: boolean;
   message: string;
@@ -27,16 +29,8 @@ export interface LoginResponse {
   };
 }
 
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
 
-export const login = async (payload: LoginPayload) => {
-  const { data } = await apiClient.post<LoginResponse>(`${BASE_API_URL}/login`, payload);
-  return data; // full response including data.user and data.authorisation
-};
-
-export const logoutApi = async () => {
-  await apiClient.post(`${BASE_API_URL}/logout`);
+export type LoginValidationErrors = {
+  message: string;
+  errors?: Record<string, string[]>;
 };
