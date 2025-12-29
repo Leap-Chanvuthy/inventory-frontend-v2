@@ -92,7 +92,7 @@ export const TableToolbar = ({
   /* ---------- Sort Toggle ---------- */
   const toggleSort = (value: string) => {
     const updated = sortValues.includes(value)
-      ? sortValues.filter((v) => v !== value)
+      ? sortValues.filter(v => v !== value)
       : [...sortValues, value];
 
     setSortValues(updated);
@@ -110,7 +110,7 @@ export const TableToolbar = ({
     setSortValues([]);
     onSortChange?.([]);
     onFilterChange?.("");
-  }
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
@@ -121,12 +121,15 @@ export const TableToolbar = ({
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={e => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
             className="pl-9"
           />
           {searchValue && (
-            <X className="text-red-500 absolute right-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer" onClick={() => setSearchValue("")} />
+            <X
+              className="text-red-500 absolute right-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
+              onClick={() => setSearchValue("")}
+            />
           )}
         </div>
 
@@ -137,13 +140,13 @@ export const TableToolbar = ({
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="h-9 px-3">
+                  <NavigationMenuTrigger className="h-9  px-4 border border-border rounded-md">
                     <ArrowUpDown className="mr-2 h-4 w-4" />
                     Sort
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="p-3 w-56">
                     <div className="space-y-2">
-                      {sortOptions.map((opt) => (
+                      {sortOptions.map(opt => (
                         <label
                           key={opt.value}
                           className="flex items-center gap-2 cursor-pointer"
@@ -169,7 +172,7 @@ export const TableToolbar = ({
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
-                {filterOptions.map((opt) => (
+                {filterOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
