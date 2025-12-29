@@ -1,11 +1,3 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
@@ -14,6 +6,8 @@ import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { BadgeCheck, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DataTable } from "@/components/reusable/data-table/data-table";
+import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 
 const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -37,6 +31,81 @@ const SORT_OPTIONS = [
   { value: "email", label: "Email" },
   { value: "-created_at", label: "Newest" },
   { value: "created_at", label: "Oldest" },
+];
+
+const columns: DataTableColumn<User>[] = [
+  {
+    key: "avatar",
+    header: "Avatar",
+    render: (user) => (
+      <img
+        src={user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`}
+        className="h-10 w-10 rounded-full border"
+      />
+    ),
+  },
+  {
+    key: "name",
+    header: "Name",
+    render: (user) => (
+      <Link
+        to={`/users/update/${user.id}`}
+        className="font-medium underline"
+      >
+        {user.name}
+      </Link>
+    ),
+  },
+  {
+    key: "last_activity",
+    header: "Last Activity",
+    render: (user) => user.last_activity || "-",
+  },
+  {
+    key: "email",
+    header: "Email",
+    render: (user) => (
+      <span className="text-muted-foreground">{user.email}</span>
+    ),
+  },
+  {
+    key: "role",
+    header: "Role",
+    render: (user) => (
+      <RoleBadge role={user.role} />
+    ),
+  },
+  {
+    key: "created_at",
+    header: "Created At",
+    render: (user) =>
+      new Date(user.created_at).toLocaleDateString(),
+  },
+  {
+    key: "updated_at",
+    header: "Updated At",
+    render: (user) =>
+      new Date(user.updated_at).toLocaleDateString(),
+  },
+  {
+    key: "verified",
+    header: "Email Verified",
+    render: (user) =>
+      user.email_verified_at ? (
+        <BadgeCheck className="w-4 h-4 text-blue-400" />
+      ) : (
+        "-"
+      ),
+  },
+  {
+    key: "actions",
+    header: "Actions",
+    render: (user) => (
+      <Link to={`/users/update/${user.id}`}>
+        <SquarePen size={15} />
+      </Link>
+    ),
+  },
 ];
 
 
@@ -75,77 +144,13 @@ export default function UserList() {
           createHref="/users/create"
         />
 
-        {/* Table */}
-        <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px] whitespace-nowrap">Avatar</TableHead>
-                <TableHead className="whitespace-nowrap">Name</TableHead>
-                <TableHead className="whitespace-nowrap">Last Activity</TableHead>
-                <TableHead className="whitespace-nowrap">Email</TableHead>
-                <TableHead className="whitespace-nowrap">Role</TableHead>
-                <TableHead className="whitespace-nowrap">IP Address</TableHead>
-                <TableHead className="whitespace-nowrap">Devices</TableHead>
-                <TableHead className="whitespace-nowrap">Created At</TableHead>
-                <TableHead className="whitespace-nowrap">Updated At</TableHead>
-                <TableHead className="whitespace-nowrap">Email Verified</TableHead>
-                <TableHead className="whitespace-nowrap">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : data?.data.length ? (
-                data.data.map((user: User, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>
-                      <img
-                        src={user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`}
-                        alt={user.name}
-                        className="h-10 w-10 rounded-full border border-border"
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium underline">
-                      <Link to={`/users/update/${user.id}`}>{user.name}</Link>
-                    </TableCell>
-                    <TableCell>{user.last_activity || "-"}</TableCell>
-                    <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                    <TableCell>
-                      <RoleBadge role={user.role} />
-                    </TableCell>
-                    <TableCell>{user.ip_address || "-"}</TableCell>
-                    <TableCell>{user.devices}</TableCell>
-                    <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(user.updated_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{user.email_verified_at ? <BadgeCheck className="text-blue-400 w-4 h-4" /> : "-"}</TableCell>
-                    <TableCell>
-                      <div>
-                        <Link
-                          to={`/users/update/${user.id}`}
-                          className="text-sm"
-                        >
-                          <SquarePen size="15" />
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    No users found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        {/* Data Table */}
+        <DataTable<User>
+          columns={columns}
+          data={data?.data}
+          isLoading={isLoading}
+          emptyText="No users found"
+        />
 
         {/* Pagination */}
         <div className="flex justify-center mt-6">

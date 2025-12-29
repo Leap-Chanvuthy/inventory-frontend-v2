@@ -13,7 +13,6 @@ import { logout } from "@/redux/slices/auth-slice";
 
 export function AppSidebar() {
   const { user, role } = useAuth();
-  console.log("sidebar user:", user);
   const dispatch = useDispatch();
 
   return (
