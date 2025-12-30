@@ -12,7 +12,7 @@ import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { MapPin, Eye, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { StatusBadge } from "../utils/status-warehouser";
+// import { StatusBadge } from "../utils/status-warehouser";
 import { useWarehouses } from "@/api/warehouses/warehouses.query";
 
 // Sort Options
@@ -25,16 +25,18 @@ const SORT_OPTIONS = [
 ];
 
 // Filter Options
-const FILTER_OPTIONS = [
-  { value: " ", label: "All" },
-  { value: "Active", label: "Active" },
-  { value: "Low Stock", label: "Low Stock" },
-  { value: "Full", label: "Full" },
-  { value: "Inactive", label: "Inactive" },
-];
+// const FILTER_OPTIONS = [
+//   { value: " ", label: "All" },
+//   { value: "Active", label: "Active" },
+//   { value: "Low Stock", label: "Low Stock" },
+//   { value: "Full", label: "Full" },
+//   { value: "Inactive", label: "Inactive" },
+// ];
 
 export default function WarehousesList() {
-  const { page, setPage, setSearch, filter, setFilter, apiParams } =
+  // const { page, setPage, setSearch, filter, setFilter, apiParams } =
+  //   useTableQueryParams();
+    const { page, setPage, setSearch, filter, apiParams } =
     useTableQueryParams();
 
   const { data, isLoading, isError } = useWarehouses({

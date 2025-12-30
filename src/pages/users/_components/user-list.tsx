@@ -4,7 +4,7 @@ import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { BadgeCheck, SquarePen, Table } from "lucide-react";
+import { BadgeCheck, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
