@@ -9,7 +9,7 @@ import {
   Warehouse,
   HelpCircle,
 } from "lucide-react";
-import { ROLES , Role } from "./role";
+import { ROLES, Role } from "./role";
 
 export interface SidebarItem {
   title: string;
@@ -48,8 +48,8 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     label: "Catalogs",
     items: [
       {
-        title: "Multi Warehouses",
-        url: "/multi-warehouses",
+        title: "Warehouses",
+        url: "/warehouses",
         icon: Warehouse,
         roles: [ROLES.ADMIN],
       },
@@ -74,8 +74,6 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     ],
   },
   {
-    items: [
-      { title: "Help", url: "/help", icon: HelpCircle },
-    ],
+    items: [{ title: "Help", url: "/help", icon: HelpCircle }],
   },
 ];

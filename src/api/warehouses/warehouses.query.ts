@@ -19,7 +19,7 @@ export const useWarehouses = (params: GetWarehousesParams) => {
   } as UseQueryOptions<PaginatedData<Warehouse>>);
 };
 
-export const useWarehouse = (id: string | number) => {
+export const useSingleWarehouse = (id: string | number) => {
   return useQuery<Warehouse>({
     queryKey: WAREHOUSE_QUERY_KEYS.detail(id),
     queryFn: () => getWarehouse(id),

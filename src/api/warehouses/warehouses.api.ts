@@ -34,5 +34,23 @@ export const createWarehouse = async (
   return data;
 };
 
+export const updateWarehouse = async (
+  id: string | number,
+  payload: CreateWarehousesPayload
+): Promise<CreateWarehouse> => {
+  const { data } = await apiClient.patch(
+    `${BASE_API_URL}/warehouses/${id}`,
+    payload,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
+  return data;
+};
 
+export const deleteWarehouse = async (id: string | number): Promise<void> => {
+  await apiClient.delete(`${BASE_API_URL}/warehouses/${id}`);
+};

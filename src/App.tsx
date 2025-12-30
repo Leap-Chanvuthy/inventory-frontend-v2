@@ -17,8 +17,10 @@ import Setting from "./pages/settings/page";
 import Company from "./pages/company/page";
 import { ROLES } from "./consts/role";
 import UpdateUser from "./pages/users/update/page";
-import Warehouses from "./pages/warehouses/_components/page";
+import Warehouses from "./pages/warehouses/page";
 import ViewWarehouses from "./pages/warehouses/view/page";
+import UpdateWarehouse from "./pages/warehouses/update/page";
+import CreateWarehouses from "./pages/warehouses/create/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -46,14 +48,21 @@ export default function App() {
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
                 <Route path="/users/update/:id" element={<UpdateUser />} />
-
                 {/* Warehouse Routes */}
-
-                <Route path="/multi-warehouses" element={<Warehouses />} />
+                <Route path="/warehouses" element={<Warehouses />} />
                 <Route
-                  path="/multi-warehouses/:id"
+                  path="/warehouses/view/:id"
                   element={<ViewWarehouses />}
                 />
+                <Route
+                  path="/warehouses/update/:id"
+                  element={<UpdateWarehouse />}
+                />
+                <Route
+                  path="/warehouses/create"
+                  element={<CreateWarehouses />}
+                />
+
                 <Route path="/settings" element={<Setting />} />
                 <Route path="/company-info" element={<Company />} />
               </Route>

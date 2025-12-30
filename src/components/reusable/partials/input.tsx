@@ -21,6 +21,8 @@ type TextAreaInputProps = {
     placeholder?: string
     error?: string
     label?: string
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
 type SelectInputProps = {
@@ -96,9 +98,9 @@ export const TextInput = ({
 }
 
 
-export const TextAreaInput = ({ id, placeholder, error, label }: TextAreaInputProps) => {
+export const TextAreaInput = ({ id, placeholder, error, label, value, onChange }: TextAreaInputProps) => {
     return (
-                <div className="space-y-1.5 w-full">
+        <div className="space-y-1.5 w-full">
             {label && (
                 <Label
                     htmlFor={id}
@@ -112,6 +114,8 @@ export const TextAreaInput = ({ id, placeholder, error, label }: TextAreaInputPr
                 <Textarea
                     id={id}
                     placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
                     className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                 />
             </div>

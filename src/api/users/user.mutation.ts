@@ -18,13 +18,10 @@ export const useCreateUser = () => {
     },
 
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to create user"
-      );
+      toast.error(error?.response?.data?.message || "Failed to create user");
     },
   });
 };
-
 
 // export const useUpdateUser = (userId: number) => {
 //   const queryClient = useQueryClient();
@@ -52,8 +49,7 @@ export const useUpdateUser = (userId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateUserPayload) =>
-      updateUser(userId, payload),
+    mutationFn: (payload: UpdateUserPayload) => updateUser(userId, payload),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -68,11 +64,7 @@ export const useUpdateUser = (userId: number) => {
     },
 
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to update user"
-      );
+      toast.error(error?.response?.data?.message || "Failed to update user");
     },
   });
 };
-
-

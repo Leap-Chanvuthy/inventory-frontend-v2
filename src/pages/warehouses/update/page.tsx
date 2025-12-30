@@ -1,15 +1,22 @@
 import { useParams } from "react-router-dom";
-import { ViewWarehouseForm } from "../_components/view-warehouse-form";
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { UpdateWarehouseForm } from "../_components/update-warehouse-form";
+import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
 
-export default function ViewWarehouses() {
+const UpdateWarehouse = () => {
   const { id } = useParams<{ id: string }>();
-
+  const warehouseId = String(id);
+  const { data: warehouse } = useSingleWarehouse(warehouseId);
   const breadcrumbItems = [
     { name: "catalog", label: "Catalog", link: "" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
-    { name: "view-warehouse", label: "View Warehouse" },
+    { name: "update-warehouse", label: "Update Warehouse" },
+    {
+      name: `${warehouse?.warehouse_name || ""}`,
+      label: `${warehouse?.warehouse_name || ""}`,
+    },
   ];
+
   if (!id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -21,7 +28,9 @@ export default function ViewWarehouses() {
   return (
     <div>
       <BreadCrumb items={breadcrumbItems} />
-      <ViewWarehouseForm warehouseId={id} />
+      <UpdateWarehouseForm />
     </div>
   );
-}
+};
+
+export default UpdateWarehouse;
