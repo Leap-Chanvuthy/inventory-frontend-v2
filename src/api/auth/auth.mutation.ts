@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { loginUser , logoutUser, verifyEmail } from "./auth.api";
+import { forgotPassword, loginUser , logoutUser, resetPassword, verifyEmail } from "./auth.api";
 import { login, logout } from "@/redux/slices/auth-slice";
-import { LoginPayload, VerifyEmailPayload } from "./auth.type";
+import { ForgotPasswordPayload, LoginPayload, ResetPasswordPayload, VerifyEmailPayload } from "./auth.type";
 
 export const useLogin = () => {
   const dispatch = useDispatch();
@@ -39,3 +39,18 @@ export const useVerifyEmail = () => {
   });
 }
 
+
+
+export const useForgotPassword = () =>{
+    return useMutation({
+        mutationFn: (payload : ForgotPasswordPayload) => forgotPassword(payload),
+    });
+}
+
+
+
+export const useResetPassword = () => {
+    return useMutation({
+        mutationFn: (payload : ResetPasswordPayload) => resetPassword(payload),
+    });
+}

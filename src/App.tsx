@@ -19,6 +19,9 @@ import { ROLES } from "./consts/role";
 import UpdateUser from "./pages/users/update/page";
 import Warehouses from "./pages/warehouses/_components/page";
 import ViewWarehouses from "./pages/warehouses/view/page";
+import VerifyEmail from "./pages/auth/verify-email";
+import ForgotPassword from "./pages/auth/forgot-password";
+import ResetPassword from "./pages/auth/reset-password";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -33,6 +36,8 @@ export default function App() {
           <Route element={<UnauthicatedRoute />}>
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
           </Route>
 
           {/* Protected Routes (Authenticated Users) */}

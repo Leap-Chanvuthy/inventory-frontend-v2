@@ -53,3 +53,51 @@ export interface VerifyEmailErrorResponse {
     message: string,
     errors?: string,
 }
+
+
+// Forgot Password Types
+export interface ForgotPasswordPayload  {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  status: boolean;
+  message: string;
+  data?: null;
+}
+export interface ForgotPasswordErrorResponse {
+  message: string;
+  errors?: Record<string, string[]>;
+}
+
+
+// Reset Password Types
+export interface ResetPasswordPayload {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+// ...existing code...
+
+export type ResetPasswordSuccessResponse = {
+  status: true;
+  message: string; // "Password reset successful"
+  data: {
+    message: string; // e.g. "Your password has been reset."
+  };
+};
+
+export type ResetPasswordErrorResponse = {
+  status: false;
+  message: string; // "Password reset failed" | "Something went wrong"
+  errors: {
+    error?: string;
+    password?: string[];
+  };
+};
+
+export type ResetPasswordResponse =
+  | ResetPasswordSuccessResponse
+  | ResetPasswordErrorResponse;

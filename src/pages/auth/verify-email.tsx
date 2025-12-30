@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import { VerifyEmailErrorResponse } from "@/api/auth/auth.type";
 import FormContainer from "@/components/reusable/auth/form-container";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { IMAGES } from "@/consts/image";
 
 
 interface VerifyEmailResponse {
@@ -28,7 +29,7 @@ const VerifyEmail = () => {
                 </p>
 
                 <img
-                    src="https://cdni.iconscout.com/illustration/premium/thumb/teenage-girl-verified-account-on-mobile-illustration-svg-download-png-10420934.png"
+                    src={IMAGES.VERIFY_EMAIL}
                     alt="Inventory Dashboard"
                     width={600}
                     height={400}
