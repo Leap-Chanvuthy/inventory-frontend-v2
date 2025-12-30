@@ -1,6 +1,5 @@
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
-import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { MapPin, Eye, SquarePen, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -11,11 +10,11 @@ import { Warehouse } from "@/api/warehouses/warehouses.types";
 
 // Sort Options
 const SORT_OPTIONS = [
-  { value: "warehouse_name", label: "Warehouse Name" },
-  { value: "warehouse_address", label: "Location" },
-  { value: "capacity_units", label: "Capacity" },
+  { value: "warehouse_manager", label: "Manager Name" },
   { value: "-created_at", label: "Newest" },
   { value: "created_at", label: "Oldest" },
+  { value: "-updated_at", label: "Recently Updated" },
+  { value: "updated_at", label: "Least Recently Updated" },
 ];
 
 // Define table columns
@@ -74,7 +73,8 @@ const columns: DataTableColumn<Warehouse>[] = [
 ];
 
 export default function WarehousesList() {
-  const { page, setPage, setSearch, filter, apiParams } = useTableQueryParams();
+  const { page, setPage, setSearch, setSort, filter, apiParams } =
+    useTableQueryParams();
 
   const { data, isLoading, isError } = useWarehouses({
     ...apiParams,
@@ -101,7 +101,7 @@ export default function WarehousesList() {
           searchPlaceholder="Search warehouses...."
           onSearch={setSearch}
           sortOptions={SORT_OPTIONS}
-          onSortChange={() => {}}
+          onSortChange={values => setSort(values[0])}
           createHref="/warehouses/create"
         />
 

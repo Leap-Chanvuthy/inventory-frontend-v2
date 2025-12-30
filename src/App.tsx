@@ -1,14 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
 import Layout from "./components/layout/layout";
 import Login from "./pages/auth/login";
 import NotFound from "./components/layout/404";
 import Forbidden from "./components/layout/403";
 import ProtectedRoute from "./components/routes/protected-route";
 import UnauthicatedRoute from "./components/routes/unauthenticated-route";
-
 import Home from "./pages/home/page";
 import Product from "./pages/products/page";
 import Users from "./pages/users/page";
@@ -21,6 +19,9 @@ import Warehouses from "./pages/warehouses/page";
 import ViewWarehouses from "./pages/warehouses/view/page";
 import UpdateWarehouse from "./pages/warehouses/update/page";
 import CreateWarehouses from "./pages/warehouses/create/page";
+import VerifyEmail from "./pages/auth/verify-email";
+import ForgotPassword from "./pages/auth/forgot-password";
+import ResetPassword from "./pages/auth/reset-password";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -34,6 +35,9 @@ export default function App() {
 
           <Route element={<UnauthicatedRoute />}>
             <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/verify-email" element={<VerifyEmail />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
           </Route>
 
           {/* Protected Routes (Authenticated Users) */}
