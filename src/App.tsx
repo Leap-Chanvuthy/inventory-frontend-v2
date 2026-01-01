@@ -32,12 +32,14 @@ export default function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
-
-          <Route element={<UnauthicatedRoute />}>
-            <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+          
+
+          {/* Unauthenticated Routes */}
+          <Route element={<UnauthicatedRoute />}>
+            <Route path="/auth/login" element={<Login />} />
           </Route>
 
           {/* Protected Routes (Authenticated Users) */}
