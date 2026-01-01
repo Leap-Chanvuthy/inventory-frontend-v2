@@ -25,7 +25,6 @@ export const CreateUserForm = () => {
     profile_picture: null as File | null,
   });
 
-  console.log("Error: ", userMutation.error);
 
   /* ---------- Handlers ---------- */
 

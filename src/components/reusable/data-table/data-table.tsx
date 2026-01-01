@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumn, RowSelection } from "./data-table.type";
+import DataTableLoading from "./data-table-loading";
+import DataTableEmpty from "./data-table-empty";
 
 type DataTableProps<T> = {
     columns: DataTableColumn<T>[];
@@ -102,12 +104,14 @@ export function DataTable<T>({
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                            <TableCell
-                                colSpan={columns.length + (hasSelection ? 1 : 0)}
-                                className="text-center py-6"
-                            >
-                                Loading...
-                            </TableCell>
+                        <TableCell
+                            colSpan={columns.length + (hasSelection ? 1 : 0)}
+                            className="p-0"
+                        >
+                            <div className="flex min-h-[220px] w-full items-center justify-center text-center">
+                            <DataTableLoading />
+                            </div>
+                        </TableCell>
                         </TableRow>
                     ) : data?.length ? (
                         data.map((row, idx) => {
@@ -152,7 +156,7 @@ export function DataTable<T>({
                                 colSpan={columns.length + (hasSelection ? 1 : 0)}
                                 className="text-center py-6"
                             >
-                                {emptyText}
+                                <DataTableEmpty emptyText={emptyText} />
                             </TableCell>
                         </TableRow>
                     )}
