@@ -5,6 +5,8 @@ import storage from 'redux-persist/lib/storage'
 
 import themeReducer from './slices/theme-slice'
 import authReducer from './slices/auth-slice'
+import selectionReducer from './slices/selection-slice';
+
 
 const persistConfig = {
   key: 'root',
@@ -15,6 +17,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   theme: themeReducer,
   auth: authReducer,
+  selection: selectionReducer,
 })
 
 export type RootReducerState = ReturnType<typeof rootReducer>
