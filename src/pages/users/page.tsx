@@ -1,6 +1,7 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb"
 import UsersList from "./_components/user-list"
 import UserStat from "./_components/user-state"
+import MockSelection from "@/components/test/mock-selection"
 
 const Users = () => {
 
@@ -16,6 +17,8 @@ const Users = () => {
       </div>
       <UserStat />
       <UsersList />
+      {/* Mock Selection */}
+      <MockSelection />
     </div>
   )
 }
