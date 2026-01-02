@@ -40,7 +40,7 @@ export const useUpdateWarehouse = (warehouseId: string) => {
       queryClient.invalidateQueries({ queryKey: ["warehouses"] });
       queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
       toast.success("Warehouse updated successfully");
-      navigate("/warehouses");
+      // navigate("/warehouses");
     },
     onError: (error: any) => {
       toast.error(

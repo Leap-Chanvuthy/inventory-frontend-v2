@@ -4,20 +4,7 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState } from "react";
-
-interface CreateWarehouseValidationErrors {
-  errors?: {
-    warehouse_name?: string[];
-    warehouse_manager?: string[];
-    warehouse_manager_contact?: string[];
-    warehouse_manager_email?: string[];
-    warehouse_address?: string[];
-    latitude?: string[];
-    longitude?: string[];
-    warehouse_description?: string[];
-    images?: string[];
-  };
-}
+import { CreateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
 
 export const CreateWarehouseForm = () => {
   const warehouseMutation = useCreateWarehouse();
@@ -53,6 +40,10 @@ export const CreateWarehouseForm = () => {
 
   const handleImagesChange = (files: File[]) => {
     setForm(prev => ({ ...prev, images: files }));
+  };
+
+  const handleLocationSelect = (lat: string, lng: string) => {
+    setForm(prev => ({ ...prev, latitude: lat, longitude: lng }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -181,13 +172,24 @@ export const CreateWarehouseForm = () => {
               />
             </div>
             {/* Warehouse Images */}
-            <div>
-              <MultiImageUpload
-                label="Warehouse Images"
-                onChange={handleImagesChange}
-                maxImages={2}
-              />
+            <div className="flex w-full gap-4">
+              <div className="w-1/2">
+                <MultiImageUpload
+                  label="Warehouse Images"
+                  onChange={handleImagesChange}
+                  maxImages={2}
+                />
+              </div>
+
+              {/* <div className="w-1/2">
+                <MultiImageUpload
+                  label="Warehouse Images"
+                  onChange={handleImagesChange}
+                  maxImages={2}
+                />
+              </div> */}
             </div>
+
             <FormFooterActions isSubmitting={warehouseMutation.isPending} />
           </form>
         </div>

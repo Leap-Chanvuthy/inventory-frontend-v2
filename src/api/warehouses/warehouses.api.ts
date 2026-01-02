@@ -38,9 +38,27 @@ export const updateWarehouse = async (
   id: string | number,
   payload: CreateWarehousesPayload
 ): Promise<CreateWarehouse> => {
-  const { data } = await apiClient.patch(
+
+  const formData = new FormData();
+
+  // Add _method field to emulate PATCH request
+  formData.append("_method", "PATCH");
+
+
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (key === "images" && Array.isArray(value)) {
+      value.forEach(file => {
+        formData.append("images[]", file);
+      });
+    } else if (value !== null && value !== undefined) {
+      formData.append(key, value as string | Blob);
+    }
+  });
+
+  const { data } = await apiClient.post(
     `${BASE_API_URL}/warehouses/${id}`,
-    payload,
+    formData,
     {
       headers: {
         "Content-Type": "multipart/form-data",

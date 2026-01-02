@@ -7,6 +7,11 @@ import { useWarehouses } from "@/api/warehouses/warehouses.query";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Warehouse } from "@/api/warehouses/warehouses.types";
+import { useEffect } from "react";
+
+interface WarehousesListProps {
+  onTotalChange: (total: number) => void;
+}
 
 // Sort Options
 const SORT_OPTIONS = [
@@ -72,7 +77,7 @@ const columns: DataTableColumn<Warehouse>[] = [
   },
 ];
 
-export default function WarehousesList() {
+export default function WarehousesList({ onTotalChange }: WarehousesListProps) {
   const { page, setPage, setSearch, setSort, filter, apiParams } =
     useTableQueryParams();
 
@@ -84,6 +89,13 @@ export default function WarehousesList() {
   const warehouses = data?.data || [];
   const totalPages = data?.last_page || 1;
 
+  /* callback to give quatity of the warehouse to map */
+  useEffect(() => {
+    if (data?.total) {
+      onTotalChange(data.total);
+    }
+  }, [data?.total, onTotalChange]);
+
   if (isError) {
     return (
       <p className="text-center text-red-500">Failed to load warehouses</p>
@@ -91,7 +103,7 @@ export default function WarehousesList() {
   }
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
+    <div className="w-full p-4 sm:p-6 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <h1 className="text-3xl font-bold mb-6">Warehouse Inventory</h1>

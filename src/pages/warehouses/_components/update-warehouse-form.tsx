@@ -5,7 +5,7 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -216,7 +216,7 @@ export const UpdateWarehouseForm = () => {
             <div>
               <MultiImageUpload
                 label="Warehouse Images"
-                defaultImages={defaultImages}
+                defaultImages={defaultImages ?? undefined}
                 onChange={handleImagesChange}
                 maxImages={2}
               />

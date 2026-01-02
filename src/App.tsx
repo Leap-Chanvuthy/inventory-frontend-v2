@@ -22,6 +22,7 @@ import CreateWarehouses from "./pages/warehouses/create/page";
 import VerifyEmail from "./pages/auth/verify-email";
 import ForgotPassword from "./pages/auth/forgot-password";
 import ResetPassword from "./pages/auth/reset-password";
+import "leaflet/dist/leaflet.css";
 
 export default function App() {
   const queryClient = new QueryClient();
