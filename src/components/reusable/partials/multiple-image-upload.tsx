@@ -8,12 +8,16 @@ type AspectType = "avatar" | "landscape" | "portrait";
 interface MultiImageUploadProps {
   label?: string;
   defaultImages?: string[];
+  defaultImageIds?: number[];
   maxImages?: number;
   onChange?: (files: File[]) => void;
+  onDeleteExisting?: (imageId: number) => void;
+  showEdit?: boolean;
 }
 
 interface ImageItem {
   id: string;
+  imageId?: number; // ID of existing image from server
   file: File | null;
   preview: string;
   tempPreview: string;
@@ -25,12 +29,16 @@ interface ImageItem {
 export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   label,
   defaultImages = [],
+  defaultImageIds = [],
   maxImages,
   onChange,
+  onDeleteExisting,
+  showEdit = true,
 }) => {
   const [images, setImages] = useState<ImageItem[]>(() =>
     defaultImages.map((url, idx) => ({
       id: `img-${idx}`,
+      imageId: defaultImageIds[idx], // Track existing image ID
       file: null,
       preview: url,
       tempPreview: url,
@@ -44,6 +52,31 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const dragStart = useRef<Position>({ x: 0, y: 0 });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Update images when defaultImages changes (e.g., when warehouse data loads)
+  useEffect(() => {
+    if (defaultImages.length > 0) {
+      setImages(prev => {
+        // Preserve newly uploaded images (those with file)
+        const uploadedImages = prev.filter(img => img.file !== null);
+
+        // Create image items from defaultImages
+        const existingImages = defaultImages.map((url, idx) => ({
+          id: `img-${idx}`,
+          imageId: defaultImageIds[idx],
+          file: null,
+          preview: url,
+          tempPreview: url,
+          zoom: 1,
+          position: { x: 0, y: 0 },
+          aspect: "avatar" as AspectType,
+        }));
+
+        // Combine existing images from server with newly uploaded images
+        return [...existingImages, ...uploadedImages];
+      });
+    }
+  }, [defaultImages, defaultImageIds]);
 
   // --- Drag pan
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
@@ -193,6 +226,13 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   };
 
   const handleRemove = (index: number) => {
+    const imageToRemove = images[index];
+
+    // If this is an existing image (has imageId), call onDeleteExisting
+    if (imageToRemove.imageId && onDeleteExisting) {
+      onDeleteExisting(imageToRemove.imageId);
+    }
+
     setImages(prev => {
       const copy = [...prev];
       copy.splice(index, 1);
@@ -290,10 +330,13 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
 
             {/* Right: actions */}
             <div className="flex items-center gap-1 mx-5">
-              <Edit
-                className="cursor-pointer w-3 h-3"
-                onClick={() => setEditIndex(index)}
-              />
+              {/* Show edit button only for new uploads (has file) or if showEdit is true globally */}
+              {(img.file || showEdit) && !img.imageId && (
+                <Edit
+                  className="cursor-pointer w-3 h-3"
+                  onClick={() => setEditIndex(index)}
+                />
+              )}
               <Trash2
                 className="cursor-pointer w-3 h-3 text-red-500"
                 onClick={() => handleRemove(index)}

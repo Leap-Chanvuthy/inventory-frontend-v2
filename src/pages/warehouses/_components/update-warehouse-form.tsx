@@ -1,4 +1,7 @@
-import { useUpdateWarehouse } from "@/api/warehouses/warehouses.mutation";
+import {
+  useUpdateWarehouse,
+  useDeleteWarehouseImage,
+} from "@/api/warehouses/warehouses.mutation";
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
@@ -24,8 +27,10 @@ interface UpdateWarehouseValidationErrors {
 export const UpdateWarehouseForm = () => {
   const { id } = useParams<{ id: string }>();
   const warehouseId = String(id);
+  // const navigate = useNavigate();
   const { data: warehouse, isLoading } = useSingleWarehouse(warehouseId);
   const warehouseMutation = useUpdateWarehouse(warehouseId);
+  const deleteImageMutation = useDeleteWarehouseImage(warehouseId);
   const error =
     warehouseMutation.error as AxiosError<UpdateWarehouseValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
@@ -42,6 +47,12 @@ export const UpdateWarehouseForm = () => {
     images: [] as File[],
   });
 
+  // Track existing images and images to delete
+  const [existingImages, setExistingImages] = useState<
+    { id: number; url: string }[]
+  >([]);
+  const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
+
   // Pre-fill form
   useEffect(() => {
     if (warehouse) {
@@ -56,6 +67,11 @@ export const UpdateWarehouseForm = () => {
         warehouse_description: warehouse.warehouse_description || "",
         images: [],
       });
+
+      // Set existing images
+      setExistingImages(
+        warehouse.images?.map(img => ({ id: img.id, url: img.image })) || []
+      );
     }
   }, [warehouse]);
 
@@ -75,8 +91,24 @@ export const UpdateWarehouseForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleDeleteExistingImage = (imageId: number) => {
+    // Remove from existing images
+    setExistingImages(prev => prev.filter(img => img.id !== imageId));
+    // Add to delete list
+    setImagesToDelete(prev => [...prev, imageId]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (imagesToDelete.length > 0) {
+      for (const imageId of imagesToDelete) {
+        // Give the image ID to delete the image first
+        await deleteImageMutation.mutateAsync(imageId);
+      }
+    }
+
+    // Then update the warehouse
     warehouseMutation.mutate(form);
   };
 
@@ -89,9 +121,6 @@ export const UpdateWarehouseForm = () => {
       </div>
     );
   }
-
-  // Image that already exit
-  const defaultImages = warehouse?.images?.map(img => img.image) || [];
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
@@ -216,8 +245,10 @@ export const UpdateWarehouseForm = () => {
             <div>
               <MultiImageUpload
                 label="Warehouse Images"
-                defaultImages={defaultImages ?? undefined}
+                defaultImages={existingImages.map(img => img.url)}
+                defaultImageIds={existingImages.map(img => img.id)}
                 onChange={handleImagesChange}
+                onDeleteExisting={handleDeleteExistingImage}
                 maxImages={2}
               />
             </div>

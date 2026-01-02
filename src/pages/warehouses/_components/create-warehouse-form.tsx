@@ -42,10 +42,6 @@ export const CreateWarehouseForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
-  const handleLocationSelect = (lat: string, lng: string) => {
-    setForm(prev => ({ ...prev, latitude: lat, longitude: lng }));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     warehouseMutation.mutate(form);

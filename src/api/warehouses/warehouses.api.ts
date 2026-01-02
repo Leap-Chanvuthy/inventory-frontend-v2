@@ -38,13 +38,10 @@ export const updateWarehouse = async (
   id: string | number,
   payload: CreateWarehousesPayload
 ): Promise<CreateWarehouse> => {
-
   const formData = new FormData();
 
   // Add _method field to emulate PATCH request
   formData.append("_method", "PATCH");
-
-
 
   Object.entries(payload).forEach(([key, value]) => {
     if (key === "images" && Array.isArray(value)) {
@@ -71,4 +68,13 @@ export const updateWarehouse = async (
 
 export const deleteWarehouse = async (id: string | number): Promise<void> => {
   await apiClient.delete(`${BASE_API_URL}/warehouses/${id}`);
+};
+
+export const deleteWarehouseImage = async (
+  warehouseId: string | number,
+  imageId: string | number
+): Promise<void> => {
+  await apiClient.delete(
+    `${BASE_API_URL}/warehouses/${warehouseId}/images/${imageId}`
+  );
 };
