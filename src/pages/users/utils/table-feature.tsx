@@ -1,6 +1,7 @@
 import { User } from "@/api/users/user.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/utils/date-format";
 import { BadgeCheck, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -72,18 +73,23 @@ export const columns: DataTableColumn<User>[] = [
   {
     key: "created_at",
     header: "Created At",
-    render: user => new Date(user.created_at).toLocaleDateString(),
+    render: user => formatDate(user.created_at),
   },
   {
     key: "updated_at",
     header: "Updated At",
-    render: user => new Date(user.updated_at).toLocaleDateString(),
+    render: user => formatDate(user.updated_at),
   },
   {
-    key: "verified",
-    header: "Email Verified",
+    key: "email_verified_at",
+    header: "Email Verified At",
+    render: user => formatDate(user.email_verified_at),
+  },
+  {
+    key: "verification_status",
+    header: "Verification Status",
     render: user =>
-      user.email_verified_at ? (
+      formatDate(user.email_verified_at) ? (
         <BadgeCheck className="w-4 h-4 text-blue-400" />
       ) : (
         "-"

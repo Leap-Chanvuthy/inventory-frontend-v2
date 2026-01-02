@@ -23,6 +23,7 @@ import { DataTable } from "@/components/reusable/data-table/data-table";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { GlobalPagination } from "../partials/pagination";
 import { TableToolbar } from "../partials/table-toolbar";
+import { useLocation } from "react-router-dom";
 
 type DataSelectionModalProps<T> = {
     // actions
@@ -81,22 +82,22 @@ export function DataSelectionModal<T>({
     onFilterChange,
     createHref,
 }: DataSelectionModalProps<T>) {
+    const path = useLocation().pathname;
     const dispatch = useDispatch();
 
     const selectedItems = useSelector((state: any) =>
         selectSelectedItems(state, scope)
     ) as { id: string; payload: T }[];
 
-    // init scope on open
+    // clean up on unmount or path change
     useEffect(() => {
         if (open) {
             dispatch(initScope({ scope, mode }));
         }
-
         return () => {
             dispatch(clearScope({ scope }));
         };
-    }, [open]);
+    }, [path]);
 
 
     const selectedRows = selectedItems.map(x => x.payload);
@@ -109,7 +110,7 @@ export function DataSelectionModal<T>({
             }}
         >
             <DialogContent
-                className="max-w-5xl p-0"
+                className="max-w-7xl mx-w-[95vw] max-h-[90vh] overflow-y-auto"
                 onPointerDownOutside={e => e.preventDefault()}
                 onEscapeKeyDown={e => e.preventDefault()}
             >

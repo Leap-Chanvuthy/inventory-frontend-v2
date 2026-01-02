@@ -140,7 +140,7 @@ export function DataTable<T>({
                                     {columns.map((col) => (
                                         <TableCell
                                             key={col.key}
-                                            className={col.className}
+                                            className={`${col.className} whitespace-nowrap`}
                                         >
                                             {col.render
                                                 ? col.render(row)
