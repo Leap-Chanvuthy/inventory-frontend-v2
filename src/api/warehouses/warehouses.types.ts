@@ -98,3 +98,17 @@ export interface CreateWarehouseValidationErrors {
     images?: string[];
   };
 }
+
+export interface UpdateWarehouseValidationErrors {
+  errors?: {
+    warehouse_name?: string[];
+    warehouse_manager?: string[];
+    warehouse_manager_contact?: string[];
+    warehouse_manager_email?: string[];
+    warehouse_address?: string[];
+    latitude?: string[];
+    longitude?: string[];
+    warehouse_description?: string[];
+    images?: string[];
+  };
+}

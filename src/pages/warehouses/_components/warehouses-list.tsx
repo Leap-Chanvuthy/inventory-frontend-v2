@@ -10,7 +10,7 @@ import { Warehouse } from "@/api/warehouses/warehouses.types";
 import { useEffect } from "react";
 
 interface WarehousesListProps {
-  onTotalChange: (total: number) => void;
+  onWarehousesChange: (warehouses: Warehouse[]) => void;
 }
 
 // Sort Options
@@ -77,7 +77,9 @@ const columns: DataTableColumn<Warehouse>[] = [
   },
 ];
 
-export default function WarehousesList({ onTotalChange }: WarehousesListProps) {
+export default function WarehousesList({
+  onWarehousesChange,
+}: WarehousesListProps) {
   const { page, setPage, setSearch, setSort, filter, apiParams } =
     useTableQueryParams();
 
@@ -89,12 +91,10 @@ export default function WarehousesList({ onTotalChange }: WarehousesListProps) {
   const warehouses = data?.data || [];
   const totalPages = data?.last_page || 1;
 
-  /* callback to give quatity of the warehouse to map */
+  /* callback to give warehouse data to map */
   useEffect(() => {
-    if (data?.total) {
-      onTotalChange(data.total);
-    }
-  }, [data?.total, onTotalChange]);
+    onWarehousesChange(warehouses);
+  }, [warehouses, onWarehousesChange]);
 
   if (isError) {
     return (

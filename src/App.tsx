@@ -23,6 +23,7 @@ import VerifyEmail from "./pages/auth/verify-email";
 import ForgotPassword from "./pages/auth/forgot-password";
 import ResetPassword from "./pages/auth/reset-password";
 import "leaflet/dist/leaflet.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -33,10 +34,9 @@ export default function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
-            <Route path="/auth/verify-email" element={<VerifyEmail />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
-          
+          <Route path="/auth/verify-email" element={<VerifyEmail />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
 
           {/* Unauthenticated Routes */}
           <Route element={<UnauthicatedRoute />}>

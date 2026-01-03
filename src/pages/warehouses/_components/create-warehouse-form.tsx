@@ -5,6 +5,7 @@ import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { CreateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
+import MapPicker from "@/components/reusable/map-picker/map-picker";
 
 export const CreateWarehouseForm = () => {
   const warehouseMutation = useCreateWarehouse();
@@ -168,8 +169,8 @@ export const CreateWarehouseForm = () => {
               />
             </div>
             {/* Warehouse Images */}
-            <div className="flex w-full gap-4">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row w-full gap-4">
+              <div className="w-full lg:w-1/2">
                 <MultiImageUpload
                   label="Warehouse Images"
                   onChange={handleImagesChange}
@@ -177,13 +178,9 @@ export const CreateWarehouseForm = () => {
                 />
               </div>
 
-              {/* <div className="w-1/2">
-                <MultiImageUpload
-                  label="Warehouse Images"
-                  onChange={handleImagesChange}
-                  maxImages={2}
-                />
-              </div> */}
+              <div className="w-full lg:w-1/2">
+                <MapPicker label="Warehouse Location" />
+              </div>
             </div>
 
             <FormFooterActions isSubmitting={warehouseMutation.isPending} />

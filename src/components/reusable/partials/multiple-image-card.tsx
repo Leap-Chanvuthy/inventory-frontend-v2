@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useRef } from "react";
 
 interface Image {
   id: number | string;
@@ -19,88 +19,72 @@ export const MultipleImageCard = ({
   description,
   className = "",
 }: MultipleImageCardProps) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasImages = images.length > 0;
 
-  const nextImage = () => {
-    setCurrentImageIndex(prev => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex(prev => (prev - 1 + images.length) % images.length);
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
     <div className={`bg-card border border-border rounded-lg p-4 sm:p-6 ${className}`}>
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
         {title}
       </h2>
 
       {hasImages ? (
         <div className="relative">
-          {/* Image Carousel */}
-          <div className="relative aspect-video bg-muted rounded-lg overflow-hidden touch-pan-y">
-            <img
-              src={images[currentImageIndex].image}
-              alt={`Image ${currentImageIndex + 1}`}
-              className="w-full h-full object-cover"
-            />
+          {/* Horizontal Scrolling Carousel */}
+          <div className="relative group">
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 snap-x snap-mandatory"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {images.map((img, index) => (
+                <div
+                  key={img.id}
+                  className="flex-shrink-0 w-40 sm:w-48 lg:w-56 aspect-square rounded-3xl overflow-hidden bg-muted snap-center"
+                >
+                  <img
+                    src={img.image}
+                    alt={`Image ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
 
             {/* Navigation Buttons */}
             {images.length > 1 && (
               <>
                 <button
-                  onClick={prevImage}
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-primary/90 text-primary-foreground rounded-full p-1.5 sm:p-2 hover:bg-primary transition-all shadow-lg"
-                  aria-label="Previous image"
+                  onClick={() => scroll("left")}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-3 sm:p-4 transition-all shadow-lg z-10 opacity-0 group-hover:opacity-100"
+                  aria-label="Scroll left"
                 >
-                  <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" />
                 </button>
                 <button
-                  onClick={nextImage}
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-primary/90 text-primary-foreground rounded-full p-1.5 sm:p-2 hover:bg-primary transition-all shadow-lg"
-                  aria-label="Next image"
+                  onClick={() => scroll("right")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-3 sm:p-4 transition-all shadow-lg z-10 opacity-0 group-hover:opacity-100"
+                  aria-label="Scroll right"
                 >
-                  <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <ChevronRight className="h-6 w-6 sm:h-8 sm:w-8" />
                 </button>
               </>
             )}
-
-            {/* Image Counter */}
-            {images.length > 1 && (
-              <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs sm:text-sm px-2 py-1 rounded-md">
-                {currentImageIndex + 1} / {images.length}
-              </div>
-            )}
           </div>
-
-          {/* Thumbnails */}
-          {images.length > 1 && (
-            <div className="flex gap-2 mt-3 sm:mt-4 overflow-x-auto pb-2 scrollbar-thin">
-              {images.map((img, index) => (
-                <button
-                  key={img.id}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    index === currentImageIndex
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                >
-                  <img
-                    src={img.image}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
 
           {/* Description */}
           {description && (
-            <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4 line-clamp-2">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4">
               {description}
             </p>
           )}

@@ -9,20 +9,7 @@ import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-
-interface UpdateWarehouseValidationErrors {
-  errors?: {
-    warehouse_name?: string[];
-    warehouse_manager?: string[];
-    warehouse_manager_contact?: string[];
-    warehouse_manager_email?: string[];
-    warehouse_address?: string[];
-    latitude?: string[];
-    longitude?: string[];
-    warehouse_description?: string[];
-    images?: string[];
-  };
-}
+import { UpdateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
 
 export const UpdateWarehouseForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +39,7 @@ export const UpdateWarehouseForm = () => {
     { id: number; url: string }[]
   >([]);
   const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
+  const [isDeletingImages, setIsDeletingImages] = useState(false);
 
   // Pre-fill form
   useEffect(() => {
@@ -102,9 +90,14 @@ export const UpdateWarehouseForm = () => {
     e.preventDefault();
 
     if (imagesToDelete.length > 0) {
-      for (const imageId of imagesToDelete) {
-        // Give the image ID to delete the image first
-        await deleteImageMutation.mutateAsync(imageId);
+      setIsDeletingImages(true);
+      try {
+        for (const imageId of imagesToDelete) {
+          // Give the image ID to delete the image first
+          await deleteImageMutation.mutateAsync(imageId);
+        }
+      } finally {
+        setIsDeletingImages(false);
       }
     }
 
@@ -253,7 +246,7 @@ export const UpdateWarehouseForm = () => {
               />
             </div>
 
-            <FormFooterActions isSubmitting={warehouseMutation.isPending} />
+            <FormFooterActions isSubmitting={isDeletingImages || warehouseMutation.isPending} />
           </form>
         </div>
       </div>
