@@ -9,19 +9,11 @@ import { DataTableColumn } from "@/components/reusable/data-table/data-table.typ
 import { Warehouse } from "@/api/warehouses/warehouses.types";
 import { useEffect } from "react";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { SORT_OPTIONS } from "../utils/table-feature";
 
 interface WarehousesListProps {
   onTotalChange: (total: number) => void;
 }
-
-// Sort Options
-const SORT_OPTIONS = [
-  { value: "warehouse_manager", label: "Manager Name" },
-  { value: "-created_at", label: "Newest" },
-  { value: "created_at", label: "Oldest" },
-  { value: "-updated_at", label: "Recently Updated" },
-  { value: "updated_at", label: "Least Recently Updated" },
-];
 
 // Define table columns
 const columns: DataTableColumn<Warehouse>[] = [
