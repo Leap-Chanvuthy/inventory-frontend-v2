@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 type TableQueryConfig = {
   defaultPage?: number;
+  defaultPerPage?: number;
   defaultSearch?: string;
   defaultSort?: string;
   defaultFilter?: string;
@@ -13,6 +14,10 @@ export function useTableQueryParams(config?: TableQueryConfig) {
 
   const [page, setPage] = useState(
     Number(searchParams.get("page")) || config?.defaultPage || 1
+  );
+
+  const [perPage , setPerPage] = useState(
+    Number(searchParams.get("per_page")) || config?.defaultPerPage || 10
   );
 
   const [search, setSearch] = useState(
@@ -33,11 +38,12 @@ export function useTableQueryParams(config?: TableQueryConfig) {
 
     if (search) params.search = search;
     if (page > 1) params.page = String(page);
+    if (perPage && perPage !== (config?.defaultPerPage || 10)) params.per_page = String(perPage);
     if (sort) params.sort = sort;
     if (filter) params.filter = filter;
 
     setSearchParams(params, { replace: true });
-  }, [search, page, sort, filter, setSearchParams]);
+  }, [search, page, perPage, sort, filter, setSearchParams]);
 
   // 📦 API params (memoized)
   const apiParams = useMemo(() => ({
@@ -45,7 +51,8 @@ export function useTableQueryParams(config?: TableQueryConfig) {
     "filter[search]": search || undefined,
     sort,
     filter,
-  }), [page, search, sort, filter]);
+    per_page: perPage,
+  }), [page, search, perPage, sort, filter]);
 
   return {
     // state
@@ -53,12 +60,14 @@ export function useTableQueryParams(config?: TableQueryConfig) {
     search,
     sort,
     filter,
+    perPage,
 
     // setters
     setPage,
     setSearch,
     setSort,
     setFilter,
+    setPerPage,
 
     // api-ready params
     apiParams,
