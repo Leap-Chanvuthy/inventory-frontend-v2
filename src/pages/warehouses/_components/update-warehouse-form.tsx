@@ -8,7 +8,7 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -25,6 +25,7 @@ interface UpdateWarehouseValidationErrors {
 }
 
 export const UpdateWarehouseForm = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const warehouseId = String(id);
   // const navigate = useNavigate();
@@ -101,6 +102,11 @@ export const UpdateWarehouseForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+        const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
     if (imagesToDelete.length > 0) {
       for (const imageId of imagesToDelete) {
         // Give the image ID to delete the image first
@@ -109,7 +115,13 @@ export const UpdateWarehouseForm = () => {
     }
 
     // Then update the warehouse
-    warehouseMutation.mutate(form);
+    warehouseMutation.mutate(form , {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/warehouses");
+        }
+      }
+    });
   };
 
   if (isLoading) {

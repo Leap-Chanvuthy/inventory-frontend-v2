@@ -208,8 +208,8 @@ export const TableToolbar = ({
           {/* request per page */}
           {requestPerPageOptions.length > 0 && (
             <Select value={perPageValue?.toString()} onValueChange={handlePerPageChange}>
-              <SelectTrigger className="w-20 h-9">
-                <SelectValue placeholder="Items" />
+              <SelectTrigger className="w-24 h-9">
+                <SelectValue placeholder="Per Page" />
               </SelectTrigger>
               <SelectContent>
                 {requestPerPageOptions.map(opt => (
@@ -222,7 +222,7 @@ export const TableToolbar = ({
           )}
 
 
-          {(filterValue || sortValues.length > 0 || perPageValue !== 10) && (
+          {(filterValue || sortValues.length > 0) && (
             <Button
               variant="outline"
               className="text-red-500"

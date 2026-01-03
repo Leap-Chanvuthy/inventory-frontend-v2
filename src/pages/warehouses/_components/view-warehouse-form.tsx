@@ -3,6 +3,7 @@ import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { MultipleImageCard } from "@/components/reusable/partials/multiple-image-card";
+import { formatDate } from "@/utils/date-format";
 
 interface ViewWarehouseFormProps {
   warehouseId: string;
@@ -32,22 +33,6 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
     );
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return (
-      date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }) +
-      " " +
-      date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-    );
-  };
 
   return (
     <div className="min-h-screen w-full p-4 sm:p-6 lg:p-8 bg-background">

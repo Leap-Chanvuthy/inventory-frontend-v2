@@ -26,6 +26,7 @@ export interface GetUsersParams {
   "filter[id]"?: number;
   "filter[role]"?: string;
   "filter[search]"?: string;
+  per_page?: number;
   sort?: string;
 }
 
