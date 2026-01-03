@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, Plus, ArrowUpDown, Download, X } from "lucide-react";
+import { Search, ArrowUpDown, Download, X, CirclePlus } from "lucide-react";
 
 /* ===================== Types ===================== */
 
@@ -247,7 +247,7 @@ export const TableToolbar = ({
       {createHref && (
         <Link to={createHref}>
           <Button onClick={onCreate} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
+            <CirclePlus className="h-4 w-4" />
             Create New
           </Button>
         </Link>

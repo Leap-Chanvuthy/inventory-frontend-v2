@@ -20,10 +20,10 @@ export function AppSidebar() {
       {/* Header */}
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center gap-2">
-          <img
+          {/* <img
             src="https://cdn2.vectorstock.com/i/1000x1000/75/61/software-as-a-service-saas-technology-icon-logo-vector-34097561.jpg"
             className="h-8 w-8 rounded-md"
-          />
+          /> */}
           <h1 className="text-lg font-semibold">Inventory</h1>
         </div>
       </SidebarHeader>
