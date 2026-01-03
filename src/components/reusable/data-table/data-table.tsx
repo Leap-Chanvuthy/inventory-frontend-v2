@@ -78,7 +78,7 @@ export function DataTable<T>({
     };
 
     return (
-        <div className="grid grid-cols-1 rounded-lg border border-border overflow-x-auto">
+        <div className="grid grid-cols-1 justify-items-center rounded-lg border border-border overflow-x-auto">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -104,14 +104,14 @@ export function DataTable<T>({
                 <TableBody>
                     {isLoading ? (
                         <TableRow>
-                        <TableCell
-                            colSpan={columns.length + (hasSelection ? 1 : 0)}
-                            className="p-0"
-                        >
-                            <div className="flex min-h-[220px] w-full items-center justify-center text-center">
-                            <DataTableLoading />
-                            </div>
-                        </TableCell>
+                            <TableCell
+                                colSpan={columns.length + (hasSelection ? 1 : 0)}
+                                className="p-0"
+                            >
+                                <div className="flex min-h-[220px] w-full items-center justify-center text-center">
+                                    <DataTableLoading />
+                                </div>
+                            </TableCell>
                         </TableRow>
                     ) : data?.length ? (
                         data.map((row, idx) => {
@@ -140,7 +140,7 @@ export function DataTable<T>({
                                     {columns.map((col) => (
                                         <TableCell
                                             key={col.key}
-                                            className={col.className}
+                                            className={`${col.className} whitespace-nowrap`}
                                         >
                                             {col.render
                                                 ? col.render(row)
