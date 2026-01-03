@@ -8,19 +8,12 @@ import { DataTable } from "@/components/reusable/data-table/data-table";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Warehouse } from "@/api/warehouses/warehouses.types";
 import { useEffect } from "react";
+import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { SORT_OPTIONS } from "../utils/table-feature";
 
 interface WarehousesListProps {
   onWarehousesChange: (warehouses: Warehouse[]) => void;
 }
-
-// Sort Options
-const SORT_OPTIONS = [
-  { value: "warehouse_manager", label: "Manager Name" },
-  { value: "-created_at", label: "Newest" },
-  { value: "created_at", label: "Oldest" },
-  { value: "-updated_at", label: "Recently Updated" },
-  { value: "updated_at", label: "Least Recently Updated" },
-];
 
 // Define table columns
 const columns: DataTableColumn<Warehouse>[] = [
@@ -80,7 +73,7 @@ const columns: DataTableColumn<Warehouse>[] = [
 export default function WarehousesList({
   onWarehousesChange,
 }: WarehousesListProps) {
-  const { page, setPage, setSearch, setSort, filter, apiParams } =
+  const { page, setPage, setPerPage, setSearch, setSort, filter, apiParams } =
     useTableQueryParams();
 
   const { data, isLoading, isError } = useWarehouses({
@@ -115,6 +108,8 @@ export default function WarehousesList({
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           createHref="/warehouses/create"
+          requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+          onPerPageChange={setPerPage}
         />
 
         {/* Table */}

@@ -34,10 +34,21 @@ export type FilterOption = {
   label: string;
 };
 
+export type RequestPerPageOption = {
+  value: number;
+  label: string;
+}
+
 interface TableToolbarProps {
   /* Search */
   searchPlaceholder?: string;
   onSearch: (value: string) => void;
+
+  // request per page
+  requestPerPageOptions?: RequestPerPageOption[];
+  onPerPageChange?: (value: number) => void;
+
+  
 
   /* Sort */
   sortOptions?: SortOption[];
@@ -61,6 +72,10 @@ export const TableToolbar = ({
   searchPlaceholder = "Search...",
   onSearch,
 
+  // request per page
+  requestPerPageOptions = [],
+  onPerPageChange,
+
   sortOptions = [],
   selectedSort = [],
   onSortChange,
@@ -76,6 +91,7 @@ export const TableToolbar = ({
   const [searchValue, setSearchValue] = useState("");
   const [sortValues, setSortValues] = useState<string[]>(selectedSort);
   const [filterValue, setFilterValue] = useState<string>(selectedFilter ?? "");
+  const [perPageValue, setPerPageValue] = useState<number | undefined>(undefined);
 
   /* ---------- Debounced Search ---------- */
   const debouncedSearch = useCallback(
@@ -99,6 +115,12 @@ export const TableToolbar = ({
     onSortChange?.(updated);
   };
 
+  const handlePerPageChange = (value: string) => {
+    const perPage = Number(value);
+    setPerPageValue(perPage);
+    onPerPageChange?.(perPage);
+  }
+
   /* ---------- Filter Change ---------- */
   const handleFilterChange = (value: string) => {
     setFilterValue(value);
@@ -110,6 +132,8 @@ export const TableToolbar = ({
     setSortValues([]);
     onSortChange?.([]);
     onFilterChange?.("");
+    onPerPageChange?.(10);
+    setPerPageValue(10);
   };
 
   return (
@@ -180,7 +204,25 @@ export const TableToolbar = ({
               </SelectContent>
             </Select>
           )}
-          {(filterValue || sortValues.length > 0) && (
+
+          {/* request per page */}
+          {requestPerPageOptions.length > 0 && (
+            <Select value={perPageValue?.toString()} onValueChange={handlePerPageChange}>
+              <SelectTrigger className="w-20 h-9">
+                <SelectValue placeholder="Items" />
+              </SelectTrigger>
+              <SelectContent>
+                {requestPerPageOptions.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value.toString()}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+
+          {(filterValue || sortValues.length > 0 || perPageValue !== 10) && (
             <Button
               variant="outline"
               className="text-red-500"
