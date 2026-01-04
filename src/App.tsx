@@ -24,6 +24,7 @@ import ForgotPassword from "./pages/auth/forgot-password";
 import ResetPassword from "./pages/auth/reset-password";
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import Categories from "./pages/category/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -70,8 +71,8 @@ export default function App() {
                   element={<CreateWarehouses />}
                 />
 
-                <Route path="/settings" element={<Setting />} />
-                <Route path="/company-info" element={<Company />} />
+                {/* Categories */}
+                <Route path="/categories" element={<Categories />} />
               </Route>
             </Route>
           </Route>

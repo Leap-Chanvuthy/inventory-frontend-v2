@@ -225,7 +225,7 @@ export const TableToolbar = ({
           {(filterValue || sortValues.length > 0 || perPageValue !== 10) && (
             <Button
               variant="outline"
-              className="text-red-500"
+              className="text-red-500 h-9"
               size="sm"
               onClick={clearShortAndFilter}
             >
