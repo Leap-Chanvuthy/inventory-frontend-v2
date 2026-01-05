@@ -66,8 +66,8 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     items: [
       { title: "Settings", url: "/settings", icon: Settings },
       {
-        title: "Company Info",
-        url: "/company-info",
+        title: "Company",
+        url: "/company",
         icon: User,
         roles: [ROLES.ADMIN],
       },

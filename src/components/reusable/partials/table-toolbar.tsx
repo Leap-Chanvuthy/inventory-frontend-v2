@@ -222,7 +222,7 @@ export const TableToolbar = ({
           )}
 
 
-          {(filterValue || sortValues.length > 0 || perPageValue !== 10) && (
+          {(filterValue || sortValues.length > 0) && (
             <Button
               variant="outline"
               className="text-red-500 h-9"

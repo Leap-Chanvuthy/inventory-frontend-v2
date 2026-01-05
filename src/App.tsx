@@ -52,10 +52,12 @@ export default function App() {
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
+
                 {/* User Routes */}
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
                 <Route path="/users/update/:id" element={<UpdateUser />} />
+
                 {/* Warehouse Routes */}
                 <Route path="/warehouses" element={<Warehouses />} />
                 <Route
@@ -73,6 +75,13 @@ export default function App() {
 
                 {/* Categories */}
                 <Route path="/categories" element={<Categories />} />
+
+
+
+                {/* Company Settings */}                
+                <Route path="/company" element={<Company />} />
+                <Route path="/settings" element={<Setting />} />
+
               </Route>
             </Route>
           </Route>
