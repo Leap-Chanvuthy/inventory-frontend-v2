@@ -99,7 +99,7 @@ export const CategoryCard = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 mt-12 lg:grid-cols-3 gap-x-24 gap-y-14">
+    <div className="grid grid-cols-1 md:grid-cols-2 mt-12 lg:grid-cols-3 gap-5">
       {data.map((category) => (
         <SingleCard
           key={category.id}

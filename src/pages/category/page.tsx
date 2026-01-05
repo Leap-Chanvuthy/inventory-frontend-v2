@@ -1,6 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import ReusableTabs from "@/components/reusable/partials/tabs";
-import { breadcrumbItems, tabs } from "./data/data";
+import { breadcrumbItems, tabs } from "./utils/tabs";
 
 export default function Categories() {
   return (
@@ -13,7 +13,7 @@ export default function Categories() {
         <ReusableTabs
           name="category-tabs"
           tabs={tabs}
-          defaultValue="raw-material"
+          defaultValue="raw-material-category"
         />
       </div>
     </div>

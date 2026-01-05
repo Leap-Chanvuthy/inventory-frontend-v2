@@ -9,12 +9,12 @@ export const breadcrumbItems = [
 export const tabs = [
   {
     label: "Raw Material Category",
-    value: "raw-material",
+    value: "raw-material-category",
     content: <CategoryList />,
   },
   {
     label: "Product Category",
-    value: "product",
+    value: "product-category",
     content: (
       <div className="p-6 text-center text-muted-foreground">
         Product Category - Coming soon
@@ -23,7 +23,7 @@ export const tabs = [
   },
   {
     label: "Customer Category",
-    value: "customer",
+    value: "customer-category",
     content: (
       <div className="p-6 text-center text-muted-foreground">
         Customer Category - Coming soon

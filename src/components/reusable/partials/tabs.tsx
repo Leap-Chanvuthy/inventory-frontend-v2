@@ -1,7 +1,19 @@
 import React, { useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ReusableTabsProps } from "@/config/types/company-tab-item"
+
+interface TabItem {
+  label: string
+  value: string
+  content: React.ReactNode
+}
+
+interface ReusableTabsProps {
+  name: string
+  tabs: TabItem[]
+  defaultValue?: string
+}
+
 
 const ReusableTabs: React.FC<ReusableTabsProps> = ({ tabs, defaultValue }) => {
   const [searchParams, setSearchParams] = useSearchParams()
