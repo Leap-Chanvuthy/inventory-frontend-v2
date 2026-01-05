@@ -12,7 +12,7 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { SORT_OPTIONS } from "../utils/table-feature";
 
 interface WarehousesListProps {
-  onTotalChange: (total: number) => void;
+  onWarehousesChange: (warehouses: Warehouse[]) => void;
 }
 
 // Define table columns
@@ -70,7 +70,9 @@ const columns: DataTableColumn<Warehouse>[] = [
   },
 ];
 
-export default function WarehousesList({ onTotalChange }: WarehousesListProps) {
+export default function WarehousesList({
+  onWarehousesChange,
+}: WarehousesListProps) {
   const { page, setPage, setPerPage, setSearch, setSort, filter, apiParams } =
     useTableQueryParams();
 
@@ -82,12 +84,10 @@ export default function WarehousesList({ onTotalChange }: WarehousesListProps) {
   const warehouses = data?.data || [];
   const totalPages = data?.last_page || 1;
 
-  /* callback to give quatity of the warehouse to map */
+  /* callback to give warehouse data to map */
   useEffect(() => {
-    if (data?.total) {
-      onTotalChange(data.total);
-    }
-  }, [data?.total, onTotalChange]);
+    onWarehousesChange(warehouses);
+  }, [warehouses, onWarehousesChange]);
 
   if (isError) {
     return (

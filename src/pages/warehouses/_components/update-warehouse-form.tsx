@@ -53,6 +53,7 @@ export const UpdateWarehouseForm = () => {
     { id: number; url: string }[]
   >([]);
   const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
+  const [isDeletingImages, setIsDeletingImages] = useState(false);
 
   // Pre-fill form
   useEffect(() => {
@@ -108,9 +109,14 @@ export const UpdateWarehouseForm = () => {
     const action = submitter?.value;
 
     if (imagesToDelete.length > 0) {
-      for (const imageId of imagesToDelete) {
-        // Give the image ID to delete the image first
-        await deleteImageMutation.mutateAsync(imageId);
+      setIsDeletingImages(true);
+      try {
+        for (const imageId of imagesToDelete) {
+          // Give the image ID to delete the image first
+          await deleteImageMutation.mutateAsync(imageId);
+        }
+      } finally {
+        setIsDeletingImages(false);
       }
     }
 
@@ -265,7 +271,7 @@ export const UpdateWarehouseForm = () => {
               />
             </div>
 
-            <FormFooterActions isSubmitting={warehouseMutation.isPending} />
+            <FormFooterActions isSubmitting={isDeletingImages || warehouseMutation.isPending} />
           </form>
         </div>
       </div>

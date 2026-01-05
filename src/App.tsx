@@ -23,6 +23,8 @@ import VerifyEmail from "./pages/auth/verify-email";
 import ForgotPassword from "./pages/auth/forgot-password";
 import ResetPassword from "./pages/auth/reset-password";
 import "leaflet/dist/leaflet.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import Categories from "./pages/category/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -33,10 +35,9 @@ export default function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
-            <Route path="/auth/verify-email" element={<VerifyEmail />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
-          
+          <Route path="/auth/verify-email" element={<VerifyEmail />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
 
           {/* Unauthenticated Routes */}
           <Route element={<UnauthicatedRoute />}>
@@ -51,10 +52,12 @@ export default function App() {
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
+
                 {/* User Routes */}
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
                 <Route path="/users/update/:id" element={<UpdateUser />} />
+
                 {/* Warehouse Routes */}
                 <Route path="/warehouses" element={<Warehouses />} />
                 <Route
@@ -70,8 +73,15 @@ export default function App() {
                   element={<CreateWarehouses />}
                 />
 
+                {/* Categories */}
+                <Route path="/categories" element={<Categories />} />
+
+
+
+                {/* Company Settings */}                
+                <Route path="/company" element={<Company />} />
                 <Route path="/settings" element={<Setting />} />
-                <Route path="/company-info" element={<Company />} />
+
               </Route>
             </Route>
           </Route>

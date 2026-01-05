@@ -50,18 +50,16 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
 
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const dragStart = useRef<Position>({ x: 0, y: 0 });
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Update images when defaultImages changes (e.g., when warehouse data loads)
+  // Only run this once when component first mounts and data loads
   useEffect(() => {
-    if (defaultImages.length > 0) {
-      setImages(prev => {
-        // Preserve newly uploaded images (those with file)
-        const uploadedImages = prev.filter(img => img.file !== null);
-
-        // Create image items from defaultImages
-        const existingImages = defaultImages.map((url, idx) => ({
+    if (defaultImages.length > 0 && !hasInitialized) {
+      setImages(
+        defaultImages.map((url, idx) => ({
           id: `img-${idx}`,
           imageId: defaultImageIds[idx],
           file: null,
@@ -70,13 +68,11 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           zoom: 1,
           position: { x: 0, y: 0 },
           aspect: "avatar" as AspectType,
-        }));
-
-        // Combine existing images from server with newly uploaded images
-        return [...existingImages, ...uploadedImages];
-      });
+        }))
+      );
+      setHasInitialized(true);
     }
-  }, [defaultImages, defaultImageIds]);
+  }, [defaultImages, defaultImageIds, hasInitialized]);
 
   // --- Drag pan
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>, index: number) => {

@@ -1,45 +1,26 @@
-import { WarehousesMap } from "@/components/reusable/partials/openstreet-map";
-import { useWarehouses } from "@/api/warehouses/warehouses.query";
+import { OpenStreetMap } from "@/components/reusable/partials/openstreet-map";
+import { Warehouse } from "@/api/warehouses/warehouses.types";
 
 interface WarehousesOpenMapProps {
-  totalWarehouses: number;
+  warehouses: Warehouse[];
 }
 
 export default function WarehousesOpenMap({
-  totalWarehouses,
+  warehouses,
 }: WarehousesOpenMapProps) {
-  const { data, isLoading, isError } = useWarehouses({
-    per_page: totalWarehouses,
-  });
-
-  const warehouses = data?.data || [];
-
-  if (isError) {
-    return (
-      <div className="mb-6 mt-8 mx-6">
-        <div className="flex items-center justify-center h-[500px] border rounded-lg bg-muted/10">
-          <p className="text-red-500">Failed to load warehouse locations</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="mb-6 mt-8 mx-6">
-        <div className="flex items-center justify-center h-[500px] border rounded-lg bg-muted/10">
-          <p className="text-muted-foreground">Loading map...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="mb-6 mt-8 mx-6">
-      <WarehousesMap
-        warehouses={warehouses}
+      <OpenStreetMap
         title="Warehouse Locations"
         subtitle="View all active warehouse sites on the map."
+        markers={warehouses.map(w => ({
+          id: w.id,
+          lat: w.latitude,
+          lng: w.longitude,
+          title: w.warehouse_name,
+          description: w.warehouse_address,
+          viewLink: `/warehouses/view/${w.id}`,
+        }))}
       />
     </div>
   );
