@@ -26,6 +26,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import Categories from "./pages/category/page";
 import { CreateCategories } from "./pages/category/create/page";
+import { EditCategories } from "./pages/category/edit/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -53,7 +54,6 @@ export default function App() {
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
-
                 {/* User Routes */}
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
@@ -76,13 +76,18 @@ export default function App() {
 
                 {/* Categories */}
                 <Route path="/categories" element={<Categories />} />
+                <Route
+                  path="/categories/create"
+                  element={<CreateCategories />}
+                />
+                <Route
+                  path="/categories/edit/:id"
+                  element={<EditCategories />}
+                />
 
-
-
-                {/* Company Settings */}                
+                {/* Company Settings */}
                 <Route path="/company" element={<Company />} />
                 <Route path="/settings" element={<Setting />} />
-
               </Route>
             </Route>
           </Route>

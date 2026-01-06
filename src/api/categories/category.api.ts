@@ -27,3 +27,23 @@ export const createRawMaterialCategory = async (
   );
   return response.data;
 };
+
+export const getRawMaterialCategoryById = async (
+  id: number
+): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/raw-material-categories/${id}`
+  );
+  return response.data;
+};
+
+export const updateRawMaterialCategory = async (
+  id: number,
+  data: CreateCategoryRequest
+): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/raw-material-categories/${id}`,
+    data
+  );
+  return response.data;
+};

@@ -1,28 +1,26 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
-
 import { useSingleUser } from "@/api/users/user.query";
 import { useUpdateUser } from "@/api/users/user.mutation";
 import { CreateUserValidationErrors } from "@/api/users/user.types";
-
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { USER_ROLES } from "@/consts/role";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
 import { Info } from "lucide-react";
-
+import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 
 export const UpdateUserForm = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
 
-  const { data: user } = useSingleUser(userId);
+  const { data: user, isError, isLoading } = useSingleUser(userId);
 
   const updateMutation = useUpdateUser(userId);
 
-  const error = updateMutation.error as AxiosError<CreateUserValidationErrors> | null;
+  const error =
+    updateMutation.error as AxiosError<CreateUserValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
 
   const [form, setForm] = useState({
@@ -36,7 +34,7 @@ export const UpdateUserForm = () => {
   useEffect(() => {
     if (!user) return;
 
-    setForm((prev) => ({
+    setForm(prev => ({
       ...prev,
       name: user.name,
       email: user.email,
@@ -48,34 +46,50 @@ export const UpdateUserForm = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setForm((prev) => ({ ...prev, [id]: value }));
+    setForm(prev => ({ ...prev, [id]: value }));
   };
 
   const handleFileChange = (file: File | null) => {
-    setForm((prev) => ({
+    setForm(prev => ({
       ...prev,
       profile_picture: file,
     }));
   };
 
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const submitter = (e.nativeEvent as SubmitEvent)
-      .submitter as HTMLButtonElement | null;
-
-    const action = submitter?.value;
-
-    updateMutation.mutate(form, {
-      onSuccess: () => {
-        if (action === "save_and_close") {
-          navigate("/users");
-        }
-        // save → stay, data auto-refreshed
-      },
-    });
+    updateMutation.mutate(form);
   };
+
+  if (isLoading) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <DataTableLoading />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <p className="text-center text-red-500">
+                Failed to load user data
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
@@ -109,7 +123,9 @@ export const UpdateUserForm = () => {
                     label="Email"
                     placeholder="Enter email address"
                     value={form.email}
-                    error={fieldErrors?.email ? fieldErrors.email[0] : undefined}
+                    error={
+                      fieldErrors?.email ? fieldErrors.email[0] : undefined
+                    }
                     onChange={handleChange}
                   />
 
@@ -119,8 +135,8 @@ export const UpdateUserForm = () => {
                     options={USER_ROLES}
                     value={form.role}
                     error={fieldErrors?.role ? fieldErrors.role[0] : undefined}
-                    onChange={(value) =>
-                      setForm((prev) => ({ ...prev, role: value }))
+                    onChange={value =>
+                      setForm(prev => ({ ...prev, role: value }))
                     }
                   />
                 </div>
@@ -141,17 +157,19 @@ export const UpdateUserForm = () => {
                     id="phone_number"
                     label="Phone Number"
                     onChange={handleChange}
-                    error={fieldErrors?.phone_number ? fieldErrors.phone_number[0] : undefined}
+                    error={
+                      fieldErrors?.phone_number
+                        ? fieldErrors.phone_number[0]
+                        : undefined
+                    }
                     placeholder="Enter phone number"
                     value={form.phone_number}
                   />
                 </div>
-
               </div>
             </div>
 
             <FormFooterActions isSubmitting={updateMutation.isPending} />
-
           </form>
         </div>
       </div>

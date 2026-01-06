@@ -47,6 +47,7 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = (userId: number) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: UpdateUserPayload) => updateUser(userId, payload),
@@ -59,8 +60,8 @@ export const useUpdateUser = (userId: number) => {
       await queryClient.invalidateQueries({
         queryKey: ["users"],
       });
-
       toast.success("User updated successfully");
+      navigate("/users");
     },
 
     onError: (error: any) => {
