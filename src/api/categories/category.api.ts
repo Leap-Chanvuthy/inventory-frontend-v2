@@ -4,6 +4,7 @@ import {
   CategoryResponse,
   CategoryQueryParams,
   RawMaterialCategory,
+  CreateCategoryRequest,
 } from "./category.types";
 
 // Raw Material Categories
@@ -13,6 +14,16 @@ export const getRawMaterialCategories = async (
   const response = await apiClient.get(
     `${BASE_API_URL}/raw-material-categories`,
     { params }
+  );
+  return response.data;
+};
+
+export const createRawMaterialCategory = async (
+  data: CreateCategoryRequest
+): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/raw-material-categories`,
+    data
   );
   return response.data;
 };

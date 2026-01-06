@@ -50,7 +50,10 @@ export const columns: DataTableColumn<User>[] = [
     key: "name",
     header: "Name",
     render: user => (
-      <Link to={`/users/update/${user.id}`} className="font-medium underline whitespace-nowrap">
+      <Link
+        to={`/users/update/${user.id}`}
+        className="font-medium underline whitespace-nowrap"
+      >
         {user.name}
       </Link>
     ),

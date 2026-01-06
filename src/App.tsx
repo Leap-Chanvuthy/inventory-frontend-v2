@@ -25,6 +25,7 @@ import ResetPassword from "./pages/auth/reset-password";
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import Categories from "./pages/category/page";
+import { CreateCategories } from "./pages/category/create/page";
 
 export default function App() {
   const queryClient = new QueryClient();

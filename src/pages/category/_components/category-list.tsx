@@ -7,17 +7,22 @@ import { SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
 interface CategoryListProps {
-  onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
 }
 
-export const CategoryList = ({ onEdit, onDelete }: CategoryListProps) => {
+export const CategoryList = ({ onDelete }: CategoryListProps) => {
   const { setPage, setSearch, setSort, setPerPage, apiParams } =
     useTableQueryParams();
 
-  const { data, isLoading } = useRawMaterialCategories(apiParams);
+  const { data, isLoading, error } = useRawMaterialCategories(apiParams);
 
   const categories = data?.data?.data || [];
+
+  if (error) {
+    return (
+      <p className="text-center text-red-500">Failed to load categories</p>
+    );
+  }
 
   return (
     <div className="mt-8">
@@ -27,7 +32,7 @@ export const CategoryList = ({ onEdit, onDelete }: CategoryListProps) => {
         onSearch={setSearch}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/category/create"
+        createHref="/categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         onPerPageChange={setPerPage}
       />
@@ -37,7 +42,6 @@ export const CategoryList = ({ onEdit, onDelete }: CategoryListProps) => {
         data={categories}
         isLoading={isLoading}
         emptyText="No categories found"
-        onEdit={onEdit}
         onDelete={onDelete}
       />
 

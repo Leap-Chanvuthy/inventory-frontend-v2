@@ -45,3 +45,17 @@ export interface CategoryQueryParams {
   "filter[search]"?: string;
   sort?: string;
 }
+
+// Create Category Request
+export interface CreateCategoryRequest {
+  category_name: string;
+  label_color: string;
+  description: string;
+}
+
+// Validation Errors
+export interface CreateCategoryValidationErrors {
+  status: boolean;
+  message: string;
+  errors?: Record<string, string[]>;
+}
