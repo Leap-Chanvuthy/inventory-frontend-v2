@@ -22,6 +22,7 @@ export const ViewCategories = () => {
   return (
     <div>
       <div className="mx-6 mb-5">
+        
         <BreadCrumb items={breadcrumbItems} />
       </div>{" "}
       {id && <ViewCategoryForm categoryId={id} />}
