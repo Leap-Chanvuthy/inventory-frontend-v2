@@ -2,36 +2,29 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "@/api/auth/auth.mutation";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
 import { TextInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { LoginValidationErrors } from "@/api/auth/auth.type";
 import FormContainer from "@/components/reusable/auth/form-container";
 import SubmitButton from "@/components/reusable/auth/submit-button";
+import { IMAGES } from "@/consts/image";
 
 function Login() {
     return (
         <div className="min-h-screen w-full lg:grid lg:grid-cols-2 bg-white dark:bg-gray-950">
             {/* Left Column */}
             <div className="hidden lg:flex lg:flex-col lg:items-start lg:justify-center p-12 space-y-6 bg-gray-100 dark:bg-gray-900">
-                <div className="flex items-center gap-2">
-                    <Star className="h-8 w-8 text-purple-600 dark:text-purple-400" fill="currentColor" />
-                    <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                        Inventory
-                    </span>
-                </div>
 
                 <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
-                    Manage your Inventory
+                    Login to your account
                 </h1>
 
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
-                    តាមដាន និង វិភាគទិន្នន័យលក់តាមរយៈ: trends, ត្រួតពិនិត្យ និង
-                    រាយការណ៍ងាយៗដើម្បីបង្កើនប្រសិទ្ធភាពការលក់។
+                    Access your inventory management system easily and securely.
                 </p>
 
                 <img
-                    src="/placeholder-dashboard.png"
+                    src={IMAGES.LOGIN}
                     alt="Inventory Dashboard"
                     width={600}
                     height={400}
