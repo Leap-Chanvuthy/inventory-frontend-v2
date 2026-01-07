@@ -24,8 +24,6 @@ export default function UserList() {
     apiParams,
   } = useTableQueryParams();
 
-  console.log("api paras:", apiParams);
-
   const { data, isLoading, isError } = useUsers({
     ...apiParams,
     "filter[role]": filter,
