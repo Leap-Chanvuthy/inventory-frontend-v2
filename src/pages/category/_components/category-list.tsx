@@ -11,7 +11,7 @@ interface CategoryListProps {
 }
 
 export const CategoryList = ({ onDelete }: CategoryListProps) => {
-  const { setPage, setSearch, setSort, setPerPage, apiParams } =
+  const { setPage, setSearch, setSort, setPerPage, perPage , search, apiParams } =
     useTableQueryParams();
 
   const { data, isLoading, error } = useRawMaterialCategories(apiParams);
@@ -31,10 +31,12 @@ export const CategoryList = ({ onDelete }: CategoryListProps) => {
       <TableToolbar
         searchPlaceholder="Search category..."
         onSearch={setSearch}
+        search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
         createHref="/categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+        perPage={perPage}
         onPerPageChange={setPerPage}
       />
 

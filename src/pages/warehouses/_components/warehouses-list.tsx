@@ -15,7 +15,7 @@ interface WarehousesListProps {
 export default function WarehousesList({
   onWarehousesChange,
 }: WarehousesListProps) {
-  const { page, setPage, setPerPage, setSearch, setSort, filter, apiParams } =
+  const { page, setPage, setPerPage, setSearch, setSort, perPage , search , filter, apiParams } =
     useTableQueryParams();
 
   const { data, isLoading, isError } = useWarehouses({
@@ -44,10 +44,12 @@ export default function WarehousesList({
         <TableToolbar
           searchPlaceholder="Search warehouses...."
           onSearch={setSearch}
+          search={search}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           createHref="/warehouses/create"
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+          perPage={perPage}
           onPerPageChange={setPerPage}
         />
 

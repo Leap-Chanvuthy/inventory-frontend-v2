@@ -42,10 +42,12 @@ export type RequestPerPageOption = {
 interface TableToolbarProps {
   /* Search */
   searchPlaceholder?: string;
+  search?: string;
   onSearch: (value: string) => void;
 
   // request per page
   requestPerPageOptions?: RequestPerPageOption[];
+  perPage?: number;
   onPerPageChange?: (value: number) => void;
 
   
@@ -70,10 +72,12 @@ interface TableToolbarProps {
 
 export const TableToolbar = ({
   searchPlaceholder = "Search...",
+  search,
   onSearch,
 
   // request per page
   requestPerPageOptions = [],
+  perPage,
   onPerPageChange,
 
   sortOptions = [],
@@ -88,10 +92,10 @@ export const TableToolbar = ({
   createHref,
   onCreate,
 }: TableToolbarProps) => {
-  const [searchValue, setSearchValue] = useState("");
-  const [sortValues, setSortValues] = useState<string[]>(selectedSort);
+  const [searchValue, setSearchValue] = useState<string>(search || "");
+  const [sortValues, setSortValues] = useState<string[]>(selectedSort || []);
   const [filterValue, setFilterValue] = useState<string>(selectedFilter ?? "");
-  const [perPageValue, setPerPageValue] = useState<number | undefined>(undefined);
+  const [perPageValue, setPerPageValue] = useState<number | undefined>(perPage || undefined);
 
   /* ---------- Debounced Search ---------- */
   const debouncedSearch = useCallback(
@@ -128,6 +132,7 @@ export const TableToolbar = ({
   };
 
   const clearShortAndFilter = () => {
+    setSearchValue("");
     setFilterValue("");
     setSortValues([]);
     onSortChange?.([]);
@@ -144,7 +149,7 @@ export const TableToolbar = ({
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            value={searchValue}
+            value={search || searchValue}
             onChange={e => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
             className="pl-9"
@@ -179,7 +184,7 @@ export const TableToolbar = ({
                             checked={sortValues.includes(opt.value)}
                             onCheckedChange={() => toggleSort(opt.value)}
                           />
-                          <span className="text-sm">{opt.label}</span>
+                          <span className="text-sm">{opt.label == selectedSort[0] ? `${opt.label} (Selected)` : opt.label}</span>
                         </label>
                       ))}
                     </div>
@@ -198,7 +203,7 @@ export const TableToolbar = ({
               <SelectContent>
                 {filterOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
+                    {opt.label == selectedFilter ? `${opt.label} (Selected)` : opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -214,7 +219,7 @@ export const TableToolbar = ({
               <SelectContent>
                 {requestPerPageOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value.toString()}>
-                    {opt.label}
+                    {opt.value == perPage ? `${opt.label} (Selected)` : opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>

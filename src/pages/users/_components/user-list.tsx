@@ -15,10 +15,16 @@ export default function UserList() {
     setSearch,
     setSort,
     setPerPage,
-    filter,
     setFilter,
+    filter,
+    search,
+    perPage,
+    
+    // api ready params
     apiParams,
   } = useTableQueryParams();
+
+  console.log("api paras:", apiParams);
 
   const { data, isLoading, isError } = useUsers({
     ...apiParams,
@@ -37,11 +43,14 @@ export default function UserList() {
         <TableToolbar
           searchPlaceholder="Search users..."
           onSearch={setSearch}
+          search={search}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
+          selectedFilter={filter || ""}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           onPerPageChange={setPerPage}
+          perPage={perPage}
           onFilterChange={val => setFilter(val || undefined)}
           createHref="/users/create"
         />

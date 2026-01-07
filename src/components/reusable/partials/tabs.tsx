@@ -36,6 +36,14 @@ const ReusableTabs: React.FC<ReusableTabsProps> = ({
   const handleTabChange = useCallback(
     (value: string) => {
       const newParams = new URLSearchParams(searchParams);
+
+      // Clear table-related params when switching tabs
+      newParams.delete("search");
+      newParams.delete("page");
+      newParams.delete("per_page");
+      newParams.delete("sort");
+      newParams.delete("filter");
+
       newParams.set("tab", value);
       setSearchParams(newParams, { replace: true });
     },
