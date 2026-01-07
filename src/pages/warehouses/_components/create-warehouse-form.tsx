@@ -6,13 +6,14 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { CreateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
 import MapPicker from "@/components/reusable/map-picker/map-picker";
+import { useNavigate } from "react-router-dom";
 
 export const CreateWarehouseForm = () => {
   const warehouseMutation = useCreateWarehouse();
   const error =
     warehouseMutation.error as AxiosError<CreateWarehouseValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
-
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     warehouse_name: "",
     warehouse_manager: "",
@@ -43,9 +44,22 @@ export const CreateWarehouseForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    warehouseMutation.mutate(form);
+
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
+    warehouseMutation.mutate(form, {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/warehouses");
+        }
+        // save → stay, data auto-refreshed
+      },
+    });
   };
 
   return (

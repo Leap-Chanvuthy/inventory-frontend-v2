@@ -54,7 +54,6 @@ export const useDeleteWarehouseImage = (warehouseId: string) => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
-      // toast.success("Image deleted successfully");
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || "Failed to delete image");

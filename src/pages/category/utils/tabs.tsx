@@ -15,11 +15,7 @@ export const tabs = [
   {
     label: "Product Category",
     value: "product-category",
-    content: (
-      <div className="p-6 text-center text-muted-foreground">
-        Product Category - Coming soon
-      </div>
-    ),
+    content: <CategoryList />,
   },
   {
     label: "Customer Category",

@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createUser, updateUser } from "./user.api";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CreateUserPayload, UpdateUserPayload } from "./user.types";
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: CreateUserPayload) => createUser(payload),
@@ -14,7 +12,6 @@ export const useCreateUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("User created successfully");
-      navigate("/users");
     },
 
     onError: (error: any) => {
@@ -47,7 +44,6 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = (userId: number) => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: UpdateUserPayload) => updateUser(userId, payload),
@@ -61,7 +57,6 @@ export const useUpdateUser = (userId: number) => {
         queryKey: ["users"],
       });
       toast.success("User updated successfully");
-      navigate("/users");
     },
 
     onError: (error: any) => {
