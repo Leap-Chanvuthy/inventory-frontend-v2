@@ -1,7 +1,7 @@
 import { CategoryList } from "../_components/category-list";
 
 export const breadcrumbItems = [
-  { name: "catalog", label: "Catalog", link: "" },
+  { name: "application", label: "Application", link: "/" },
   { name: "category", label: "Category", link: "/category" },
   { name: "list", label: "List of Categories" },
 ];

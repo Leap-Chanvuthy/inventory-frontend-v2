@@ -3,14 +3,16 @@ import { UpdateCategoryForm } from "../_components/update-category-form";
 
 export const EditCategories = () => {
   const breadcrumbItems = [
-    { name: "catalog", label: "Catalog", link: "/" },
+    { name: "application", label: "Application", link: "/" },
     { name: "categories", label: "Category", link: "/categories" },
     { name: "edit-category", label: "Edit Raw Material Category" },
   ];
 
   return (
     <div>
-      <BreadCrumb items={breadcrumbItems} />
+      <div className="mx-6 mb-5">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
       <UpdateCategoryForm />
     </div>
   );

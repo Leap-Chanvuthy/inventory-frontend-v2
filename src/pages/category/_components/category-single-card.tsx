@@ -12,23 +12,25 @@ const SingleCard = ({
 }) => {
   return (
     <div className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
-      {/* Color Circle */}
-      <div className="flex justify-center mb-6">
-        <div
-          className="w-32 h-32 sm:w-40 sm:h-40 rounded-full"
-          style={{ backgroundColor: category.label_color }}
-        />
-      </div>
+      <Link to={`/categories/view/${category.id}`} className="block cursor-pointer">
+        {/* Color Circle */}
+        <div className="flex justify-center mb-6">
+          <div
+            className="w-32 h-32 sm:w-40 sm:h-40 rounded-full"
+            style={{ backgroundColor: category.label_color }}
+          />
+        </div>
 
-      {/* Category Name Label */}
-      <h3 className="text-primary font-semibold text-base sm:text-lg mb-2">
-        {category.category_name}
-      </h3>
+        {/* Category Name Label */}
+        <h3 className="text-primary font-semibold text-base sm:text-lg mb-2">
+          {category.category_name}
+        </h3>
 
-      {/* Category Name Value */}
-      <p className="text-foreground font-bold text-lg sm:text-xl mb-6 line-clamp-2 min-h-[3.5rem]">
-        {category.description}
-      </p>
+        {/* Category Name Value */}
+        <p className="text-foreground font-bold text-lg sm:text-xl mb-6 line-clamp-2 min-h-[3.5rem]">
+          {category.description}
+        </p>
+      </Link>
 
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-border">

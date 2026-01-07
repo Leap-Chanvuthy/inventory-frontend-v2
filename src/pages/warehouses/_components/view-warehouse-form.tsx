@@ -1,15 +1,13 @@
-import { useNavigate } from "react-router-dom";
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
 import { MultipleImageCard } from "@/components/reusable/partials/multiple-image-card";
+import { EditButton } from "@/components/reusable/partials/edit-button";
+import { DeleteButton } from "@/components/reusable/partials/delete-button";
 
 interface ViewWarehouseFormProps {
   warehouseId: string;
 }
 
 export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
-  const navigate = useNavigate();
   const {
     data: warehouse,
     isLoading,
@@ -58,23 +56,8 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
             {warehouse.warehouse_name}
           </h1>
           <div className="flex gap-2 sm:gap-3 flex-shrink-0">
-            <Button
-              variant="default"
-              size="sm"
-              className="flex items-center gap-2 bg-primary sm:size-default"
-              onClick={() => navigate(`/warehouses/update/${warehouseId}`)}
-            >
-              <Pencil className="h-4 w-4" />
-              <span className="hidden sm:inline">Edit</span>
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="flex items-center gap-2 sm:size-default"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Delete</span>
-            </Button>
+            <EditButton editPath={`/warehouses/update/${warehouseId}`} />
+            <DeleteButton />
           </div>
         </div>
 

@@ -8,7 +8,7 @@ const UpdateWarehouse = () => {
   const warehouseId = String(id);
   const { data: warehouse } = useSingleWarehouse(warehouseId);
   const breadcrumbItems = [
-    { name: "catalog", label: "Catalog", link: "" },
+    { name: "application", label: "Application", link: "" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
     { name: "update-warehouse", label: "Update Warehouse" },
     {
@@ -24,7 +24,6 @@ const UpdateWarehouse = () => {
       </div>
     );
   }
-
   return (
     <div>
       <BreadCrumb items={breadcrumbItems} />

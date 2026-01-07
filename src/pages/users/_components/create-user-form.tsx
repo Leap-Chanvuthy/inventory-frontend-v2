@@ -10,7 +10,8 @@ import { useState } from "react";
 
 export const CreateUserForm = () => {
   const userMutation = useCreateUser();
-  const error = userMutation.error as AxiosError<CreateUserValidationErrors> | null;
+  const error =
+    userMutation.error as AxiosError<CreateUserValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
 
   // console.log(fieldErrors);
@@ -25,23 +26,21 @@ export const CreateUserForm = () => {
     profile_picture: null as File | null,
   });
 
-
   /* ---------- Handlers ---------- */
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setForm((prev) => ({ ...prev, [id]: value }));
+    setForm(prev => ({ ...prev, [id]: value }));
   };
 
   const handleFileChange = (file: File | null) => {
-    setForm((prev) => ({ ...prev, profile_picture: file }));
+    setForm(prev => ({ ...prev, profile_picture: file }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     userMutation.mutate(form);
-  }
-
+  };
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
@@ -74,7 +73,9 @@ export const CreateUserForm = () => {
                     label="Email"
                     placeholder="Enter email address"
                     value={form.email}
-                    error={fieldErrors?.email ? fieldErrors.email[0] : undefined}
+                    error={
+                      fieldErrors?.email ? fieldErrors.email[0] : undefined
+                    }
                     onChange={handleChange}
                   />
 
@@ -84,8 +85,8 @@ export const CreateUserForm = () => {
                     options={USER_ROLES}
                     value={form.role}
                     error={fieldErrors?.role ? fieldErrors.role[0] : undefined}
-                    onChange={(value) =>
-                      setForm((prev) => ({ ...prev, role: value }))
+                    onChange={value =>
+                      setForm(prev => ({ ...prev, role: value }))
                     }
                   />
                 </div>
@@ -101,14 +102,16 @@ export const CreateUserForm = () => {
                   />
                 </div>
 
-
-
                 <div className="flex flex-col lg:flex-row gap-3">
                   <TextInput
                     id="phone_number"
                     label="Phone Number"
                     onChange={handleChange}
-                    error={fieldErrors?.phone_number ? fieldErrors.phone_number[0] : undefined}
+                    error={
+                      fieldErrors?.phone_number
+                        ? fieldErrors.phone_number[0]
+                        : undefined
+                    }
                     placeholder="Enter phone number"
                     value={form.phone_number}
                   />
@@ -118,7 +121,11 @@ export const CreateUserForm = () => {
                   <TextInput
                     id="password"
                     type="password"
-                    error={fieldErrors?.password ? fieldErrors.password[0] : undefined}
+                    error={
+                      fieldErrors?.password
+                        ? fieldErrors.password[0]
+                        : undefined
+                    }
                     label="Password"
                     placeholder="Enter password"
                     value={form.password}
@@ -129,7 +136,11 @@ export const CreateUserForm = () => {
                     id="password_confirmation"
                     type="password"
                     label="Confirm Password"
-                    error={fieldErrors?.password_confirmation ? fieldErrors.password_confirmation[0] : undefined}
+                    error={
+                      fieldErrors?.password_confirmation
+                        ? fieldErrors.password_confirmation[0]
+                        : undefined
+                    }
                     placeholder="Re-enter password"
                     value={form.password_confirmation}
                     onChange={handleChange}
@@ -139,7 +150,6 @@ export const CreateUserForm = () => {
             </div>
 
             <FormFooterActions isSubmitting={userMutation.isPending} />
-
           </form>
         </div>
       </div>

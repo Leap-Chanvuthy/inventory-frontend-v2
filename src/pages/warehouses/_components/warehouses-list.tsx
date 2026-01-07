@@ -40,9 +40,6 @@ export default function WarehousesList({
   return (
     <div className="w-full p-4 sm:p-6 bg-background">
       <div className="mx-auto max-w-[1600px]">
-        {/* Header */}
-        <h1 className="text-3xl font-bold mb-6">Warehouse Inventory</h1>
-
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search warehouses...."

@@ -3,14 +3,18 @@ import { CreateCategoryForm } from "../_components/create-category-form";
 
 export const CreateCategories = () => {
   const breadcrumbItems = [
-    { name: "catalog", label: "Catalog", link: "/" },
+    { name: "application", label: "Application", link: "/" },
     { name: "categories", label: "Category", link: "/categories" },
     { name: "create-category", label: "Create a new Raw Material Category" },
   ];
 
   return (
     <div>
-      <BreadCrumb items={breadcrumbItems} />
+      <div className="mx-6 mb-5">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
+
+      {/* Form */}
       <CreateCategoryForm />
     </div>
   );

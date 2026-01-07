@@ -40,7 +40,7 @@ export const CreateCategoryForm = () => {
   };
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
           <h2 className="text-2xl font-semibold mb-2">Create Category</h2>

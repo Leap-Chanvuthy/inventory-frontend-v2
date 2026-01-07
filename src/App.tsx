@@ -26,7 +26,8 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import Categories from "./pages/category/page";
 import { CreateCategories } from "./pages/category/create/page";
-import { EditCategories } from "./pages/category/edit/page";
+import { EditCategories } from "./pages/category/update/page";
+import { ViewCategories } from "./pages/category/view/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -79,6 +80,10 @@ export default function App() {
                 <Route
                   path="/categories/create"
                   element={<CreateCategories />}
+                />
+                <Route
+                  path="/categories/view/:id"
+                  element={<ViewCategories />}
                 />
                 <Route
                   path="/categories/edit/:id"

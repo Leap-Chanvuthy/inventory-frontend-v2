@@ -27,6 +27,7 @@ export const CategoryList = ({ onDelete }: CategoryListProps) => {
   return (
     <div className="mt-8">
       {/* Toolbar */}
+
       <TableToolbar
         searchPlaceholder="Search category..."
         onSearch={setSearch}
