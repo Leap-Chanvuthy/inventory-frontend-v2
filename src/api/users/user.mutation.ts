@@ -11,7 +11,7 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: (payload: CreateUserPayload) => createUser(payload),
 
-    onSuccess: () => {
+    onSuccess: () => { 
       queryClient.invalidateQueries({ queryKey: ["users"] });
       toast.success("User created successfully");
       navigate("/users");
