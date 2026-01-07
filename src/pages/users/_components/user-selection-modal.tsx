@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { DataSelectionModal } from "@/components/reusable/data-modal/data-selection-modal";
-import { columns, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 
 
@@ -44,7 +44,7 @@ export function UserSelectModal() {
                 emptyText="No users found."
                 mode="multiple"
                 data={data?.data}
-                columns={columns}
+                columns={COLUMNS}
                 getRowId={user => user.id}
 
                 // ✅ pagination

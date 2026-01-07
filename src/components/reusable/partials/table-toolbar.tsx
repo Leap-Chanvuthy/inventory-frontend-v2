@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, Plus, ArrowUpDown, Download, X } from "lucide-react";
+import { Search, ArrowUpDown, Download, X, CirclePlus } from "lucide-react";
 
 /* ===================== Types ===================== */
 
@@ -208,8 +208,8 @@ export const TableToolbar = ({
           {/* request per page */}
           {requestPerPageOptions.length > 0 && (
             <Select value={perPageValue?.toString()} onValueChange={handlePerPageChange}>
-              <SelectTrigger className="w-20 h-9">
-                <SelectValue placeholder="Items" />
+              <SelectTrigger className="w-24 h-9">
+                <SelectValue placeholder="Per Page" />
               </SelectTrigger>
               <SelectContent>
                 {requestPerPageOptions.map(opt => (
@@ -247,7 +247,7 @@ export const TableToolbar = ({
       {createHref && (
         <Link to={createHref}>
           <Button onClick={onCreate} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
+            <CirclePlus className="h-4 w-4" />
             Create New
           </Button>
         </Link>

@@ -33,7 +33,7 @@ export const SORT_OPTIONS = [
   { value: "created_at", label: "Oldest" },
 ];
 
-export const columns: DataTableColumn<User>[] = [
+export const COLUMNS: DataTableColumn<User>[] = [
   {
     key: "avatar",
     header: "Avatar",

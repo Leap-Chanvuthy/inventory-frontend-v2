@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { FolderSync, Save, SquareX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Loading from "./loading";
 
 type FormFooterActionsProps = {
   cancelLabel?: string;
@@ -30,12 +32,13 @@ const FormFooterActions = ({
       {/* Cancel */}
       <Button
         type="button"
-        variant="outline"
-        className="w-full sm:w-auto"
+        variant="outline_failure"
+        className="w-full sm:w-auto text-red-500"
         onClick={handleCancel}
         disabled={isSubmitting}
       >
-        {cancelLabel}
+        <SquareX />
+        {isSubmitting ? <Loading /> : cancelLabel}
       </Button>
 
       {/* Save & Close */}
@@ -46,7 +49,8 @@ const FormFooterActions = ({
         className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto"
         disabled={isSubmitting}
       >
-        {saveAndCloseLabel}
+        <FolderSync />
+        {isSubmitting ? <Loading /> : saveAndCloseLabel}
       </Button>
 
       {/* Save */}
@@ -57,7 +61,8 @@ const FormFooterActions = ({
         className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Saving..." : saveLabel}
+        <Save />
+        {isSubmitting ? <Loading /> : saveLabel}
       </Button>
     </div>
   );

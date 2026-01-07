@@ -4,13 +4,11 @@ import {
   updateWarehouse,
   deleteWarehouseImage,
 } from "./warehouses.api";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CreateWarehousesPayload } from "./warehouses.types";
 
 export const useCreateWarehouse = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: CreateWarehousesPayload) => createWarehouse(payload),
@@ -18,7 +16,6 @@ export const useCreateWarehouse = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["warehouses"] });
       toast.success("Warehouse created successfully");
-      navigate("/warehouses");
     },
     onError: (error: any) => {
       toast.error(
@@ -30,7 +27,6 @@ export const useCreateWarehouse = () => {
 
 export const useUpdateWarehouse = (warehouseId: string) => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (payload: CreateWarehousesPayload) =>
@@ -40,7 +36,6 @@ export const useUpdateWarehouse = (warehouseId: string) => {
       queryClient.invalidateQueries({ queryKey: ["warehouses"] });
       queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
       toast.success("Warehouse updated successfully");
-      navigate("/warehouses");
     },
     onError: (error: any) => {
       toast.error(

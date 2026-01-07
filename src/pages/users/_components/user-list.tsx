@@ -4,8 +4,8 @@ import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { DataTable } from "@/components/reusable/data-table/data-table";
-import { UserSelectModal } from "./user-selection-modal";
-import { columns, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
+import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
 
 export default function UserList() {
@@ -14,6 +14,7 @@ export default function UserList() {
     setPage,
     setSearch,
     setSort,
+    setPerPage,
     filter,
     setFilter,
     apiParams,
@@ -31,6 +32,7 @@ export default function UserList() {
   return (
     <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
       <div className="mx-auto max-w-[1600px]">
+
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search users..."
@@ -38,20 +40,19 @@ export default function UserList() {
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
+          requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+          onPerPageChange={setPerPage}
           onFilterChange={val => setFilter(val || undefined)}
           createHref="/users/create"
         />
 
         {/* Data Table */}
         <DataTable<User>
-          columns={columns}
+          columns={COLUMNS}
           data={data?.data}
           isLoading={isLoading}
           emptyText="No users found"
         />
-
-        <UserSelectModal />
-
         {/* Pagination */}
         <div className="flex justify-center mt-6">
           <div className="flex items-center gap-1 border border-border rounded-lg p-1">

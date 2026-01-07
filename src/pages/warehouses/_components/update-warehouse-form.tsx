@@ -8,10 +8,24 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { UpdateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
+import { useNavigate, useParams } from "react-router-dom";
+
+interface UpdateWarehouseValidationErrors {
+  errors?: {
+    warehouse_name?: string[];
+    warehouse_manager?: string[];
+    warehouse_manager_contact?: string[];
+    warehouse_manager_email?: string[];
+    warehouse_address?: string[];
+    latitude?: string[];
+    longitude?: string[];
+    warehouse_description?: string[];
+    images?: string[];
+  };
+}
 
 export const UpdateWarehouseForm = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const warehouseId = String(id);
   // const navigate = useNavigate();
@@ -89,6 +103,11 @@ export const UpdateWarehouseForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+        const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
     if (imagesToDelete.length > 0) {
       setIsDeletingImages(true);
       try {
@@ -102,7 +121,13 @@ export const UpdateWarehouseForm = () => {
     }
 
     // Then update the warehouse
-    warehouseMutation.mutate(form);
+    warehouseMutation.mutate(form , {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/warehouses");
+        }
+      }
+    });
   };
 
   if (isLoading) {
