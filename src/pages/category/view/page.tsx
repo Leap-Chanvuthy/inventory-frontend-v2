@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { ViewCategoryForm } from "../_components/view-category-form";
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { useSingleUser } from "@/api/users/user.query";
 import { useSingleRawMaterialCategory } from "@/api/categories/category.query";
 
 export const ViewCategories = () => {
@@ -21,7 +22,7 @@ export const ViewCategories = () => {
 
   return (
     <div>
-      <div className="mx-6 mb-5">
+      <div className="mx-6 mb-5 ">
         <BreadCrumb items={breadcrumbItems} />
       </div>{" "}
       {id && <ViewCategoryForm categoryId={id} />}
