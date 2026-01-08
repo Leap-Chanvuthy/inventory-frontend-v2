@@ -1,11 +1,11 @@
 import { BASE_API_URL } from "@/consts/endpoints";
-import { apiClient } from "../client";
 import {
   CategoryResponse,
   CategoryQueryParams,
   RawMaterialCategory,
   CreateCategoryRequest,
-} from "./category.types";
+} from "./raw-material-category.types";
+import { apiClient } from "@/api/client";
 
 // Raw Material Categories
 export const getRawMaterialCategories = async (

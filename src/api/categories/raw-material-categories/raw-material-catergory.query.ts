@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getRawMaterialCategories, getRawMaterialCategoryById } from "./category.api";
-import { CategoryQueryParams } from "./category.types";
+import {
+  getRawMaterialCategories,
+  getRawMaterialCategoryById,
+} from "./raw-material-category.api";
+import { CategoryQueryParams } from "./raw-material-category.types";
 
 export const useRawMaterialCategories = (params?: CategoryQueryParams) => {
   return useQuery({

@@ -1,4 +1,4 @@
-import { CategoryList } from "../_components/category-list";
+import { CategoryList } from "../raw-material-category/_components/raw-material-category-list";
 
 export const breadcrumbItems = [
   { name: "application", label: "Application", link: "/" },

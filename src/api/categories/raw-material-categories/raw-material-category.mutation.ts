@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createRawMaterialCategory,
   updateRawMaterialCategory,
-} from "./category.api";
-import { CreateCategoryRequest } from "./category.types";
+} from "./raw-material-category.api";
+import { CreateCategoryRequest } from "./raw-material-category.types";
 import { toast } from "sonner";
 
 export const useCreateRawMaterialCategory = () => {
