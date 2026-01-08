@@ -31,11 +31,11 @@ import { ViewCategories } from "./pages/category/view/page";
 
 export default function App() {
   const queryClient = new QueryClient();
-
+ 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes> 
+        <Routes>  
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
