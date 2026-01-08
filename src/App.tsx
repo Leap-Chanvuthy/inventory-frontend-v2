@@ -30,7 +30,7 @@ import { EditCategories } from "./pages/category/update/page";
 import { ViewCategories } from "./pages/category/view/page";
 
 export default function App() {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient(); 
  
   return (
     <QueryClientProvider client={queryClient}>
