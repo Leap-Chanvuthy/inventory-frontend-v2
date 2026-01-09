@@ -188,7 +188,7 @@ export const CreateWarehouseForm = () => {
                 <MultiImageUpload
                   label="Warehouse Images"
                   onChange={handleImagesChange}
-                  maxImages={2}
+                  maxImages={3}
                 />
               </div>
 

@@ -9,7 +9,7 @@ export const ViewCategories = () => {
   const { data: category } = useSingleRawMaterialCategory(categoryId);
 
   const breadcrumbItems = [
-    { name: "application", label: "Application", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "/" },
     { name: "categories", label: "Categories", link: "/categories" },
     { name: "view-categories", label: "View Categories" },
 

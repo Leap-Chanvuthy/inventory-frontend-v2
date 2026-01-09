@@ -1,5 +1,5 @@
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
-import { MultipleImageCard } from "@/components/reusable/partials/multiple-image-card";
+import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { EditButton } from "@/components/reusable/partials/edit-button";
 import { DeleteButton } from "@/components/reusable/partials/delete-button";
 import { formatDate } from "@/utils/date-format";
@@ -49,11 +49,21 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Warehouse Images */}
-          <MultipleImageCard
-            images={warehouse.images}
-            title="Warehouse Images"
-            description={warehouse.warehouse_address}
-          />
+          <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
+              Warehouse Images
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {warehouse.warehouse_address}
+            </p>
+            <HorizontalImageScroll
+              images={warehouse.images}
+              imageWidth="450px"
+              imageHeight="300px"
+              gap="1.5rem"
+              emptyMessage="No images available"
+            />
+          </div>
 
           {/* Warehouse Information */}
           <div className="bg-card border border-border rounded-lg p-4 sm:p-6">

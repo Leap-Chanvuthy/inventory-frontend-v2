@@ -6,7 +6,7 @@ import { Warehouse } from "@/api/warehouses/warehouses.types";
 
 export default function Warehouses() {
   const breadcrumbItems = [
-    { name: "application", label: "Application", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "/" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
     { name: "list", label: "List of Warehouses" },
   ];

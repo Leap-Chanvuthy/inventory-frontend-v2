@@ -3,7 +3,7 @@ import { CreateWarehouseForm } from "../_components/create-warehouse-form";
 
 const CreateWarehouses = () => {
   const breadcrumbItems = [
-    { name: "application", label: "Application", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "/" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
     { name: "create-warehouse", label: "Create a new Warehouse" },
   ];

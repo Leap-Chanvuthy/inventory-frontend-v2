@@ -267,7 +267,7 @@ export const UpdateWarehouseForm = () => {
                 defaultImageIds={existingImages.map(img => img.id)}
                 onChange={handleImagesChange}
                 onDeleteExisting={handleDeleteExistingImage}
-                maxImages={2}
+                maxImages={3}
               />
             </div>
 

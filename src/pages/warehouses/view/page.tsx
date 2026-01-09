@@ -9,7 +9,7 @@ export default function ViewWarehouses() {
   const { data: warehouse } = useSingleWarehouse(warehouseId);
 
   const breadcrumbItems = [
-    { name: "application", label: "Application", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "/" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
     { name: "view-warehouse", label: "View Warehouse" },
     {
