@@ -8,6 +8,7 @@ import {
   Boxes,
   Warehouse,
   HelpCircle,
+  Truck,
 } from "lucide-react";
 import { ROLES, Role } from "./role";
 
@@ -41,6 +42,12 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/users",
         icon: User,
         roles: [ROLES.ADMIN], // ⛔ ADMIN ONLY
+      },
+      {
+        title: "Supplier",
+        url: "/supplier",
+        icon: Truck,
+        roles: [ROLES.ADMIN],
       },
     ],
   },
