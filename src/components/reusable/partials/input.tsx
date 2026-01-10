@@ -10,6 +10,7 @@ type TextInputProps = {
     type?: "text" | "email" | "password" | "tel" | "number"
     id?: string
     placeholder?: string
+    required?: boolean
     error?: string
     label?: string
     value?: string
@@ -39,6 +40,7 @@ export const TextInput = ({
     type = "text",
     id,
     placeholder,
+    required,
     error,
     label,
     value,
@@ -56,6 +58,7 @@ export const TextInput = ({
                     className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
                 >
                     {label}
+                    {required && <span className="text-red-500">*</span>}
                 </Label>
             )}
 

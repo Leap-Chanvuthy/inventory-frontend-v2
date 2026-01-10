@@ -85,6 +85,7 @@ export const CreateUserForm = () => {
                     id="email"
                     type="email"
                     label="Email"
+                    required={true}
                     placeholder="Enter email address"
                     value={form.email}
                     error={
