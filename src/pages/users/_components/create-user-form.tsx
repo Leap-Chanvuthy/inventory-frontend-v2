@@ -57,7 +57,7 @@ export const CreateUserForm = () => {
   };
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 ">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
           <h2 className="text-xl font-bold mb-6">Create a New User</h2>

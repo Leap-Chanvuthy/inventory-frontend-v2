@@ -15,8 +15,17 @@ interface WarehousesListProps {
 export default function WarehousesList({
   onWarehousesChange,
 }: WarehousesListProps) {
-  const { page, setPage, setPerPage, setSearch, setSort, perPage , search , filter, apiParams } =
-    useTableQueryParams();
+  const {
+    page,
+    setPage,
+    setPerPage,
+    setSearch,
+    setSort,
+    perPage,
+    search,
+    filter,
+    apiParams,
+  } = useTableQueryParams();
 
   const { data, isLoading, isError } = useWarehouses({
     ...apiParams,
@@ -38,7 +47,7 @@ export default function WarehousesList({
   }
 
   return (
-    <div className="w-full p-4 sm:p-6 bg-background">
+    <div className="w-full p-4 sm:p-8 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Toolbar */}
         <TableToolbar

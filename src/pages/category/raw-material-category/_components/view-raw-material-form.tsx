@@ -1,8 +1,7 @@
 import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
-import { EditButton } from "@/components/reusable/partials/edit-button";
-import { DeleteButton } from "@/components/reusable/partials/delete-button";
+import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 
 interface ViewCategoryFormProps {
   categoryId: string;
@@ -61,10 +60,11 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">
             {category.category_name}
           </h1>
-          <div className="flex gap-2 sm:gap-3 flex-shrink-0">
-            <EditButton editPath={`/categories/edit/${id}`} />
-            <DeleteButton />
-          </div>
+          <HeaderActionButtons
+            editPath={`/categories/edit/${id}`}
+            showEdit={true}
+            showDelete={true}
+          />
         </div>
 
         {/* Content Card */}

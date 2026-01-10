@@ -1,5 +1,5 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
-import { UpdateCategoryForm } from "../_components/update-raw-material-form";
+import { UpdateCategoryForm } from "../_components/update-raw-material-category-form";
 
 export const EditCategories = () => {
   const breadcrumbItems = [
@@ -13,7 +13,9 @@ export const EditCategories = () => {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-      <UpdateCategoryForm />
+      <div className="mx-6">
+        <UpdateCategoryForm />
+      </div>
     </div>
   );
 };

@@ -18,22 +18,19 @@ export function AppSidebar() {
   return (
     <Sidebar>
       {/* Header */}
-      <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center gap-2">
-          {/* <img
-            src="https://cdn2.vectorstock.com/i/1000x1000/75/61/software-as-a-service-saas-technology-icon-logo-vector-34097561.jpg"
-            className="h-8 w-8 rounded-md"
-          /> */}
-          <h1 className="text-lg font-semibold">Inventory</h1>
-        </div>
+      <SidebarHeader className="flex items-center justify-center h-[72px] px-5 border-b">
+        {/* <img
+          src="https://cdn2.vectorstock.com/i/1000x1000/75/61/software-as-a-service-saas-technology-icon-logo-vector-34097561.jpg"
+          className="h-8 w-8 rounded-md"
+        /> */}
+        <h1 className="text-lg font-semibold">Inventory</h1>
       </SidebarHeader>
 
       {/* Content */}
       <SidebarContent>
         {SIDEBAR_CONFIG.map((group, idx) => {
           const filteredItems = group.items.filter(
-            (item) =>
-              !item.roles || item.roles.includes(role as any)
+            item => !item.roles || item.roles.includes(role as any)
           );
 
           if (filteredItems.length === 0) return null;
@@ -53,7 +50,11 @@ export function AppSidebar() {
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
               {/* <User size={14} /> */}
-              <img src={user?.profile_picture || ''} alt={user?.name} className="h-8 w-8 rounded-full" />
+              <img
+                src={user?.profile_picture || ""}
+                alt={user?.name}
+                className="h-8 w-8 rounded-full"
+              />
             </div>
             <div className="text-xs">
               <div className="font-medium">{user?.name}</div>

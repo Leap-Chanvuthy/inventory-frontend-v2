@@ -1,7 +1,6 @@
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
+import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
-import { EditButton } from "@/components/reusable/partials/edit-button";
-import { DeleteButton } from "@/components/reusable/partials/delete-button";
 import { formatDate } from "@/utils/date-format";
 
 interface ViewWarehouseFormProps {
@@ -31,19 +30,20 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
     );
   }
 
-
   return (
-    <div className="min-h-screen w-full p-4 sm:p-6 lg:p-8 bg-background">
+    <div className="min-h-screen w-full my-5 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">
+          <h1 className="text-3xl font-bold mb-2">
             {warehouse.warehouse_name}
           </h1>
-          <div className="flex gap-2 sm:gap-3 flex-shrink-0">
-            <EditButton editPath={`/warehouses/update/${warehouseId}`} />
-            <DeleteButton />
-          </div>
+
+          <HeaderActionButtons
+            editPath={`/warehouses/update/${warehouseId}`}
+            showEdit={true}
+            showDelete={true}
+          />
         </div>
 
         {/* Main Content */}

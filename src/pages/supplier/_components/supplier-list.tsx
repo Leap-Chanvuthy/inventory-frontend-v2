@@ -8,8 +8,16 @@ import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
 export function SupplierList() {
-  const { setPage, setSearch, setSort, setPerPage, perPage , filter , search , apiParams } =
-    useTableQueryParams();
+  const {
+    setPage,
+    setSearch,
+    setSort,
+    setPerPage,
+    perPage,
+    filter,
+    search,
+    apiParams,
+  } = useTableQueryParams();
 
   const { data, isLoading, isError } = useSuppliers(apiParams);
 
@@ -18,7 +26,7 @@ export function SupplierList() {
   }
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
+    <div className="min-h-screen w-full p-4 sm:p-8 bg-background">
       <div className="mx-auto max-w-[1600px]">
         {/* Toolbar */}
         <TableToolbar

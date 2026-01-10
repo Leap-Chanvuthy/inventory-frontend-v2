@@ -19,10 +19,8 @@ export default function ViewWarehouses() {
   ];
 
   return (
-    <div>
-      <div className="mx-6 mb-5">
-        <BreadCrumb items={breadcrumbItems} />
-      </div>
+    <div className="mx-6 mb-5">
+      <BreadCrumb items={breadcrumbItems} />
       {id && <ViewWarehouseForm warehouseId={id} />}
     </div>
   );

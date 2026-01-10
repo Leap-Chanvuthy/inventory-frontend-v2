@@ -50,13 +50,13 @@ const SingleCard = ({
             <span>Edit</span>
           </Link>
 
-          <button
+          {/* <button
             onClick={() => onDelete?.(category.id)}
             className="flex items-center gap-1 text-sm text-destructive hover:text-destructive/80 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             <span>Delete</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -10,8 +10,12 @@ const CreateWarehouses = () => {
 
   return (
     <div>
-      <BreadCrumb items={breadcrumbItems} />
-      <CreateWarehouseForm />
+      <div className="mx-6">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
+      <div className="mx-6">
+        <CreateWarehouseForm />
+      </div>
     </div>
   );
 };

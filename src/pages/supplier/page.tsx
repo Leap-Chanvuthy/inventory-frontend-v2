@@ -13,13 +13,8 @@ export function Supplier() {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-      <div className="my-8 mx-6">
-        <h1 className="text-3xl font-bold mb-2">Supplier Managerment</h1>
-        <p className="text-sm text-muted-foreground">
-          {/* Below the inputs, there is an interactive map preview with. */}
-          {/* if have subtitle */}
-        </p>
-      </div>
+
+      <h1 className="text-3xl font-bold mx-6">Supplier Managerment</h1>
 
       <SupplierList />
     </div>

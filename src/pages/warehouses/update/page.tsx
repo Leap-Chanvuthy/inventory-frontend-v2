@@ -25,7 +25,7 @@ const UpdateWarehouse = () => {
     );
   }
   return (
-    <div>
+    <div className="mx-6 mb-5">
       <BreadCrumb items={breadcrumbItems} />
       <UpdateWarehouseForm />
     </div>

@@ -10,8 +10,12 @@ function CreateSupplier() {
 
   return (
     <div>
-      <BreadCrumb items={breadcrumbItems} />
-      <CreateSupplierForm />
+      <div className="px-6">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
+      <div className="px-6">
+        <CreateSupplierForm />
+      </div>
     </div>
   );
 }
