@@ -1,6 +1,6 @@
 import { Edit2, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RawMaterialCategory } from "@/api/categories/category.types";
+import { RawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import { formatDate } from "@/utils/date-format";
 
 const SingleCard = ({
@@ -12,7 +12,10 @@ const SingleCard = ({
 }) => {
   return (
     <div className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
-      <Link to={`/categories/view/${category.id}`} className="block cursor-pointer">
+      <Link
+        to={`/categories/view/${category.id}`}
+        className="block cursor-pointer"
+      >
         {/* Color Circle */}
         <div className="flex justify-center mb-6">
           <div

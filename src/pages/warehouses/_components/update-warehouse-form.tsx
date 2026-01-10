@@ -103,7 +103,7 @@ export const UpdateWarehouseForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-        const submitter = (e.nativeEvent as SubmitEvent)
+    const submitter = (e.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement | null;
 
     const action = submitter?.value;
@@ -121,12 +121,12 @@ export const UpdateWarehouseForm = () => {
     }
 
     // Then update the warehouse
-    warehouseMutation.mutate(form , {
+    warehouseMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/warehouses");
         }
-      }
+      },
     });
   };
 
@@ -267,11 +267,13 @@ export const UpdateWarehouseForm = () => {
                 defaultImageIds={existingImages.map(img => img.id)}
                 onChange={handleImagesChange}
                 onDeleteExisting={handleDeleteExistingImage}
-                maxImages={2}
+                maxImages={3}
               />
             </div>
 
-            <FormFooterActions isSubmitting={isDeletingImages || warehouseMutation.isPending} />
+            <FormFooterActions
+              isSubmitting={isDeletingImages || warehouseMutation.isPending}
+            />
           </form>
         </div>
       </div>

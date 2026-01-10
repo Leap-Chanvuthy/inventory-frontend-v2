@@ -17,7 +17,7 @@ export const columns: DataTableColumn<Warehouse>[] = [
   {
     key: "warehouse_name",
     header: "Warehouse Name",
-    className: "whitespace-nowrap py-4",
+    className: "whitespace-nowrap py-6",
     render: warehouse => (
       <div className="flex items-center gap-3">
         <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />

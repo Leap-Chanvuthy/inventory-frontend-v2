@@ -1,4 +1,4 @@
-import { CategoryList } from "../_components/category-list";
+import { CategoryList } from "../raw-material-category/_components/raw-material-category-list";
 
 export const breadcrumbItems = [
   { name: "application", label: "Application", link: "/" },
@@ -15,11 +15,7 @@ export const tabs = [
   {
     label: "Product Category",
     value: "product-category",
-    content: (
-      <div className="p-6 text-center text-muted-foreground">
-        Product Category - Coming soon
-      </div>
-    ),
+    content: <CategoryList />,
   },
   {
     label: "Customer Category",

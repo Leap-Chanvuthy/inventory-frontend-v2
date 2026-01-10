@@ -7,13 +7,14 @@ import { USER_ROLES } from "@/consts/role";
 import { AxiosError } from "axios";
 import { Info } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const CreateUserForm = () => {
   const userMutation = useCreateUser();
   const error =
     userMutation.error as AxiosError<CreateUserValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
-
+  const navigate = useNavigate();
   // console.log(fieldErrors);
 
   const [form, setForm] = useState({
@@ -37,9 +38,22 @@ export const CreateUserForm = () => {
     setForm(prev => ({ ...prev, profile_picture: file }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    userMutation.mutate(form);
+
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
+    userMutation.mutate(form, {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/users");
+        }
+        // save → stay, data auto-refreshed
+      },
+    });
   };
 
   return (

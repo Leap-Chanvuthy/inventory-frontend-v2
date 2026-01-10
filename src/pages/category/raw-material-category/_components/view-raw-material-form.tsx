@@ -1,4 +1,4 @@
-import { useSingleRawMaterialCategory } from "@/api/categories/category.query";
+import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { EditButton } from "@/components/reusable/partials/edit-button";

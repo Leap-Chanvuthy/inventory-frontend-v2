@@ -1,10 +1,10 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { useRawMaterialCategories } from "@/api/categories/category.query";
+import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 import { CategoryCard } from "./category-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
-import { SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { SORT_OPTIONS } from "../../utils/table-feature";
 
 interface CategoryListProps {
   onDelete?: (id: number) => void;

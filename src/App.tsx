@@ -25,9 +25,11 @@ import ResetPassword from "./pages/auth/reset-password";
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import Categories from "./pages/category/page";
-import { CreateCategories } from "./pages/category/create/page";
-import { EditCategories } from "./pages/category/update/page";
-import { ViewCategories } from "./pages/category/view/page";
+import { CreateCategories } from "./pages/category/raw-material-category/create/page";
+import { EditCategories } from "./pages/category/raw-material-category/update/page";
+import { ViewCategories } from "./pages/category/raw-material-category/view/page";
+import { Supplier } from "./pages/supplier/page";
+import CreateSupplier from "./pages/supplier/create/page";
 
 export default function App() {
   const queryClient = new QueryClient(); 
@@ -59,6 +61,10 @@ export default function App() {
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
                 <Route path="/users/update/:id" element={<UpdateUser />} />
+
+                {/* Supplier */}
+                <Route path="/supplier" element={<Supplier />} />
+                <Route path="/supplier/create" element={<CreateSupplier />} />
 
                 {/* Warehouse Routes */}
                 <Route path="/warehouses" element={<Warehouses />} />

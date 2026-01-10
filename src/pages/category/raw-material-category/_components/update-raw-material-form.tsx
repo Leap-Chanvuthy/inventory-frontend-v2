@@ -1,18 +1,18 @@
-import { useUpdateRawMaterialCategory } from "@/api/categories/category.mutation";
+import { useUpdateRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { CreateCategoryValidationErrors } from "@/api/categories/category.types";
+import { useNavigate, useParams } from "react-router-dom";
+import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
-import { useSingleRawMaterialCategory } from "@/api/categories/category.query";
+import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 
 export const UpdateCategoryForm = () => {
   const { id } = useParams<{ id: string }>();
   const categoryId = Number(id);
-
+  const navigate = useNavigate();
   const {
     data: categoryData,
     isLoading,
@@ -57,9 +57,22 @@ export const UpdateCategoryForm = () => {
     setForm(prev => ({ ...prev, label_color: color }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    categoryMutation.mutate(form);
+
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
+    categoryMutation.mutate(form, {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/categories");
+        }
+        // save → stay, data auto-refreshed
+      },
+    });
   };
 
   if (isError) {

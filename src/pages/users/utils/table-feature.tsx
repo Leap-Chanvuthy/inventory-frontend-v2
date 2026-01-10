@@ -39,9 +39,7 @@ export const COLUMNS: DataTableColumn<User>[] = [
     header: "Avatar",
     render: user => (
       <img
-        src={
-          user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`
-        }
+        src={user.profile_picture || ""}
         className="h-10 w-10 rounded-full border"
       />
     ),
@@ -49,6 +47,7 @@ export const COLUMNS: DataTableColumn<User>[] = [
   {
     key: "name",
     header: "Name",
+    className: "whitespace-nowrap py-6",
     render: user => (
       <Link
         to={`/users/update/${user.id}`}
@@ -61,36 +60,43 @@ export const COLUMNS: DataTableColumn<User>[] = [
   {
     key: "last_activity",
     header: "Last Activity",
+    className: "whitespace-nowrap py-6",
     render: user => user.last_activity || "-",
   },
   {
     key: "email",
     header: "Email",
+    className: "whitespace-nowrap py-6",
     render: user => <span className="text-muted-foreground">{user.email}</span>,
   },
   {
     key: "role",
     header: "Role",
+    className: "whitespace-nowrap py-6",
     render: user => <RoleBadge role={user.role} />,
   },
   {
     key: "created_at",
     header: "Created At",
+    className: "whitespace-nowrap py-6",
     render: user => formatDate(user.created_at),
   },
   {
     key: "updated_at",
     header: "Updated At",
+    className: "whitespace-nowrap py-6",
     render: user => formatDate(user.updated_at),
   },
   {
     key: "email_verified_at",
     header: "Email Verified At",
+    className: "whitespace-nowrap py-6",
     render: user => formatDate(user.email_verified_at),
   },
   {
     key: "verification_status",
     header: "Verification Status",
+    className: "whitespace-nowrap py-6",
     render: user =>
       formatDate(user.email_verified_at) ? (
         <BadgeCheck className="w-4 h-4 text-blue-400" />
@@ -101,6 +107,7 @@ export const COLUMNS: DataTableColumn<User>[] = [
   {
     key: "actions",
     header: "Actions",
+    className: "whitespace-nowrap py-6",
     render: user => (
       <Link to={`/users/update/${user.id}`}>
         <SquarePen size={15} />

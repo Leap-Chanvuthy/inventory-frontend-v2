@@ -1,6 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import ReusableTabs from "@/components/reusable/partials/tabs";
-import { breadcrumbItems, tabs } from "./utils/tabs";
+import { breadcrumbItems, tabs } from "./utils/data";
 
 export default function Categories() {
   return (

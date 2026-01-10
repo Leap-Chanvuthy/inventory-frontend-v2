@@ -1,7 +1,7 @@
-import { CategoryList } from "../_components/category-list";
+import { CategoryList } from "../raw-material-category/_components/raw-material-category-list";
 
 export const breadcrumbItems = [
-  { name: "application", label: "Application", link: "/" },
+  { name: "catalogs", label: "Catalogs", link: "/" },
   { name: "category", label: "Category", link: "/category" },
   { name: "list", label: "List of Categories" },
 ];
@@ -9,13 +9,13 @@ export const breadcrumbItems = [
 export const tabs = [
   {
     label: "Raw Material Category",
-    value: "raw-material",
+    value: "raw-material-category",
     content: <CategoryList />,
   },
   {
     label: "Product Category",
     value: "product",
-    content: <CategoryList/>
+    content: <CategoryList />,
   },
   {
     label: "Customer Category",

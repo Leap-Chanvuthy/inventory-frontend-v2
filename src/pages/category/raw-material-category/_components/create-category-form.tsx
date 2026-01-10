@@ -1,17 +1,18 @@
-import { useCreateRawMaterialCategory } from "@/api/categories/category.mutation";
+import { useCreateRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { CreateCategoryValidationErrors } from "@/api/categories/category.types";
+import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
+import { useNavigate } from "react-router-dom";
 
 export const CreateCategoryForm = () => {
   const categoryMutation = useCreateRawMaterialCategory();
   const error =
     categoryMutation.error as AxiosError<CreateCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
-
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     category_name: "",
     label_color: "#6366F1",
@@ -34,11 +35,23 @@ export const CreateCategoryForm = () => {
     setForm(prev => ({ ...prev, label_color: color }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    categoryMutation.mutate(form);
-  };
 
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
+    categoryMutation.mutate(form, {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/categories");
+        }
+        // save → stay, data auto-refreshed
+      },
+    });
+  };
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">

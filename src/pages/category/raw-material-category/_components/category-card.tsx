@@ -1,4 +1,4 @@
-import { RawMaterialCategory } from "@/api/categories/category.types";
+import { RawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import SingleCard from "./category-single-card";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { useSingleUser } from "@/api/users/user.query";
@@ -14,6 +14,7 @@ import DataTableLoading from "@/components/reusable/data-table/data-table-loadin
 export const UpdateUserForm = () => {
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
+  const navigate = useNavigate();
 
   const { data: user, isError, isLoading } = useSingleUser(userId);
 
@@ -58,7 +59,20 @@ export const UpdateUserForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateMutation.mutate(form);
+
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
+    updateMutation.mutate(form, {
+      onSuccess: () => {
+        if (action === "save_and_close") {
+          navigate("/users");
+        }
+        // save → stay, data auto-refreshed
+      },
+    });
   };
 
   if (isLoading) {
