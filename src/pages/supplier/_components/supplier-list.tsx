@@ -8,7 +8,7 @@ import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
 export function SupplierList() {
-  const { setPage, setSearch, setSort, setPerPage, apiParams } =
+  const { setPage, setSearch, setSort, setPerPage, perPage , filter , search , apiParams } =
     useTableQueryParams();
 
   const { data, isLoading, isError } = useSuppliers(apiParams);
@@ -24,9 +24,12 @@ export function SupplierList() {
         <TableToolbar
           searchPlaceholder="Search supplier..."
           onSearch={setSearch}
+          search={search}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+          perPage={perPage}
+          selectedFilter={filter}
           onPerPageChange={setPerPage}
           createHref="/supplier/create"
         />
