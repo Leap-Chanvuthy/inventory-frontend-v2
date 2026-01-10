@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 const CategoryBadge = ({ category }: { category: string }) => {
   const map: Record<string, string> = {
+    ELECTRONICS: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
     PRODUCTS: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
     FOOD: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     CLOTHING: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
@@ -69,10 +70,7 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
 
     render: supplier => (
       <img
-        src={
-          supplier.image ||
-          `https://avatar.iran.liara.run/public/${supplier.id}`
-        }
+        src={supplier.image || ""}
         alt={supplier.official_name}
         className="h-10 w-10 rounded-full border"
       />

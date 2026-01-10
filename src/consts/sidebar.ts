@@ -43,6 +43,11 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         icon: User,
         roles: [ROLES.ADMIN], // ⛔ ADMIN ONLY
       },
+    ],
+  },
+  {
+    label: "Inventory",
+    items: [
       {
         title: "Supplier",
         url: "/supplier",
@@ -51,6 +56,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
       },
     ],
   },
+
   {
     label: "Catalogs",
     items: [

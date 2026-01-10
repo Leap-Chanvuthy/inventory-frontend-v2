@@ -39,9 +39,7 @@ export const COLUMNS: DataTableColumn<User>[] = [
     header: "Avatar",
     render: user => (
       <img
-        src={
-          user.profile_picture || `https://i.pravatar.cc/150?u=${user.email}`
-        }
+        src={user.profile_picture || ""}
         className="h-10 w-10 rounded-full border"
       />
     ),
