@@ -3,7 +3,7 @@ import { SupplierList } from "./_components/supplier-list";
 
 export function Supplier() {
   const breadcrumbItems = [
-    { name: "management", label: "Management", link: "/" },
+    { name: "inventory", label: "Inventory", link: "/" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "list", label: "List of Supplier" },
   ];

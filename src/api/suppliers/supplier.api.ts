@@ -4,6 +4,7 @@ import {
   GetSupplierResponse,
   SupplierQueryParams,
   CreateSupplierRequest,
+  CreateSupplierFormPayload,
 } from "./supplier.types";
 import { apiClient } from "@/api/client";
 
@@ -27,9 +28,13 @@ export const getSupplierById = async (
 
 // Create new supplier
 export const createSupplier = async (
-  data: CreateSupplierRequest
+  data: CreateSupplierFormPayload | CreateSupplierRequest
 ): Promise<GetSupplierResponse> => {
-  const response = await apiClient.post(`${BASE_API_URL}/suppliers`, data);
+  const response = await apiClient.post(`${BASE_API_URL}/suppliers`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 

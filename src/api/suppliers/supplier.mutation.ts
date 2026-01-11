@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSupplier, updateSupplier, deleteSupplier } from "./supplier.api";
-import { CreateSupplierRequest } from "./supplier.types";
+import {
+  CreateSupplierRequest,
+  CreateSupplierFormPayload,
+} from "./supplier.types";
 import { toast } from "sonner";
 
 export const useCreateSupplier = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: FormData) => createSupplier(data as any),
-    onSuccess: (response) => {
+    mutationFn: (payload: CreateSupplierFormPayload) => createSupplier(payload),
+    onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
       toast.success(response.message || "Supplier created successfully");
     },
@@ -22,9 +25,14 @@ export const useUpdateSupplier = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<CreateSupplierRequest> }) =>
-      updateSupplier(id, data),
-    onSuccess: (response) => {
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<CreateSupplierRequest>;
+    }) => updateSupplier(id, data),
+    onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
       toast.success(response.message || "Supplier updated successfully");
     },
@@ -39,7 +47,7 @@ export const useDeleteSupplier = () => {
 
   return useMutation({
     mutationFn: (id: number) => deleteSupplier(id),
-    onSuccess: (response) => {
+    onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
       toast.success(response.message || "Supplier deleted successfully");
     },

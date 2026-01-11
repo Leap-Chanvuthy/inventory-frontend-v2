@@ -133,3 +133,40 @@ export interface SupplierQueryParams {
   "filter[search]"?: string;
   sort?: string;
 }
+
+export interface ValidationErrors {
+  status: boolean;
+  message: string;
+  errors?: Record<string, string[]>;
+}
+export interface BankDetails {
+  bank_name: string;
+  account_number: string;
+  account_holder_name: string;
+  payment_link: string;
+  qr_code_image: File | null;
+}
+
+export interface CreateSupplierFormPayload {
+  official_name: string;
+  contact_person: string;
+  phone: string;
+  email: string;
+  legal_business_name: string;
+  tax_identification_number: string;
+  business_registration_number: string;
+  supplier_category: string;
+  business_description: string;
+  address_line1: string;
+  address_line2: string;
+  village: string;
+  commune: string;
+  district: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  latitude: string;
+  longitude: string;
+  image: File | null;
+  banks: BankDetails[];
+}

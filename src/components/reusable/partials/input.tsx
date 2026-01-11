@@ -1,136 +1,160 @@
-import * as React from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Eye, EyeOff } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-import { SelectValue } from "@radix-ui/react-select"
-import { Textarea } from "@/components/ui/textarea"
+import * as React from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import { Textarea } from "@/components/ui/textarea";
 
 type TextInputProps = {
-    type?: "text" | "email" | "password" | "tel" | "number"
-    id?: string
-    placeholder?: string
-    required?: boolean
-    error?: string
-    label?: string
-    value?: string
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
-}
+  type?: "text" | "email" | "password" | "tel" | "number";
+  id: string;
+  placeholder?: string;
+  required?: boolean;
+  error?: string;
+  label?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isNumberOnly?: boolean;
+};
 
 type TextAreaInputProps = {
-    id?: string
-    placeholder?: string
-    error?: string
-    label?: string
-    value?: string
-    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-}
+  id: string;
+  placeholder?: string;
+  error?: string;
+  label?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+};
 
 type SelectInputProps = {
-  id?: string
-  label?: string
-  placeholder?: string
-  options: { value: string; label: string }[]
-  error?: string
-  value?: string
-  onChange?: (value: string) => void
-}
+  id: string;
+  label?: string;
+  placeholder?: string;
+  options: { value: string; label: string }[];
+  error?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+};
 
 export const TextInput = ({
-    type = "text",
-    id,
-    placeholder,
-    required,
-    error,
-    label,
-    value,
-    onChange,
+  type = "text",
+  id,
+  placeholder,
+  required,
+  error,
+  label,
+  value,
+  onChange,
+  isNumberOnly = false,
 }: TextInputProps) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
 
-    const isPassword = type === "password"
+  const isPassword = type === "password";
 
-    return (
-        <div className="space-y-1.5 w-full">
-            {label && (
-                <Label
-                    htmlFor={id}
-                    className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
-                >
-                    {label}
-                    {required && <span className="text-red-500">*</span>}
-                </Label>
-            )}
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isNumberOnly) {
+      // Filter out non-numeric characters
+      const numericValue = e.target.value.replace(/\D/g, "");
+      e.target.value = numericValue;
+    }
+    onChange?.(e);
+  };
 
-            <div className="relative">
-                <Input
-                    id={id}
-                    type={isPassword && showPassword ? "text" : type}
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
-                    className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                />
+  return (
+    <div className="space-y-1.5 w-full">
+      {label && (
+        <Label
+          htmlFor={id}
+          className={
+            error ? "text-red-500" : "text-gray-700 dark:text-gray-300"
+          }
+        >
+          {label}
+          {required && <span className="text-red-500 px-1">*</span>}
+        </Label>
+      )}
 
-                {/* Password Toggle */}
-                {isPassword && (
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="
+      <div className="relative">
+        <Input
+          id={id}
+          type={isPassword && showPassword ? "text" : type}
+          placeholder={placeholder}
+          value={value}
+          onChange={handleChange}
+          className={`pr-10 ${
+            error ? "border-red-500 focus-visible:ring-red-500" : ""
+          }`}
+        />
+
+        {/* Password Toggle */}
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="
               absolute inset-y-0 right-0 flex items-center pr-3
               text-gray-400 hover:text-gray-600
               dark:hover:text-gray-300
             "
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                        {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                        ) : (
-                            <Eye className="h-4 w-4" />
-                        )}
-                    </button>
-                )}
-            </div>
-
-            {error && (
-                <p className="text-xs text-red-500">{error}</p>
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
             )}
-        </div>
-    )
-}
+          </button>
+        )}
+      </div>
 
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
 
-export const TextAreaInput = ({ id, placeholder, error, label, value, onChange }: TextAreaInputProps) => {
-    return (
-        <div className="space-y-1.5 w-full">
-            {label && (
-                <Label
-                    htmlFor={id}
-                    className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
-                >
-                    {label}
-                </Label>
-            )}
+export const TextAreaInput = ({
+  id,
+  placeholder,
+  error,
+  label,
+  value,
+  onChange,
+}: TextAreaInputProps) => {
+  return (
+    <div className="space-y-1.5 w-full">
+      {label && (
+        <Label
+          htmlFor={id}
+          className={
+            error ? "text-red-500" : "text-gray-700 dark:text-gray-300"
+          }
+        >
+          {label}
+        </Label>
+      )}
 
-            <div>
-                <Textarea
-                    id={id}
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
-                    className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                />
-            </div>
+      <div>
+        <Textarea
+          id={id}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          className={`pr-10 ${
+            error ? "border-red-500 focus-visible:ring-red-500" : ""
+          }`}
+        />
+      </div>
 
-            {error && (
-                <p className="text-xs text-red-500">{error}</p>
-            )}
-        </div>
-    )
-
-}
-
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
 
 export const SelectInput = ({
   id,
@@ -146,7 +170,9 @@ export const SelectInput = ({
       {label && (
         <Label
           htmlFor={id}
-          className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
+          className={
+            error ? "text-red-500" : "text-gray-700 dark:text-gray-300"
+          }
         >
           {label}
         </Label>
@@ -158,7 +184,7 @@ export const SelectInput = ({
         </SelectTrigger>
 
         <SelectContent>
-          {options.map((option) => (
+          {options.map(option => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
@@ -168,5 +194,5 @@ export const SelectInput = ({
 
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
-  )
-}
+  );
+};

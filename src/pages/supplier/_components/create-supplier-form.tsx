@@ -12,32 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { BankPaymentSection } from "./bank-payment-section";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-
-interface BankDetails {
-  bank_name: string;
-  account_number: string;
-  account_holder_name: string;
-  payment_link: string;
-  qr_code_image: File | null;
-}
-
-interface ValidationErrors {
-  status: boolean;
-  message: string;
-  errors?: Record<string, string[]>;
-}
-
-const BANK_OPTIONS = ["ACLEDA", "ABA", "WING", "BAKONG"];
+  BankDetails,
+  CreateSupplierFormPayload,
+  ValidationErrors,
+} from "@/api/suppliers/supplier.types";
 
 export const CreateSupplierForm = () => {
   const supplierMutation = useCreateSupplier();
@@ -94,37 +74,6 @@ export const CreateSupplierForm = () => {
     setImage(file);
   };
 
-  const handleBankChange = (
-    index: number,
-    field: keyof BankDetails,
-    value: string | File | null
-  ) => {
-    const updatedBanks = [...banks];
-    updatedBanks[index] = { ...updatedBanks[index], [field]: value };
-    setBanks(updatedBanks);
-  };
-
-  const addBank = () => {
-    if (banks.length < 4) {
-      setBanks([
-        ...banks,
-        {
-          bank_name: "",
-          account_number: "",
-          account_holder_name: "",
-          payment_link: "",
-          qr_code_image: null,
-        },
-      ]);
-    }
-  };
-
-  const removeBank = (index: number) => {
-    if (banks.length > 1) {
-      setBanks(banks.filter((_, i) => i !== index));
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -133,42 +82,14 @@ export const CreateSupplierForm = () => {
 
     const action = submitter?.value;
 
-    // Create FormData for multipart/form-data
-    const formData = new FormData();
+    // Create payload with proper typing
+    const payload: CreateSupplierFormPayload = {
+      ...form,
+      image,
+      banks,
+    };
 
-    // Append basic fields (always append all fields, even empty ones)
-    Object.entries(form).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    // Append image
-    if (image) {
-      formData.append("image", image);
-    }
-
-    // Append banks data
-    banks.forEach((bank, index) => {
-      if (bank.bank_name) {
-        formData.append(`banks[${index}][bank_name]`, bank.bank_name);
-      }
-      if (bank.account_number) {
-        formData.append(`banks[${index}][account_number]`, bank.account_number);
-      }
-      if (bank.account_holder_name) {
-        formData.append(
-          `banks[${index}][account_holder_name]`,
-          bank.account_holder_name
-        );
-      }
-      if (bank.payment_link) {
-        formData.append(`banks[${index}][payment_link]`, bank.payment_link);
-      }
-      if (bank.qr_code_image) {
-        formData.append(`banks[${index}][qr_code_image]`, bank.qr_code_image);
-      }
-    });
-
-    supplierMutation.mutate(formData, {
+    supplierMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/suppliers");
@@ -193,51 +114,60 @@ export const CreateSupplierForm = () => {
                 <CardTitle>Basic Information</CardTitle>
                 <CardDescription>Supplier's basic details</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <TextInput
-                    id="official_name"
-                    label="Official Name"
-                    placeholder="Enter official name"
-                    value={form.official_name}
-                    error={fieldErrors?.official_name?.[0]}
-                    onChange={handleChange}
-                  />
-                  <TextInput
-                    id="contact_person"
-                    label="Contact Person"
-                    placeholder="Enter contact person"
-                    value={form.contact_person}
-                    error={fieldErrors?.contact_person?.[0]}
-                    onChange={handleChange}
-                  />
-                </div>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Upload Section */}
+                  <div className="lg:col-span-1">
+                    <ImageUpload
+                      label="Supplier Image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <TextInput
-                    id="phone"
-                    label="Phone"
-                    type="tel"
-                    placeholder="Enter phone number"
-                    value={form.phone}
-                    error={fieldErrors?.phone?.[0]}
-                    onChange={handleChange}
-                  />
-                  <TextInput
-                    id="email"
-                    label="Email"
-                    type="email"
-                    placeholder="Enter email address"
-                    value={form.email}
-                    error={fieldErrors?.email?.[0]}
-                    onChange={handleChange}
-                  />
-                </div>
+                  {/* Form Fields */}
+                  <div className="lg:col-span-2 space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <TextInput
+                        required={true}
+                        id="official_name"
+                        label="Official Name"
+                        placeholder="Enter official name"
+                        value={form.official_name}
+                        error={fieldErrors?.official_name?.[0]}
+                        onChange={handleChange}
+                      />
+                      <TextInput
+                        id="contact_person"
+                        label="Contact Person"
+                        placeholder="Enter contact person"
+                        value={form.contact_person}
+                        error={fieldErrors?.contact_person?.[0]}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-                <ImageUpload
-                  label="Supplier Image"
-                  onChange={handleImageChange}
-                />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <TextInput
+                        id="phone"
+                        label="Phone"
+                        type="tel"
+                        placeholder="Enter phone number"
+                        value={form.phone}
+                        error={fieldErrors?.phone?.[0]}
+                        onChange={handleChange}
+                      />
+                      <TextInput
+                        id="email"
+                        label="Email"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={form.email}
+                        error={fieldErrors?.email?.[0]}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -297,6 +227,7 @@ export const CreateSupplierForm = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <TextInput
+                  required={true}
                   id="address_line1"
                   label="Address Line 1"
                   placeholder="Enter address"
@@ -315,6 +246,7 @@ export const CreateSupplierForm = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <TextInput
+                    required={true}
                     id="village"
                     label="Village"
                     placeholder="Enter village"
@@ -323,6 +255,7 @@ export const CreateSupplierForm = () => {
                     onChange={handleChange}
                   />
                   <TextInput
+                    required={true}
                     id="commune"
                     label="Commune"
                     placeholder="Enter commune"
@@ -331,6 +264,7 @@ export const CreateSupplierForm = () => {
                     onChange={handleChange}
                   />
                   <TextInput
+                    required={true}
                     id="district"
                     label="District"
                     placeholder="Enter district"
@@ -342,6 +276,7 @@ export const CreateSupplierForm = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <TextInput
+                    required={true}
                     id="city"
                     label="City"
                     placeholder="Enter city"
@@ -350,6 +285,7 @@ export const CreateSupplierForm = () => {
                     onChange={handleChange}
                   />
                   <TextInput
+                    required={true}
                     id="province"
                     label="Province"
                     placeholder="Enter province"
@@ -392,118 +328,11 @@ export const CreateSupplierForm = () => {
             </Card>
 
             {/* Bank Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Bank Information</CardTitle>
-                <CardDescription>
-                  Payment methods (up to 4 banks)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {banks.map((bank, index) => (
-                  <div key={index} className="p-4 border rounded-lg space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Bank {index + 1}</h4>
-                      {banks.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeBank(index)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Bank Name</Label>
-                        <Select
-                          onValueChange={value =>
-                            handleBankChange(index, "bank_name", value)
-                          }
-                          value={bank.bank_name}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select bank" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {BANK_OPTIONS.map(bankName => (
-                              <SelectItem key={bankName} value={bankName}>
-                                {bankName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <TextInput
-                        id={`account_number_${index}`}
-                        label="Account Number"
-                        type="number"
-                        placeholder="Enter account number"
-                        value={bank.account_number}
-                        onChange={e =>
-                          handleBankChange(
-                            index,
-                            "account_number",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id={`account_holder_name_${index}`}
-                        label="Account Holder Name"
-                        placeholder="Enter account holder name"
-                        value={bank.account_holder_name}
-                        onChange={e =>
-                          handleBankChange(
-                            index,
-                            "account_holder_name",
-                            e.target.value
-                          )
-                        }
-                      />
-
-                      <TextInput
-                        id={`payment_link_${index}`}
-                        label="Payment Link"
-                        placeholder="Enter payment link (optional)"
-                        value={bank.payment_link}
-                        onChange={e =>
-                          handleBankChange(
-                            index,
-                            "payment_link",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-
-                    <ImageUpload
-                      label="QR Code Image (Optional)"
-                      onChange={file => handleBankChange(index, "qr_code_image", file)}
-                    />
-                  </div>
-                ))}
-
-                {banks.length < 4 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={addBank}
-                    className="w-full"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Another Bank
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
+            <BankPaymentSection
+              banks={banks}
+              setBanks={setBanks}
+              fieldErrors={fieldErrors}
+            />
 
             <FormFooterActions
               isSubmitting={supplierMutation.isPending}

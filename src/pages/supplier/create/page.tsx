@@ -3,7 +3,7 @@ import { CreateSupplierForm } from "../_components/create-supplier-form";
 
 function CreateSupplier() {
   const breadcrumbItems = [
-    { name: "managerment", label: "Managerment", link: "/" },
+    { name: "inventory", label: "Inventory", link: "/" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "create-supplier", label: "Create a new Supplier" },
   ];
