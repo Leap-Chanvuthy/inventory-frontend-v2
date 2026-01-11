@@ -30,6 +30,7 @@ type TextAreaInputProps = {
   label?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  required?: boolean;
 };
 
 type SelectInputProps = {
@@ -40,6 +41,7 @@ type SelectInputProps = {
   error?: string;
   value?: string;
   onChange?: (value: string) => void;
+  required?: boolean;
 };
 
 export const TextInput = ({
@@ -125,6 +127,7 @@ export const TextAreaInput = ({
   label,
   value,
   onChange,
+  required = false,
 }: TextAreaInputProps) => {
   return (
     <div className="space-y-1.5 w-full">
@@ -136,6 +139,7 @@ export const TextAreaInput = ({
           }
         >
           {label}
+          {required && <span className="text-red-500 px-1">*</span>}
         </Label>
       )}
 
@@ -164,6 +168,7 @@ export const SelectInput = ({
   error,
   value,
   onChange,
+  required = false,
 }: SelectInputProps) => {
   return (
     <div className="space-y-1.5 w-full">
@@ -175,11 +180,15 @@ export const SelectInput = ({
           }
         >
           {label}
+          {required && <span className="text-red-500 px-1">*</span>}
         </Label>
       )}
 
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
+        <SelectTrigger
+          id={id}
+          className={error ? "border-red-500" : ""}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 

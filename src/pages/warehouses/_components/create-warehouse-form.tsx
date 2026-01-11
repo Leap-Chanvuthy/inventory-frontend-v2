@@ -74,7 +74,6 @@ export const CreateWarehouseForm = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Row 1: Warehouse Name, Latitude, Longitude */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <TextInput
                 id="warehouse_name"
@@ -87,6 +86,7 @@ export const CreateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
+                required={true}
               />
               <TextInput
                 id="latitude"
@@ -110,11 +110,11 @@ export const CreateWarehouseForm = () => {
               />
             </div>
 
-            {/* Row 2: Warehouse Address (Full Width Textarea) */}
             <div>
               <TextAreaInput
                 id="warehouse_address"
                 label="Warehouse Address"
+                required={true}
                 placeholder="Enter warehouse address"
                 value={form.warehouse_address}
                 error={

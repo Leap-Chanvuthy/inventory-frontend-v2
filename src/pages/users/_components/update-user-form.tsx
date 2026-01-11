@@ -141,17 +141,19 @@ export const UpdateUserForm = () => {
                       fieldErrors?.email ? fieldErrors.email[0] : undefined
                     }
                     onChange={handleChange}
+                    required={true}
                   />
 
                   <SelectInput
+                    id="role"
                     label="Role"
-                    placeholder="Select role"
                     options={USER_ROLES}
                     value={form.role}
                     error={fieldErrors?.role ? fieldErrors.role[0] : undefined}
                     onChange={value =>
                       setForm(prev => ({ ...prev, role: value }))
                     }
+                    required={true}
                   />
                 </div>
 
@@ -163,6 +165,7 @@ export const UpdateUserForm = () => {
                     placeholder="Enter username"
                     value={form.name}
                     onChange={handleChange}
+                    required={true}
                   />
                 </div>
 
@@ -178,6 +181,7 @@ export const UpdateUserForm = () => {
                     }
                     placeholder="Enter phone number"
                     value={form.phone_number}
+                    required={true}
                   />
                 </div>
               </div>

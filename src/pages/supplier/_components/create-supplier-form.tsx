@@ -82,11 +82,22 @@ export const CreateSupplierForm = () => {
 
     const action = submitter?.value;
 
+    // Filter out empty banks (banks where no fields are filled)
+    const filledBanks = banks.filter(bank => {
+      return (
+        bank.bank_name ||
+        bank.account_number ||
+        bank.account_holder_name ||
+        bank.payment_link ||
+        bank.qr_code_image
+      );
+    });
+
     // Create payload with proper typing
     const payload: CreateSupplierFormPayload = {
       ...form,
       image,
-      banks,
+      banks: filledBanks,
     };
 
     supplierMutation.mutate(payload, {

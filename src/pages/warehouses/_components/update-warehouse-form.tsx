@@ -163,6 +163,7 @@ export const UpdateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
+                required={true}
               />
               <TextInput
                 id="latitude"
@@ -199,6 +200,7 @@ export const UpdateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleTextAreaChange}
+                required={true}
               />
             </div>
 

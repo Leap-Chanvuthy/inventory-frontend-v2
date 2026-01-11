@@ -6,16 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
-import { TextInput } from "@/components/reusable/partials/input";
+import { TextInput, SelectInput } from "@/components/reusable/partials/input";
 import { Plus, Trash2 } from "lucide-react";
 import { BankDetails, ValidationErrors } from "@/api/suppliers/supplier.types";
 
@@ -62,20 +54,29 @@ export const BankPaymentSection = ({
     }
   };
 
-  // Get available banks
+  // Get available banks as options for SelectInput
   const getAvailableBanks = (currentIndex: number) => {
     const selectedBanks = banks
       .map((bank, idx) => (idx !== currentIndex ? bank.bank_name : null))
       .filter(Boolean);
 
-    return BANK_OPTIONS.filter(bankName => !selectedBanks.includes(bankName));
+    const availableBanks = BANK_OPTIONS.filter(
+      bankName => !selectedBanks.includes(bankName)
+    );
+
+    return availableBanks.map(bankName => ({
+      value: bankName,
+      label: bankName,
+    }));
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bank Information</CardTitle>
-        <CardDescription>Payment methods (up to 4 banks)</CardDescription>
+        <CardTitle>Bank Information (Optional)</CardTitle>
+        <CardDescription>
+          Add payment methods if needed (up to 4 banks). If you add a bank, all fields marked with * are required.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {banks.map((bank, index) => (
@@ -113,37 +114,18 @@ export const BankPaymentSection = ({
               {/* Form Fields */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Bank Name</Label>
-                    <Select
-                      onValueChange={value =>
-                        handleBankChange(index, "bank_name", value)
-                      }
-                      value={bank.bank_name}
-                    >
-                      <SelectTrigger
-                        className={
-                          fieldErrors?.[`banks.${index}.bank_name`]?.[0]
-                            ? "border-red-500"
-                            : ""
-                        }
-                      >
-                        <SelectValue placeholder="Select bank" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getAvailableBanks(index).map(bankName => (
-                          <SelectItem key={bankName} value={bankName}>
-                            {bankName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldErrors?.[`banks.${index}.bank_name`]?.[0] && (
-                      <p className="text-sm text-red-500">
-                        {fieldErrors[`banks.${index}.bank_name`][0]}
-                      </p>
-                    )}
-                  </div>
+                  <SelectInput
+                    id={`bank_name_${index}`}
+                    label="Bank Name"
+                    placeholder="Select bank"
+                    options={getAvailableBanks(index)}
+                    value={bank.bank_name}
+                    onChange={value =>
+                      handleBankChange(index, "bank_name", value)
+                    }
+                    error={fieldErrors?.[`banks.${index}.bank_name`]?.[0]}
+                    required={true}
+                  />
 
                   <TextInput
                     id={`account_number_${index}`}
@@ -156,6 +138,7 @@ export const BankPaymentSection = ({
                     }
                     error={fieldErrors?.[`banks.${index}.account_number`]?.[0]}
                     isNumberOnly={true}
+                    required={true}
                   />
                 </div>
 
@@ -175,6 +158,7 @@ export const BankPaymentSection = ({
                     error={
                       fieldErrors?.[`banks.${index}.account_holder_name`]?.[0]
                     }
+                    required={true}
                   />
 
                   <TextInput

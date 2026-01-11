@@ -74,6 +74,7 @@ export const CreateCategoryForm = () => {
                     ? fieldErrors.category_name[0]
                     : undefined
                 }
+                required={true}
                 onChange={handleChange}
               />
             </div>

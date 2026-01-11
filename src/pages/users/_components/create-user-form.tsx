@@ -95,6 +95,7 @@ export const CreateUserForm = () => {
                   />
 
                   <SelectInput
+                    id="role"
                     label="Role"
                     placeholder="Select role"
                     options={USER_ROLES}
@@ -114,6 +115,7 @@ export const CreateUserForm = () => {
                     placeholder="Enter username"
                     value={form.name}
                     onChange={handleChange}
+                    required={true}
                   />
                 </div>
 
@@ -121,6 +123,7 @@ export const CreateUserForm = () => {
                   <TextInput
                     id="phone_number"
                     label="Phone Number"
+                    required={true}
                     onChange={handleChange}
                     error={
                       fieldErrors?.phone_number
@@ -145,6 +148,7 @@ export const CreateUserForm = () => {
                     placeholder="Enter password"
                     value={form.password}
                     onChange={handleChange}
+                    required={true}
                   />
 
                   <TextInput
