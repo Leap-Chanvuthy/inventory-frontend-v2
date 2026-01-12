@@ -30,6 +30,7 @@ import { EditCategories } from "./pages/category/raw-material-category/update/pa
 import { ViewCategories } from "./pages/category/raw-material-category/view/page";
 import { Supplier } from "./pages/supplier/page";
 import CreateSupplier from "./pages/supplier/create/page";
+import { SupplierDetail } from "./pages/supplier/view/page";
 
 export default function App() {
   const queryClient = new QueryClient(); 
@@ -65,6 +66,7 @@ export default function App() {
                 {/* Supplier */}
                 <Route path="/supplier" element={<Supplier />} />
                 <Route path="/supplier/create" element={<CreateSupplier />} />
+                <Route path="/supplier/view/:id" element={<SupplierDetail />} />
 
                 {/* Warehouse Routes */}
                 <Route path="/warehouses" element={<Warehouses />} />

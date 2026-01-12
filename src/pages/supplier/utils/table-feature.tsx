@@ -1,7 +1,7 @@
 import { Supplier } from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
-import { SquarePen } from "lucide-react";
+import { SquarePen, Eye, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const CategoryBadge = ({ category }: { category: string }) => {
@@ -131,12 +131,23 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: supplier => (
-      <Link to={`/suppliers/update/${supplier.id}`}>
-        <SquarePen
-          size={15}
-          className="text-muted-foreground hover:text-foreground"
-        />
-      </Link>
+      <div className="flex items-center gap-3">
+        <Link
+          to={`/supplier/view/${supplier.id}`}
+          className="text-blue-500 hover:text-blue-700 transition-colors"
+        >
+          <Eye className="h-5 w-5" />
+        </Link>
+        <Link
+          to={`/suppliers/update/${supplier.id}`}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <SquarePen className="h-5 w-5" />
+        </Link>
+        <button className="text-red-500 hover:text-red-700 transition-colors">
+          <Trash2 className="h-5 w-5" />
+        </button>
+      </div>
     ),
   },
 ];
