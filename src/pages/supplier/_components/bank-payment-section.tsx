@@ -75,7 +75,8 @@ export const BankPaymentSection = ({
       <CardHeader>
         <CardTitle>Bank Information (Optional)</CardTitle>
         <CardDescription>
-          Add payment methods if needed (up to 4 banks). If you add a bank, all fields marked with * are required.
+          Add payment methods if needed (up to 4 banks). If you add a bank, all
+          fields marked with * are required.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -103,6 +104,7 @@ export const BankPaymentSection = ({
                   onChange={file =>
                     handleBankChange(index, "qr_code_image", file)
                   }
+                  defaultImage={bank.existing_qr_code}
                 />
                 {fieldErrors?.[`banks.${index}.qr_code_image`]?.[0] && (
                   <p className="text-sm text-red-500 mt-2">

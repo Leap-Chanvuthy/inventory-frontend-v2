@@ -145,6 +145,7 @@ export interface BankDetails {
   account_holder_name: string;
   payment_link: string;
   qr_code_image: File | null;
+  existing_qr_code?: string; // For update form - URL of existing QR code image
 }
 
 export interface CreateSupplierFormPayload {

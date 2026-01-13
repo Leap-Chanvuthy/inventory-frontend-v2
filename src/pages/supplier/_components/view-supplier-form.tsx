@@ -38,7 +38,7 @@ export function ViewSupplierForm() {
         <h1 className="text-3xl font-bold mb-2">{supplier.official_name}</h1>
 
         <HeaderActionButtons
-          editPath={`/warehouses/update/${supplier.id}`}
+          editPath={`/supplier/update/${supplier.id}`}
           showEdit={true}
           showDelete={true}
         />

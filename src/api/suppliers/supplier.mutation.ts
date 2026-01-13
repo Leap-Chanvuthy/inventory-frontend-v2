@@ -30,7 +30,7 @@ export const useUpdateSupplier = () => {
       data,
     }: {
       id: number;
-      data: Partial<CreateSupplierRequest>;
+      data: CreateSupplierFormPayload | Partial<CreateSupplierRequest>;
     }) => updateSupplier(id, data),
     onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });

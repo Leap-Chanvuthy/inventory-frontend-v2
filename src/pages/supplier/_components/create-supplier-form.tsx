@@ -82,7 +82,6 @@ export const CreateSupplierForm = () => {
 
     const action = submitter?.value;
 
-    // Filter out empty banks (banks where no fields are filled)
     const filledBanks = banks.filter(bank => {
       return (
         bank.bank_name ||
@@ -103,7 +102,7 @@ export const CreateSupplierForm = () => {
     supplierMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/suppliers");
+          navigate("/supplier");
         }
       },
     });
@@ -347,7 +346,7 @@ export const CreateSupplierForm = () => {
 
             <FormFooterActions
               isSubmitting={supplierMutation.isPending}
-              onCancel={() => navigate("/suppliers")}
+              onCancel={() => navigate("/supplier")}
             />
           </form>
         </div>

@@ -30,6 +30,7 @@ import { EditCategories } from "./pages/category/raw-material-category/update/pa
 import { ViewCategories } from "./pages/category/raw-material-category/view/page";
 import { Supplier } from "./pages/supplier/page";
 import CreateSupplier from "./pages/supplier/create/page";
+import UpdateSupplier from "./pages/supplier/update/page";
 import { SupplierDetail } from "./pages/supplier/view/page";
 
 export default function App() {
@@ -66,6 +67,7 @@ export default function App() {
                 {/* Supplier */}
                 <Route path="/supplier" element={<Supplier />} />
                 <Route path="/supplier/create" element={<CreateSupplier />} />
+                <Route path="/supplier/update/:id" element={<UpdateSupplier />} />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
 
                 {/* Warehouse Routes */}

@@ -41,11 +41,16 @@ export const createSupplier = async (
 // Update existing supplier
 export const updateSupplier = async (
   id: number,
-  data: Partial<CreateSupplierRequest>
+  data: CreateSupplierFormPayload | Partial<CreateSupplierRequest>
 ): Promise<GetSupplierResponse> => {
-  const response = await apiClient.patch(
+  const response = await apiClient.post(
     `${BASE_API_URL}/suppliers/${id}`,
-    data
+    { ...data, _method: "PATCH" },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
   return response.data;
 };

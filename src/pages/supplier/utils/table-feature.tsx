@@ -125,7 +125,7 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
           <Eye className="h-5 w-5" />
         </Link>
         <Link
-          to={`/suppliers/update/${supplier.id}`}
+          to={`/supplier/update/${supplier.id}`}
           className="text-muted-foreground hover:text-foreground transition-colors"
         >
           <SquarePen className="h-5 w-5" />
