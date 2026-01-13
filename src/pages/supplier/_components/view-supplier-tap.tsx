@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2, FileText } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReusableTabs from "@/components/reusable/partials/tabs";
 import { Supplier } from "@/api/suppliers/supplier.types";
 
 interface ViewSupplierTapProps {
@@ -8,31 +8,11 @@ interface ViewSupplierTapProps {
 }
 
 export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
-  return (
-    <Tabs defaultValue="general" className="w-full mt-6">
-      <TabsList className="bg-transparent border-b border-border rounded-none w-full justify-start gap-1 mb-6">
-        <TabsTrigger
-          value="general"
-          className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-        >
-          General Info
-        </TabsTrigger>
-        <TabsTrigger
-          value="banking"
-          className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-        >
-          Banking Info
-        </TabsTrigger>
-        <TabsTrigger
-          value="location"
-          className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-        >
-          Location
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="general">
-        {/* Company Overview Card */}
+  const tabs = [
+    {
+      label: "General Info",
+      value: "general",
+      content: (
         <Card>
           <CardHeader>
             <CardTitle>
@@ -41,7 +21,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
+            {/* <div>
               <p className="text-sm text-muted-foreground">
                 Business Registration Number
               </p>
@@ -58,104 +38,118 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
               <p className="font-medium whitespace-pre-wrap">
                 {supplier.business_description || "-"}
               </p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
-      </TabsContent>
-
-      <TabsContent value="banking">
-        {/* Banking Info Section */}
-        {supplier.banks && supplier.banks.length > 0 ? (
-          supplier.banks.map((bank) => (
-            <Card key={bank.id} className="mb-6">
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Left Section - Banking Information */}
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold">Banking Information</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Details for direct bank transfers and KHQR payments.
-                    </p>
-                  </div>
-
-                  {/* Middle Section - Bank Details */}
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Supplier Bank Account Name
+      ),
+    },
+    {
+      label: "Banking Info",
+      value: "banking",
+      content: (
+        <>
+          {supplier.banks && supplier.banks.length > 0 ? (
+            supplier.banks.map(bank => (
+              <Card key={bank.id} className="mb-6">
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_1fr] gap-8 items-start">
+                    {/* Left Section */}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold">
+                        Banking Information
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Details for direct bank transfers and KHQR payments.
                       </p>
-                      <p className="text-lg font-semibold">
-                        {bank.account_holder_name}
-                      </p>
+                      <div className="hidden lg:block h-full w-px bg-gray-300"></div>
                     </div>
 
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Bank Account Number
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {bank.account_number}
-                      </p>
+                    {/* Vertical Divider */}
+                    <div className="hidden lg:block h-full w-px bg-gray-300"></div>
+
+                    {/* Middle Bank Details Section */}
+                    <div className="space-y-4 pl-14">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Supplier Bank Account Name
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {bank.account_holder_name}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Bank Account Number
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {bank.account_number}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Name of the Bank
+                        </p>
+                        <p className="text-lg font-semibold">
+                          {bank.bank_name}
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Name of the Bank
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {bank.bank_name}
-                      </p>
+                    {/* Right Section - KHQR */}
+                    <div className="flex flex-col items-center justify-start space-y-4">
+                      <h4 className="text-base font-semibold text-center">
+                        KHQR Code of Payment
+                      </h4>
+
+                      {bank.qr_code_image ? (
+                        <>
+                          <div className="border rounded-xl p-3 shadow-sm">
+                            <img
+                              src={bank.qr_code_image}
+                              alt={`KHQR Code for ${bank.bank_name}`}
+                              className="w-32 h-32 object-contain"
+                            />
+                          </div>
+
+                          {bank.payment_link && (
+                            <a
+                              href={bank.payment_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-purple-600 hover:underline font-medium"
+                            >
+                              Click here to pay via KHQR
+                            </a>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center">
+                          No QR code available
+                        </p>
+                      )}
                     </div>
                   </div>
-
-                  {/* Right Section - KHQR Code */}
-                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <h4 className="text-base font-semibold text-center">
-                      KHQR Code of Payment
-                    </h4>
-                    {bank.qr_code_image ? (
-                      <>
-                        <div className="border-2 rounded-lg p-3">
-                          <img
-                            src={bank.qr_code_image}
-                            alt={`KHQR Code for ${bank.bank_name}`}
-                            className="w-40 h-40 object-contain"
-                          />
-                        </div>
-                        {bank.payment_link && (
-                          <a
-                            href={bank.payment_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline font-medium"
-                          >
-                            Click here to pay via KHQR
-                          </a>
-                        )}
-                      </>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center">
-                        No QR code available
-                      </p>
-                    )}
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  No banking information available
+                </p>
               </CardContent>
             </Card>
-          ))
-        ) : (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">
-                No banking information available
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </TabsContent>
-
-      <TabsContent value="location">
-        {/* Location Section */}
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Location",
+      value: "location",
+      content: (
         <Card>
           <CardHeader>
             <CardTitle>
@@ -170,18 +164,14 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                   <p className="text-sm text-muted-foreground">
                     Address Line 1
                   </p>
-                  <p className="font-medium">
-                    {supplier.address_line1 || "-"}
-                  </p>
+                  <p className="font-medium">{supplier.address_line1 || "-"}</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Address Line 2
                   </p>
-                  <p className="font-medium">
-                    {supplier.address_line2 || "-"}
-                  </p>
+                  <p className="font-medium">{supplier.address_line2 || "-"}</p>
                 </div>
 
                 <div>
@@ -219,21 +209,13 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                 {(supplier.latitude || supplier.longitude) && (
                   <>
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Latitude
-                      </p>
-                      <p className="font-medium">
-                        {supplier.latitude || "-"}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Latitude</p>
+                      <p className="font-medium">{supplier.latitude || "-"}</p>
                     </div>
 
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Longitude
-                      </p>
-                      <p className="font-medium">
-                        {supplier.longitude || "-"}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Longitude</p>
+                      <p className="font-medium">{supplier.longitude || "-"}</p>
                     </div>
                   </>
                 )}
@@ -241,7 +223,17 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
             </div>
           </CardContent>
         </Card>
-      </TabsContent>
-    </Tabs>
+      ),
+    },
+  ];
+
+  return (
+    <div className="mt-6">
+      <ReusableTabs
+        name="supplier-details"
+        tabs={tabs}
+        defaultValue="general"
+      />
+    </div>
   );
 }

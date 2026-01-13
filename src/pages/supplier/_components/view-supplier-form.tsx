@@ -4,6 +4,7 @@ import { Phone, Mail, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { ViewSupplierTap } from "./view-supplier-tap";
+import { SupplierCategoryBadge } from "../utils/supplier-status";
 
 export function ViewSupplierForm() {
   const { id } = useParams<{ id: string }>();
@@ -30,23 +31,6 @@ export function ViewSupplierForm() {
   }
 
   const supplier = data.data;
-
-  const CategoryBadge = ({ category }: { category: string }) => {
-    const map: Record<string, string> = {
-      ELECTRONICS: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
-      PRODUCTS: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-      FOOD: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      CLOTHING: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-      LOGISTICS: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-      OTHERS: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
-    };
-
-    return (
-      <Badge variant="secondary" className={map[category] || map["OTHERS"]}>
-        {category}
-      </Badge>
-    );
-  };
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 ">
@@ -133,7 +117,9 @@ export function ViewSupplierForm() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Category</p>
                 <p className="font-medium">
-                  <CategoryBadge category={supplier.supplier_category} />
+                  <SupplierCategoryBadge
+                    category={supplier.supplier_category}
+                  />
                 </p>
               </div>
 
@@ -174,7 +160,7 @@ export function ViewSupplierForm() {
       </div>
 
       {/* Tabs Section */}
-      {/* <ViewSupplierTap supplier={supplier} /> */}
+      <ViewSupplierTap supplier={supplier} />
     </div>
   );
 }

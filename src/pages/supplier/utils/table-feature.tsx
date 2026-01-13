@@ -3,23 +3,7 @@ import { DataTableColumn } from "@/components/reusable/data-table/data-table.typ
 import { Badge } from "@/components/ui/badge";
 import { SquarePen, Eye, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const CategoryBadge = ({ category }: { category: string }) => {
-  const map: Record<string, string> = {
-    ELECTRONICS: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
-    PRODUCTS: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    FOOD: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    CLOTHING: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-    LOGISTICS: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-    OTHERS: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
-  };
-
-  return (
-    <Badge variant="secondary" className={map[category] || map["OTHERS"]}>
-      {category}
-    </Badge>
-  );
-};
+import { SupplierCategoryBadge } from "./supplier-status";
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { label: string; className: string }> = {
@@ -106,7 +90,9 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     key: "supplier_category",
     header: "Category",
     className: "whitespace-nowrap py-6",
-    render: supplier => <CategoryBadge category={supplier.supplier_category} />,
+    render: supplier => (
+      <SupplierCategoryBadge category={supplier.supplier_category} />
+    ),
   },
   {
     key: "active_status",
