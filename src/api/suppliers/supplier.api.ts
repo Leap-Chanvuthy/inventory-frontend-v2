@@ -62,3 +62,24 @@ export const deleteSupplier = async (
   const response = await apiClient.delete(`${BASE_API_URL}/suppliers/${id}`);
   return response.data;
 };
+
+// Import suppliers from Excel/CSV
+export const importSuppliers = async (
+  file: File | null
+): Promise<{ status: boolean; message: string }> => {
+  const formData = new FormData();
+  if (file) {
+    formData.append("supplier_file", file);
+  }
+
+  const response = await apiClient.post(
+    `${BASE_API_URL}/suppliers/import`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};

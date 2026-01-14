@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, ArrowUpDown, Download, X, CirclePlus } from "lucide-react";
+import { Search, ArrowUpDown, Download, X, CirclePlus, Upload } from "lucide-react";
 
 /* ===================== Types ===================== */
 
@@ -64,6 +64,7 @@ interface TableToolbarProps {
 
   /* Actions */
   onExport?: () => void;
+  importHref?: string;
   createHref?: string;
   onCreate?: () => void;
 }
@@ -89,6 +90,7 @@ export const TableToolbar = ({
   onFilterChange,
 
   onExport,
+  importHref,
   createHref,
   onCreate,
 }: TableToolbarProps) => {
@@ -249,14 +251,27 @@ export const TableToolbar = ({
       </div>
 
       {/* RIGHT */}
-      {createHref && (
-        <Link to={createHref}>
-          <Button onClick={onCreate} className="flex items-center gap-2">
-            <CirclePlus className="h-4 w-4" />
-            Create New
-          </Button>
-        </Link>
-      )}
+      <div className="flex items-center gap-2">
+        {/* Import Button */}
+        {importHref && (
+          <Link to={importHref}>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+          </Link>
+        )}
+
+        {/* Create Button */}
+        {createHref && (
+          <Link to={createHref}>
+            <Button onClick={onCreate} className="flex items-center gap-2">
+              <CirclePlus className="h-4 w-4" />
+              Create New
+            </Button>
+          </Link>
+        )}
+      </div>
     </div>
   );
 };

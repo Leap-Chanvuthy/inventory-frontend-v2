@@ -1,5 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSupplier, updateSupplier, deleteSupplier } from "./supplier.api";
+import {
+  createSupplier,
+  updateSupplier,
+  deleteSupplier,
+  importSuppliers,
+} from "./supplier.api";
 import {
   CreateSupplierRequest,
   CreateSupplierFormPayload,
@@ -53,6 +58,23 @@ export const useDeleteSupplier = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to delete supplier");
+    },
+  });
+};
+
+export const useImportSuppliers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File | null) => importSuppliers(file),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      toast.success(response.message || "Suppliers imported successfully");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to import suppliers"
+      );
     },
   });
 };

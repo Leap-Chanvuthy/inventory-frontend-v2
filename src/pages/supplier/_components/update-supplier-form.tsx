@@ -424,10 +424,7 @@ export const UpdateSupplierForm = () => {
               fieldErrors={fieldErrors}
             />
 
-            <FormFooterActions
-              isSubmitting={supplierMutation.isPending}
-              onCancel={() => navigate("/supplier")}
-            />
+            <FormFooterActions isSubmitting={supplierMutation.isPending} />
           </form>
         </div>
       </div>

@@ -32,6 +32,7 @@ import { Supplier } from "./pages/supplier/page";
 import CreateSupplier from "./pages/supplier/create/page";
 import UpdateSupplier from "./pages/supplier/update/page";
 import { SupplierDetail } from "./pages/supplier/view/page";
+import ImportSuppliers from "./pages/supplier/import/page";
 
 export default function App() {
   const queryClient = new QueryClient(); 
@@ -67,6 +68,7 @@ export default function App() {
                 {/* Supplier */}
                 <Route path="/supplier" element={<Supplier />} />
                 <Route path="/supplier/create" element={<CreateSupplier />} />
+                <Route path="/supplier/import" element={<ImportSuppliers />} />
                 <Route path="/supplier/update/:id" element={<UpdateSupplier />} />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
 
