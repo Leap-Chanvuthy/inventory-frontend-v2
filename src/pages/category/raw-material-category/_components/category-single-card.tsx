@@ -1,11 +1,10 @@
-import { Edit2, Trash2 } from "lucide-react";
+import { Edit2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import { formatDate } from "@/utils/date-format";
 
 const SingleCard = ({
   category,
-  onDelete,
 }: {
   category: RawMaterialCategory;
   onDelete?: (id: number) => void;

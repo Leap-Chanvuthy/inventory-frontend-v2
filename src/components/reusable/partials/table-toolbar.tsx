@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, ArrowUpDown, Download, X, CirclePlus, Upload } from "lucide-react";
+import { Search, ArrowUpDown, Download, X, CirclePlus, Upload, History } from "lucide-react";
 
 /* ===================== Types ===================== */
 
@@ -65,6 +65,7 @@ interface TableToolbarProps {
   /* Actions */
   onExport?: () => void;
   importHref?: string;
+  historyHref?: string;
   createHref?: string;
   onCreate?: () => void;
 }
@@ -91,6 +92,7 @@ export const TableToolbar = ({
 
   onExport,
   importHref,
+  historyHref,
   createHref,
   onCreate,
 }: TableToolbarProps) => {
@@ -258,6 +260,16 @@ export const TableToolbar = ({
             <Button variant="outline" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               Import
+            </Button>
+          </Link>
+        )}
+
+        {/* History Button */}
+        {historyHref && (
+          <Link to={historyHref}>
+            <Button variant="outline" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              History
             </Button>
           </Link>
         )}

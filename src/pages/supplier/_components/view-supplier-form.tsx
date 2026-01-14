@@ -1,5 +1,5 @@
 import { useSingleSupplier } from "@/api/suppliers/supplier.query";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Phone, Mail, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";

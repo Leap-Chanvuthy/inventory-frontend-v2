@@ -5,6 +5,8 @@ import {
   SupplierQueryParams,
   CreateSupplierRequest,
   CreateSupplierFormPayload,
+  GetImportHistoriesResponse,
+  ImportHistoryQueryParams,
 } from "./supplier.types";
 import { apiClient } from "@/api/client";
 
@@ -81,5 +83,15 @@ export const importSuppliers = async (
       },
     }
   );
+  return response.data;
+};
+
+// Get import histories with pagination and filters
+export const getImportHistories = async (
+  params?: ImportHistoryQueryParams
+): Promise<GetImportHistoriesResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/suppliers/import-histories`, {
+    params,
+  });
   return response.data;
 };

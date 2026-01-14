@@ -171,3 +171,54 @@ export interface CreateSupplierFormPayload {
   image: File | null;
   banks: BankDetails[];
 }
+
+// User Information (for import history uploader)
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Import History Record
+export interface ImportHistoryRecord {
+  id: number;
+  filename: string;
+  size: string;
+  uploaded_by: number;
+  total_uploaded: number;
+  uploaded_at: string;
+  user: User;
+}
+
+// Import History Paginated Data
+export interface ImportHistoryPaginatedData {
+  current_page: number;
+  data: ImportHistoryRecord[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLink[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+// Import History Response
+export interface GetImportHistoriesResponse {
+  status: boolean;
+  message: string;
+  data: ImportHistoryPaginatedData;
+}
+
+// Import History Query Parameters
+export interface ImportHistoryQueryParams {
+  page?: number;
+  per_page?: number;
+  "filter[id]"?: number;
+  "filter[search]"?: string;
+  sort?: string;
+}

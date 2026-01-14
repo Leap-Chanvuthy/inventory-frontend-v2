@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSuppliers, getSupplierById } from "./supplier.api";
-import { SupplierQueryParams } from "./supplier.types";
+import { getSuppliers, getSupplierById, getImportHistories } from "./supplier.api";
+import { SupplierQueryParams, ImportHistoryQueryParams } from "./supplier.types";
 
 // Get all suppliers with pagination and filters
 export const useSuppliers = (params?: SupplierQueryParams) => {
@@ -16,5 +16,13 @@ export const useSingleSupplier = (id: number) => {
     queryKey: ["supplier", id],
     queryFn: () => getSupplierById(id),
     enabled: !!id,
+  });
+};
+
+// Get import histories with pagination and filters
+export const useImportHistories = (params?: ImportHistoryQueryParams) => {
+  return useQuery({
+    queryKey: ["import-histories", params],
+    queryFn: () => getImportHistories(params),
   });
 };

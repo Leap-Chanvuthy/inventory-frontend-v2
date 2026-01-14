@@ -1,13 +1,13 @@
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
-import { useSuppliers } from "@/api/suppliers/supplier.query";
-import { Supplier } from "@/api/suppliers/supplier.types";
+import { useImportHistories } from "@/api/suppliers/supplier.query";
+import { ImportHistoryRecord } from "@/api/suppliers/supplier.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
-export function SupplierList() {
+export function ImportHistoryList() {
   const {
     setPage,
     setSearch,
@@ -19,10 +19,14 @@ export function SupplierList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useSuppliers(apiParams);
+  const { data, isLoading, isError } = useImportHistories(apiParams);
 
   if (isError) {
-    return <p className="text-center text-red-500">Failed to load suppliers</p>;
+    return (
+      <p className="text-center text-red-500">
+        Failed to load import histories
+      </p>
+    );
   }
 
   return (
@@ -30,7 +34,7 @@ export function SupplierList() {
       <div className="mx-auto max-w-[1600px]">
         {/* Toolbar */}
         <TableToolbar
-          searchPlaceholder="Search supplier..."
+          searchPlaceholder="Search by filename or uploader..."
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
@@ -40,16 +44,14 @@ export function SupplierList() {
           selectedFilter={filter}
           onPerPageChange={setPerPage}
           importHref="/supplier/import"
-          historyHref="/supplier/import-history"
-          createHref="/supplier/create"
         />
 
         {/* Data Table */}
-        <DataTable<Supplier>
+        <DataTable<ImportHistoryRecord>
           columns={COLUMNS}
           data={data?.data?.data}
           isLoading={isLoading}
-          emptyText="No suppliers found"
+          emptyText="No import history found"
         />
 
         <div className="flex justify-center mt-6">
