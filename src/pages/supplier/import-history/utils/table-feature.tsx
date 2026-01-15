@@ -29,7 +29,7 @@ export const COLUMNS: DataTableColumn<ImportHistoryRecord>[] = [
     header: "File Size",
     className: "whitespace-nowrap",
     render: record => (
-      <span className="text-muted-foreground">{record.size}</span>
+      <span className="text-muted-foreground">{record.size} KB</span>
     ),
   },
   {
@@ -51,7 +51,7 @@ export const COLUMNS: DataTableColumn<ImportHistoryRecord>[] = [
     className: "whitespace-nowrap py-6",
     render: record => (
       <span className="font-semibold text-green-600">
-        {record.total_uploaded}
+        {record.total_uploaded} entries
       </span>
     ),
   },
