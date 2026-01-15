@@ -394,10 +394,10 @@ export const TableToolbar = ({
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
-  /* ---------- Keyboard shortcut: press "p" to focus search ---------- */
+  /* ---------- Keyboard shortcut: press "/" to focus search ---------- */
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      // only plain "p" (no modifiers)
+      // only plain "/" (no modifiers)
       if (e.key.toLowerCase() !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
 
       // don't hijack typing in inputs/textareas/selects/contenteditable
