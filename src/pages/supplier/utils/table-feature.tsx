@@ -1,9 +1,8 @@
 import { Supplier } from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
-import { SquarePen, Eye, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { SupplierCategoryBadge } from "./supplier-status";
+import TableActions from "@/components/reusable/partials/table-actions";
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { label: string; className: string }> = {
@@ -30,14 +29,14 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-// export const FILTER_OPTIONS = [
-//   { value: " ", label: "All" },
-//   { value: "PRODUCTS", label: "Products" },
-//   { value: "FOOD", label: "Food" },
-//   { value: "CLOTHING", label: "Clothing" },
-//   { value: "LOGISTICS", label: "Logistics" },
-//   { value: "OTHERS", label: "Others" },
-// ];
+export const FILTER_OPTIONS = [
+  { value: " ", label: "All" },
+  { value: "PRODUCTS", label: "Products" },
+  { value: "FOOD", label: "Food" },
+  { value: "CLOTHING", label: "Clothing" },
+  { value: "LOGISTICS", label: "Logistics" },
+  { value: "OTHERS", label: "Others" },
+];
 
 export const SORT_OPTIONS = [
   // { value: "official_name", label: "Name" },
@@ -117,23 +116,14 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: supplier => (
-      <div className="flex items-center gap-3">
-        <Link
-          to={`/supplier/view/${supplier.id}`}
-          className="text-blue-500 hover:text-blue-700 transition-colors"
-        >
-          <Eye className="h-5 w-5" />
-        </Link>
-        <Link
-          to={`/supplier/update/${supplier.id}`}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <SquarePen className="h-5 w-5" />
-        </Link>
-        <button className="text-red-500 hover:text-red-700 transition-colors">
-          <Trash2 className="h-5 w-5" />
-        </button>
-      </div>
+      <TableActions 
+        viewDetailPath={`/supplier/view/${supplier.id}`}
+        editPath={`/supplier/update/${supplier.id}`}
+        deleteHeading="Delete This Supplier"
+        deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
+        deleteTooltip="Delete Supplier"
+        onDelete={() => {console.log("delete")}}
+      />
     ),
   },
 ];

@@ -131,6 +131,7 @@ export interface SupplierQueryParams {
   per_page?: number;
   "filter[id]"?: number;
   "filter[search]"?: string;
+  "filter[supplier_category]"?:string;
   sort?: string;
 }
 
