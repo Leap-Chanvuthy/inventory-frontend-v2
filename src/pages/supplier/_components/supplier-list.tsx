@@ -4,7 +4,7 @@ import { useSuppliers } from "@/api/suppliers/supplier.query";
 import { Supplier } from "@/api/suppliers/supplier.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { DataTable } from "@/components/reusable/data-table/data-table";
-import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 
 export function SupplierList() {
@@ -13,13 +13,17 @@ export function SupplierList() {
     setSearch,
     setSort,
     setPerPage,
+    setFilter,
     perPage,
     filter,
     search,
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useSuppliers(apiParams);
+  const { data, isLoading, isError } = useSuppliers({
+    ...apiParams,
+    "filter[supplier_category]": filter,
+  });
 
   if (isError) {
     return <p className="text-center text-red-500">Failed to load suppliers</p>;
@@ -33,13 +37,14 @@ export function SupplierList() {
           searchPlaceholder="Search supplier..."
           onSearch={setSearch}
           search={search}
+          filterOptions={FILTER_OPTIONS}
+          selectedFilter={filter}
+          onFilterChange={val => setFilter(val || undefined)}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
-          selectedFilter={filter}
           onPerPageChange={setPerPage}
-          importHref="/supplier/import"
           historyHref="/supplier/import-history"
           createHref="/supplier/create"
         />

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2 } from "lucide-react";
-import ReusableTabs from "@/components/reusable/partials/tabs";
 import { Supplier } from "@/api/suppliers/supplier.types";
+import ReusableTabs from "@/components/reusable/partials/tabs";
 
 interface ViewSupplierTapProps {
   supplier: Supplier;
@@ -229,6 +229,12 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
 
   return (
     <div className="mt-6">
+      {/* <UnderlineTabs
+        name="supplier-details"
+        tabs={tabs}
+        defaultValue="general"
+      /> */}
+
       <ReusableTabs
         name="supplier-details"
         tabs={tabs}
