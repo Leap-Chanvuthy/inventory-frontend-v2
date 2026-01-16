@@ -39,7 +39,6 @@ export function SupplierList() {
           perPage={perPage}
           selectedFilter={filter}
           onPerPageChange={setPerPage}
-          importHref="/supplier/import"
           historyHref="/supplier/import-history"
           createHref="/supplier/create"
         />

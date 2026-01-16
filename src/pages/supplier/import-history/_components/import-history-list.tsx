@@ -43,7 +43,7 @@ export function ImportHistoryList() {
           perPage={perPage}
           selectedFilter={filter}
           onPerPageChange={setPerPage}
-          importHref="/supplier/import"
+          importHref="/supplier/create?tab=import"
         />
 
         {/* Data Table */}
