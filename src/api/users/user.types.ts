@@ -31,6 +31,24 @@ export interface GetUsersParams {
 }
 
 
+export interface GetUserStatisticResponse {
+  total_users: number;
+  total_users_as_of_end_last_month: number;
+  total_users_trend : {
+    delta: number;
+    percent: number;
+    direction: string;
+  }
+  total_by_role : {
+    ADMIN: string;
+    STOCK_CONTROLLER: string;
+    VENDER: string;
+  }
+  verified_users: number;
+  unverified_users: number;
+}
+
+
 
 export interface CreateUserPayload {
     name: string;

@@ -2,6 +2,7 @@ import {
   CreateUserPayload,
   GetUsersParams,
   GetUsersResponse,
+  GetUserStatisticResponse,
   UpdateUserPayload,
   User,
 } from "./user.types";
@@ -19,6 +20,12 @@ export const getUserById = async (id: number | string): Promise<User> => {
   const { data } = await apiClient.get(`${BASE_API_URL}/users/${id}`);
   return data.data;
 };
+
+
+export const getUserStatistic = async (): Promise<GetUserStatisticResponse> => {
+  const {data} = await apiClient.get(`${BASE_API_URL}/users/statistics`);
+  return data.data;
+}
 
 export const updateUser = async (
   id: number,
