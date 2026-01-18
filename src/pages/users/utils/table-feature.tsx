@@ -2,8 +2,9 @@ import { User } from "@/api/users/user.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/date-format";
-import { BadgeCheck, SquarePen } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import TableActions from "@/components/reusable/partials/table-actions";
 
 const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -109,9 +110,15 @@ export const COLUMNS: DataTableColumn<User>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: user => (
-      <Link to={`/users/update/${user.id}`}>
-        <SquarePen size={15} />
-      </Link>
+      <TableActions
+        editPath={`/users/update/${user.id}`}
+        deleteHeading="Delete User"
+        deleteSubheading={`Are you sure you want to delete ${user.name}?`}
+        deleteTooltip="Delete this user"
+        onDelete={() => console.log("Delete user:", user.id)}
+        showView={false}
+        showDelete={false}
+      />
     ),
   },
 ];
