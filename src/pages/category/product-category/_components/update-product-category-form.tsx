@@ -1,23 +1,45 @@
-import { useCreateRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
+import { useUpdateProductCategory } from "@/api/categories/product-categories/product-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
+import { useSingleProductCategory } from "@/api/categories/product-categories/product-category.query";
 import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
-import { useNavigate } from "react-router-dom";
 
-export const CreateCategoryForm = () => {
-  const categoryMutation = useCreateRawMaterialCategory();
+export const UpdateCategoryForm = () => {
+  const { id } = useParams<{ id: string }>();
+  const categoryId = Number(id);
+  const navigate = useNavigate();
+  const {
+    data: categoryData,
+    isLoading,
+    isError,
+  } = useSingleProductCategory(categoryId);
+  const categoryMutation = useUpdateProductCategory(categoryId);
+
   const error =
     categoryMutation.error as AxiosError<CreateCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
-  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     category_name: "",
     label_color: "#6366F1",
     description: "",
   });
+
+  //  data is fetched
+  useEffect(() => {
+    if (categoryData?.data) {
+      setForm({
+        category_name: categoryData.data.category_name,
+        label_color: categoryData.data.label_color,
+        description: categoryData.data.description,
+      });
+    }
+  }, [categoryData]);
 
   /* ---------- Handlers ---------- */
 
@@ -46,19 +68,48 @@ export const CreateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories");
+          navigate("/product-categories");
         }
         // save → stay, data auto-refreshed
       },
     });
   };
+
+  if (isError) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <p className="text-center text-red-500">
+                Failed to load category data
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <DataTableLoading />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">
-            Create Raw Material Category
-          </h2>
+          <h2 className="text-2xl font-semibold mb-2">Update Category</h2>
           <p className="text-sm text-muted-foreground mb-6">
             Update the details for the selected product category.
           </p>
@@ -76,7 +127,6 @@ export const CreateCategoryForm = () => {
                     ? fieldErrors.category_name[0]
                     : undefined
                 }
-                required={true}
                 onChange={handleChange}
               />
             </div>

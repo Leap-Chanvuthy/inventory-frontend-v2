@@ -28,6 +28,10 @@ import Categories from "./pages/category/page";
 import { CreateCategories } from "./pages/category/raw-material-category/create/page";
 import { EditCategories } from "./pages/category/raw-material-category/update/page";
 import { ViewCategories } from "./pages/category/raw-material-category/view/page";
+import { ProductCategories } from "./pages/category/product-category/page";
+import { CreateProductCategories } from "./pages/category/product-category/create/page";
+import { EditProductCategories } from "./pages/category/product-category/update/page";
+import { ViewProductCategories } from "./pages/category/product-category/view/page";
 import { Supplier } from "./pages/supplier/page";
 import CreateSupplier from "./pages/supplier/create/page";
 import UpdateSupplier from "./pages/supplier/update/page";
@@ -102,6 +106,21 @@ export default function App() {
                 <Route
                   path="/categories/edit/:id"
                   element={<EditCategories />}
+                />
+
+                {/* Product Categories */}
+                <Route path="/product-categories" element={<ProductCategories />} />
+                <Route
+                  path="/product-categories/create"
+                  element={<CreateProductCategories />}
+                />
+                <Route
+                  path="/product-categories/view/:id"
+                  element={<ViewProductCategories />}
+                />
+                <Route
+                  path="/product-categories/edit/:id"
+                  element={<EditProductCategories />}
                 />
 
                 {/* Company Settings */}

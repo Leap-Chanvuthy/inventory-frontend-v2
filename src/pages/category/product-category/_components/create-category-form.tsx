@@ -1,16 +1,16 @@
-import { useCreateRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
+import { useCreateProductCategory } from "@/api/categories/product-categories/product-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import { useNavigate } from "react-router-dom";
+import { CreateProductCategoryValidationErrors } from "@/api/categories/product-categories/product-category.types";
 
 export const CreateCategoryForm = () => {
-  const categoryMutation = useCreateRawMaterialCategory();
+  const categoryMutation = useCreateProductCategory();
   const error =
-    categoryMutation.error as AxiosError<CreateCategoryValidationErrors> | null;
+    categoryMutation.error as AxiosError<CreateProductCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -46,7 +46,7 @@ export const CreateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories");
+          navigate("/product-categories");
         }
         // save → stay, data auto-refreshed
       },
@@ -57,10 +57,11 @@ export const CreateCategoryForm = () => {
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
           <h2 className="text-2xl font-semibold mb-2">
-            Create Raw Material Category
+            Create Product Category
           </h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Update the details for the selected product category.
+            Create a new product category with name, description and label
+            color.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
