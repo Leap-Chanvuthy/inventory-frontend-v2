@@ -1,11 +1,12 @@
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { useUsers } from "@/api/users/user.query";
-import { User } from "@/api/users/user.types";
+import {  User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { DataTable } from "@/components/reusable/data-table/data-table";
 import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { UserCard } from "../utils/table-feature";
+import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 
 
 export default function UserList() {
@@ -19,7 +20,7 @@ export default function UserList() {
     filter,
     search,
     perPage,
-    
+
     // api ready params
     apiParams,
   } = useTableQueryParams();
@@ -51,15 +52,34 @@ export default function UserList() {
           perPage={perPage}
           onFilterChange={val => setFilter(val || undefined)}
           createHref="/users/create"
+          isListOptionDisplayed={true}
         />
 
         {/* Data Table */}
-        <DataTable<User>
+        {/* <DataTable<User>
           columns={COLUMNS}
           data={data?.data}
           isLoading={isLoading}
           emptyText="No users found"
+        /> */}
+
+        {/* Data Card */}
+        {/* <DataCard<User> 
+          data={data?.data}
+          isLoading={isLoading}
+          emptyText="No users found"
+          renderItem={user => <UserCard user={user} />}
+        /> */}
+
+        {/* Toggleable List for both Table & Card */}
+        <ToggleableList<User>
+          items={data?.data}
+          isLoading={isLoading}
+          emptyText="No users found"
+          columns={COLUMNS}
+          renderItem={(user) => <UserCard user={user} />}
         />
+
         {/* Pagination */}
         <div className="flex justify-center mt-6">
           <div className="flex items-center gap-1 border border-border rounded-lg p-1">

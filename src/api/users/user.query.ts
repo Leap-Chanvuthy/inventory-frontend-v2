@@ -1,9 +1,10 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { getUserById, getUsers } from "./user.api";
-import { GetUsersParams, GetUsersResponse, User } from "./user.types";
+import { getUserById, getUsers, getUserStatistic } from "./user.api";
+import { GetUsersParams, GetUsersResponse, GetUserStatisticResponse, User } from "./user.types";
 
 export const USER_QUERY_KEYS = {
   list: (params: GetUsersParams) => ["users", params] as const,
+  statistic: () => ['user-statistic'] as const,
   detail: (id: number | string) => ["user", id] as const,
 };
 
@@ -22,5 +23,14 @@ export const useSingleUser = (id: number | string) => {
     queryFn: () => getUserById(id),
     enabled: !!id,
   } as UseQueryOptions<User>
+);
+}
+
+
+export const useUserStatistic= () => {
+  return useQuery({
+    queryKey: USER_QUERY_KEYS.statistic(),
+    queryFn: () => getUserStatistic()
+  } as UseQueryOptions<GetUserStatisticResponse>
 );
 }

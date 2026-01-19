@@ -3,6 +3,14 @@ import { DataTableColumn } from "@/components/reusable/data-table/data-table.typ
 import { Badge } from "@/components/ui/badge";
 import { SupplierCategoryBadge } from "./supplier-status";
 import TableActions from "@/components/reusable/partials/table-actions";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { label: string; className: string }> = {
@@ -116,14 +124,121 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: supplier => (
-      <TableActions 
+      <TableActions
         viewDetailPath={`/supplier/view/${supplier.id}`}
         editPath={`/supplier/update/${supplier.id}`}
         deleteHeading="Delete This Supplier"
         deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
         deleteTooltip="Delete Supplier"
-        onDelete={() => {console.log("delete")}}
+        onDelete={() => {
+          console.log("delete");
+        }}
       />
     ),
   },
 ];
+
+interface SupplierCardProps {
+  supplier?: Supplier;
+}
+
+export function SupplierCard({ supplier }: SupplierCardProps) {
+  if (!supplier) return null;
+
+  const addressText = [
+    [supplier.address_line1, supplier.address_line2].filter(Boolean).join(" "),
+    [supplier.village, supplier.commune, supplier.district]
+      .filter(Boolean)
+      .join(", "),
+    [supplier.city, supplier.province, supplier.postal_code]
+      .filter(Boolean)
+      .join(" "),
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return (
+    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+      {/* Header */}
+      <CardHeader className="flex items-start justify-between gap-4 pb-3">
+        <Link to={`/supplier/view/${supplier.id}`} className="flex-1">
+          <div className="flex items-center gap-4">
+            <img
+              src={supplier.image || "/supplier-placeholder.png"}
+              alt={supplier.official_name}
+              className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
+            />
+            {/* <div className="min-w-0 flex flex-col gap-1"> */}
+            <div className="font-semibold text-lg truncate text-wrap">
+              {supplier.official_name}
+            </div>
+
+            {/* </div> */}
+          </div>
+        </Link>
+      </CardHeader>
+
+      {/* Content */}
+      <CardContent className="space-y-3 text-sm">
+        {/* Supplier Info */}
+        <div className="flex flex-wrap gap-2 mt-1">
+          <SupplierCategoryBadge category={supplier.supplier_category} />
+          <StatusBadge status="active" />
+        </div>
+
+        {/* Contact */}
+        <div className="flex flex-col gap-1">
+          {supplier.supplier_code && (
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <ScanQrCode className="h-4 w-4" />
+              {supplier.supplier_code}
+            </div>
+          )}
+          {supplier.phone && (
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <Phone className="h-4 w-4 text-blue-500" />
+              {supplier.phone}
+            </div>
+          )}
+          {supplier.email && (
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <Mail className="h-4 w-4 text-green-500" />
+              {supplier.email}
+            </div>
+          )}
+        </div>
+
+        {/* Address */}
+        <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
+          <MapPin className="h-4 w-4 text-red-400 mt-0.5" />
+          <div
+            className="text-xs leading-snug break-words"
+            style={{
+              display: "-webkit-box",
+              WebkitBoxOrient: "vertical",
+              WebkitLineClamp: 2,
+              overflow: "hidden",
+              whiteSpace: "pre-line",
+            }}
+            title={addressText || "-"}
+          >
+            {addressText || "-"}
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex justify-end pt-0">
+        <TableActions
+          viewDetailPath={`/supplier/view/${supplier.id}`}
+          editPath={`/supplier/update/${supplier.id}`}
+          deleteHeading="Delete This Supplier"
+          deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
+          deleteTooltip="Delete Supplier"
+          onDelete={() => {
+            console.log("delete");
+          }}
+        />
+      </CardFooter>
+    </Card>
+  );
+}

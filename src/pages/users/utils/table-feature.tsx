@@ -2,11 +2,12 @@ import { User } from "@/api/users/user.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/date-format";
-import { BadgeCheck } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { BadgeCheck, Calendar, Mail, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import TableActions from "@/components/reusable/partials/table-actions";
 
-const RoleBadge = ({ role }: { role: string }) => {
+export const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
     ADMIN: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     VENDER: "bg-red-500/10 text-red-600 dark:text-red-400",
@@ -122,3 +123,57 @@ export const COLUMNS: DataTableColumn<User>[] = [
     ),
   },
 ];
+
+export function UserCard({ user }: { user?: User }) {
+  if (!user) return null;
+
+  return (
+    <Card className="transition-shadow hover:shadow-md">
+      {/* Header */}
+      <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
+        <div className="flex items-center gap-3">
+          <img
+            src={user.profile_picture || "/avatar-placeholder.png"}
+            alt={user.name}
+            className="h-12 w-12 rounded-full border object-cover"
+          />
+
+          <div className="min-w-0">
+            <Link
+              to={`/users/update/${user.id}`}
+              className="block font-medium truncate hover:text-primary"
+            >
+              {user.name}
+            </Link>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Mail className="h-3 w-3" />
+              <span className="truncate">{user.email}</span>
+            </div>
+          </div>
+        </div>
+
+        {user.email_verified_at && (
+          <BadgeCheck className="h-4 w-4 text-blue-500 shrink-0" />
+        )}
+      </CardHeader>
+
+      {/* Content */}
+      <CardContent className="space-y-3 text-sm">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <RoleBadge role={user.role} />
+        </div>
+
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Calendar className="h-4 w-4" />
+          <span>Created {formatDate(user.created_at)}</span>
+        </div>
+
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Calendar className="h-4 w-4" />
+          <span>Updated {formatDate(user.updated_at)}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

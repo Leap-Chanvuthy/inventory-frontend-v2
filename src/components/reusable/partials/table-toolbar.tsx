@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import debounce from "debounce";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import { Search, ArrowUpDown, Download, X, CirclePlus, Upload, History } from "lucide-react";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import ListOptionToggle from "./list-option-toggle";
 
 /* ===================== Types ===================== */
 
@@ -50,8 +52,6 @@ interface TableToolbarProps {
   perPage?: number;
   onPerPageChange?: (value: number) => void;
 
-  
-
   /* Sort */
   sortOptions?: SortOption[];
   selectedSort?: string[];
@@ -68,6 +68,7 @@ interface TableToolbarProps {
   historyHref?: string;
   createHref?: string;
   onCreate?: () => void;
+  isListOptionDisplayed?: boolean;
 }
 
 /* ===================== Component ===================== */
@@ -95,11 +96,40 @@ export const TableToolbar = ({
   historyHref,
   createHref,
   onCreate,
+  isListOptionDisplayed = false,
 }: TableToolbarProps) => {
   const [searchValue, setSearchValue] = useState<string>(search || "");
   const [sortValues, setSortValues] = useState<string[]>(selectedSort || []);
   const [filterValue, setFilterValue] = useState<string>(selectedFilter ?? "");
   const [perPageValue, setPerPageValue] = useState<number | undefined>(perPage || undefined);
+
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  /* ---------- Keyboard shortcut: press "/" to focus search ---------- */
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // only plain "/" (no modifiers)
+      if (e.key.toLowerCase() !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+
+      // don't hijack typing in inputs/textareas/selects/contenteditable
+      const el = document.activeElement as HTMLElement | null;
+      const tag = el?.tagName?.toLowerCase();
+      const isTypingContext =
+        tag === "input" ||
+        tag === "textarea" ||
+        tag === "select" ||
+        el?.isContentEditable;
+
+      if (isTypingContext) return;
+
+      e.preventDefault();
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   /* ---------- Debounced Search ---------- */
   const debouncedSearch = useCallback(
@@ -152,17 +182,28 @@ export const TableToolbar = ({
         {/* Search */}
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+
           <Input
+            ref={searchInputRef}
             value={search || searchValue}
             onChange={e => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
-            className="pl-9"
+            className="pl-9 pr-12"
           />
-          {searchValue && (
+
+          {searchValue ? (
             <X
               className="text-red-500 absolute right-3 top-2.5 h-4 w-4 text-muted-foreground cursor-pointer"
               onClick={() => setSearchValue("")}
             />
+          ) : (
+            <KbdGroup
+              className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2
+                         rounded border border-border bg-muted
+                         text-[10px] font-medium text-muted-foreground"
+            >
+              <Kbd>/</Kbd>
+            </KbdGroup>
           )}
         </div>
 
@@ -230,6 +271,7 @@ export const TableToolbar = ({
             </Select>
           )}
 
+          {isListOptionDisplayed && <ListOptionToggle />}
 
           {(filterValue || sortValues.length > 0) && (
             <Button
