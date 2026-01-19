@@ -166,7 +166,7 @@ export const BankPaymentSection = ({
                   <TextInput
                     id={`payment_link_${index}`}
                     label="Payment Link"
-                    placeholder="Enter payment link (optional)"
+                    placeholder="Enter payment link"
                     value={bank.payment_link}
                     onChange={e =>
                       handleBankChange(index, "payment_link", e.target.value)

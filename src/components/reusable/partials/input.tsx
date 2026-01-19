@@ -21,6 +21,7 @@ type TextInputProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isNumberOnly?: boolean;
+  maxLength?: number;
 };
 
 type TextAreaInputProps = {
@@ -31,6 +32,7 @@ type TextAreaInputProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   required?: boolean;
+  maxLength?: number;
 };
 
 type SelectInputProps = {
@@ -54,6 +56,7 @@ export const TextInput = ({
   value,
   onChange,
   isNumberOnly = false,
+  maxLength,
 }: TextInputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -89,6 +92,7 @@ export const TextInput = ({
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
+          maxLength={maxLength}
           className={`pr-10 ${
             error ? "border-red-500 focus-visible:ring-red-500" : ""
           }`}
@@ -128,6 +132,7 @@ export const TextAreaInput = ({
   value,
   onChange,
   required = false,
+  maxLength,
 }: TextAreaInputProps) => {
   return (
     <div className="space-y-1.5 w-full">
@@ -149,6 +154,7 @@ export const TextAreaInput = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          maxLength={maxLength}
           className={`pr-10 ${
             error ? "border-red-500 focus-visible:ring-red-500" : ""
           }`}
@@ -185,10 +191,7 @@ export const SelectInput = ({
       )}
 
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger
-          id={id}
-          className={error ? "border-red-500" : ""}
-        >
+        <SelectTrigger id={id} className={error ? "border-red-500" : ""}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 

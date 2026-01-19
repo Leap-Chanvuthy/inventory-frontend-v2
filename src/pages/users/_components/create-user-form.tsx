@@ -5,7 +5,7 @@ import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
 import { USER_ROLES } from "@/consts/role";
 import { AxiosError } from "axios";
-import { Info } from "lucide-react";
+import { Info, Truck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -132,6 +132,8 @@ export const CreateUserForm = () => {
                     }
                     placeholder="Enter phone number"
                     value={form.phone_number}
+                    isNumberOnly={true}
+                    maxLength={10}
                   />
                 </div>
 

@@ -40,7 +40,17 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
 }) => {
   const popupCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const validMarkers = markers.filter(m => m.lat && m.lng);
+  // Filter markers with valid coordinates
+  const validMarkers = markers.filter(m => {
+    const lat = Number(m.lat);
+    const lng = Number(m.lng);
+    return (
+      m.lat != null && m.lng != null &&
+      !isNaN(lat) && !isNaN(lng) &&
+      lat >= -90 && lat <= 90 &&
+      lng >= -180 && lng <= 180
+    );
+  });
 
   const center =
     validMarkers.length > 0

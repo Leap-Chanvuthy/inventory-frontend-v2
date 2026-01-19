@@ -182,6 +182,8 @@ export const UpdateUserForm = () => {
                     placeholder="Enter phone number"
                     value={form.phone_number}
                     required={true}
+                    isNumberOnly={true}
+                    maxLength={10}
                   />
                 </div>
               </div>

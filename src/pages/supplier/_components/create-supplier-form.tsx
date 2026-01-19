@@ -165,6 +165,8 @@ export const CreateSupplierForm = () => {
                         value={form.phone}
                         error={fieldErrors?.phone?.[0]}
                         onChange={handleChange}
+                        isNumberOnly={true}
+                        maxLength={10}
                       />
                       <TextInput
                         id="email"
@@ -201,20 +203,22 @@ export const CreateSupplierForm = () => {
                   <TextInput
                     id="tax_identification_number"
                     label="Tax Identification Number"
-                    type="number"
+                    type="text"
                     placeholder="Enter TIN"
                     value={form.tax_identification_number}
                     error={fieldErrors?.tax_identification_number?.[0]}
                     onChange={handleChange}
+                    isNumberOnly={true}
                   />
                   <TextInput
                     id="business_registration_number"
                     label="Business Registration Number"
-                    type="number"
+                    type="text"
                     placeholder="Enter BRN"
                     value={form.business_registration_number}
                     error={fieldErrors?.business_registration_number?.[0]}
                     onChange={handleChange}
+                    isNumberOnly={true}
                   />
                 </div>
 
@@ -306,11 +310,12 @@ export const CreateSupplierForm = () => {
                   <TextInput
                     id="postal_code"
                     label="Postal Code"
-                    type="number"
+                    type="text"
                     placeholder="Enter postal code"
                     value={form.postal_code}
                     error={fieldErrors?.postal_code?.[0]}
                     onChange={handleChange}
+                    isNumberOnly={true}
                   />
                 </div>
 
