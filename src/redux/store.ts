@@ -5,18 +5,23 @@ import storage from 'redux-persist/lib/storage'
 
 import themeReducer from './slices/theme-slice'
 import authReducer from './slices/auth-slice'
+import listOptionsReducer from './slices/list-options-slice'
 import selectionReducer from './slices/selection-slice';
 
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['theme' , 'auth'],
+  whitelist: ['theme' , 'auth', 'listOptions'],
 }
 
 const rootReducer = combineReducers({
+  // Persisted
   theme: themeReducer,
   auth: authReducer,
+  listOptions: listOptionsReducer,
+
+  // Not persisted
   selection: selectionReducer,
 })
 

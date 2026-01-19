@@ -2,10 +2,11 @@ import { User } from "@/api/users/user.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/date-format";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BadgeCheck, SquarePen } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const RoleBadge = ({ role }: { role: string }) => {
+export const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
     ADMIN: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     VENDER: "bg-red-500/10 text-red-600 dark:text-red-400",
@@ -115,3 +116,39 @@ export const COLUMNS: DataTableColumn<User>[] = [
     ),
   },
 ];
+
+
+
+export function UserCard({ user }: { user?: User }) {
+  if (!user) return null;
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center gap-4">
+        <img
+          src={user.profile_picture || "/avatar-placeholder.png"}
+          className="h-12 w-12 rounded-full border"
+          alt={user.name}
+        />
+
+        <div>
+          <Link
+            to={`/users/update/${user.id}`}
+            className="font-medium underline"
+          >
+            {user.name}
+          </Link>
+          <p className="text-xs text-muted-foreground">{user.email}</p>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-2 text-sm">
+        <div>
+          Role: <RoleBadge role={user.role} />
+        </div>
+        <div>Created: {formatDate(user.created_at)}</div>
+        <div>Updated: {formatDate(user.updated_at)}</div>
+      </CardContent>
+    </Card>
+  );
+}
