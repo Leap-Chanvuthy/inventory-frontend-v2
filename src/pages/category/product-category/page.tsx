@@ -1,5 +1,5 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
-import { CategoryList } from "./_components/product-category-list";
+import { ProductCategoryList } from "./_components/product-category-list";
 
 export const ProductCategories = () => {
   const breadcrumbItems = [
@@ -17,7 +17,7 @@ export const ProductCategories = () => {
         <p className="text-muted-foreground mb-6">
           Manage your product categories
         </p>
-        <CategoryList />
+        <ProductCategoryList />
       </div>
     </div>
   );

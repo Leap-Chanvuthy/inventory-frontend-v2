@@ -3,7 +3,7 @@ import {
   getRawMaterialCategories,
   getRawMaterialCategoryById,
 } from "./raw-material-category.api";
-import { CategoryQueryParams } from "./raw-material-category.types";
+import { CategoryQueryParams } from "@/api/categories/types/category.type";
 
 export const useRawMaterialCategories = (params?: CategoryQueryParams) => {
   return useQuery({

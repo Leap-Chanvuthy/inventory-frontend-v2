@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { useSingleProductCategory } from "@/api/categories/product-categories/product-category.query";
-import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
+import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
 
 export const UpdateCategoryForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,7 +68,7 @@ export const UpdateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/product-categories");
+          navigate("/categories?tab=product-category");
         }
         // save → stay, data auto-refreshed
       },

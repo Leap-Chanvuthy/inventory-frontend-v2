@@ -4,7 +4,7 @@ import {
   updateProductCategory,
 } from "./product-category.api";
 import { toast } from "sonner";
-import { CreateProductCategoryRequest } from "./product-category.types";
+import { CreateProductCategoryRequest } from "@/api/categories/types/category.type";
 
 export const useCreateProductCategory = () => {
   const queryClient = useQueryClient();

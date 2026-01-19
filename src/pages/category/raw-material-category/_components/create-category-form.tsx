@@ -4,7 +4,7 @@ import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
+import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
 import { useNavigate } from "react-router-dom";
 
 export const CreateCategoryForm = () => {
@@ -46,7 +46,7 @@ export const CreateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories");
+          navigate("/categories?tab=raw-material-category");
         }
         // save → stay, data auto-refreshed
       },

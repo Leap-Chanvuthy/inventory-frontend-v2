@@ -5,7 +5,7 @@ import { ColorPickerInput } from "@/components/reusable/partials/color-picker-in
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CreateCategoryValidationErrors } from "@/api/categories/raw-material-categories/raw-material-category.types";
+import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 
@@ -68,7 +68,7 @@ export const UpdateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories");
+          navigate("/categories?tab=raw-material-category");
         }
         // save → stay, data auto-refreshed
       },

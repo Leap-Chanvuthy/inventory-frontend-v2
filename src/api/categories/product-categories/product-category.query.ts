@@ -3,7 +3,7 @@ import {
   getProductCategories,
   getProductCategoryById,
 } from "./product-category.api";
-import { ProductCategoryQueryParams } from "./product-category.types";
+import { ProductCategoryQueryParams } from "@/api/categories/types/category.type";
 
 export const useProductCategories = (params?: ProductCategoryQueryParams) => {
   return useQuery({

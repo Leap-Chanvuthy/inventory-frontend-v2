@@ -1,16 +1,16 @@
-import { useCreateProductCategory } from "@/api/categories/product-categories/product-category.mutation";
+import { useCreateCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreateProductCategoryValidationErrors } from "@/api/categories/types/category.type";
+import { CreateCustomerCategoryValidationErrors } from "@/api/categories/types/category.type";
 
-export const CreateCategoryForm = () => {
-  const categoryMutation = useCreateProductCategory();
+export const CreateCustomerCategoryForm = () => {
+  const categoryMutation = useCreateCustomerCategory();
   const error =
-    categoryMutation.error as AxiosError<CreateProductCategoryValidationErrors> | null;
+    categoryMutation.error as AxiosError<CreateCustomerCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -46,8 +46,9 @@ export const CreateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories?tab=product-category");
+          navigate("/categories?tab=customer-category");
         }
+        // save → stay, data auto-refreshed
       },
     });
   };
@@ -56,10 +57,10 @@ export const CreateCategoryForm = () => {
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
           <h2 className="text-2xl font-semibold mb-2">
-            Create Product Category
+            Create Customer Category
           </h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Create a new product category with name, description and label
+            Create a new customer category with name, description and label
             color.
           </p>
 

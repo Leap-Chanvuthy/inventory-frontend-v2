@@ -10,7 +10,7 @@ interface CategoryListProps {
   onDelete?: (id: number) => void;
 }
 
-export const CategoryList = ({ onDelete }: CategoryListProps) => {
+export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
   const {
     setPage,
     setSearch,

@@ -4,13 +4,13 @@ import {
   ProductCategory,
   ProductCategoryQueryParams,
   ProductCategoryResponse,
-} from "./product-category.types";
+} from "@/api/categories/types/category.type";
 import { apiClient } from "@/api/client";
 
 // Product Categories
 export const getProductCategories = async (
   params?: ProductCategoryQueryParams
-): Promise<ProductCategoryResponse<ProductCategory>> => {
+): Promise<ProductCategoryResponse> => {
   const response = await apiClient.get(`${BASE_API_URL}/product-categories`, {
     params,
   });
