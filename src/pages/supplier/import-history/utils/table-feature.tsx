@@ -54,9 +54,9 @@ export const COLUMNS: DataTableColumn<ImportHistoryRecord>[] = [
     className: "whitespace-nowrap ",
     render: record => (
       <div className="flex flex-col">
-        <span className="font-medium">{record?.user?.name}</span>
+        <span className="font-medium">{record?.user?.name || 'DELETED USER'}</span>
         <span className="text-sm text-muted-foreground">
-          {record?.user?.email}
+          {record?.user?.email || 'DELETED USER EMAIL'}
         </span>
       </div>
     ),
@@ -68,7 +68,10 @@ export const COLUMNS: DataTableColumn<ImportHistoryRecord>[] = [
     render: record => (
       <div className="flex flex-col">
         <span className="text-sm text-muted-foreground">
-          {record.user.role && <RoleBadge role={record.user.role} />}
+          {record?.user?.role || 'DELETED USER ROLE'}
+        </span>
+        <span className="font-medium">
+          {record?.user?.role && <RoleBadge role={record?.user?.role || 'DELETED USER ROLE'} />}
         </span>
       </div>
     ),
