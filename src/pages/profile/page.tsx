@@ -33,7 +33,7 @@ const Profile = () => {
   return (
     <div className="max-w-[1500px] mx-auto p-10 space-y-6 min-h-screen">
       <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
         <p className="text-muted-foreground">
           Manage your account settings and preferences.
         </p>
