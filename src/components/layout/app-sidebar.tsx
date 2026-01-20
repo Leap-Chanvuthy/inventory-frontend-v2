@@ -4,16 +4,13 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { LogOut } from "lucide-react";
 import { SIDEBAR_CONFIG } from "../../consts/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarMenuGroup } from "./sidebar-menu";
-import { useDispatch } from "react-redux";
-import { logout } from "@/redux/slices/auth-slice";
+import SidebarFooterComponent from "./sidebar-footer";
 
 export function AppSidebar() {
-  const { user, role } = useAuth();
-  const dispatch = useDispatch();
+  const { role } = useAuth();
 
   return (
     <Sidebar>
@@ -46,29 +43,7 @@ export function AppSidebar() {
 
       {/* Footer */}
       <SidebarFooter className="border-t p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-              {/* <User size={14} /> */}
-              <img
-                src={user?.profile_picture || ""}
-                alt={user?.name}
-                className="h-8 w-8 rounded-full"
-              />
-            </div>
-            <div className="text-xs">
-              <div className="font-medium">{user?.name}</div>
-              <div className="text-muted-foreground">{user?.role}</div>
-            </div>
-          </div>
-
-          <button
-            onClick={() => dispatch(logout())}
-            className="text-destructive hover:opacity-80"
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
+        <SidebarFooterComponent />
       </SidebarFooter>
     </Sidebar>
   );
