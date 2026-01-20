@@ -9,7 +9,7 @@ export function TwoFactorAuth() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h3 className="text-lg font-medium ">Two-Factor Authentication</h3>
         <p className="text-sm text-muted-foreground">

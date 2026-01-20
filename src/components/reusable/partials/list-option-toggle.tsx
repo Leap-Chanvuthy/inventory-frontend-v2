@@ -1,36 +1,3 @@
-// import { RootState } from "@/redux/store";
-// import { useDispatch, useSelector } from "react-redux";
-// import { LayoutGrid, Table } from "lucide-react";
-// import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-// // Adjust this import path to your actual slice file location.
-// import { setOption } from "@/redux/slices/list-options-slice";
-
-// type ListOption = "table" | "card";
-
-// const ListOptionToggle = () => {
-//   const dispatch = useDispatch();
-//   const option = useSelector((state: RootState) => state.listOptions.option) ?? "table";
-
-//   const nextOption: ListOption = option === "table" ? "card" : "table";
-//   const NextIcon = option === "table" ? LayoutGrid : Table;
-
-
-//   return (
-//     <ToggleGroup type="single" value={option}>
-//       <ToggleGroupItem
-//         value={option}
-//         aria-label={nextOption === "card" ? "Switch to card view" : "Switch to table view"}
-//         onClick={() => dispatch(setOption(nextOption))}
-//       >
-//         <NextIcon className="h-4 w-4" />
-//       </ToggleGroupItem>
-//     </ToggleGroup>
-//   );
-// };
-
-// export default ListOptionToggle;
-
 import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { LayoutGrid, Table } from "lucide-react";

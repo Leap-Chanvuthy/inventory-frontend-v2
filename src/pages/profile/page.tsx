@@ -1,12 +1,13 @@
 import { Separator } from "@/components/ui/separator";
 import { ProfileForm } from "./_components/profile-form";
 import { ProfileSidebar } from "@/components/reusable/partials/profile-sidebar";
-import { User, Palette, Bell, LockKeyhole } from "lucide-react";
+import { User, Palette, Bell, LockKeyhole, MailCheck } from "lucide-react";
 import { ProfileTab } from "@/components/reusable/partials/profile-sidebar";
 import { useSearchParams } from "react-router-dom";
 import { TwoFactorAuth } from "./_components/two-factor-auth";
 import { AppearanceSetting } from "./_components/appearance-setting";
 import SidebarFooter from "@/components/layout/sidebar-footer";
+import { ForgetPassword } from "./_components/forget-password";
 
 export const PROFILE_SIDEBAR_MENU_ITEMS: {
   title: string;
@@ -14,6 +15,7 @@ export const PROFILE_SIDEBAR_MENU_ITEMS: {
   icon: React.ReactNode;
 }[] = [
   { title: "Profile", tab: "profile", icon: <User className="w-4 h-4" /> },
+  { title: "Forget Password", tab: "forget-password", icon: <MailCheck className="w-4 h-4" /> },
   { title: "Two Factor Auth", tab: "two-factor-auth", icon: <LockKeyhole className="w-4 h-4" /> },
   { title: "Appearance", tab: "appearance", icon: <Palette className="w-4 h-4" /> },
   { title: "Notifications", tab: "notifications", icon: <Bell className="w-4 h-4" /> },
@@ -52,7 +54,8 @@ const Profile = () => {
 
         <div className="flex-1 lg:max-w-2xl">
           {activeTab === "profile" && <ProfileForm />}
-            {activeTab === "two-factor-auth" && <TwoFactorAuth />}
+          {activeTab === "two-factor-auth" && <TwoFactorAuth />}
+            {activeTab === "forget-password" && <ForgetPassword />}
           {activeTab === "appearance" && <AppearanceSetting />}
           {activeTab === "notifications" && <div>Notification Settings</div>}
         </div>

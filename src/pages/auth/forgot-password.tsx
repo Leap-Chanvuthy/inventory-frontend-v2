@@ -52,7 +52,7 @@ const ForgotPassword = () => {
 }
 
 
-const RequestForm = () => {
+export const RequestForm = () => {
 
     const [email , setEmail] = useState<string>("");
     
@@ -103,7 +103,7 @@ const RequestForm = () => {
 }
 
 
-const FormFooter = () => {
+export const FormFooter = () => {
     return (
         <p className="text-sm text-gray-600 dark:text-gray-400">
             Remember your password?{" "}
@@ -115,7 +115,7 @@ const FormFooter = () => {
 }
 
 
-const RequestSuccess = (props: VerifyEmailResponse) => {
+export const RequestSuccess = (props: VerifyEmailResponse) => {
     return (
         <div className="grid w-full max-w-xl items-start gap-4">
             <Alert variant="success">
@@ -129,7 +129,7 @@ const RequestSuccess = (props: VerifyEmailResponse) => {
     )
 }
 
-const RequestFailed = (props: VerifyEmailResponse) => {
+export const RequestFailed = (props: VerifyEmailResponse) => {
     return (
         <div className="grid w-full max-w-xl items-start gap-4">
             <Alert variant="destructive">

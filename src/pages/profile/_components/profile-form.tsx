@@ -5,7 +5,7 @@ import FormFooterActions from "@/components/reusable/partials/form-footer-action
 
 export function ProfileForm() {
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
             <div className="grid gap-6">
 
