@@ -1,5 +1,13 @@
 import { BASE_API_URL } from "@/consts/endpoints";
-import { CompanyResponse, UpdateCompanyRequest, Company } from "./company.type";
+import {
+  CompanyResponse,
+  UpdateCompanyRequest,
+  Company,
+  UpdateAddressRequest,
+  AddressResponse,
+  UpdateTelegramRequest,
+  TelegramResponse
+} from "./company.type";
 import { apiClient } from "@/api/client";
 
 // Get company information
@@ -17,5 +25,21 @@ export const updateCompanyInfo = async (
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+// Update company address information
+export const updateAddressInfo = async (
+  data: UpdateAddressRequest
+): Promise<AddressResponse> => {
+  const response = await apiClient.post(`${BASE_API_URL}/company/address-info`, data);
+  return response.data;
+};
+
+// Update telegram notification chat ID
+export const updateTelegramInfo = async (
+  data: UpdateTelegramRequest
+): Promise<TelegramResponse> => {
+  const response = await apiClient.post(`${BASE_API_URL}/company/telegram-info`, data);
   return response.data;
 };

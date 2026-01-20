@@ -56,3 +56,49 @@ export interface CompanyValidationErrors {
 export type UpdateCompanyValidationErrors = {
   errors?: Record<string, string[]>;
 };
+
+// Address Information
+export interface AddressInfo {
+  full_address: string;
+  house_number: string;
+  street: string;
+  commune: string;
+  district: string;
+  city: string;
+}
+
+// Update Address Request
+export interface UpdateAddressRequest {
+  full_address: string;
+  house_number: string;
+  street: string;
+  commune: string;
+  district: string;
+  city: string;
+}
+
+// Address Response
+export interface AddressResponse {
+  status: boolean;
+  message: string;
+  data: AddressInfo;
+}
+
+// Telegram Information
+export interface TelegramInfo {
+  type: string;
+  chat_id: string;
+}
+
+// Update Telegram Request
+export interface UpdateTelegramRequest {
+  type: string;
+  chat_id: string;
+}
+
+// Telegram Response
+export interface TelegramResponse {
+  status: boolean;
+  message: string;
+  data: TelegramInfo;
+}

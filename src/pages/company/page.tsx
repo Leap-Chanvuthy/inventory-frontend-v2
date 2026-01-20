@@ -2,6 +2,7 @@ import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import ReusableTabs from "@/components/reusable/partials/tabs";
 import { NotificationInfo } from "./_components/notification-info";
 import { GeneralInfo } from "./company_general_detail/page";
+import { AddressInfo } from "./company-address-info/page";
 
 const breadcrumbItems = [
   { name: "settings", label: "Settings", link: "/settings" },
@@ -13,6 +14,11 @@ const tabs = [
     label: "General",
     value: "general-info",
     content: <GeneralInfo />,
+  },
+  {
+    label: "Address",
+    value: "address-info",
+    content: <AddressInfo />,
   },
   {
     label: "Banking",

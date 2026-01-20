@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateCompanyInfo } from "./company.api";
+import { updateCompanyInfo, updateAddressInfo, updateTelegramInfo } from "./company.api";
 import { toast } from "sonner";
-import { UpdateCompanyRequest } from "./company.type";
+import { UpdateCompanyRequest, UpdateAddressRequest, UpdateTelegramRequest } from "./company.type";
 
 export const useUpdateCompanyInfo = () => {
   const queryClient = useQueryClient();
@@ -16,6 +16,42 @@ export const useUpdateCompanyInfo = () => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to update company information"
+      );
+    },
+  });
+};
+
+export const useUpdateAddressInfo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateAddressRequest) => updateAddressInfo(data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["company-info"] });
+      toast.success("Address information updated successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update address information"
+      );
+    },
+  });
+};
+
+export const useUpdateTelegramInfo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateTelegramRequest) => updateTelegramInfo(data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["company-info"] });
+      toast.success("Telegram notification updated successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update telegram notification"
       );
     },
   });
