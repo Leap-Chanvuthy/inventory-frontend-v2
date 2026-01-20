@@ -97,6 +97,7 @@ export const CreateWarehouseForm = () => {
                   fieldErrors?.latitude ? fieldErrors.latitude[0] : undefined
                 }
                 onChange={handleChange}
+                isNumberOnly={true}
               />
               <TextInput
                 id="longitude"
@@ -107,6 +108,7 @@ export const CreateWarehouseForm = () => {
                   fieldErrors?.longitude ? fieldErrors.longitude[0] : undefined
                 }
                 onChange={handleChange}
+                isNumberOnly={true}
               />
             </div>
 
@@ -151,6 +153,8 @@ export const CreateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
+                isNumberOnly={true}
+                maxLength={10}
               />
               <TextInput
                 id="warehouse_manager_email"

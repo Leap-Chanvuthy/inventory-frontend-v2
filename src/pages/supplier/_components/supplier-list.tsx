@@ -3,9 +3,9 @@ import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { useSuppliers } from "@/api/suppliers/supplier.query";
 import { Supplier } from "@/api/suppliers/supplier.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS, SupplierCard } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS, SupplierCard } from "../utils/table-feature";
 
 export function SupplierList() {
   const {
@@ -50,14 +50,12 @@ export function SupplierList() {
           isListOptionDisplayed={true}
         />
 
-
         <ToggleableList<Supplier>
           items={data?.data?.data || []}
           isLoading={isLoading}
           emptyText="No suppliers found"
           columns={COLUMNS}
-          renderItem={(supplier) => <SupplierCard supplier={supplier} />}
-
+          renderItem={supplier => <SupplierCard supplier={supplier} />}
         />
 
         <div className="flex justify-center mt-6">

@@ -3,8 +3,9 @@ import { DataTableColumn } from "@/components/reusable/data-table/data-table.typ
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/date-format";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BadgeCheck, Calendar, Mail, Shield, SquarePen } from "lucide-react";
+import { BadgeCheck, Calendar, Mail, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
+import TableActions from "@/components/reusable/partials/table-actions";
 
 export const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -110,14 +111,18 @@ export const COLUMNS: DataTableColumn<User>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: user => (
-      <Link to={`/users/update/${user.id}`}>
-        <SquarePen size={15} />
-      </Link>
+      <TableActions
+        editPath={`/users/update/${user.id}`}
+        deleteHeading="Delete User"
+        deleteSubheading={`Are you sure you want to delete ${user.name}?`}
+        deleteTooltip="Delete this user"
+        onDelete={() => console.log("Delete user:", user.id)}
+        showView={false}
+        showDelete={false}
+      />
     ),
   },
 ];
-
-
 
 export function UserCard({ user }: { user?: User }) {
   if (!user) return null;
@@ -148,9 +153,7 @@ export function UserCard({ user }: { user?: User }) {
         </div>
 
         {user.email_verified_at && (
-          <BadgeCheck
-            className="h-4 w-4 text-blue-500 shrink-0"
-          />
+          <BadgeCheck className="h-4 w-4 text-blue-500 shrink-0" />
         )}
       </CardHeader>
 

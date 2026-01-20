@@ -229,6 +229,7 @@ export const UpdateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
+                isNumberOnly={false}
               />
               <TextInput
                 id="warehouse_manager_email"

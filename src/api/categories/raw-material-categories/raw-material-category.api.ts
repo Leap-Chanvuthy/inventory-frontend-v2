@@ -1,16 +1,16 @@
 import { BASE_API_URL } from "@/consts/endpoints";
 import {
-  CategoryResponse,
-  CategoryQueryParams,
+  RawMaterialCategoryResponse,
+  RawMaterialCategoryQueryParams,
   RawMaterialCategory,
-  CreateCategoryRequest,
-} from "./raw-material-category.types";
+  CreateRawMaterialCategoryRequest,
+} from "../types/category.type";
 import { apiClient } from "@/api/client";
 
 // Raw Material Categories
 export const getRawMaterialCategories = async (
-  params?: CategoryQueryParams
-): Promise<CategoryResponse<RawMaterialCategory>> => {
+  params?: RawMaterialCategoryQueryParams
+): Promise<RawMaterialCategoryResponse> => {
   const response = await apiClient.get(
     `${BASE_API_URL}/raw-material-categories`,
     { params }
@@ -19,7 +19,7 @@ export const getRawMaterialCategories = async (
 };
 
 export const createRawMaterialCategory = async (
-  data: CreateCategoryRequest
+  data: CreateRawMaterialCategoryRequest
 ): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
   const response = await apiClient.post(
     `${BASE_API_URL}/raw-material-categories`,
@@ -39,7 +39,7 @@ export const getRawMaterialCategoryById = async (
 
 export const updateRawMaterialCategory = async (
   id: number,
-  data: CreateCategoryRequest
+  data: CreateRawMaterialCategoryRequest
 ): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
   const response = await apiClient.patch(
     `${BASE_API_URL}/raw-material-categories/${id}`,

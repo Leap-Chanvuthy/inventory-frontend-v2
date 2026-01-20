@@ -3,8 +3,13 @@ import { DataTableColumn } from "@/components/reusable/data-table/data-table.typ
 import { Badge } from "@/components/ui/badge";
 import { SupplierCategoryBadge } from "./supplier-status";
 import TableActions from "@/components/reusable/partials/table-actions";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { MapPin, Phone, Mail, ScanQrCode } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -125,13 +130,13 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
         deleteHeading="Delete This Supplier"
         deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
         deleteTooltip="Delete Supplier"
-        onDelete={() => { console.log("delete") }}
+        onDelete={() => {
+          console.log("delete");
+        }}
       />
     ),
   },
 ];
-
-
 
 interface SupplierCardProps {
   supplier?: Supplier;
@@ -142,8 +147,12 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
 
   const addressText = [
     [supplier.address_line1, supplier.address_line2].filter(Boolean).join(" "),
-    [supplier.village, supplier.commune, supplier.district].filter(Boolean).join(", "),
-    [supplier.city, supplier.province, supplier.postal_code].filter(Boolean).join(" "),
+    [supplier.village, supplier.commune, supplier.district]
+      .filter(Boolean)
+      .join(", "),
+    [supplier.city, supplier.province, supplier.postal_code]
+      .filter(Boolean)
+      .join(" "),
   ]
     .filter(Boolean)
     .join("\n");
@@ -160,7 +169,9 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
               className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
             />
             {/* <div className="min-w-0 flex flex-col gap-1"> */}
-            <div className="font-semibold text-lg truncate text-wrap">{supplier.official_name}</div>
+            <div className="font-semibold text-lg truncate text-wrap">
+              {supplier.official_name}
+            </div>
 
             {/* </div> */}
           </div>
@@ -214,7 +225,6 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             {addressText || "-"}
           </div>
         </div>
-
       </CardContent>
 
       <CardFooter className="flex justify-end pt-0">
@@ -224,7 +234,9 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
           deleteHeading="Delete This Supplier"
           deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
           deleteTooltip="Delete Supplier"
-          onDelete={() => { console.log("delete") }}
+          onDelete={() => {
+            console.log("delete");
+          }}
         />
       </CardFooter>
     </Card>

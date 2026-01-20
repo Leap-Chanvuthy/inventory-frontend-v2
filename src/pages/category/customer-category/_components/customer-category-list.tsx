@@ -1,5 +1,5 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
+import { useCustomerCategories } from "@/api/categories/customer-categories/customer-category.query";
 import { CategoryCard } from "../../_components/category-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
@@ -10,11 +10,18 @@ interface CategoryListProps {
   onDelete?: (id: number) => void;
 }
 
-export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
-  const { setPage, setSearch, setSort, setPerPage, perPage , search, apiParams } =
-    useTableQueryParams();
+export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
+  const {
+    setPage,
+    setSearch,
+    setSort,
+    setPerPage,
+    perPage,
+    search,
+    apiParams,
+  } = useTableQueryParams();
 
-  const { data, isLoading, error } = useRawMaterialCategories(apiParams);
+  const { data, isLoading, error } = useCustomerCategories(apiParams);
 
   const categories = data?.data?.data || [];
 
@@ -34,7 +41,7 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/categories/create"
+        createHref="/customer-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
@@ -46,8 +53,8 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         isLoading={isLoading}
         emptyText="No categories found"
         onDelete={onDelete}
-        viewRoute="/categories/view"
-        editRoute="/categories/edit"
+        viewRoute="/customer-categories/view"
+        editRoute="/customer-categories/edit"
       />
 
       {/* Pagination */}

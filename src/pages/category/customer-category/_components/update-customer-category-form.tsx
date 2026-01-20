@@ -1,23 +1,45 @@
-import { useCreateRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
+import { useUpdateCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ColorPickerInput } from "@/components/reusable/partials/color-picker-input";
 import { AxiosError } from "axios";
-import { useState } from "react";
-import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
+import { useSingleCustomerCategory } from "@/api/categories/customer-categories/customer-category.query";
+import { CreateCustomerCategoryValidationErrors } from "@/api/categories/types/category.type";
 
-export const CreateCategoryForm = () => {
-  const categoryMutation = useCreateRawMaterialCategory();
-  const error =
-    categoryMutation.error as AxiosError<CreateCategoryValidationErrors> | null;
-  const fieldErrors = error?.response?.data?.errors;
+export const UpdateCustomerCategoryForm = () => {
+  const { id } = useParams<{ id: string }>();
+  const categoryId = Number(id);
   const navigate = useNavigate();
+  const {
+    data: categoryData,
+    isLoading,
+    isError,
+  } = useSingleCustomerCategory(categoryId);
+  const categoryMutation = useUpdateCustomerCategory(categoryId);
+
+  const error =
+    categoryMutation.error as AxiosError<CreateCustomerCategoryValidationErrors> | null;
+  const fieldErrors = error?.response?.data?.errors;
+
   const [form, setForm] = useState({
     category_name: "",
     label_color: "#6366F1",
     description: "",
   });
+
+  //  data is fetched
+  useEffect(() => {
+    if (categoryData?.data) {
+      setForm({
+        category_name: categoryData.data.category_name,
+        label_color: categoryData.data.label_color,
+        description: categoryData.data.description,
+      });
+    }
+  }, [categoryData]);
 
   /* ---------- Handlers ---------- */
 
@@ -46,21 +68,52 @@ export const CreateCategoryForm = () => {
     categoryMutation.mutate(form, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/categories?tab=raw-material-category");
+          navigate("/categories?tab=customer-category");
         }
         // save → stay, data auto-refreshed
       },
     });
   };
+
+  if (isError) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <p className="text-center text-red-500">
+                Failed to load category data
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
+        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+          <div className="p-8">
+            <div className="flex min-h-[400px] w-full items-center justify-center">
+              <DataTableLoading />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
           <h2 className="text-2xl font-semibold mb-2">
-            Create Raw Material Category
+            Update Customer Category
           </h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Update the details for the selected product category.
+            Update the details for the selected customer category.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -76,7 +129,6 @@ export const CreateCategoryForm = () => {
                     ? fieldErrors.category_name[0]
                     : undefined
                 }
-                required={true}
                 onChange={handleChange}
               />
             </div>

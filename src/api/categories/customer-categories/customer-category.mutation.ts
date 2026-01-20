@@ -1,19 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  createRawMaterialCategory,
-  updateRawMaterialCategory,
-} from "./raw-material-category.api";
-import { CreateCategoryRequest } from "@/api/categories/types/category.type";
+  createCustomerCategory,
+  updateCustomerCategory,
+} from "./customer-category.api";
 import { toast } from "sonner";
+import { CreateCustomerCategoryRequest } from "@/api/categories/types/category.type";
 
-export const useCreateRawMaterialCategory = () => {
+export const useCreateCustomerCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateCategoryRequest) =>
-      createRawMaterialCategory(data),
+    mutationFn: (data: CreateCustomerCategoryRequest) =>
+      createCustomerCategory(data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
+      queryClient.invalidateQueries({ queryKey: ["customer-categories"] });
       toast.success("Category created successfully");
     },
 
@@ -25,16 +25,16 @@ export const useCreateRawMaterialCategory = () => {
   });
 };
 
-export const useUpdateRawMaterialCategory = (id: number) => {
+export const useUpdateCustomerCategory = (id: number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateCategoryRequest) =>
-      updateRawMaterialCategory(id, data),
+    mutationFn: (data: CreateCustomerCategoryRequest) =>
+      updateCustomerCategory(id, data),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
+      queryClient.invalidateQueries({ queryKey: ["customer-categories"] });
       queryClient.invalidateQueries({
-        queryKey: ["raw-material-category", id],
+        queryKey: ["customer-category", id],
       });
       toast.success("Category updated successfully");
     },

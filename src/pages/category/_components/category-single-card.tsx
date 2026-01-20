@@ -1,20 +1,31 @@
 import { Edit2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.types";
 import { formatDate } from "@/utils/date-format";
+
+interface Category {
+  id: number;
+  category_name: string;
+  label_color: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface SingleCardProps {
+  category: Category;
+  onDelete?: (id: number) => void;
+  viewRoute?: string;
+  editRoute?: string;
+}
 
 const SingleCard = ({
   category,
-}: {
-  category: RawMaterialCategory;
-  onDelete?: (id: number) => void;
-}) => {
+  viewRoute = "/categories/view",
+  editRoute = "/categories/edit",
+}: SingleCardProps) => {
   return (
     <div className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
-      <Link
-        to={`/categories/view/${category.id}`}
-        className="block cursor-pointer"
-      >
+      <Link to={`${viewRoute}/${category.id}`} className="block cursor-pointer">
         {/* Color Circle */}
         <div className="flex justify-center mb-6">
           <div
@@ -42,7 +53,7 @@ const SingleCard = ({
 
         <div className="flex items-center gap-3">
           <Link
-            to={`/categories/edit/${category.id}`}
+            to={`${editRoute}/${category.id}`}
             className="flex items-center gap-1 text-sm text-foreground hover:text-primary transition-colors"
           >
             <Edit2 className="w-4 h-4" />
