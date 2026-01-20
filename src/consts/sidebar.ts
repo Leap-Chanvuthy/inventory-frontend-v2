@@ -149,6 +149,12 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         roles: [ROLES.ADMIN],
         isLocked: false,
       },
+      {
+        title: "Profile",
+        url: "/profile",
+        icon: User,
+        roles: [ROLES.ADMIN , ROLES.VENDER , ROLES.STOCK_CONTROLLER],
+      },
     ],
   },
   {

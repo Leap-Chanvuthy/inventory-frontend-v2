@@ -6,14 +6,15 @@ import { ProfileTab } from "@/components/reusable/partials/profile-sidebar";
 import { useSearchParams } from "react-router-dom";
 import { TwoFactorAuth } from "./_components/two-factor-auth";
 import { AppearanceSetting } from "./_components/appearance-setting";
+import SidebarFooter from "@/components/layout/sidebar-footer";
 
-const sidebarNavItems: {
+export const PROFILE_SIDEBAR_MENU_ITEMS: {
   title: string;
   tab: ProfileTab;
   icon: React.ReactNode;
 }[] = [
   { title: "Profile", tab: "profile", icon: <User className="w-4 h-4" /> },
-  { title: "Two Factor Authentication", tab: "two-factor-auth", icon: <LockKeyhole className="w-4 h-4" /> },
+  { title: "Two Factor Auth", tab: "two-factor-auth", icon: <LockKeyhole className="w-4 h-4" /> },
   { title: "Appearance", tab: "appearance", icon: <Palette className="w-4 h-4" /> },
   { title: "Notifications", tab: "notifications", icon: <Bell className="w-4 h-4" /> },
 ];
@@ -36,12 +37,14 @@ const Profile = () => {
         </p>
       </div>
 
+      <SidebarFooter />
+
       <Separator className="my-6" />
 
       <div className="flex flex-col lg:flex-row lg:space-x-12 lg:space-y-0">
         <aside className="lg:w-1/5">
           <ProfileSidebar
-            items={sidebarNavItems}
+            items={PROFILE_SIDEBAR_MENU_ITEMS}
             activeTab={activeTab}
             onChange={setTab}
           />
