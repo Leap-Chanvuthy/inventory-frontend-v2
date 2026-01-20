@@ -14,7 +14,7 @@ export function Supplier() {
         <BreadCrumb items={breadcrumbItems} />
       </div>
 
-      <h1 className="text-3xl font-bold mx-6">Supplier Managerment</h1>
+      <h1 className="text-3xl font-bold mx-6">Supplier Management</h1>
 
       <SupplierList />
     </div>

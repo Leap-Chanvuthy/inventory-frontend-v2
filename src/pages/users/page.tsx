@@ -14,6 +14,7 @@ const Users = () => {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
+      <h1 className="text-3xl font-bold mx-6 mb-6">User Management</h1>
       <UserStat />
       <UsersList />
     </div>
