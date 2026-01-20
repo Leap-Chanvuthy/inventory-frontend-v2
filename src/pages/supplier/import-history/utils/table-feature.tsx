@@ -54,9 +54,9 @@ export const COLUMNS: DataTableColumn<ImportHistoryRecord>[] = [
     className: "whitespace-nowrap ",
     render: record => (
       <div className="flex flex-col">
-        <span className="font-medium">{record.user.name}</span>
+        <span className="font-medium">{record?.user?.name}</span>
         <span className="text-sm text-muted-foreground">
-          {record.user.email}
+          {record?.user?.email}
         </span>
       </div>
     ),
