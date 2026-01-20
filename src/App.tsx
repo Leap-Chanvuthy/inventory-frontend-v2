@@ -41,6 +41,7 @@ import UpdateSupplier from "./pages/supplier/update/page";
 import { SupplierDetail } from "./pages/supplier/view/page";
 import ImportSuppliers from "./pages/supplier/import/page";
 import ImportHistory from "./pages/supplier/import-history/page";
+import Profile from "./pages/profile/page";
 
 export default function App() {
   const queryClient = new QueryClient(); 
@@ -64,6 +65,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
+              <Route path='/profile' element={<Profile />} />
               <Route path="/products" element={<Product />} />
 
               {/* ADMIN ONLY */}
