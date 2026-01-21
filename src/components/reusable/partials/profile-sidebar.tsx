@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
-export type ProfileTab = "profile" | "two-factor-auth" | 'forget-password' | "appearance" | "notifications";
+export type ProfileTab = "profile" | "two-factor-auth" | 'forget-password' | "appearance" | "notifications" | "api-docs";
 
 interface SidebarNavProps extends Omit<React.HTMLAttributes<HTMLElement>, "onChange"> {
   items: {

@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
+import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -204,6 +204,24 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
               <Mail className="h-4 w-4 text-green-500" />
               {supplier.email}
+            </div>
+          )}
+          {supplier.banks && supplier.banks.length > 0 && (
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+              <Banknote className="h-4 w-4 text-purple-500" />
+              <div className="flex items-center gap-1 flex-wrap">
+                {supplier.banks
+                  .filter(bank => Boolean(bank.bank_label))
+                  .map(bank => (
+                    <img
+                      key={bank.id}
+                      src={bank.bank_label}
+                      alt={`${bank.bank_name} label`}
+                      title={bank.bank_name}
+                      className="h-4 w-4 shrink-0 rounded-full"
+                    />
+                  ))}
+              </div>
             </div>
           )}
         </div>
