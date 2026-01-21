@@ -61,6 +61,11 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                       <p className="text-sm text-muted-foreground">
                         Details for direct bank transfers and KHQR payments.
                       </p>
+                      <img
+                        src={bank.bank_label || ""}
+                        alt={`${bank.bank_name} label`}
+                        className="h-24 w-24 rounded-full object-cover"
+                      />
                       <div className="hidden lg:block h-full w-px bg-gray-300"></div>
                     </div>
 
