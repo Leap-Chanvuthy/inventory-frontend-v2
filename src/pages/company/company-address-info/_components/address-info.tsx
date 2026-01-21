@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SquarePen } from "lucide-react";
-import React, { useState } from "react";
 
 type DetailItemProps = {
   label: string;

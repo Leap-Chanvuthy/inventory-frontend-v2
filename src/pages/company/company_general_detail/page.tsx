@@ -7,7 +7,7 @@ export function GeneralInfo() {
   const [isEditing, setIsEditing] = useState(false);
   const { data, error, isLoading } = useCompanyInfo();
   return (
-    <div className="space-y-4">
+    <div className="pt-4">
       {!isEditing && (
         <GeneralInfoCard
           onEditClick={() => setIsEditing(true)}
