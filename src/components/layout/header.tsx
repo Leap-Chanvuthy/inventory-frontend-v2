@@ -1,7 +1,7 @@
 import RouteSearch from "../reusable/navigation/route-search";
 import { SidebarTrigger } from "../ui/sidebar";
 import UserAvatar from "./avatar/user-avatar";
-import LanguageToggle from "./lang/lang-toggle";
+// import LanguageToggle from "./lang/lang-toggle";
 import NotificationBell from "./notificaton/notification-bell";
 import { ThemeToggle } from "./theme/theme-toggle";
 
@@ -17,7 +17,7 @@ export default function Header() {
       {/* Right */}
       <div className="flex items-center gap-x-4">
         {/* Localization */}
-        <LanguageToggle />
+        {/* <LanguageToggle /> */}
         <ThemeToggle />
         <NotificationBell />
         <UserAvatar />
