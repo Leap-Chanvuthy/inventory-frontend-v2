@@ -8,7 +8,7 @@ export function ApiDocsGuide() {
   const swaggerUrl = `${BASE_API_URL}/documentation`;
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-xl">
       {/* Header Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
@@ -43,11 +43,11 @@ export function ApiDocsGuide() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-1">
             <div className="p-4 rounded-lg border  space-y-2">
               <p className="text-sm font-medium ">Base URL</p>
               <code className="text-xs text-zinc-400 block  p-2 rounded border /50 text-wrap">
-                https://api-inventory-v2.camsmeinventory.com/api/documentation
+                {swaggerUrl}
               </code>
             </div>
             <div className="p-4 rounded-lg border  space-y-2">
