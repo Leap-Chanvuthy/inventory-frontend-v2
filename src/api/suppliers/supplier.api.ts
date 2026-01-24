@@ -58,12 +58,17 @@ export const updateSupplier = async (
 };
 
 // Delete supplier
-export const deleteSupplier = async (
-  id: number
-): Promise<{ status: boolean; message: string }> => {
-  const response = await apiClient.delete(`${BASE_API_URL}/suppliers/${id}`);
-  return response.data;
+// export const deleteSupplier = async (
+//   id: number
+// ): Promise<{ status: boolean; message: string }> => {
+//   const response = await apiClient.delete(`${BASE_API_URL}/suppliers/${id}`);
+//   return response.data;
+// };
+
+export const deleteSupplier = async (id: string | number): Promise<void> => {
+  await apiClient.delete(`${BASE_API_URL}/suppliers/${id}`);
 };
+
 
 // Import suppliers from Excel/CSV
 export const importSuppliers = async (

@@ -202,7 +202,7 @@ export function WarehouseCard({ warehouse }: WarehouseCardProps) {
       </CardContent>
 
       <CardFooter className="flex justify-end pt-0">
-        <WarehouseActions warehouse={warehouse} /> {/* ✅ */}
+        <WarehouseActions warehouse={warehouse} />
       </CardFooter>
     </Card>
   );
