@@ -47,17 +47,36 @@ export const useUpdateSupplier = () => {
   });
 };
 
+// export const useDeleteSupplier = () => {
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: (id: number) => deleteSupplier(id),
+//     onSuccess: response => {
+//       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+//       toast.success(response.message || "Supplier deleted successfully");
+//     },
+//     onError: (error: any) => {
+//       toast.error(error.response?.data?.message || "Failed to delete supplier");
+//     },
+//   });
+// };
+
+
 export const useDeleteSupplier = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: (id: number) => deleteSupplier(id),
-    onSuccess: response => {
+    mutationFn: (supplierId: string | number) =>
+      deleteSupplier(supplierId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-      toast.success(response.message || "Supplier deleted successfully");
+      toast.success("Supplier deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to delete supplier");
+      toast.error(
+        error?.response?.data?.message || "Failed to delete supplier"
+      );
     },
   });
 };

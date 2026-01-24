@@ -97,6 +97,8 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
                 )}
               </div>
 
+              {/* Capacity */}
+
               {/* Contact Person */}
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-1">

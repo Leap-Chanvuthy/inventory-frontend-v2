@@ -3,6 +3,7 @@ import {
   createWarehouse,
   updateWarehouse,
   deleteWarehouseImage,
+  deleteWarehouse,
 } from "./warehouses.api";
 import { toast } from "sonner";
 import { CreateWarehousesPayload } from "./warehouses.types";
@@ -40,6 +41,25 @@ export const useUpdateWarehouse = (warehouseId: string) => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to update warehouse"
+      );
+    },
+  });
+};
+
+
+export const useDeleteWarehouse = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (warehouseId: string | number) =>
+      deleteWarehouse(warehouseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      toast.success("Warehouse deleted successfully");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete warehouse"
       );
     },
   });

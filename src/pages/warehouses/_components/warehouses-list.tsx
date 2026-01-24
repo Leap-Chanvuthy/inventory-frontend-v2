@@ -5,9 +5,8 @@ import { useWarehouses } from "@/api/warehouses/warehouses.query";
 import { Warehouse } from "@/api/warehouses/warehouses.types";
 import { useEffect } from "react";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { columns, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS, WarehouseCard } from "../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
-import { WarehouseCard } from "../utils/warehouser-cart";
 
 interface WarehousesListProps {
   onWarehousesChange: (warehouses: Warehouse[]) => void;
@@ -47,6 +46,7 @@ export default function WarehousesList({
     );
   }
 
+
   return (
     <div className="w-full p-4 sm:p-8 bg-background">
       <div className="mx-auto max-w-[1600px]">
@@ -64,12 +64,11 @@ export default function WarehousesList({
           isListOptionDisplayed={true}
         />
 
-        {/* Toggleable List with Card and Table View */}
         <ToggleableList<Warehouse>
-          items={warehouses}
+          items={data?.data || []}
           isLoading={isLoading}
           emptyText="No warehouses found"
-          columns={columns}
+          columns={COLUMNS}
           renderItem={warehouse => <WarehouseCard warehouse={warehouse} />}
         />
 

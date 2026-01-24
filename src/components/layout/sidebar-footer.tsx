@@ -1,5 +1,5 @@
 import {
-  ChevronDown,
+  ChevronsUpDown,
   LogOut,
 } from "lucide-react";
 
@@ -49,7 +49,7 @@ export default function SidebarFooterComponent() {
             <AvatarFallback className="rounded-lg">{user?.name?.[0] || "?"}</AvatarFallback>
           </Avatar>
           <div className="truncate">{user?.name}</div>
-          <ChevronDown />
+          <ChevronsUpDown />
         </Button>
       </DropdownMenuTrigger>
 

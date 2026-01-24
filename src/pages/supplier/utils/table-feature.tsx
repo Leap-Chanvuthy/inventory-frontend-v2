@@ -11,6 +11,26 @@ import {
 } from "@/components/ui/card";
 import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDeleteSupplier } from "@/api/suppliers/supplier.mutation";
+
+
+const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
+
+  const deleteMutation = useDeleteSupplier();
+
+  return (
+    <div className="flex items-center gap-2">
+      <TableActions
+        viewDetailPath={`/supplier/view/${supplier.id}`}
+        editPath={`/supplier/update/${supplier.id}`}
+        deleteHeading="Delete This Supplier"
+        deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
+        deleteTooltip="Delete Supplier"
+        onDelete={() => { deleteMutation.mutate(supplier.id) }}
+      />
+    </div>
+  );
+}
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { label: string; className: string }> = {
@@ -124,16 +144,7 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: supplier => (
-      <TableActions
-        viewDetailPath={`/supplier/view/${supplier.id}`}
-        editPath={`/supplier/update/${supplier.id}`}
-        deleteHeading="Delete This Supplier"
-        deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
-        deleteTooltip="Delete Supplier"
-        onDelete={() => {
-          console.log("delete");
-        }}
-      />
+      <SupplierActions supplier={supplier} />
     ),
   },
 ];
@@ -246,16 +257,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
       </CardContent>
 
       <CardFooter className="flex justify-end pt-0">
-        <TableActions
-          viewDetailPath={`/supplier/view/${supplier.id}`}
-          editPath={`/supplier/update/${supplier.id}`}
-          deleteHeading="Delete This Supplier"
-          deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
-          deleteTooltip="Delete Supplier"
-          onDelete={() => {
-            console.log("delete");
-          }}
-        />
+        <SupplierActions supplier={supplier} />
       </CardFooter>
     </Card>
   );
