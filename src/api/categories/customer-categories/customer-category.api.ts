@@ -46,3 +46,8 @@ export const updateCustomerCategory = async (
   );
   return response.data;
 };
+
+
+export const deleteCustomerCategory = async (id: string | number): Promise<void> => {
+  await apiClient.delete(`${BASE_API_URL}/customer-categories/${id}`);
+};

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createCustomerCategory,
+  deleteCustomerCategory,
   updateCustomerCategory,
 } from "./customer-category.api";
 import { toast } from "sonner";
@@ -46,3 +47,24 @@ export const useUpdateCustomerCategory = (id: number) => {
     },
   });
 };
+
+
+
+export const useDeleteCustomerCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => 
+      deleteCustomerCategory(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customer-categories"] });
+      toast.success("Category deleted successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete category"
+      );
+    },
+  });
+}

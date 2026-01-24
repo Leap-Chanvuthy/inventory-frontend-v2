@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createRawMaterialCategory,
+  deleteRawMaterialCategory,
   updateRawMaterialCategory,
 } from "./raw-material-category.api";
 import { CreateCategoryRequest } from "@/api/categories/types/category.type";
@@ -46,3 +47,24 @@ export const useUpdateRawMaterialCategory = (id: number) => {
     },
   });
 };
+
+
+export const useDeleteRawMaterialCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => 
+    
+    deleteRawMaterialCategory(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
+      toast.success("Category deleted successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete category"
+      );
+    },
+  });
+}

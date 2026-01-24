@@ -47,3 +47,7 @@ export const updateRawMaterialCategory = async (
   );
   return response.data;
 };
+
+export const deleteRawMaterialCategory = async (id: string | number): Promise<void> => {
+  await apiClient.delete(`${BASE_API_URL}/raw-material-categories/${id}`);
+};

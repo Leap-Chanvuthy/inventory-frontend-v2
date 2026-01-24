@@ -7,12 +7,9 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { CustomerCategory } from "@/api/categories/types/category.type";
+import { useDeleteCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
 
-interface CategoryListProps {
-  onDelete?: (id: number) => void;
-}
-
-export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
+export const CustomerCategoryList = () => {
   const {
     setPage,
     setSearch,
@@ -25,13 +22,19 @@ export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
 
   const { data, isLoading, error } = useCustomerCategories(apiParams);
 
+ const deleteMutation = useDeleteCustomerCategory();
+
   const categories = data?.data?.data || [];
+
 
   if (error) {
     return (
       <p className="text-center text-red-500">Failed to load categories</p>
     );
   }
+
+
+
 
   return (
     <div className="mt-8">
@@ -58,10 +61,12 @@ export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
         renderItem={category => (
           <SingleCard
             category={category}
-            onDelete={onDelete}
             viewRoute="/customer-categories/view"
             editRoute="/customer-categories/edit"
-          />
+onDelete={(id) => {
+  console.log("DELETE FIRED id:", id);
+  deleteMutation.mutate(Number(id));
+}}          />
         )}
       />
 

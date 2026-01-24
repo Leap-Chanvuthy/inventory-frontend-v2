@@ -1,6 +1,6 @@
-import { Edit2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatDate } from "@/utils/date-format";
+import TableActions from "@/components/reusable/partials/table-actions";
 
 interface Category {
   id: number;
@@ -13,7 +13,7 @@ interface Category {
 
 interface SingleCardProps {
   category: Category;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: number | string) => void;
   viewRoute?: string;
   editRoute?: string;
 }
@@ -22,6 +22,7 @@ const SingleCard = ({
   category,
   viewRoute = "/categories/view",
   editRoute = "/categories/edit",
+  onDelete,
 }: SingleCardProps) => {
   return (
     <div className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
@@ -52,21 +53,14 @@ const SingleCard = ({
         </span>
 
         <div className="flex items-center gap-3">
-          <Link
-            to={`${editRoute}/${category.id}`}
-            className="flex items-center gap-1 text-sm text-foreground hover:text-primary transition-colors"
-          >
-            <Edit2 className="w-4 h-4" />
-            <span>Edit</span>
-          </Link>
-
-          {/* <button
-            onClick={() => onDelete?.(category.id)}
-            className="flex items-center gap-1 text-sm text-destructive hover:text-destructive/80 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </button> */}
+          <TableActions 
+            viewDetailPath={`/categories/view/${category.id}`}
+            editPath={`/categories/edit/${category.id}`}
+            deleteHeading="Delete This Category"
+            deleteSubheading="Are you sure want to delete this category? This action cannot be undone."
+            deleteTooltip="Delete Category"
+            onDelete={() => onDelete?.(category.id)}
+          />
         </div>
       </div>
     </div>
