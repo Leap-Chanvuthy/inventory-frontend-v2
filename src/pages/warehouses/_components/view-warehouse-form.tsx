@@ -98,25 +98,6 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
               </div>
 
               {/* Capacity */}
-              {warehouse.capacity_units && (
-                <div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-2">
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Capacity:
-                    </p>
-                    <p className="text-sm sm:text-base font-medium">
-                      {warehouse.capacity_percentage}% (
-                      {warehouse.capacity_units}m³)
-                    </p>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2 sm:h-2.5">
-                    <div
-                      className="bg-primary h-2 sm:h-2.5 rounded-full transition-all"
-                      style={{ width: `${warehouse.capacity_percentage}%` }}
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Contact Person */}
               <div>

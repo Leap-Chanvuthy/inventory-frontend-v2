@@ -25,8 +25,6 @@ export type Warehouse = {
   latitude: string;
   longitude: string;
   warehouse_description: string;
-  capacity_units: number;
-  capacity_percentage: number;
   // status: 'Active' | 'Low Stock' | 'Full' | 'Inactive';
   created_at: string;
   updated_at: string;
