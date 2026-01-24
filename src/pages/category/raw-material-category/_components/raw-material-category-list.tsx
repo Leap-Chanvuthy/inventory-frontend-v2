@@ -1,18 +1,27 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
-import { CategoryCard } from "../../_components/category-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { SORT_OPTIONS } from "../../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
+import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import { RawMaterialCategory } from "@/api/categories/types/category.type";
+import SingleCard from "../../_components/category-single-card";
 
 interface CategoryListProps {
   onDelete?: (id: number) => void;
 }
 
 export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
-  const { setPage, setSearch, setSort, setPerPage, perPage , search, apiParams } =
-    useTableQueryParams();
+  const {
+    setPage,
+    setSearch,
+    setSort,
+    setPerPage,
+    perPage,
+    search,
+    apiParams,
+  } = useTableQueryParams();
 
   const { data, isLoading, error } = useRawMaterialCategories(apiParams);
 
@@ -38,9 +47,10 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
+        isListOptionDisplayed={true}
       />
 
-      {/* Categories Grid */}
+      {/* Categories Grid
       <CategoryCard
         data={categories}
         isLoading={isLoading}
@@ -48,6 +58,21 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         onDelete={onDelete}
         viewRoute="/categories/view"
         editRoute="/categories/edit"
+      /> */}
+
+      <ToggleableList<RawMaterialCategory>
+        items={categories}
+        isLoading={isLoading}
+        emptyText="No categories found"
+        columns={COLUMNS}
+        renderItem={category => (
+          <SingleCard
+            category={category}
+            onDelete={onDelete}
+            viewRoute="/categories/view"
+            editRoute="/categories/edit"
+          />
+        )}
       />
 
       {/* Pagination */}

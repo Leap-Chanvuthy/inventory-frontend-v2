@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateCompanyInfo, updateAddressInfo, updateTelegramInfo } from "./company.api";
+import { updateCompanyInfo, updateAddressInfo, updateTelegramInfo, setupBankingPayment } from "./company.api";
 import { toast } from "sonner";
-import { UpdateCompanyRequest, UpdateAddressRequest, UpdateTelegramRequest } from "./company.type";
+import { UpdateCompanyRequest, UpdateAddressRequest, UpdateTelegramRequest, SetupBankingPaymentRequest } from "./company.type";
 
 export const useUpdateCompanyInfo = () => {
   const queryClient = useQueryClient();
@@ -52,6 +52,24 @@ export const useUpdateTelegramInfo = () => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to update telegram notification"
+      );
+    },
+  });
+};
+
+export const useSetupBankingPayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SetupBankingPaymentRequest) => setupBankingPayment(data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["company-info"] });
+      toast.success("Banking payment added successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to add banking payment"
       );
     },
   });

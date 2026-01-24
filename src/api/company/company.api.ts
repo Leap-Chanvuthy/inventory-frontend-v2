@@ -6,7 +6,9 @@ import {
   UpdateAddressRequest,
   AddressResponse,
   UpdateTelegramRequest,
-  TelegramResponse
+  TelegramResponse,
+  SetupBankingPaymentRequest,
+  BankingPaymentResponse
 } from "./company.type";
 import { apiClient } from "@/api/client";
 
@@ -41,5 +43,21 @@ export const updateTelegramInfo = async (
   data: UpdateTelegramRequest
 ): Promise<TelegramResponse> => {
   const response = await apiClient.post(`${BASE_API_URL}/company/telegram-info`, data);
+  return response.data;
+};
+
+// Setup banking payment
+export const setupBankingPayment = async (
+  data: SetupBankingPaymentRequest
+): Promise<BankingPaymentResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/company/setup-payment`,
+    data,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };

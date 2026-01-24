@@ -1,10 +1,12 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { useCustomerCategories } from "@/api/categories/customer-categories/customer-category.query";
-import { CategoryCard } from "../../_components/category-card";
+import SingleCard from "../../_components/category-single-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { SORT_OPTIONS } from "../../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
+import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import { CustomerCategory } from "@/api/categories/types/category.type";
 
 interface CategoryListProps {
   onDelete?: (id: number) => void;
@@ -34,7 +36,6 @@ export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
   return (
     <div className="mt-8">
       {/* Toolbar */}
-
       <TableToolbar
         searchPlaceholder="Search category..."
         onSearch={setSearch}
@@ -45,16 +46,23 @@ export const CustomerCategoryList = ({ onDelete }: CategoryListProps) => {
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
+        isListOptionDisplayed={true}
       />
 
-      {/* Categories Grid */}
-      <CategoryCard
-        data={categories}
+      {/* Toggleable List with Card and List View */}
+      <ToggleableList<CustomerCategory>
+        items={categories}
         isLoading={isLoading}
         emptyText="No categories found"
-        onDelete={onDelete}
-        viewRoute="/customer-categories/view"
-        editRoute="/customer-categories/edit"
+        columns={COLUMNS}
+        renderItem={category => (
+          <SingleCard
+            category={category}
+            onDelete={onDelete}
+            viewRoute="/customer-categories/view"
+            editRoute="/customer-categories/edit"
+          />
+        )}
       />
 
       {/* Pagination */}

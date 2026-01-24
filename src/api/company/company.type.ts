@@ -102,3 +102,20 @@ export interface TelegramResponse {
   message: string;
   data: TelegramInfo;
 }
+
+// Setup Banking Payment Request
+export interface SetupBankingPaymentRequest {
+  bank_name: string;
+  payment_link: string;
+  bank_account_holder_name: string;
+  bank_account_number: string;
+  khqr_code?: File | string;
+  set_as_default: boolean;
+}
+
+// Banking Payment Response
+export interface BankingPaymentResponse {
+  status: boolean;
+  message: string;
+  data: BankingInfo;
+}

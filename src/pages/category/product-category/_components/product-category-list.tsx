@@ -1,10 +1,12 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { useProductCategories } from "@/api/categories/product-categories/product-category.query";
-import { CategoryCard } from "../../_components/category-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { SORT_OPTIONS } from "../../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
+import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import { ProductCategory } from "@/api/categories/types/category.type";
+import SingleCard from "../../_components/category-single-card";
 
 interface CategoryListProps {
   onDelete?: (id: number) => void;
@@ -45,9 +47,25 @@ export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
+        isListOptionDisplayed={true}
       />
 
-      {/* Categories Grid */}
+      <ToggleableList<ProductCategory>
+        items={categories}
+        isLoading={isLoading}
+        emptyText="No categories found"
+        columns={COLUMNS}
+        renderItem={category => (
+          <SingleCard
+            category={category}
+            onDelete={onDelete}
+            viewRoute="/product-categories/view"
+            editRoute="/product-categories/edit"
+          />
+        )}
+      />
+
+      {/* Categories Grid
       <CategoryCard
         data={categories}
         isLoading={isLoading}
@@ -55,7 +73,7 @@ export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
         onDelete={onDelete}
         viewRoute="/product-categories/view"
         editRoute="/product-categories/edit"
-      />
+      /> */}
 
       {/* Pagination */}
       {data?.data && (

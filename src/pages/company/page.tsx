@@ -3,6 +3,7 @@ import ReusableTabs from "@/components/reusable/partials/tabs";
 import { GeneralInfo } from "./company_general_detail/page";
 import { AddressInfo } from "./company-address-info/page";
 import { TelegramInfo } from "./company-telegram-info/page";
+import { BankingInfo } from "./company-banking-info/page";
 
 const breadcrumbItems = [
   { name: "settings", label: "Settings", link: "/settings" },
@@ -23,7 +24,7 @@ const tabs = [
   {
     label: "Banking",
     value: "banking-info",
-    content: <div>Banking</div>,
+    content: <BankingInfo />,
   },
   {
     label: "Notification",
