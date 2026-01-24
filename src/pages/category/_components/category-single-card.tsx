@@ -13,7 +13,7 @@ interface Category {
 
 interface SingleCardProps {
   category: Category;
-  onDelete?: (id: number | string) => void;
+  onDelete?: (id: number) => void;
   viewRoute?: string;
   editRoute?: string;
 }
@@ -53,7 +53,7 @@ const SingleCard = ({
         </span>
 
         <div className="flex items-center gap-3">
-          <TableActions 
+          <TableActions
             viewDetailPath={`/categories/view/${category.id}`}
             editPath={`/categories/edit/${category.id}`}
             deleteHeading="Delete This Category"

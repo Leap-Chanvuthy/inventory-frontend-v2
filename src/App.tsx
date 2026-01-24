@@ -42,14 +42,18 @@ import { SupplierDetail } from "./pages/supplier/view/page";
 import ImportSuppliers from "./pages/supplier/import/page";
 import ImportHistory from "./pages/supplier/import-history/page";
 import Profile from "./pages/profile/page";
+import UOM from "./pages/uom/page";
+import CreateUOM from "./pages/uom/create/page";
+import ViewUOM from "./pages/uom/view/page";
+import EditUOM from "./pages/uom/edit/page";
 
 export default function App() {
-  const queryClient = new QueryClient(); 
- 
+  const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>  
+        <Routes>
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
@@ -65,7 +69,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
-              <Route path='/profile' element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/products" element={<Product />} />
 
               {/* ADMIN ONLY */}
@@ -79,8 +83,14 @@ export default function App() {
                 <Route path="/supplier" element={<Supplier />} />
                 <Route path="/supplier/create" element={<CreateSupplier />} />
                 <Route path="/supplier/import" element={<ImportSuppliers />} />
-                <Route path="/supplier/import-history" element={<ImportHistory />} />
-                <Route path="/supplier/update/:id" element={<UpdateSupplier />} />
+                <Route
+                  path="/supplier/import-history"
+                  element={<ImportHistory />}
+                />
+                <Route
+                  path="/supplier/update/:id"
+                  element={<UpdateSupplier />}
+                />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
 
                 {/* Warehouse Routes */}
@@ -114,7 +124,10 @@ export default function App() {
                 />
 
                 {/* Product Categories */}
-                <Route path="/product-categories" element={<ProductCategories />} />
+                <Route
+                  path="/product-categories"
+                  element={<ProductCategories />}
+                />
                 <Route
                   path="/product-categories/create"
                   element={<CreateProductCategories />}
@@ -141,6 +154,11 @@ export default function App() {
                   path="/customer-categories/edit/:id"
                   element={<EditCustomerCategories />}
                 />
+
+                <Route path="/unit-of-measurement" element={<UOM />} />
+                <Route path="/uom/create" element={<CreateUOM />} />
+                <Route path="/uom/view/:id" element={<ViewUOM />} />
+                <Route path="/uom/edit/:id" element={<EditUOM />} />
 
                 {/* Company Settings */}
                 <Route path="/company" element={<Company />} />

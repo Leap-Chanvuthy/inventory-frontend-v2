@@ -14,7 +14,7 @@ interface CategoryCardProps {
   data?: Category[];
   isLoading?: boolean;
   emptyText?: string;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: number | string) => void;
   viewRoute?: string;
   editRoute?: string;
 }
