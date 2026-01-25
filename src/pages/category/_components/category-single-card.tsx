@@ -21,7 +21,7 @@ interface SingleCardProps {
 const SingleCard = ({
   category,
   viewRoute = "/categories/view",
-  editRoute = "/categories/edit",
+  // editRoute = "/categories/edit",
   onDelete,
 }: SingleCardProps) => {
   return (

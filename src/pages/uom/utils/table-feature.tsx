@@ -25,10 +25,16 @@ export const SORT_OPTIONS = [
 // Define table columns
 export const COLUMNS: DataTableColumn<UOM>[] = [
   {
-    key: "uom_code",
+    key: "uom_id",
     header: "Unit ID",
     className: "whitespace-nowrap py-6",
     render: uom => <span className="font-medium">{uom.id}</span>,
+  },
+    {
+    key: "uom_code",
+    header: "UOM Code",
+    className: "whitespace-nowrap py-6",
+    render: uom => <span className="font-medium">{uom.uom_code}</span>,
   },
   {
     key: "name",

@@ -229,7 +229,7 @@ export const TableToolbar = ({
                             checked={sortValues.includes(opt.value)}
                             onCheckedChange={() => toggleSort(opt.value)}
                           />
-                          <span className="text-sm">{opt.label == selectedSort[0] ? `${opt.label} (Selected)` : opt.label}</span>
+                          <span className="text-sm">{opt.label == selectedSort[0] ? `${opt.label}` : opt.label}</span>
                         </label>
                       ))}
                     </div>
@@ -242,13 +242,13 @@ export const TableToolbar = ({
           {/* Filter */}
           {filterOptions.length > 0 && (
             <Select value={filterValue} onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-36 h-9">
-                <SelectValue placeholder="Filter" />
+              <SelectTrigger className="w-28 h-9">
+                <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
                 {filterOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label == selectedFilter ? `${opt.label} (Selected)` : opt.label}
+                    {opt.label == selectedFilter ? `${opt.label}` : opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -258,13 +258,13 @@ export const TableToolbar = ({
           {/* request per page */}
           {requestPerPageOptions.length > 0 && (
             <Select value={perPageValue?.toString()} onValueChange={handlePerPageChange}>
-              <SelectTrigger className="w-24 h-9">
+              <SelectTrigger className="w-16 h-9">
                 <SelectValue placeholder="Per Page" />
               </SelectTrigger>
               <SelectContent>
                 {requestPerPageOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value.toString()}>
-                    {opt.value == perPage ? `${opt.label} (Selected)` : opt.label}
+                    {opt.value == perPage ? `${opt.label}` : opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
