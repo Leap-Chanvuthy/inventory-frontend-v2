@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { IMAGES } from "@/consts/image";
 import { TextInput } from "@/components/reusable/partials/input";
 import SubmitButton from "@/components/reusable/auth/submit-button";
+import { Text } from "@/components/ui/text/app-text";
 
 
 interface VerifyEmailResponse {
@@ -21,9 +22,9 @@ const ForgotPassword = () => {
             {/* Left Column */}
             <div className="hidden lg:flex lg:flex-col lg:items-start lg:justify-center p-12 space-y-6 bg-gray-100 dark:bg-gray-900">
 
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                <Text.TitleLarge className="text-gray-900 dark:text-gray-100">
                     Request Password Reset
-                </h1>
+                </Text.TitleLarge>
 
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Please enter your email address to receive a password reset link.

@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Download } from "lucide-react";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ImportInstructionsCardProps {
   requiredFields: string[];
@@ -63,7 +64,7 @@ export const ImportInstructionsCard = ({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <h4 className="font-medium">File Requirements:</h4>
+          <Text.TitleSmall>File Requirements:</Text.TitleSmall>
           <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
             <li>File format: {fileFormats}</li>
             <li>Maximum file size: {maxFileSize}</li>
@@ -72,7 +73,7 @@ export const ImportInstructionsCard = ({
         </div>
 
         <div className="space-y-2">
-          <h4 className="font-medium">Required Fields:</h4>
+          <Text.TitleSmall>Required Fields:</Text.TitleSmall>
           <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
             {requiredFields.map((field, index) => (
               <li key={index}>{field}</li>

@@ -18,6 +18,7 @@ import {
   CreateSupplierFormPayload,
   ValidationErrors,
 } from "@/api/suppliers/supplier.types";
+import { Text } from "@/components/ui/text/app-text";
 
 export const CreateSupplierForm = () => {
   const supplierMutation = useCreateSupplier();
@@ -112,7 +113,7 @@ export const CreateSupplierForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Create a new Supplier</h2>
+          <Text.TitleMedium className="mb-2">Create a new Supplier</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Manage supplier details and roles within the application.{" "}
           </p>

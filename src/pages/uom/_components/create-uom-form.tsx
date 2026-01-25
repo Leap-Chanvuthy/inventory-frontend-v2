@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateUOMValidationErrors } from "@/api/uom/uom.types";
 import { UOMTypeSelect } from "./uom-type-select";
+import { Text } from "@/components/ui/text/app-text";
 
 export const CreateUOMForm = () => {
   const uomMutation = useCreateUOM();
@@ -67,7 +68,7 @@ export const CreateUOMForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Unit Details</h2>
+          <Text.TitleMedium className="mb-2">Unit Details</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Manage the properties of this unit of measurement.
           </p>

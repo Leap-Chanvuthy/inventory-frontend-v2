@@ -2,6 +2,7 @@ import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { formatDate } from "@/utils/date-format";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ViewWarehouseFormProps {
   warehouseId: string;
@@ -35,9 +36,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-3xl font-bold mb-2">
+          <Text.TitleLarge className="mb-2">
             {warehouse.warehouse_name}
-          </h1>
+          </Text.TitleLarge>
 
           <HeaderActionButtons
             editPath={`/warehouses/update/${warehouseId}`}
@@ -50,9 +51,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Warehouse Images */}
           <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">
+            <Text.TitleMedium className="mb-2">
               Warehouse Images
-            </h2>
+            </Text.TitleMedium>
             <p className="text-sm text-muted-foreground mb-4">
               {warehouse.warehouse_address}
             </p>
@@ -67,9 +68,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
 
           {/* Warehouse Information */}
           <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">
+            <Text.TitleMedium className="mb-4 sm:mb-6">
               Warehouse Information
-            </h2>
+            </Text.TitleMedium>
 
             <div className="space-y-4 sm:space-y-6">
               {/* Warehouse Name */}

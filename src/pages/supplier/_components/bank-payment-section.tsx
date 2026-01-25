@@ -10,6 +10,7 @@ import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { TextInput, SelectInput } from "@/components/reusable/partials/input";
 import { Plus, Trash2 } from "lucide-react";
 import { BankDetails, ValidationErrors } from "@/api/suppliers/supplier.types";
+import { Text } from "@/components/ui/text/app-text";
 
 export interface BankPaymentSectionProps {
   banks: BankDetails[];
@@ -83,7 +84,7 @@ export const BankPaymentSection = ({
         {banks.map((bank, index) => (
           <div key={`bank_${index}`} className="p-4 border rounded-lg">
             <div className="flex items-center justify-between mb-6">
-              <h4 className="font-medium">Bank {index + 1}</h4>
+              <Text.TitleSmall>Bank {index + 1}</Text.TitleSmall>
               {banks.length > 1 && (
                 <Button
                   type="button"

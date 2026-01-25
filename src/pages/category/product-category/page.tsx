@@ -1,5 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { ProductCategoryList } from "./_components/product-category-list";
+import { Text } from "@/components/ui/text/app-text";
 
 export const ProductCategories = () => {
   const breadcrumbItems = [
@@ -13,7 +14,7 @@ export const ProductCategories = () => {
         <BreadCrumb items={breadcrumbItems} />
       </div>
       <div className="mx-6">
-        <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
+        <Text.TitleLarge className="mb-2">Product Categories</Text.TitleLarge>
         <p className="text-muted-foreground mb-6">
           Manage your product categories
         </p>

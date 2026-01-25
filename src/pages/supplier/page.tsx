@@ -1,5 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { SupplierList } from "./_components/supplier-list";
+import { Text } from "@/components/ui/text/app-text";
 
 export function Supplier() {
   const breadcrumbItems = [
@@ -14,7 +15,7 @@ export function Supplier() {
         <BreadCrumb items={breadcrumbItems} />
       </div>
 
-      <h1 className="text-3xl font-bold mx-6">Supplier Management</h1>
+      <Text.TitleLarge className="mx-6">Supplier Management</Text.TitleLarge>
 
       <SupplierList />
     </div>

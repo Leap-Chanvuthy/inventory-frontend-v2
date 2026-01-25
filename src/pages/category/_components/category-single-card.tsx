@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "@/utils/date-format";
 import TableActions from "@/components/reusable/partials/table-actions";
+import { Text } from "@/components/ui/text/app-text";
 
 interface Category {
   id: number;
@@ -21,7 +22,7 @@ interface SingleCardProps {
 const SingleCard = ({
   category,
   viewRoute = "/categories/view",
-  editRoute = "/categories/edit",
+  // editRoute = "/categories/edit",
   onDelete,
 }: SingleCardProps) => {
   return (
@@ -35,10 +36,9 @@ const SingleCard = ({
           />
         </div>
 
-        {/* Category Name Label */}
-        <h3 className="text-primary font-semibold text-base sm:text-lg mb-2">
+        <Text.TitleSmall className="text-primary mb-2">
           {category.category_name}
-        </h3>
+        </Text.TitleSmall>
 
         {/* Category Name Value */}
         <p className="text-foreground font-bold text-lg sm:text-xl mb-6 line-clamp-2 min-h-[3.5rem]">

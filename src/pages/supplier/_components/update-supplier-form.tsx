@@ -19,6 +19,7 @@ import {
   CreateSupplierFormPayload,
   ValidationErrors,
 } from "@/api/suppliers/supplier.types";
+import { Text } from "@/components/ui/text/app-text";
 
 export const UpdateSupplierForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -191,7 +192,7 @@ export const UpdateSupplierForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Update Supplier</h2>
+          <Text.TitleMedium className="mb-2">Update Supplier</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Update supplier details and roles within the application.
           </p>

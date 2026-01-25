@@ -4,6 +4,7 @@ import { SquarePen } from "lucide-react";
 import { Company } from "@/api/company/company.type";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
+import { Text } from "@/components/ui/text/app-text";
 
 type DetailItemProps = {
   label: string;
@@ -68,9 +69,9 @@ export const GeneralInfoCard = ({
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
+            <Text.TitleSmall className="mb-2">
               Failed to load company information
-            </h3>
+            </Text.TitleSmall>
             <p className="text-sm text-muted-foreground">
               {error.message || "An error occurred while fetching data"}
             </p>

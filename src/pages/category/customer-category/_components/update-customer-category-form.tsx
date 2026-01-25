@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { useSingleCustomerCategory } from "@/api/categories/customer-categories/customer-category.query";
 import { CreateCustomerCategoryValidationErrors } from "@/api/categories/types/category.type";
+import { Text } from "@/components/ui/text/app-text";
 
 export const UpdateCustomerCategoryForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -109,9 +110,9 @@ export const UpdateCustomerCategoryForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">
+          <Text.TitleMedium className="mb-2">
             Update Customer Category
-          </h2>
+          </Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Update the details for the selected customer category.
           </p>

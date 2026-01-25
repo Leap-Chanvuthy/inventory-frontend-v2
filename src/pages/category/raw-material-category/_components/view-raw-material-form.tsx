@@ -2,6 +2,7 @@ import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-cate
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ViewCategoryFormProps {
   categoryId: string;
@@ -57,9 +58,9 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
       <div className="mx-auto max-w-[1600px]">
         {/* Header with Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">
+          <Text.TitleLarge className="truncate">
             {category.category_name}
-          </h1>
+          </Text.TitleLarge>
           <HeaderActionButtons
             editPath={`/categories/edit/${id}`}
             showEdit={true}

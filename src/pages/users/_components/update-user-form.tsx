@@ -10,6 +10,7 @@ import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
 import { Info } from "lucide-react";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
+import { Text } from "@/components/ui/text/app-text";
 
 export const UpdateUserForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +110,7 @@ export const UpdateUserForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-xl font-bold mb-6">Update User Info</h2>
+          <Text.TitleMedium className="mb-6">Update User Info</Text.TitleMedium>
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

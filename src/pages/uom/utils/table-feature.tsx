@@ -10,6 +10,7 @@ import { Package } from "lucide-react";
 import TableActions from "@/components/reusable/partials/table-actions";
 import { useDeleteUOM } from "@/api/uom/uom.mutation";
 import { UOMStatusBadge } from "./uom-status";
+import { Text } from "@/components/ui/text/app-text";
 
 // Sort Options
 export const SORT_OPTIONS = [
@@ -97,7 +98,7 @@ export function UOMCard({ uom }: UOMCardProps) {
               <Package className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-xl truncate">{uom.name}</h3>
+              <Text.TitleSmall className="truncate">{uom.name}</Text.TitleSmall>
               <p className="text-sm text-muted-foreground mt-1">
                 {uom.symbol} - {uom.uom_type}
               </p>

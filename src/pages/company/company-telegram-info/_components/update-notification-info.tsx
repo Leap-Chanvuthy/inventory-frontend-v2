@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DollarSign, FileText, ShoppingCart, SquarePen } from "lucide-react";
 import { useState } from "react";
+import { Text } from "@/components/ui/text/app-text";
 
 interface NotificationInfoItemProps {
   id: string;
@@ -84,7 +85,7 @@ export const NotificationInfoItem: React.FC<NotificationInfoItemProps> = ({
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold">{title}</h3>
+              <Text.TitleSmall>{title}</Text.TitleSmall>
               <p className="text-sm text-gray-400">
                 Telegram Chat ID: {chatId}
               </p>

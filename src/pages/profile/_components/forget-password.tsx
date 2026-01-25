@@ -2,13 +2,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ShieldQuestion, ExternalLink } from "lucide-react";
 import FormContainer from "@/components/reusable/auth/form-container";
 import { FormFooter, RequestForm } from "@/pages/auth/forgot-password";
+import { Text } from "@/components/ui/text/app-text";
 
 export function ForgetPassword() {
     return (
         <div className="max-w-[2500px] animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header Section */}
             <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Check your email after link is sent</h3>
+                <Text.TitleSmall>Check your email after link is sent</Text.TitleSmall>
                 <Alert >
                     <div className="flex items-center gap-2">
                         <ShieldQuestion className="h-4 w-4" />

@@ -3,6 +3,7 @@ import { UOMStatusBadge } from "../utils/uom-status";
 import { useSingleUOM } from "@/api/uom/uom.query";
 import { useDeleteUOM } from "@/api/uom/uom.mutation";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ViewUOMProps {
   id: number;
@@ -55,10 +56,10 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
     <div>
       {/* Title and Actions */}
       <div className="mx-6 mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">
+        <Text.TitleLarge>
           {uom.name}
           {uom.symbol ? ` | ${uom.symbol}` : ""}
-        </h1>
+        </Text.TitleLarge>
         <HeaderActionButtons
           editPath={`/uom/edit/${uom.id}`}
           onDelete={() => deleteMutation.mutate(uom.id)}
@@ -73,7 +74,9 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Section - Unit Information */}
             <div>
-              <h2 className="text-2xl font-semibold mb-6">Unit Information</h2>
+              <Text.TitleMedium className="mb-6">
+                Unit Information
+              </Text.TitleMedium>
 
               <div className="space-y-8">
                 {/* Unit Name, Symbol, and Status - Horizontal */}
@@ -129,9 +132,9 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
 
             {/* Right Section - Distribution Chart */}
             <div>
-              <h2 className="text-2xl font-semibold mb-6">
+              <Text.TitleMedium className="mb-6">
                 Distribution of Unit of Measurement
-              </h2>
+              </Text.TitleMedium>
 
               {/* Placeholder for Pie Chart */}
               <div className="flex items-center justify-center h-[300px] bg-muted/30 rounded-lg">

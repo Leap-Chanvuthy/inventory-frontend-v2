@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useSingleUOM } from "@/api/uom/uom.query";
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { UpdateUOMForm } from "../_components/update-uom-form";
+import { Text } from "@/components/ui/text/app-text";
 
 const EditUOM = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,10 +47,10 @@ const EditUOM = () => {
       </div>
 
       <div className="mx-6 mb-6">
-        <h1 className="text-3xl font-bold">Edit Unit of Measurement</h1>
-        <p className="text-muted-foreground mt-2">
+        <Text.TitleLarge>Edit Unit of Measurement</Text.TitleLarge>
+        <Text.Medium className="mt-2">
           Update the information for this unit of measurement
-        </p>
+        </Text.Medium>
       </div>
 
       <UpdateUOMForm uom={uom} />

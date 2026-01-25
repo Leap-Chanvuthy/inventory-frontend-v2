@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2 } from "lucide-react";
 import { Supplier } from "@/api/suppliers/supplier.types";
 import ReusableTabs from "@/components/reusable/partials/tabs";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ViewSupplierTapProps {
   supplier: Supplier;
@@ -55,9 +56,9 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_1fr] gap-8 items-start">
                     {/* Left Section */}
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">
+                      <Text.TitleSmall>
                         Banking Information
-                      </h3>
+                      </Text.TitleSmall>
                       <p className="text-sm text-muted-foreground">
                         Details for direct bank transfers and KHQR payments.
                       </p>
@@ -78,7 +79,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         <p className="text-sm text-muted-foreground mb-1">
                           Supplier Bank Account Name
                         </p>
-                        <p className="text-lg font-semibold">
+                        <p className="">
                           {bank.account_holder_name}
                         </p>
                       </div>
@@ -87,7 +88,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         <p className="text-sm text-muted-foreground mb-1">
                           Bank Account Number
                         </p>
-                        <p className="text-lg font-semibold">
+                        <p className="">
                           {bank.account_number}
                         </p>
                       </div>
@@ -96,7 +97,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         <p className="text-sm text-muted-foreground mb-1">
                           Name of the Bank
                         </p>
-                        <p className="text-lg font-semibold">
+                        <p className="">
                           {bank.bank_name}
                         </p>
                       </div>
@@ -104,9 +105,9 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
 
                     {/* Right Section - KHQR */}
                     <div className="flex flex-col items-center justify-start space-y-4">
-                      <h4 className="text-base font-semibold text-center">
+                      <Text.TitleSmall className="text-center">
                         KHQR Code of Payment
-                      </h4>
+                      </Text.TitleSmall>
 
                       {bank.qr_code_image ? (
                         <>
