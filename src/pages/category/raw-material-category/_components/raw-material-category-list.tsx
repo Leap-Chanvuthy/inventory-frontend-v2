@@ -1,5 +1,6 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
+import { useDeleteRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
@@ -8,11 +9,7 @@ import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { RawMaterialCategory } from "@/api/categories/types/category.type";
 import SingleCard from "../../_components/category-single-card";
 
-interface CategoryListProps {
-  onDelete?: (id: number) => void;
-}
-
-export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
+export const RawMaterialCategoryList = () => {
   const {
     setPage,
     setSearch,
@@ -24,6 +21,7 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
   } = useTableQueryParams();
 
   const { data, isLoading, error } = useRawMaterialCategories(apiParams);
+  const deleteMutation = useDeleteRawMaterialCategory();
 
   const categories = data?.data?.data || [];
 
@@ -43,7 +41,7 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/categories/create"
+        createHref="/raw-material-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
@@ -68,9 +66,11 @@ export const RawMaterialCategoryList = ({ onDelete }: CategoryListProps) => {
         renderItem={category => (
           <SingleCard
             category={category}
-            onDelete={onDelete}
-            viewRoute="/categories/view"
-            editRoute="/categories/edit"
+            onDelete={id => {
+              deleteMutation.mutate(Number(id));
+            }}
+            viewRoute="/raw-material-categories/view"
+            editRoute="/raw-material-categories/edit"
           />
         )}
       />

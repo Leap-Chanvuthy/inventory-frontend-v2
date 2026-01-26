@@ -7,7 +7,7 @@ export const EditCustomerCategories = () => {
     {
       name: "customer-categories",
       label: "Customer Categories",
-      link: "/categories",
+      link: "/categories?tab=customer-category",
     },
     { name: "edit-category", label: "Edit Customer Category" },
   ];

@@ -22,19 +22,15 @@ export const CustomerCategoryList = () => {
 
   const { data, isLoading, error } = useCustomerCategories(apiParams);
 
- const deleteMutation = useDeleteCustomerCategory();
+  const deleteMutation = useDeleteCustomerCategory();
 
   const categories = data?.data?.data || [];
-
 
   if (error) {
     return (
       <p className="text-center text-red-500">Failed to load categories</p>
     );
   }
-
-
-
 
   return (
     <div className="mt-8">
@@ -63,10 +59,10 @@ export const CustomerCategoryList = () => {
             category={category}
             viewRoute="/customer-categories/view"
             editRoute="/customer-categories/edit"
-onDelete={(id) => {
-  console.log("DELETE FIRED id:", id);
-  deleteMutation.mutate(Number(id));
-}}          />
+            onDelete={id => {
+              deleteMutation.mutate(Number(id));
+            }}
+          />
         )}
       />
 

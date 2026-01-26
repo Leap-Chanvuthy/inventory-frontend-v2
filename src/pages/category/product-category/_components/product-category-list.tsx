@@ -1,5 +1,6 @@
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { useProductCategories } from "@/api/categories/product-categories/product-category.query";
+import { useDeleteProductCategory } from "@/api/categories/product-categories/product-category.mutation";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
@@ -8,11 +9,7 @@ import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { ProductCategory } from "@/api/categories/types/category.type";
 import SingleCard from "../../_components/category-single-card";
 
-interface CategoryListProps {
-  onDelete?: (id: number) => void;
-}
-
-export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
+export const ProductCategoryList = () => {
   const {
     setPage,
     setSearch,
@@ -24,6 +21,7 @@ export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
   } = useTableQueryParams();
 
   const { data, isLoading, error } = useProductCategories(apiParams);
+  const deleteMutation = useDeleteProductCategory();
 
   const categories = data?.data?.data || [];
 
@@ -58,7 +56,9 @@ export const ProductCategoryList = ({ onDelete }: CategoryListProps) => {
         renderItem={category => (
           <SingleCard
             category={category}
-            onDelete={onDelete}
+            onDelete={id => {
+              deleteMutation.mutate(Number(id));
+            }}
             viewRoute="/product-categories/view"
             editRoute="/product-categories/edit"
           />

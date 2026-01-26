@@ -10,7 +10,11 @@ export const ViewCategories = () => {
 
   const breadcrumbItems = [
     { name: "catalogs", label: "Catalogs", link: "/" },
-    { name: "categories", label: "Categories", link: "/categories" },
+    {
+      name: "categories",
+      label: "Categories",
+      link: "/categories?tab=raw-material-category",
+    },
     { name: "view-categories", label: "View Categories" },
 
     {

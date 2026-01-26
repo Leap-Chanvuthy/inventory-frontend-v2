@@ -13,7 +13,7 @@ export const ViewProductCategories = () => {
     {
       name: "product-categories",
       label: "Product Categories",
-      link: "/categories",
+      link: "/categories?tab=product-category",
     },
     { name: "view-categories", label: "View Category" },
 

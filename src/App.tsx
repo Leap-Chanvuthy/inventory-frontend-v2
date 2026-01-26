@@ -110,16 +110,18 @@ export default function App() {
 
                 {/* Categories */}
                 <Route path="/categories" element={<Categories />} />
+
+                {/* Raw Material Categories */}
                 <Route
-                  path="/categories/create"
+                  path="/raw-material-categories/create"
                   element={<CreateCategories />}
                 />
                 <Route
-                  path="/categories/view/:id"
+                  path="/raw-material-categories/view/:id"
                   element={<ViewCategories />}
                 />
                 <Route
-                  path="/categories/edit/:id"
+                  path="/raw-material-categories/edit/:id"
                   element={<EditCategories />}
                 />
 

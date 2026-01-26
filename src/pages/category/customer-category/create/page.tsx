@@ -7,7 +7,7 @@ export const CreateCustomerCategories = () => {
     {
       name: "customer-categories",
       label: "Customer Categories",
-      link: "/categories",
+      link: "/categories?tab=customer-category",
     },
     { name: "create-category", label: "Create a new Customer Category" },
   ];

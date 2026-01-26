@@ -20,7 +20,7 @@ export const useCreateRawMaterialCategory = () => {
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to create category"
+        error?.response?.data?.message || "Failed to create category",
       );
     },
   });
@@ -42,19 +42,16 @@ export const useUpdateRawMaterialCategory = (id: number) => {
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to update category"
+        error?.response?.data?.message || "Failed to update category",
       );
     },
   });
 };
 
-
 export const useDeleteRawMaterialCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string | number) => 
-    
-    deleteRawMaterialCategory(id),
+    mutationFn: (id: string | number) => deleteRawMaterialCategory(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
@@ -63,8 +60,8 @@ export const useDeleteRawMaterialCategory = () => {
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to delete category"
+        error?.response?.data?.message || "Failed to delete category",
       );
     },
   });
-}
+};

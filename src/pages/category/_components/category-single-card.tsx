@@ -15,14 +15,14 @@ interface Category {
 interface SingleCardProps {
   category: Category;
   onDelete?: (id: number) => void;
-  viewRoute?: string;
-  editRoute?: string;
+  viewRoute: string;
+  editRoute: string;
 }
 
 const SingleCard = ({
   category,
-  viewRoute = "/categories/view",
-  // editRoute = "/categories/edit",
+  viewRoute,
+  editRoute,
   onDelete,
 }: SingleCardProps) => {
   return (
@@ -54,8 +54,8 @@ const SingleCard = ({
 
         <div className="flex items-center gap-3">
           <TableActions
-            viewDetailPath={`/categories/view/${category.id}`}
-            editPath={`/categories/edit/${category.id}`}
+            viewDetailPath={`${viewRoute}/${category.id}`}
+            editPath={`${editRoute}/${category.id}`}
             deleteHeading="Delete This Category"
             deleteSubheading="Are you sure want to delete this category? This action cannot be undone."
             deleteTooltip="Delete Category"

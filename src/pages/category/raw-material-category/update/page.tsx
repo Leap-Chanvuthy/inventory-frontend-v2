@@ -4,7 +4,11 @@ import { UpdateCategoryForm } from "../_components/update-raw-material-category-
 export const EditCategories = () => {
   const breadcrumbItems = [
     { name: "catalogs", label: "Catalogs", link: "/" },
-    { name: "categories", label: "Category", link: "/categories" },
+    {
+      name: "categories",
+      label: "Category",
+      link: "/categories?tab=raw-material-category",
+    },
     { name: "edit-category", label: "Edit Raw Material Category" },
   ];
 

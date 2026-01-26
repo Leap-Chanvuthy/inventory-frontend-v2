@@ -7,7 +7,7 @@ export const EditProductCategories = () => {
     {
       name: "product-categories",
       label: "Product Categories",
-      link: "/categories",
+      link: "/categories?tab=product-category",
     },
     { name: "edit-category", label: "Edit Product Category" },
   ];
