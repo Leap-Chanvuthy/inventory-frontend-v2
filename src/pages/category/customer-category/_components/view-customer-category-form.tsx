@@ -2,12 +2,15 @@ import { useSingleCustomerCategory } from "@/api/categories/customer-categories/
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
+import { Text } from "@/components/ui/text/app-text";
 
 interface ViewCustomerCategoryFormProps {
   categoryId: string;
 }
 
-export const ViewCustomerCategoryForm = ({ categoryId }: ViewCustomerCategoryFormProps) => {
+export const ViewCustomerCategoryForm = ({
+  categoryId,
+}: ViewCustomerCategoryFormProps) => {
   const id = Number(categoryId);
 
   const {
@@ -57,9 +60,9 @@ export const ViewCustomerCategoryForm = ({ categoryId }: ViewCustomerCategoryFor
       <div className="mx-auto max-w-[1600px]">
         {/* Header with Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">
+          <Text.TitleLarge className="truncate">
             {category.category_name}
-          </h1>
+          </Text.TitleLarge>
           <HeaderActionButtons
             editPath={`/customer-categories/edit/${id}`}
             showEdit={true}

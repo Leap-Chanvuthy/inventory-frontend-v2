@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { ViewSupplierTap } from "./view-supplier-tap";
 import { SupplierCategoryBadge } from "../utils/supplier-status";
+import { Text } from "@/components/ui/text/app-text";
 
 export function ViewSupplierForm() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +36,7 @@ export function ViewSupplierForm() {
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 ">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold mb-2">{supplier.official_name}</h1>
+        <Text.TitleLarge className="mb-2">{supplier.official_name}</Text.TitleLarge>
 
         <HeaderActionButtons
           editPath={`/supplier/update/${supplier.id}`}
@@ -46,7 +47,7 @@ export function ViewSupplierForm() {
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto p-8  ">
         <div className="flex items-center justify-between mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h1 className="text-xl  mb-2">Supplier Information</h1>
+            <Text.TitleLarge className="mb-2">Supplier Information</Text.TitleLarge>
           </div>
         </div>
 

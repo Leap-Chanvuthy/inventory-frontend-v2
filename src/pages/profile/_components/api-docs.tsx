@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Code2, BookOpen, Terminal, CheckCircle2 } from "lucide-react";
 import { BASE_API_URL } from "@/consts/endpoints";
+import { Text } from "@/components/ui/text/app-text";
 
 export function ApiDocsGuide() {
   const swaggerUrl = `${BASE_API_URL}/documentation`;
@@ -20,7 +21,7 @@ export function ApiDocsGuide() {
             Inventory System Operational
           </div>
         </div>
-        <h2 className="text-3xl font-bold tracking-tight ">API Reference</h2>
+        <Text.TitleLarge className="tracking-tight">API Reference</Text.TitleLarge>
         <p className="text-muted-foreground text-lg">
           Everything you need to integrate with our platform, from authentication to webhooks.
         </p>

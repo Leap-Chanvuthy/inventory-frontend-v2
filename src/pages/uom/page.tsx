@@ -1,5 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import UOMList from "./_components/uom-list";
+import { Text } from "@/components/ui/text/app-text";
 
 const breadcrumbItems = [
   { name: "catalog", label: "Catalog", link: "/categories" },
@@ -14,7 +15,9 @@ export default function UOM() {
         <BreadCrumb items={breadcrumbItems} />
       </div>
 
-      <h1 className="text-3xl font-bold mx-6">Unit of Measurement</h1>
+      <div className="mx-6">
+        <Text.TitleLarge>Unit of Measurement</Text.TitleLarge>
+      </div>
 
       <div className="mx-6 mt-8">
         <UOMList />

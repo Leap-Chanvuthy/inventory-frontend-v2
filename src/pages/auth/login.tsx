@@ -8,6 +8,7 @@ import { LoginValidationErrors } from "@/api/auth/auth.type";
 import FormContainer from "@/components/reusable/auth/form-container";
 import SubmitButton from "@/components/reusable/auth/submit-button";
 import { IMAGES } from "@/consts/image";
+import { Text } from "@/components/ui/text/app-text";
 
 function Login() {
     return (
@@ -15,9 +16,9 @@ function Login() {
             {/* Left Column */}
             <div className="hidden lg:flex lg:flex-col lg:items-start lg:justify-center p-12 space-y-6 bg-gray-100 dark:bg-gray-900">
 
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                <Text.TitleLarge className="text-gray-900 dark:text-gray-100">
                     Login to your account
-                </h1>
+                </Text.TitleLarge>
 
                 <p className="text-gray-600 dark:text-gray-400 text-lg">
                     Access your inventory management system easily and securely.

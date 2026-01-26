@@ -1,10 +1,12 @@
+import { Text } from "@/components/ui/text/app-text";
 
 const Home = () => {
   return (
     <div>
-      <h1>Welcome to the Home Page</h1>
+      <Text.TitleLarge>Welcome to the Home Page</Text.TitleLarge>
+      <h1 className="md:text-3xl font-bold">Welcome to the Home Page</h1>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

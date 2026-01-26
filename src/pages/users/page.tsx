@@ -1,6 +1,7 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb"
 import UsersList from "./_components/user-list"
 import UserStat from "./_components/user-state"
+import { Text } from "@/components/ui/text/app-text";
 
 const Users = () => {
 
@@ -14,7 +15,7 @@ const Users = () => {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-      <h1 className="text-3xl font-bold mx-6 mb-6">User Management</h1>
+      <Text.TitleLarge className="mx-6 mb-6">User Management</Text.TitleLarge>
       <UserStat />
       <UsersList />
     </div>

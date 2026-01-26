@@ -9,6 +9,7 @@ import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Text } from "@/components/ui/text/app-text";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -144,7 +145,7 @@ export const UpdateWarehouseForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">Update Warehouse</h2>
+          <Text.TitleMedium className="mb-2">Update Warehouse</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Update warehouse information and images.
           </p>

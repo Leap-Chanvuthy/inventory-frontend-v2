@@ -7,6 +7,7 @@ import { useState } from "react";
 import { CreateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
 import MapPicker from "@/components/reusable/map-picker/map-picker";
 import { useNavigate } from "react-router-dom";
+import { Text } from "@/components/ui/text/app-text";
 
 export const CreateWarehouseForm = () => {
   const warehouseMutation = useCreateWarehouse();
@@ -66,9 +67,9 @@ export const CreateWarehouseForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold mb-2">
+          <Text.TitleMedium className="mb-2">
             Create a new Warehouse
-          </h2>
+          </Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Below the inputs, there is an interactive map preview with.
           </p>

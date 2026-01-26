@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Text } from "@/components/ui/text/app-text";
 
 type BankingInfoListProps = {
   onAddClick: () => void;
@@ -95,7 +96,7 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                       )}
                     </div>
                     <div className="text-left">
-                      <h3 className="text-lg font-semibold">{bank.bank_name}</h3>
+                      <Text.TitleSmall>{bank.bank_name}</Text.TitleSmall>
                       <p className="text-sm text-gray-600">
                         {bank.bank_account_number}
                       </p>

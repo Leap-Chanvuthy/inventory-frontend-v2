@@ -1,6 +1,7 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import ReusableTabs from "@/components/reusable/partials/tabs";
 import { breadcrumbItems, tabs } from "./utils/data";
+import { Text } from "@/components/ui/text/app-text";
 
 export default function Categories() {
   return (
@@ -9,7 +10,9 @@ export default function Categories() {
         <BreadCrumb items={breadcrumbItems} />
       </div>
 
-      <h1 className="text-3xl font-bold  mx-6">Category Management</h1>
+      <div className="mx-6">
+        <Text.TitleLarge>Category Management</Text.TitleLarge>
+      </div>
 
       <div className="mx-6 mt-8">
         <ReusableTabs

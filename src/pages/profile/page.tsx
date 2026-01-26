@@ -9,6 +9,7 @@ import { AppearanceSetting } from "./_components/appearance-setting";
 import SidebarFooter from "@/components/layout/sidebar-footer";
 import { ForgetPassword } from "./_components/forget-password";
 import { ApiDocsGuide } from "./_components/api-docs";
+import { Text } from "@/components/ui/text/app-text";
 
 export const PROFILE_SIDEBAR_MENU_ITEMS: {
   title: string;
@@ -35,7 +36,7 @@ const Profile = () => {
   return (
     <div className="max-w-[1500px] mx-auto p-10 space-y-6 min-h-screen">
       <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
+        <Text.TitleMedium className="tracking-tight">Profile Settings</Text.TitleMedium>
         <p className="text-muted-foreground">
           Manage your account settings and preferences.
         </p>

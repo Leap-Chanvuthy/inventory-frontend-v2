@@ -6,6 +6,7 @@ import { UOM } from "@/api/uom/uom.types";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { COLUMNS, SORT_OPTIONS, UOMCard } from "../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export default function UOMList() {
   const {
@@ -33,7 +34,7 @@ export default function UOMList() {
   const totalPages = data?.last_page || 1;
 
   if (isError) {
-    return <p className="text-center text-red-500">Failed to load UOMs</p>;
+    return <UnexpectedError kind="fetch" />
   }
 
   return (

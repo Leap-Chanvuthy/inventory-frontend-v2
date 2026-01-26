@@ -3,6 +3,7 @@ import WarehousesList from "./_components/warehouses-list";
 import WarehousesOpenMap from "./_components/warehouses-open-map";
 import { useState } from "react";
 import { Warehouse } from "@/api/warehouses/warehouses.types";
+import { Text } from "@/components/ui/text/app-text";
 
 export default function Warehouses() {
   const breadcrumbItems = [
@@ -18,7 +19,8 @@ export default function Warehouses() {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-      <h1 className="text-3xl font-bold mx-6">Warehouse Inventory</h1>
+      <Text.TitleLarge className="mx-6">Warehouse Inventory</Text.TitleLarge>
+      {/* <h1 className="text-3xl font-bold mx-6">Warehouse Inventory</h1> */}
       <WarehousesList onWarehousesChange={setWarehouses} />
       <WarehousesOpenMap warehouses={warehouses} />
     </div>

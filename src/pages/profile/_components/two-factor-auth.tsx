@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Smartphone, ShieldCheck, Key, Copy, ShieldPlus } from "lucide-react";
+import { Text } from "@/components/ui/text/app-text";
 
 export function TwoFactorAuth() {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -11,7 +12,7 @@ export function TwoFactorAuth() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h3 className="text-lg font-medium ">Two-Factor Authentication</h3>
+        <Text.TitleSmall>Two-Factor Authentication</Text.TitleSmall>
         <p className="text-sm text-muted-foreground">
           Add an extra layer of security to your account by requiring more than just a password to log in.
         </p>
