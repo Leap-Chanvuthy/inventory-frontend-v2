@@ -109,7 +109,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/customer",
         icon: Users,
         roles: [ROLES.ADMIN, ROLES.VENDER],
-        isLocked: true,
+        isLocked: false,
       },
       {
         title: "Sale Orders",
