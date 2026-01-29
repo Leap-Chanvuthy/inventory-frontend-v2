@@ -1,7 +1,14 @@
 import { Separator } from "@/components/ui/separator";
 import { ProfileForm } from "./_components/profile-form";
 import { ProfileSidebar } from "@/components/reusable/partials/profile-sidebar";
-import { User, Palette, Bell, LockKeyhole, MailCheck, SquareTerminal } from "lucide-react";
+import {
+  User,
+  Palette,
+  Bell,
+  LockKeyhole,
+  MailCheck,
+  SquareTerminal,
+} from "lucide-react";
 import { ProfileTab } from "@/components/reusable/partials/profile-sidebar";
 import { useSearchParams } from "react-router-dom";
 import { TwoFactorAuth } from "./_components/two-factor-auth";
@@ -17,11 +24,31 @@ export const PROFILE_SIDEBAR_MENU_ITEMS: {
   icon: React.ReactNode;
 }[] = [
   { title: "Profile", tab: "profile", icon: <User className="w-4 h-4" /> },
-  { title: "Forget Password", tab: "forget-password", icon: <MailCheck className="w-4 h-4" /> },
-  { title: "Two Factor Auth", tab: "two-factor-auth", icon: <LockKeyhole className="w-4 h-4" /> },
-  { title: "Appearance", tab: "appearance", icon: <Palette className="w-4 h-4" /> },
-  { title: "Notifications", tab: "notifications", icon: <Bell className="w-4 h-4" /> },
-  { title: "API Docs", tab: "api-docs", icon: <SquareTerminal className="w-4 h-4" /> },
+  {
+    title: "Forget Password",
+    tab: "forget-password",
+    icon: <MailCheck className="w-4 h-4" />,
+  },
+  {
+    title: "Two Factor Auth",
+    tab: "two-factor-auth",
+    icon: <LockKeyhole className="w-4 h-4" />,
+  },
+  {
+    title: "Appearance",
+    tab: "appearance",
+    icon: <Palette className="w-4 h-4" />,
+  },
+  {
+    title: "Notifications",
+    tab: "notifications",
+    icon: <Bell className="w-4 h-4" />,
+  },
+  {
+    title: "API Docs",
+    tab: "api-docs",
+    icon: <SquareTerminal className="w-4 h-4" />,
+  },
 ];
 
 const Profile = () => {
@@ -36,7 +63,9 @@ const Profile = () => {
   return (
     <div className="max-w-[1500px] mx-auto p-10 space-y-6 min-h-screen">
       <div className="space-y-0.5">
-        <Text.TitleMedium className="tracking-tight">Profile Settings</Text.TitleMedium>
+        <Text.TitleMedium className="tracking-tight">
+          Profile Settings
+        </Text.TitleMedium>
         <p className="text-muted-foreground">
           Manage your account settings and preferences.
         </p>
@@ -58,10 +87,10 @@ const Profile = () => {
         <div className="flex-1 lg:max-w-2xl">
           {activeTab === "profile" && <ProfileForm />}
           {activeTab === "two-factor-auth" && <TwoFactorAuth />}
-            {activeTab === "forget-password" && <ForgetPassword />}
+          {activeTab === "forget-password" && <ForgetPassword />}
           {activeTab === "appearance" && <AppearanceSetting />}
           {activeTab === "notifications" && <div>Notifications</div>}
-          {activeTab === "api-docs" && <ApiDocsGuide/>}
+          {activeTab === "api-docs" && <ApiDocsGuide />}
         </div>
       </div>
     </div>

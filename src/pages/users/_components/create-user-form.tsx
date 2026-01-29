@@ -61,8 +61,9 @@ export const CreateUserForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 ">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <Text.TitleMedium className="mb-6">Create a New User</Text.TitleMedium>
-
+          <Text.TitleMedium className="mb-6">
+            Create a New User
+          </Text.TitleMedium>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Upload */}

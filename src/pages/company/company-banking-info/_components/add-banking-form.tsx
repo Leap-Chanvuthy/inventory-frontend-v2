@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TextInput } from "@/components/reusable/partials/input";
+import { BankSelect } from "@/components/reusable/partials/bank-select";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSetupBankingPayment } from "@/api/company/company.mutation";
@@ -29,7 +30,7 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
     payment_link: "",
     bank_account_holder_name: "",
     bank_account_number: "",
-    set_as_default: false,
+    set_as_default: 0,
   });
 
   const [khqrFile, setKhqrFile] = useState<File | null>(null);
@@ -73,14 +74,14 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-6">
-          {/* Account Name & Account Number */}
+          {/* Bank Name & Account Number */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TextInput
-              id="accountName"
-              label="Account Name"
+            <BankSelect
+              id="bankName"
+              label="Bank Name"
+              placeholder="Select bank"
               value={form.bank_name}
-              onChange={handleChange("bank_name")}
-              placeholder="Advanced Bank of Asia (ABA)"
+              onChange={value => setForm({ ...form, bank_name: value })}
               error={
                 fieldErrors?.bank_name ? fieldErrors.bank_name[0] : undefined
               }
@@ -92,6 +93,7 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
               value={form.bank_account_number}
               onChange={handleChange("bank_account_number")}
               placeholder="002 071 337"
+              isNumberOnly={true}
               error={
                 fieldErrors?.bank_account_number
                   ? fieldErrors.bank_account_number[0]
@@ -100,7 +102,6 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
               required={true}
             />
           </div>
-
           {/* KHQR Link & Upload KHQR */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column: KHQR Link and Account Holder Name */}
@@ -138,13 +139,12 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
             <ImageUpload label="Upload KHQR" onChange={handleImageChange} />
           </div>
 
-          {/* Set as Default Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
               id="setAsDefault"
-              checked={form.set_as_default}
-              onCheckedChange={(checked) =>
-                setForm({ ...form, set_as_default: checked === true })
+              checked={form.set_as_default === 1}
+              onCheckedChange={checked =>
+                setForm({ ...form, set_as_default: checked === true ? 1 : 0 })
               }
             />
             <label
@@ -154,7 +154,6 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
               Set as default payment method
             </label>
           </div>
-
           {/* Form Footer Buttons */}
           <CardFooter className="flex justify-end gap-2 p-0 pt-6">
             <Button

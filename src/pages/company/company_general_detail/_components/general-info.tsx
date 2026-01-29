@@ -82,7 +82,28 @@ export const GeneralInfoCard = ({
   }
 
   if (!company) {
-    return null;
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Company Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+            <Text.TitleSmall className="mb-2">
+              No company information available
+            </Text.TitleSmall>
+            <p className="text-sm text-muted-foreground mb-4">
+              Add your company details to get started
+            </p>
+            <Button variant="outline" onClick={onEditClick}>
+              <SquarePen className="h-4 w-4 mr-2" />
+              Add Company Details
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

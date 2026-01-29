@@ -13,9 +13,7 @@ import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteSupplier } from "@/api/suppliers/supplier.mutation";
 
-
 const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
-
   const deleteMutation = useDeleteSupplier();
 
   return (
@@ -26,11 +24,13 @@ const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
         deleteHeading="Delete This Supplier"
         deleteSubheading="Are you sure want to delete this supplier? This action cannot be undone."
         deleteTooltip="Delete Supplier"
-        onDelete={() => { deleteMutation.mutate(supplier.id) }}
+        onDelete={() => {
+          deleteMutation.mutate(supplier.id);
+        }}
       />
     </div>
   );
-}
+};
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { label: string; className: string }> = {
@@ -143,9 +143,7 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
-    render: supplier => (
-      <SupplierActions supplier={supplier} />
-    ),
+    render: supplier => <SupplierActions supplier={supplier} />,
   },
 ];
 
@@ -194,7 +192,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
         {/* Supplier Info */}
         <div className="flex flex-wrap gap-2 mt-1">
           <SupplierCategoryBadge category={supplier.supplier_category} />
-          <StatusBadge status="active" />
+          {/* <StatusBadge status="active" /> */}
         </div>
 
         {/* Contact */}

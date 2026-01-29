@@ -1,7 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Code2, BookOpen, Terminal, CheckCircle2 } from "lucide-react";
+import {
+  ExternalLink,
+  Code2,
+  BookOpen,
+  Terminal,
+  CheckCircle2,
+} from "lucide-react";
 import { BASE_API_URL } from "@/consts/endpoints";
 import { Text } from "@/components/ui/text/app-text";
 
@@ -9,11 +21,14 @@ export function ApiDocsGuide() {
   const swaggerUrl = `${BASE_API_URL}/documentation`;
 
   return (
-    <div className="space-y-6 max-w-xl">
+    <div className="space-y-6 max-w-xl pt-2">
       {/* Header Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-2 py-0">
+          <Badge
+            variant="outline"
+            className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-2 py-0"
+          >
             v2.0
           </Badge>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -21,9 +36,12 @@ export function ApiDocsGuide() {
             Inventory System Operational
           </div>
         </div>
-        <Text.TitleLarge className="tracking-tight">API Reference</Text.TitleLarge>
+        <Text.TitleLarge className="tracking-tight">
+          API Reference
+        </Text.TitleLarge>
         <p className="text-muted-foreground text-lg">
-          Everything you need to integrate with our platform, from authentication to webhooks.
+          Everything you need to integrate with our platform, from
+          authentication to webhooks.
         </p>
       </div>
 
@@ -32,17 +50,18 @@ export function ApiDocsGuide() {
         <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
           <Terminal className="w-32 h-32 " />
         </div>
-        
+
         <CardHeader>
           <CardTitle className=" flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-zinc-400" />
             Interactive Explorer
           </CardTitle>
           <CardDescription className="max-w-[400px]">
-            We use Swagger/OpenAPI to provide a live environment where you can test endpoints directly from your browser.
+            We use Swagger/OpenAPI to provide a live environment where you can
+            test endpoints directly from your browser.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-1">
             <div className="p-4 rounded-lg border  space-y-2">
@@ -59,7 +78,7 @@ export function ApiDocsGuide() {
             </div>
           </div>
 
-          <Button 
+          <Button
             asChild
             className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200 py-6 text-md font-semibold"
           >
@@ -79,7 +98,9 @@ export function ApiDocsGuide() {
           </div>
           <div>
             <p className="font-medium ">SDKs & Libraries</p>
-            <p className="text-sm text-zinc-500">Official wrappers for Node, Go, and Python.</p>
+            <p className="text-sm text-zinc-500">
+              Official wrappers for Node, Go, and Python.
+            </p>
           </div>
         </button>
 
@@ -89,7 +110,9 @@ export function ApiDocsGuide() {
           </div>
           <div>
             <p className="font-medium ">Postman Collection</p>
-            <p className="text-sm text-zinc-500">Import our latest spec into your workspace.</p>
+            <p className="text-sm text-zinc-500">
+              Import our latest spec into your workspace.
+            </p>
           </div>
         </button>
       </div>

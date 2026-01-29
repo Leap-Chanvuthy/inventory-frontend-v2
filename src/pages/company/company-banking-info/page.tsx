@@ -6,7 +6,7 @@ export function BankingInfo() {
   const [isAdding, setIsAdding] = useState(false);
 
   return (
-    <div className="pt-4">
+    <div className="pt-2">
       {!isAdding && <BankingInfoList onAddClick={() => setIsAdding(true)} />}
 
       {isAdding && <AddBankingForm onCancel={() => setIsAdding(false)} />}
