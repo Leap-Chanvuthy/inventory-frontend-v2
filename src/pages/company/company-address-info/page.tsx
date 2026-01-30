@@ -6,7 +6,7 @@ export function AddressInfo() {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="pt-4">
+    <div className="pt-2">
       {!isEditing && <AddressInfoCard onEditClick={() => setIsEditing(true)} />}
 
       {isEditing && <AddressInfoForm onCancel={() => setIsEditing(false)} />}

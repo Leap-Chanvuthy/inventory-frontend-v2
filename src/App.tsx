@@ -41,6 +41,10 @@ import UpdateSupplier from "./pages/supplier/update/page";
 import { SupplierDetail } from "./pages/supplier/view/page";
 import ImportSuppliers from "./pages/supplier/import/page";
 import ImportHistory from "./pages/supplier/import-history/page";
+import { Customers } from "./pages/customers/page";
+import CreateCustomer from "./pages/customers/create/page";
+import UpdateCustomer from "./pages/customers/update/page";
+import { CustomerDetail } from "./pages/customers/view/page";
 import Profile from "./pages/profile/page";
 import UOM from "./pages/uom/page";
 import CreateUOM from "./pages/uom/create/page";
@@ -92,6 +96,15 @@ export default function App() {
                   element={<UpdateSupplier />}
                 />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
+
+                {/* Customer Routes */}
+                <Route path="/customer" element={<Customers />} />
+                <Route path="/customer/create" element={<CreateCustomer />} />
+                <Route
+                  path="/customer/update/:id"
+                  element={<UpdateCustomer />}
+                />
+                <Route path="/customer/view/:id" element={<CustomerDetail />} />
 
                 {/* Warehouse Routes */}
                 <Route path="/warehouses" element={<Warehouses />} />

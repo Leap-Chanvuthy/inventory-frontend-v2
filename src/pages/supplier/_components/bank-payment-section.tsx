@@ -7,7 +7,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
-import { TextInput, SelectInput } from "@/components/reusable/partials/input";
+import { TextInput } from "@/components/reusable/partials/input";
+import { BankSelect } from "@/components/reusable/partials/bank-select";
 import { Plus, Trash2 } from "lucide-react";
 import { BankDetails, ValidationErrors } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
@@ -17,7 +18,6 @@ export interface BankPaymentSectionProps {
   setBanks: React.Dispatch<React.SetStateAction<BankDetails[]>>;
   fieldErrors?: ValidationErrors["errors"];
 }
-const BANK_OPTIONS = ["ACLEDA", "ABA", "WING", "BAKONG"];
 
 export const BankPaymentSection = ({
   banks,
@@ -27,7 +27,7 @@ export const BankPaymentSection = ({
   const handleBankChange = (
     index: number,
     field: keyof BankDetails,
-    value: string | File | null
+    value: string | File | null,
   ) => {
     const updatedBanks = [...banks];
     updatedBanks[index] = { ...updatedBanks[index], [field]: value };
@@ -55,20 +55,11 @@ export const BankPaymentSection = ({
     }
   };
 
-  // Get available banks as options for SelectInput
-  const getAvailableBanks = (currentIndex: number) => {
-    const selectedBanks = banks
+  // Get already selected banks to exclude
+  const getExcludedBanks = (currentIndex: number) => {
+    return banks
       .map((bank, idx) => (idx !== currentIndex ? bank.bank_name : null))
-      .filter(Boolean);
-
-    const availableBanks = BANK_OPTIONS.filter(
-      bankName => !selectedBanks.includes(bankName)
-    );
-
-    return availableBanks.map(bankName => ({
-      value: bankName,
-      label: bankName,
-    }));
+      .filter((bankName): bankName is string => Boolean(bankName));
   };
 
   return (
@@ -117,11 +108,11 @@ export const BankPaymentSection = ({
               {/* Form Fields */}
               <div className="lg:col-span-2 space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <SelectInput
+                  <BankSelect
                     id={`bank_name_${index}`}
                     label="Bank Name"
                     placeholder="Select bank"
-                    options={getAvailableBanks(index)}
+                    excludeBanks={getExcludedBanks(index)}
                     value={bank.bank_name}
                     onChange={value =>
                       handleBankChange(index, "bank_name", value)
@@ -155,7 +146,7 @@ export const BankPaymentSection = ({
                       handleBankChange(
                         index,
                         "account_holder_name",
-                        e.target.value
+                        e.target.value,
                       )
                     }
                     error={

@@ -4,23 +4,23 @@ import { buttonVariants } from "@/components/ui/button";
 
 export type ProfileTab = "profile" | "two-factor-auth" | 'forget-password' | "appearance" | "notifications" | "api-docs";
 
-interface SidebarNavProps extends Omit<React.HTMLAttributes<HTMLElement>, "onChange"> {
+interface SidebarNavProps<T extends string> extends Omit<React.HTMLAttributes<HTMLElement>, "onChange"> {
   items: {
     title: string;
-    tab: ProfileTab;
+    tab: T;
     icon: React.ReactNode;
   }[];
-  activeTab: ProfileTab;
-  onChange: (tab: ProfileTab) => void;
+  activeTab: T;
+  onChange: (tab: T) => void;
 }
 
-export function ProfileSidebar({
+export function ProfileSidebar<T extends string>({
   className,
   items,
   activeTab,
   onChange,
   ...props
-}: SidebarNavProps) {
+}: SidebarNavProps<T>) {
   return (
     <nav className={cn("flex flex-col space-y-1 mb-3 rounded-md h-full p-2", className)} {...props}>
       {items.map((item) => (

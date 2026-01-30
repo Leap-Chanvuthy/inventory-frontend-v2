@@ -110,7 +110,7 @@ export interface SetupBankingPaymentRequest {
   bank_account_holder_name: string;
   bank_account_number: string;
   khqr_code?: File | string;
-  set_as_default: boolean;
+  set_as_default: number;
 }
 
 // Banking Payment Response

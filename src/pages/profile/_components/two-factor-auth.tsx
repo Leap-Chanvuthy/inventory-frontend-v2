@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Smartphone, ShieldCheck, Key, Copy, ShieldPlus } from "lucide-react";
@@ -10,11 +16,12 @@ export function TwoFactorAuth() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
       <div>
         <Text.TitleSmall>Two-Factor Authentication</Text.TitleSmall>
         <p className="text-sm text-muted-foreground">
-          Add an extra layer of security to your account by requiring more than just a password to log in.
+          Add an extra layer of security to your account by requiring more than
+          just a password to log in.
         </p>
       </div>
 
@@ -29,13 +36,11 @@ export function TwoFactorAuth() {
               Enable 2FA
             </CardTitle>
             <CardDescription>
-              We recommend using an authenticator app like Google Authenticator or 1Password.
+              We recommend using an authenticator app like Google Authenticator
+              or 1Password.
             </CardDescription>
           </div>
-          <Switch 
-            checked={isEnabled} 
-            onCheckedChange={setIsEnabled} 
-          />
+          <Switch checked={isEnabled} onCheckedChange={setIsEnabled} />
         </CardHeader>
       </Card>
 
@@ -55,21 +60,25 @@ export function TwoFactorAuth() {
                       Scan the QR code in your authenticator app to get started.
                     </p>
                   </div>
-                  
+
                   {/* Placeholder for QR Code */}
                   <div className="bg-white p-4 w-40 h-40 rounded-md mx-auto lg:mx-0">
                     <div className="w-full h-full bg-slate-200 flex items-center justify-center text-black text-xs text-center px-2">
-                       [QR Code Generator Component]
+                      [QR Code Generator Component]
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground uppercase">Manual Entry Key</Label>
+                    <Label className="text-xs text-muted-foreground uppercase">
+                      Manual Entry Key
+                    </Label>
                     <div className="flex gap-2">
                       <code className="flex-1 p-2 rounded text-sm border">
                         ABCD-1234-EFGH-5678
                       </code>
-                      <Button variant="outline" size="icon"><Copy className="w-4 h-4" /></Button>
+                      <Button variant="outline" size="icon">
+                        <Copy className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -85,7 +94,8 @@ export function TwoFactorAuth() {
                 <CardTitle className="text-md ">Recovery Codes</CardTitle>
               </div>
               <CardDescription>
-                Store these in a safe place. They allow you to access your account if you lose your phone.
+                Store these in a safe place. They allow you to access your
+                account if you lose your phone.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -98,9 +108,12 @@ export function TwoFactorAuth() {
       ) : (
         <div className="rounded-lg border p-8 flex flex-col items-center text-center">
           <Key className="w-12 h-12 text-zinc-700 mb-4" />
-          <h4 className="text-zinc-400 font-medium">2FA is currently disabled</h4>
+          <h4 className="text-zinc-400 font-medium">
+            2FA is currently disabled
+          </h4>
           <p className="text-zinc-500 text-sm max-w-xs">
-            Switch the toggle above to start securing your account with time-based one-time passwords (TOTP).
+            Switch the toggle above to start securing your account with
+            time-based one-time passwords (TOTP).
           </p>
         </div>
       )}
