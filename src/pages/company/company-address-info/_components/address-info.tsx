@@ -11,7 +11,7 @@ type DetailItemProps = {
 const DetailItem = ({ label, value, className }: DetailItemProps) => {
   return (
     <div className={className}>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-muted-foreground">{label}</p> 
       <p className="text-base text-foreground">{value}</p>
     </div>
   );
