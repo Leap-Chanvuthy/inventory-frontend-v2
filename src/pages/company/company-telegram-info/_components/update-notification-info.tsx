@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { TextInput } from "@/components/reusable/partials/input";
 import { DollarSign, FileText, ShoppingCart, SquarePen } from "lucide-react";
 import { useState } from "react";
 import { Text } from "@/components/ui/text/app-text";
@@ -52,16 +52,14 @@ export const NotificationInfoItem: React.FC<NotificationInfoItemProps> = ({
     <Card className="p-4 border">
       {isEditing ? (
         <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Telegram Chat ID
-            </label>
-            <Input
-              value={newChatId}
-              onChange={e => setNewChatId(e.target.value)}
-              placeholder="Enter Telegram Chat ID"
-            />
-          </div>
+          <TextInput
+            id="telegram_chat_id"
+            label="Telegram Chat ID"
+            value={newChatId}
+            onChange={e => setNewChatId(e.target.value)}
+            placeholder="Enter Telegram Chat ID"
+            isNumberOnly={true}
+          />
 
           <div className="flex gap-2 justify-end">
             <Button

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,14 +15,16 @@ import { useSetupBankingPayment } from "@/api/company/company.mutation";
 import {
   SetupBankingPaymentRequest,
   UpdateCompanyValidationErrors,
+  BankingInfo,
 } from "@/api/company/company.type";
 import { AxiosError } from "axios";
 
 type AddBankingFormProps = {
   onCancel: () => void;
+  defaultBank?: BankingInfo | null;
 };
 
-export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
+export const AddBankingForm = ({ onCancel, defaultBank }: AddBankingFormProps) => {
   const setupBankingMutation = useSetupBankingPayment();
 
   const [form, setForm] = useState({
@@ -34,6 +36,23 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
   });
 
   const [khqrFile, setKhqrFile] = useState<File | null>(null);
+  const [defaultImage, setDefaultImage] = useState<string | null>(null);
+
+  // Populate form with default bank data when editing
+  useEffect(() => {
+    if (defaultBank) {
+      setForm({
+        bank_name: defaultBank.bank_name,
+        payment_link: defaultBank.payment_link,
+        bank_account_holder_name: defaultBank.bank_account_holder_name,
+        bank_account_number: defaultBank.bank_account_number,
+        set_as_default: defaultBank.set_as_default,
+      });
+      if (defaultBank.khqr_code) {
+        setDefaultImage(defaultBank.khqr_code);
+      }
+    }
+  }, [defaultBank]);
 
   const error =
     setupBankingMutation.error as AxiosError<UpdateCompanyValidationErrors> | null;
@@ -67,9 +86,13 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Add New Bank Account</CardTitle>
+        <CardTitle>
+          {defaultBank ? "Edit Bank Account" : "Add New Bank Account"}
+        </CardTitle>
         <p className="text-sm text-gray-500">
-          Fill in the details for the new bank account.
+          {defaultBank
+            ? "Update the bank account details."
+            : "Fill in the details for the new bank account."}
         </p>
       </CardHeader>
       <CardContent>
@@ -136,7 +159,11 @@ export const AddBankingForm = ({ onCancel }: AddBankingFormProps) => {
             </div>
 
             {/* Right Column: Upload KHQR */}
-            <ImageUpload label="Upload KHQR" onChange={handleImageChange} />
+            <ImageUpload
+              label="Upload KHQR"
+              onChange={handleImageChange}
+              defaultImage={defaultImage || undefined}
+            />
           </div>
 
           <div className="flex items-center space-x-2">
