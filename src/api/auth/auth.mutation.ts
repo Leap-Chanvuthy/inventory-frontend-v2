@@ -1,18 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { forgotPassword, loginUser , logoutUser, resetPassword, verifyEmail } from "./auth.api";
+import { confirmTwoFactor, forgotPassword, loginUser , logoutUser, resetPassword, setupTwoFactor, verifyEmail, verifyTwoFactorLogin } from "./auth.api";
 import { login, logout } from "@/redux/slices/auth-slice";
-import { ForgotPasswordPayload, LoginPayload, ResetPasswordPayload, VerifyEmailPayload } from "./auth.type";
+import { ForgotPasswordPayload, LoginPayload, ResetPasswordPayload, TwoFactorConfirmPayload, TwoFactorLoginPayload, VerifyEmailPayload } from "./auth.type";
 
 export const useLogin = () => {
-  const dispatch = useDispatch();
-
   return useMutation({
-    mutationFn: (payload: LoginPayload) =>
-      loginUser(payload),
-    onSuccess: (payload) => {
-      dispatch(login({ token: payload.data.authorisation.token , user: payload.data.user }));
-    },
+    mutationFn: (payload: LoginPayload) => loginUser(payload),
   });
 };
 
@@ -52,5 +46,31 @@ export const useForgotPassword = () =>{
 export const useResetPassword = () => {
     return useMutation({
         mutationFn: (payload : ResetPasswordPayload) => resetPassword(payload),
+    });
+}
+
+
+export const useSetupTwoFactor = () => {
+    return useMutation({
+        mutationFn: () => setupTwoFactor(),
+    });
+}
+
+
+export const useConfirmTwoFactor = () => {
+    return useMutation({
+        mutationFn: (payload: TwoFactorConfirmPayload) => confirmTwoFactor(payload),
+    });
+}
+
+
+export const useVerifyTwoFactorLogin = () => {
+    const dispatch = useDispatch();
+
+    return useMutation({
+        mutationFn: (payload: TwoFactorLoginPayload) => verifyTwoFactorLogin(payload),
+        onSuccess: (payload) => {
+            dispatch(login({ token: payload.data.authorisation.token, user: payload.data.user }));
+        },
     });
 }
