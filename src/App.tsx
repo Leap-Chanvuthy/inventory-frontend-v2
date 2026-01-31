@@ -151,7 +151,7 @@ export default function App() {
                 />
                 <Route
                   path="/product-categories/view/:id"
-                  element={<ViewProductCategories />}
+                  element={<ViewProductCategories />} 
                 />
                 <Route
                   path="/product-categories/edit/:id"
