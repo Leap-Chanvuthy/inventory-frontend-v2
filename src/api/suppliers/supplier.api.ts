@@ -7,6 +7,7 @@ import {
   CreateSupplierFormPayload,
   GetImportHistoriesResponse,
   ImportHistoryQueryParams,
+  GetSupplierStatisticsResponse,
 } from "./supplier.types";
 import { apiClient } from "@/api/client";
 
@@ -98,5 +99,11 @@ export const getImportHistories = async (
   const response = await apiClient.get(`${BASE_API_URL}/suppliers/import-histories`, {
     params,
   });
+  return response.data;
+};
+
+// Get supplier statistics
+export const getSupplierStatistics = async (): Promise<GetSupplierStatisticsResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/suppliers/statistics`);
   return response.data;
 };

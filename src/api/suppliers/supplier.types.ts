@@ -224,3 +224,75 @@ export interface ImportHistoryQueryParams {
   "filter[search]"?: string;
   sort?: string;
 }
+
+// Supplier Statistics Types
+export interface TrendData {
+  delta: number;
+  percent: number;
+  direction: "up" | "down";
+}
+
+export interface NewSuppliersData {
+  this_month: number;
+  last_month: number;
+  trend: TrendData;
+}
+
+export interface TotalByCategoryData {
+  ELECTRONICS?: number;
+  FOOD?: number;
+  CLOTHING?: number;
+  LOGISTICS?: number;
+  SERVICES?: number;
+  PRODUCTS?: number;
+  OTHERS?: number;
+  [key: string]: number | undefined; // Allow dynamic category keys
+}
+
+export interface ImportData {
+  total_histories: number;
+  total_uploaded_rows: number;
+  total_files_size_bytes: number;
+  average_file_size_bytes: number;
+  largest_file_size_bytes: number;
+  recent: ImportHistoryRecord[];
+}
+
+export interface MonthlySupplierData {
+  month: string;
+  total: number;
+}
+
+export interface MonthlyImportData {
+  month: string;
+  total_imports: number;
+  total_uploaded: number;
+  total_size_bytes: number;
+}
+
+export interface ProvinceData {
+  province: string;
+  total: number;
+}
+
+export interface SupplierCharts {
+  suppliers_created_by_month: MonthlySupplierData[];
+  imports_by_month: MonthlyImportData[];
+  top_provinces: ProvinceData[];
+}
+
+export interface SupplierStatisticsData {
+  total_suppliers: number;
+  total_suppliers_as_of_end_last_month: number;
+  total_suppliers_trend: TrendData;
+  new_suppliers: NewSuppliersData;
+  total_by_category: TotalByCategoryData;
+  imports: ImportData;
+  charts: SupplierCharts;
+}
+
+export interface GetSupplierStatisticsResponse {
+  status: boolean;
+  message: string;
+  data: SupplierStatisticsData;
+}
