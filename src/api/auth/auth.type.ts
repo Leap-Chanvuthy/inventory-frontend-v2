@@ -8,6 +8,7 @@ export interface User {
   ip_address: string | null;
   device: string | null;
   last_activity: string | null;
+  two_factor_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -28,6 +29,23 @@ export interface LoginResponse {
     };
   };
 }
+
+export interface TwoFactorChallengeResponse {
+  status: boolean;
+  message: string;
+  data: {
+    two_factor_required: boolean;
+    two_factor_token: string;
+  };
+}
+
+export interface TwoFactorLoginPayload {
+  two_factor_token: string;
+  code?: string;
+  recovery_code?: string;
+}
+
+export type LoginApiResponse = LoginResponse | TwoFactorChallengeResponse;
 
 
 export type LoginValidationErrors = {
@@ -101,3 +119,38 @@ export type ResetPasswordErrorResponse = {
 export type ResetPasswordResponse =
   | ResetPasswordSuccessResponse
   | ResetPasswordErrorResponse;
+
+
+// Two-Factor Authentication Types
+export interface TwoFactorSetupResponse {
+  status: boolean;
+  message: string;
+  data: {
+    qr_code: string; // base64 data URL
+    secret: string;
+    recovery_codes: string[];
+  };
+}
+
+export interface TwoFactorSetupErrorResponse {
+  status: false;
+  message: string;
+  errors?: Record<string, string[]>;
+}
+
+export interface TwoFactorConfirmPayload {
+  code: string;
+}
+
+export interface TwoFactorConfirmResponse {
+  status: boolean;
+  message: string;
+}
+
+export interface TwoFactorStatusResponse {
+  status: boolean;
+  message: string;
+  data: {
+    two_factor_enabled: boolean;
+  };
+}

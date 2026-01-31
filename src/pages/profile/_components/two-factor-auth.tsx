@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,11 +11,97 @@ import {
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Smartphone, ShieldCheck, Key, Copy, ShieldPlus } from "lucide-react";
+import {
+  Smartphone,
+  ShieldCheck,
+  Key,
+  Copy,
+  ShieldPlus,
+  Download,
+} from "lucide-react";
 import { Text } from "@/components/ui/text/app-text";
+import {
+  useConfirmTwoFactor,
+  useSetupTwoFactor,
+} from "@/api/auth/auth.mutation";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 export function TwoFactorAuth() {
-  const [isEnabled, setIsEnabled] = useState(false);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [isEnabled, setIsEnabled] = useState(user?.two_factor_enabled || false);
+  const [twoFactorData, setTwoFactorData] = useState<{
+    qr_code: string;
+    secret: string;
+    recovery_codes: string[];
+  } | null>(null);
+  const [showRecoveryCodes, setShowRecoveryCodes] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const setupMutation = useSetupTwoFactor();
+  const confirmMutation = useConfirmTwoFactor();
+
+  const handleToggle = async (checked: boolean) => {
+    if (checked) {
+      try {
+        const response = await setupMutation.mutateAsync();
+        setTwoFactorData(response.data);
+        setIsEnabled(true);
+        setVerificationCode("");
+        setIsConfirmed(false);
+        setShowRecoveryCodes(false);
+        toast.success(response.message);
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Failed to setup 2FA");
+        setIsEnabled(false);
+      }
+    } else {
+      setIsEnabled(false);
+      setTwoFactorData(null);
+      setShowRecoveryCodes(false);
+      setVerificationCode("");
+      setIsConfirmed(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Secret key copied to clipboard");
+  };
+
+  const downloadRecoveryCodes = () => {
+    if (!twoFactorData?.recovery_codes) return;
+
+    const codesText = twoFactorData.recovery_codes.join("\n");
+    const blob = new Blob([codesText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "recovery-codes.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Recovery codes downloaded");
+  };
+
+  const handleConfirm = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast.error("Please enter a valid 6-digit code");
+      return;
+    }
+
+    try {
+      const response = await confirmMutation.mutateAsync({
+        code: verificationCode,
+      });
+      setIsConfirmed(true);
+      toast.success(response.message || "2FA enabled successfully");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to confirm 2FA");
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
@@ -40,7 +128,11 @@ export function TwoFactorAuth() {
               or 1Password.
             </CardDescription>
           </div>
-          <Switch checked={isEnabled} onCheckedChange={setIsEnabled} />
+          <Switch
+            checked={isEnabled}
+            onCheckedChange={handleToggle}
+            disabled={setupMutation.isPending}
+          />
         </CardHeader>
       </Card>
 
@@ -61,11 +153,19 @@ export function TwoFactorAuth() {
                     </p>
                   </div>
 
-                  {/* Placeholder for QR Code */}
-                  <div className="bg-white p-4 w-40 h-40 rounded-md mx-auto lg:mx-0">
-                    <div className="w-full h-full bg-slate-200 flex items-center justify-center text-black text-xs text-center px-2">
-                      [QR Code Generator Component]
-                    </div>
+                  {/* QR Code */}
+                  <div className="bg-white p-4 w-40 h-40 rounded-md mx-auto">
+                    {twoFactorData?.qr_code ? (
+                      <img
+                        src={twoFactorData.qr_code}
+                        alt="2FA QR Code"
+                        className="w-full h-full"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-200 flex items-center justify-center text-black text-xs text-center px-2">
+                        Loading...
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -74,36 +174,114 @@ export function TwoFactorAuth() {
                     </Label>
                     <div className="flex gap-2">
                       <code className="flex-1 p-2 rounded text-sm border">
-                        ABCD-1234-EFGH-5678
+                        {twoFactorData?.secret || "Loading..."}
                       </code>
-                      <Button variant="outline" size="icon">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() =>
+                          twoFactorData?.secret &&
+                          copyToClipboard(twoFactorData.secret)
+                        }
+                        disabled={!twoFactorData?.secret}
+                      >
                         <Copy className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
+
+                  {!isConfirmed && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground uppercase">
+                        Verification Code
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          placeholder="Enter 6-digit code"
+                          value={verificationCode}
+                          onChange={e =>
+                            setVerificationCode(
+                              e.target.value.replace(/\D/g, "").slice(0, 6),
+                            )
+                          }
+                          maxLength={6}
+                          className="flex-1"
+                        />
+                        <Button
+                          onClick={handleConfirm}
+                          disabled={
+                            confirmMutation.isPending ||
+                            verificationCode.length !== 6
+                          }
+                        >
+                          {confirmMutation.isPending
+                            ? "Confirming..."
+                            : "Confirm"}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Enter the 6-digit code from your authenticator app to
+                        enable 2FA
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Recovery Codes */}
-          <Card className="border-dashed">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-green-500" />
-                <CardTitle className="text-md ">Recovery Codes</CardTitle>
-              </div>
-              <CardDescription>
-                Store these in a safe place. They allow you to access your
-                account if you lose your phone.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="secondary" className="w-full sm:w-auto">
-                Generate Recovery Codes
-              </Button>
-            </CardContent>
-          </Card>
+          {/* Recovery Codes - Only show after confirmation */}
+          {isConfirmed && (
+            <Card className="border-dashed">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-green-500" />
+                  <CardTitle className="text-md ">Recovery Codes</CardTitle>
+                </div>
+                <CardDescription>
+                  Store these in a safe place. They allow you to access your
+                  account if you lose your phone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!showRecoveryCodes ? (
+                  <Button
+                    variant="secondary"
+                    className="w-full sm:w-auto"
+                    onClick={() => setShowRecoveryCodes(true)}
+                  >
+                    View Recovery Codes
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {twoFactorData?.recovery_codes.map((code, index) => (
+                        <code
+                          key={index}
+                          className="p-2 rounded text-sm border bg-muted"
+                        >
+                          {code}
+                        </code>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Save these codes securely. Each code can only be used
+                      once.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={downloadRecoveryCodes}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Recovery Codes
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       ) : (
         <div className="rounded-lg border p-8 flex flex-col items-center text-center">

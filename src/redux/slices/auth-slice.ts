@@ -10,6 +10,7 @@ interface User {
   ip_address: string | null;
   device: string | null;
   last_activity: string | null;
+  two_factor_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

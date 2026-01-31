@@ -9,6 +9,8 @@ import FormContainer from "@/components/reusable/auth/form-container";
 import SubmitButton from "@/components/reusable/auth/submit-button";
 import { IMAGES } from "@/consts/image";
 import { Text } from "@/components/ui/text/app-text";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/auth-slice";
 
 function Login() {
     return (
@@ -50,6 +52,7 @@ function Login() {
 // Login Form (Focus on Login Logic)
 const loginForm = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [values, setValues] = useState({
         email: "",
         password: "",
@@ -77,8 +80,19 @@ const loginForm = () => {
                 password: values.password,
             },
             {
-                onSuccess: () => {
-                    navigate("/");
+                onSuccess: (response) => {
+                    // Check if 2FA is required
+                    if ("two_factor_required" in response.data && response.data.two_factor_required) {
+                        // Navigate to 2FA verification page with token in URL
+                        navigate(`/auth/two-factor-verify?token=${response.data.two_factor_token}`);
+                    } else if ("authorisation" in response.data) {
+                        // Normal login - dispatch login action
+                        dispatch(login({
+                            token: response.data.authorisation.token,
+                            user: response.data.user
+                        }));
+                        navigate("/");
+                    }
                 },
             }
         );

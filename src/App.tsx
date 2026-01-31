@@ -22,6 +22,7 @@ import CreateWarehouses from "./pages/warehouses/create/page";
 import VerifyEmail from "./pages/auth/verify-email";
 import ForgotPassword from "./pages/auth/forgot-password";
 import ResetPassword from "./pages/auth/reset-password";
+import TwoFactorVerify from "./pages/auth/two-factor-verify";
 import "leaflet/dist/leaflet.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import Categories from "./pages/category/page";
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/two-factor-verify" element={<TwoFactorVerify />} />
 
           {/* Unauthenticated Routes */}
           <Route element={<UnauthicatedRoute />}>
