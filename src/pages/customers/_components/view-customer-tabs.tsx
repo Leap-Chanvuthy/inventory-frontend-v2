@@ -23,7 +23,9 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Customer Note</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Customer Note
+              </p>
               <p className="font-medium whitespace-pre-wrap">
                 {customer.customer_note || "No notes available"}
               </p>
@@ -47,7 +49,9 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Last Updated</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Last Updated
+                </p>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <p className="font-medium">
@@ -80,11 +84,15 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Customer Address</p>
-                <p className="font-medium">{customer.customer_address || "-"}</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Customer Address
+                </p>
+                <p className="font-medium">
+                  {customer.customer_address || "-"}
+                </p>
               </div>
 
-              {customer.google_map_link && (
+              {/* {customer.google_map_link && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Google Map Location</p>
                   <a
@@ -97,12 +105,15 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
                     Open in Google Maps
                   </a>
                 </div>
-              )}
+              )} */}
 
-              {customer.google_map_link && (
+              {/* {customer.google_map_link && (
                 <div className="mt-4">
                   <iframe
-                    src={customer.google_map_link.replace('/maps/', '/maps/embed?pb=')}
+                    src={customer.google_map_link.replace(
+                      "/maps/",
+                      "/maps/embed?pb=",
+                    )}
                     width="100%"
                     height="400"
                     style={{ border: 0 }}
@@ -112,7 +123,7 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
                     className="rounded-lg"
                   ></iframe>
                 </div>
-              )}
+              )} */}
             </div>
           </CardContent>
         </Card>
@@ -132,7 +143,9 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Email Address</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Email Address
+                  </p>
                   <a
                     href={`mailto:${customer.email_address}`}
                     className="font-medium text-blue-600 hover:underline"
@@ -142,7 +155,9 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
                 </div>
 
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Phone Number</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Phone Number
+                  </p>
                   <a
                     href={`tel:${customer.phone_number}`}
                     className="font-medium text-blue-600 hover:underline"
@@ -154,7 +169,9 @@ export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
 
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Social Media</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Social Media
+                  </p>
                   {customer.social_media ? (
                     <a
                       href={customer.social_media}

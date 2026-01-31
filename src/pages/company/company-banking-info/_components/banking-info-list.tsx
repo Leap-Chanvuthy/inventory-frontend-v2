@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, Trash2, Grid3x3, List } from "lucide-react";
+import { Pencil, Grid3x3, List } from "lucide-react";
 import { useCompanyInfo } from "@/api/company/company.query";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -11,15 +11,35 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Text } from "@/components/ui/text/app-text";
+import { BankingInfo } from "@/api/company/company.type";
+import { AddBankingForm } from "./add-banking-form";
 
-type BankingInfoListProps = {
-  onAddClick: () => void;
-};
-
-export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
+export const BankingInfoList = () => {
   const { data, isLoading } = useCompanyInfo();
   const bankingInfos = data?.data?.banking_infos || [];
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingBank, setEditingBank] = useState<BankingInfo | null>(null);
+
+  const handleAddClick = () => {
+    setIsAdding(true);
+    setEditingBank(null);
+  };
+
+  const handleEditClick = (bank: BankingInfo) => {
+    setEditingBank(bank);
+    setIsAdding(true);
+  };
+
+  const handleCancel = () => {
+    setIsAdding(false);
+    setEditingBank(null);
+  };
+
+  // Show form when adding or editing
+  if (isAdding) {
+    return <AddBankingForm onCancel={handleCancel} defaultBank={editingBank} />;
+  }
 
   if (isLoading) {
     return (
@@ -63,7 +83,7 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                 <List className="h-4 w-4" />
               </Button>
             </div>
-            <Button onClick={onAddClick}>
+            <Button onClick={handleAddClick}>
               <span className="mr-2">+</span> Add New Bank
             </Button>
           </div>
@@ -78,7 +98,7 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
         ) : viewMode === "card" ? (
           // Card View with Accordion
           <Accordion type="multiple" className="w-full">
-            {bankingInfos.map((bank) => (
+            {bankingInfos.map(bank => (
               <AccordionItem key={bank.id} value={bank.id.toString()}>
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center gap-4 flex-1">
@@ -95,14 +115,14 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                         </div>
                       )}
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex-1">
                       <Text.TitleSmall>{bank.bank_name}</Text.TitleSmall>
                       <p className="text-sm text-gray-600">
                         {bank.bank_account_number}
                       </p>
                     </div>
-                    {bank.is_default && (
-                      <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                    {bank.set_as_default === 1 && (
+                      <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded mr-2">
                         Default
                       </span>
                     )}
@@ -112,7 +132,7 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                   <div className="flex gap-6 pt-2">
                     {/* KHQR Code Large Image */}
                     <div className="flex-shrink-0">
-                      <div className="w-32 h-32 border rounded-lg overflow-hidden bg-gray-50">
+                      <div className="w-32 h-32 border rounded-lg overflow-hidden bg-gray-50 ">
                         {bank.khqr_code ? (
                           <img
                             src={bank.khqr_code}
@@ -145,32 +165,22 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                           {bank.bank_account_number}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <span className="font-medium">Account Holder Name:</span>{" "}
+                          <span className="font-medium">
+                            Account Holder Name:
+                          </span>{" "}
                           {bank.bank_account_holder_name}
                         </p>
-                        {bank.payment_link && (
-                          <p className="text-sm text-gray-600">
-                            <span className="font-medium">Payment Link:</span>{" "}
-                            <a
-                              href={bank.payment_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-purple-600 hover:underline"
-                            >
-                              {bank.payment_link}
-                            </a>
-                          </p>
-                        )}
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 items-start">
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditClick(bank)}
+                      >
                         <Pencil className="h-4 w-4 text-gray-500" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </div>
                   </div>
@@ -196,16 +206,14 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
                     KHQR
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                    Status
-                  </th>
+
                   <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {bankingInfos.map((bank) => (
+                {bankingInfos.map(bank => (
                   <tr key={bank.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">{bank.bank_name}</td>
                     <td className="px-4 py-3 text-sm">
@@ -237,20 +245,15 @@ export const BankingInfoList = ({ onAddClick }: BankingInfoListProps) => {
                         <span className="text-gray-400 text-xs">No QR</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm">
-                      {bank.is_default && (
-                        <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-                          Default
-                        </span>
-                      )}
-                    </td>
+
                     <td className="px-4 py-3 text-sm">
                       <div className="flex justify-center gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(bank)}
+                        >
                           <Pencil className="h-4 w-4 text-gray-500" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
                       </div>
                     </td>
