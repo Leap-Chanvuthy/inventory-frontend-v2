@@ -9,12 +9,12 @@ import {
   Warehouse,
   HelpCircle,
   Truck,
-  Factory,
   PackageSearch,
   PencilRuler,
   Users,
   CircleDollarSign,
   NotepadText,
+  Tag,
 } from "lucide-react";
 import { ROLES, Role } from "./role";
 
@@ -64,7 +64,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
       {
         title: "Raw Materials",
         url: "/raw-materials",
-        icon: Factory,
+        icon: Tag,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
         isLocked: true,
       },

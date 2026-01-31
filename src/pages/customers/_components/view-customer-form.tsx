@@ -111,7 +111,7 @@ export function ViewCustomerForm() {
         {/* Content Section */}
         <div className="space-y-6">
           {/* Customer Profile Image */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-start mb-6">
             <img
               src={
                 customer.image ||

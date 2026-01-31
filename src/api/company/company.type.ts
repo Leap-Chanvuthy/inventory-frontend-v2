@@ -1,18 +1,23 @@
 // Banking Information
 export interface BankingInfo {
   id: number;
+  company_information_id: number;
   bank_name: string;
   payment_link: string;
   bank_account_holder_name: string;
   bank_account_number: string;
   khqr_code: string;
-  is_default: boolean;
+  payment_method_label: string;
+  set_as_default: number;
+  created_at: string;
+  updated_at: string;
 }
 
 // Company Information
 export interface Company {
   id: number;
   company_name: string;
+  company_logo: string | null;
   email: string;
   phone_number: string;
   contact_person: string;
@@ -20,8 +25,18 @@ export interface Company {
   website_url: string;
   date_established: string;
   vat_number: string;
-  description: string;
-  company_logo: string;
+  description: string | null;
+  full_address: string | null;
+  house_number: string | null;
+  street: string | null;
+  commune: string | null;
+  district: string | null;
+  city: string | null;
+  telegram_inventory_chat_id: string | null;
+  telegram_sale_chat_id: string | null;
+  telegram_purchase_chat_id: string | null;
+  created_at: string;
+  updated_at: string;
   banking_infos: BankingInfo[];
 }
 

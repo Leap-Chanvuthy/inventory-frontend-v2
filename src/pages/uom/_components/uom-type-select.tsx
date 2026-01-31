@@ -44,7 +44,6 @@ export const UOMTypeSelect = ({
           <SelectItem value="VOLUME">Volume</SelectItem>
           <SelectItem value="LENGTH">Length</SelectItem>
           <SelectItem value="AREA">Area</SelectItem>
-          <SelectItem value="TIME">Time</SelectItem>
         </SelectContent>
       </Select>
       {error && <p className="text-sm text-red-500 mt-1">{error}</p>}

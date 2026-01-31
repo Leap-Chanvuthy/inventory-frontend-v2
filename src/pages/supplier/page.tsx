@@ -1,5 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { SupplierList } from "./_components/supplier-list";
+import { SupplierStatistics } from "./_components/supplier-statistics";
 import { Text } from "@/components/ui/text/app-text";
 
 export function Supplier() {
@@ -16,6 +17,8 @@ export function Supplier() {
       </div>
 
       <Text.TitleLarge className="mx-6">Supplier Management</Text.TitleLarge>
+
+      <SupplierStatistics />
 
       <SupplierList />
     </div>
