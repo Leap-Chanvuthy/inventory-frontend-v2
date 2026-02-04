@@ -50,6 +50,18 @@ export const SearchableSelect = ({
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
+  React.useEffect(() => {
+    if (!open) return;
+    if (search.trim()) return;
+    if (!value) return;
+
+    const selectedIndex = options.findIndex(opt => opt.value === value);
+    if (selectedIndex < 0) return;
+
+    const nextPage = Math.floor(selectedIndex / itemsPerPage) + 1;
+    setCurrentPage(nextPage);
+  }, [open, search, value, options, itemsPerPage]);
+
   // Filter options based on search
   const filteredOptions = useMemo(() => {
     if (!search.trim()) return options;

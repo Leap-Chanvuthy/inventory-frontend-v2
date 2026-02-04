@@ -6,6 +6,7 @@ import {
   RawMaterialQueryParams,
   CreateRawMaterialRequest,
   CreateRawMaterialResponse,
+  UpdateRawMaterialRequest,
 } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
@@ -39,5 +40,14 @@ export const createRawMaterial = async (
       },
     }
   );
+  return response.data;
+};
+
+// Update raw material
+export const updateRawMaterial = async (
+  id: number,
+  data: Omit<UpdateRawMaterialRequest, "id">
+): Promise<CreateRawMaterialResponse> => {
+  const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}`, data);
   return response.data;
 };

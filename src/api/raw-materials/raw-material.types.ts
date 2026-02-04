@@ -7,7 +7,6 @@ import { RawMaterialCategory } from "../categories/types/category.type";
 export interface RawMaterialStockMovement {
   id: number;
   raw_material_id: number;
-  supplier_id: number;
   quantity: number;
   direction: "IN" | "OUT";
   movement_type:

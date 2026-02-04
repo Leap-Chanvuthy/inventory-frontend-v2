@@ -54,6 +54,7 @@ import EditUOM from "./pages/uom/edit/page";
 import RawMaterials from "./pages/raw-materials/page";
 import { RawMaterialDetail } from "./pages/raw-materials/view/page";
 import CreateRawMaterial from "./pages/raw-materials/create/page";
+import UpdateRawMaterial from "./pages/raw-materials/update/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -184,6 +185,7 @@ export default function App() {
                 <Route path="/raw-materials" element={<RawMaterials />} />
                 <Route path="/raw-materials/create" element={<CreateRawMaterial />} />
                 <Route path="/raw-materials/view/:id" element={<RawMaterialDetail />} />
+                <Route path="/raw-materials/update/:id" element={<UpdateRawMaterial />} />
 
                 {/* Company Settings */}
                 <Route path="/company" element={<Company />} />
