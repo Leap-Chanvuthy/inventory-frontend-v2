@@ -8,7 +8,7 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import {
   TextInput,
   TextAreaInput,
-  SelectInput,
+  DatePickerInput,
 } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -17,6 +17,10 @@ import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.ty
 import { Text } from "@/components/ui/text/app-text";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { toNumberOrNull } from "../utils/check_num_null";
+import { SupplierCard } from "@/pages/supplier/utils/table-feature";
+import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
+import { UOMCard } from "@/pages/uom/utils/table-feature";
+import CategorySingleCard from "@/pages/category/_components/category-single-card";
 
 export const CreateRawMaterialForm = () => {
   const rawMaterialMutation = useCreateRawMaterial();
@@ -78,6 +82,8 @@ export const CreateRawMaterialForm = () => {
     );
   }
 
+  console.log('Form', form)
+
   // Error state
   if (hasError) {
     return (
@@ -121,6 +127,21 @@ export const CreateRawMaterialForm = () => {
       label: `${uom.name} (${uom.symbol})`,
     })) || [];
 
+  const selectedCategory =
+    categoriesData?.data?.data?.find(
+      cat => String(cat.id) === form.raw_material_category_id,
+    ) || null;
+
+  const selectedSupplier =
+    suppliersData?.data?.data?.find(sup => String(sup.id) === form.supplier_id) ||
+    null;
+
+  const selectedWarehouse =
+    warehousesData?.data?.find(wh => String(wh.id) === form.warehouse_id) || null;
+
+  const selectedUOM =
+    uomsData?.data?.find(uom => String(uom.id) === form.uom_id) || null;
+
   /* ---------- Handlers ---------- */
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +156,10 @@ export const CreateRawMaterialForm = () => {
 
   const handleSelectChange = (field: string) => (value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDateChange = (value: string) => {
+    setForm(prev => ({ ...prev, expiry_date: value }));
   };
 
   const handleImagesChange = (files: File[]) => {
@@ -188,157 +213,268 @@ export const CreateRawMaterialForm = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
-            {/* Row 1: Material Name (alone) */}
-            <div>
-              <TextInput
-                id="material_name"
-                label="Material Name"
-                placeholder="e.g., Steel Sheet"
-                value={form.material_name}
-                error={fieldErrors?.material_name?.[0]}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left: Form inputs */}
+              <div className="lg:col-span-7 space-y-6">
+                {/* Basic Information */}
+                <div className="rounded-xl border bg-card p-6 space-y-5">
+                  <div>
+                    <Text.TitleSmall>Basic Information</Text.TitleSmall>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      General details and storage setup for this raw material.
+                    </p>
+                  </div>
 
-            {/* Row 2: Category, Unit of Measurement */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SearchableSelect
-                id="raw_material_category_id"
-                label="Category"
-                placeholder="Select category"
-                options={categoryOptions}
-                value={form.raw_material_category_id}
-                onChange={handleSelectChange("raw_material_category_id")}
-                error={fieldErrors?.raw_material_category_id?.[0]}
-                required
-              />
-              <SearchableSelect
-                id="uom_id"
-                label="Unit of Measurement"
-                placeholder="Select UOM"
-                options={uomOptions}
-                value={form.uom_id}
-                onChange={handleSelectChange("uom_id")}
-                error={fieldErrors?.uom_id?.[0]}
-                required
-              />
-            </div>
+                  <TextInput
+                    id="material_name"
+                    label="Material Name"
+                    placeholder="e.g., Steel Sheet"
+                    value={form.material_name}
+                    error={fieldErrors?.material_name?.[0]}
+                    onChange={handleChange}
+                    required
+                  />
 
-            {/* Row 3: Supplier, Warehouse */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SelectInput
-                id="supplier_id"
-                label="Supplier"
-                placeholder="Select supplier"
-                options={supplierOptions}
-                value={form.supplier_id}
-                onChange={handleSelectChange("supplier_id")}
-                error={fieldErrors?.supplier_id?.[0]}
-                required
-              />
-              <SearchableSelect
-                id="warehouse_id"
-                label="Warehouse"
-                placeholder="Select warehouse"
-                options={warehouseOptions}
-                value={form.warehouse_id}
-                onChange={handleSelectChange("warehouse_id")}
-                error={fieldErrors?.warehouse_id?.[0]}
-                required
-              />
-            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <SearchableSelect
+                      id="raw_material_category_id"
+                      label="Category"
+                      placeholder="Select category"
+                      options={categoryOptions}
+                      value={form.raw_material_category_id}
+                      onChange={handleSelectChange("raw_material_category_id")}
+                      error={fieldErrors?.raw_material_category_id?.[0]}
+                      required
+                    />
+                    <SearchableSelect
+                      id="uom_id"
+                      label="Unit of Measurement"
+                      placeholder="Select UOM"
+                      options={uomOptions}
+                      value={form.uom_id}
+                      onChange={handleSelectChange("uom_id")}
+                      error={fieldErrors?.uom_id?.[0]}
+                      required
+                    />
+                  </div>
 
-            {/* Row 4: Minimum Stock Level, Expiry Date */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TextInput
-                id="minimum_stock_level"
-                label="Minimum Stock Level"
-                placeholder="e.g., 10"
-                value={form.minimum_stock_level}
-                error={fieldErrors?.minimum_stock_level?.[0]}
-                onChange={handleChange}
-                isNumberOnly
-                required
-              />
-              <TextInput
-                id="expiry_date"
-                type="text"
-                label="Expiry Date"
-                placeholder="YYYY-MM-DD"
-                value={form.expiry_date}
-                error={fieldErrors?.expiry_date?.[0]}
-                onChange={handleChange}
-                required
-              />
-            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <SearchableSelect
+                      id="supplier_id"
+                      label="Supplier"
+                      placeholder="Select supplier"
+                      options={supplierOptions}
+                      value={form.supplier_id}
+                      onChange={handleSelectChange("supplier_id")}
+                      error={fieldErrors?.supplier_id?.[0]}
+                      required
+                    />
+                    <SearchableSelect
+                      id="warehouse_id"
+                      label="Warehouse"
+                      placeholder="Select warehouse"
+                      options={warehouseOptions}
+                      value={form.warehouse_id}
+                      onChange={handleSelectChange("warehouse_id")}
+                      error={fieldErrors?.warehouse_id?.[0]}
+                      required
+                    />
+                  </div>
 
-            {/* Row 5: Description (alone) */}
-            <div>
-              <TextAreaInput
-                id="description"
-                label="Description"
-                placeholder="Enter description..."
-                value={form.description}
-                error={fieldErrors?.description?.[0]}
-                onChange={handleTextAreaChange}
-              />
-            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TextInput
+                      id="minimum_stock_level"
+                      label="Minimum Stock Level"
+                      placeholder="e.g., 10"
+                      value={form.minimum_stock_level}
+                      error={fieldErrors?.minimum_stock_level?.[0]}
+                      onChange={handleChange}
 
-            {/* Initial Stock Movement */}
-            <div className="border-t pt-6">
-              <Text.TitleSmall className="mb-4">
-                Initial Stock Movement (Purchase)
-              </Text.TitleSmall>
+                      isNumberOnly
+                      required
+                    />
+                    {/* <TextInput
+                      id="expiry_date"
+                      type="text"
+                      label="Expiry Date"
+                      placeholder="YYYY-MM-DD"
+                      value={form.expiry_date}
+                      error={fieldErrors?.expiry_date?.[0]}
+                      onChange={handleChange}
+                      required
+                    /> */}
+                    <DatePickerInput
+                      id="expiry_date"
+                      label="Expiry Date"
+                      placeholder="Pick a date"
+                      value={form.expiry_date}
+                      onChange={handleDateChange}
+                      error={fieldErrors?.expiry_date?.[0]}
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <TextInput
-                  id="quantity"
-                  label="Initial Quantity"
-                  placeholder="e.g., 50"
-                  value={form.quantity}
-                  onChange={handleChange}
-                  isNumberOnly
-                  required
-                  error={fieldErrors?.quantity?.[0]}
-                />
-                <TextInput
-                  id="unit_price_in_usd"
-                  label="Unit Price (USD)"
-                  placeholder="e.g., 2.50"
-                  value={form.unit_price_in_usd}
-                  onChange={handleChange}
-                  required
-                  error={fieldErrors?.unit_price_in_usd?.[0]}
-                />
-                <TextInput
-                  id="exchange_rate_from_usd_to_riel"
-                  label="Exchange Rate (USD to KHR)"
-                  placeholder="e.g., 4100"
-                  value={form.exchange_rate_from_usd_to_riel}
-                  onChange={handleChange}
-                  isNumberOnly
-                  required
-                  error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
-                />
-                <TextInput
-                  id="note"
-                  label="Note"
-                  placeholder="e.g., Purchased from supplier A"
-                  value={form.note}
-                  onChange={handleChange}
-                />
+                  <TextAreaInput
+                    id="description"
+                    label="Description"
+                    placeholder="Enter description..."
+                    value={form.description}
+                    error={fieldErrors?.description?.[0]}
+                    onChange={handleTextAreaChange}
+                  />
+                </div>
+
+                {/* Initial Stock Movement */}
+                <div className="rounded-xl border bg-card p-6 space-y-5">
+                  <div>
+                    <Text.TitleSmall>
+                      Initial Stock Movement (Purchase)
+                    </Text.TitleSmall>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Sets the opening stock and valuation for this raw material.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <TextInput
+                      id="quantity"
+                      label="Initial Quantity"
+                      placeholder="e.g., 50"
+                      value={form.quantity}
+                      onChange={handleChange}
+                      isNumberOnly
+                      required
+                      error={fieldErrors?.quantity?.[0]}
+                    />
+                    <TextInput
+                      id="unit_price_in_usd"
+                      label="Unit Price (USD)"
+                      placeholder="e.g., 2.50"
+                      value={form.unit_price_in_usd}
+                      onChange={handleChange}
+                      required
+                      error={fieldErrors?.unit_price_in_usd?.[0]}
+                    />
+                    <TextInput
+                      id="exchange_rate_from_usd_to_riel"
+                      label="Exchange Rate (USD to KHR)"
+                      placeholder="e.g., 4100"
+                      value={form.exchange_rate_from_usd_to_riel}
+                      onChange={handleChange}
+                      isNumberOnly
+                      required
+                      error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <TextAreaInput
+                      id="note"
+                      label="Note"
+                      placeholder="e.g., Purchased from supplier A"
+                      value={form.note}
+                      onChange={handleTextAreaChange}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Images */}
-            <div className="border-t pt-6">
-              <MultiImageUpload
-                label="Raw Material Images"
-                onChange={handleImagesChange}
-                maxImages={4}
-              />
+              {/* Right: Selected cards + images */}
+              <div className="lg:col-span-5">
+                <div className="lg:sticky lg:top-6 space-y-6">
+                  <div className="rounded-xl border bg-card p-6  h-[30rem] overflow-y-scroll">
+                    <Text.TitleSmall className="mb-2">
+                      Selected Data Preview
+                    </Text.TitleSmall>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Review the full details of what you selected.
+                    </p>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      {selectedCategory ? (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Category
+                          </p>
+                          <CategorySingleCard
+                            category={selectedCategory}
+                            viewRoute="/raw-material-categories/view"
+                            editRoute="/raw-material-categories/edit"
+                            hideActions={false}
+                            disableLink
+                            interactive={false}
+                            variant="compact"
+                          />
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                          Select a category to preview details.
+                        </div>
+                      )}
+
+                      {selectedUOM ? (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Unit of Measurement
+                          </p>
+                          <UOMCard uom={selectedUOM} hideActions={false} interactive={false} />
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                          Select a UOM to preview details.
+                        </div>
+                      )}
+
+                      {selectedSupplier ? (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Supplier
+                          </p>
+                          <SupplierCard
+                            supplier={selectedSupplier}
+                            hideActions={false}
+                            disableLink
+                            interactive={false}
+                          />
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                          Select a supplier to preview details.
+                        </div>
+                      )}
+
+                      {selectedWarehouse ? (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Warehouse
+                          </p>
+                          <WarehouseCard
+                            warehouse={selectedWarehouse}
+                            hideActions={false}
+                            disableLink
+                            interactive={false}
+                          />
+                        </div>
+                      ) : (
+                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                          Select a warehouse to preview details.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border bg-card p-6">
+                    <Text.TitleSmall className="mb-2">Images</Text.TitleSmall>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Upload up to 4 images for this raw material.
+                    </p>
+                    <MultiImageUpload
+                      label="Raw Material Images"
+                      onChange={handleImagesChange}
+                      maxImages={4}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <FormFooterActions isSubmitting={rawMaterialMutation.isPending} />

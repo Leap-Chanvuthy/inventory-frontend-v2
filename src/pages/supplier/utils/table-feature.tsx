@@ -149,9 +149,17 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
 
 interface SupplierCardProps {
   supplier?: Supplier;
+  hideActions?: boolean;
+  disableLink?: boolean;
+  interactive?: boolean;
 }
 
-export function SupplierCard({ supplier }: SupplierCardProps) {
+export function SupplierCard({
+  supplier,
+  hideActions = false,
+  disableLink = false,
+  interactive = true,
+}: SupplierCardProps) {
   if (!supplier) return null;
 
   const addressText = [
@@ -167,24 +175,42 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
     .join("\n");
 
   return (
-    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+    <Card
+      className={
+        interactive
+          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
+          : "border border-gray-200 dark:border-gray-700 rounded-lg"
+      }
+    >
       {/* Header */}
       <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        <Link to={`/supplier/view/${supplier.id}`} className="flex-1">
-          <div className="flex items-center gap-4">
-            <img
-              src={supplier.image || "/supplier-placeholder.png"}
-              alt={supplier.official_name}
-              className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
-            />
-            {/* <div className="min-w-0 flex flex-col gap-1"> */}
-            <div className="font-semibold text-lg truncate text-wrap">
-              {supplier.official_name}
+        {disableLink ? (
+          <div className="flex-1">
+            <div className="flex items-center gap-4">
+              <img
+                src={supplier.image || "/supplier-placeholder.png"}
+                alt={supplier.official_name}
+                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
+              />
+              <div className="font-semibold text-lg truncate text-wrap">
+                {supplier.official_name}
+              </div>
             </div>
-
-            {/* </div> */}
           </div>
-        </Link>
+        ) : (
+          <Link to={`/supplier/view/${supplier.id}`} className="flex-1">
+            <div className="flex items-center gap-4">
+              <img
+                src={supplier.image || "/supplier-placeholder.png"}
+                alt={supplier.official_name}
+                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
+              />
+              <div className="font-semibold text-lg truncate text-wrap">
+                {supplier.official_name}
+              </div>
+            </div>
+          </Link>
+        )}
       </CardHeader>
 
       {/* Content */}
@@ -254,9 +280,11 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end pt-0">
-        <SupplierActions supplier={supplier} />
-      </CardFooter>
+      {!hideActions && (
+        <CardFooter className="flex justify-end pt-0">
+          <SupplierActions supplier={supplier} />
+        </CardFooter>
+      )}
     </Card>
   );
 }
