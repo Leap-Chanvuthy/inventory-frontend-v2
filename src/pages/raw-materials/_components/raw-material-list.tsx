@@ -30,8 +30,6 @@ export function RawMaterialList() {
     "filter[raw_material_category_id]": filter ? Number(filter) : undefined,
   });
 
-  console.log("Raw Materials API Response:", data);
-
   if (isError) {
     return (
       <p className="text-center text-red-500">Failed to load raw materials</p>
