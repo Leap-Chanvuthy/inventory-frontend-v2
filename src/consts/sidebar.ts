@@ -66,7 +66,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/raw-materials",
         icon: Tag,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
-        isLocked: true,
+        isLocked: false,
       },
       {
         title: "Production",

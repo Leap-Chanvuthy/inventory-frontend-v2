@@ -51,6 +51,9 @@ import UOM from "./pages/uom/page";
 import CreateUOM from "./pages/uom/create/page";
 import ViewUOM from "./pages/uom/view/page";
 import EditUOM from "./pages/uom/edit/page";
+import RawMaterials from "./pages/raw-materials/page";
+import { RawMaterialDetail } from "./pages/raw-materials/view/page";
+import CreateRawMaterial from "./pages/raw-materials/create/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -176,6 +179,11 @@ export default function App() {
                 <Route path="/uom/create" element={<CreateUOM />} />
                 <Route path="/uom/view/:id" element={<ViewUOM />} />
                 <Route path="/uom/edit/:id" element={<EditUOM />} />
+
+                {/* Raw Materials */}
+                <Route path="/raw-materials" element={<RawMaterials />} />
+                <Route path="/raw-materials/create" element={<CreateRawMaterial />} />
+                <Route path="/raw-materials/view/:id" element={<RawMaterialDetail />} />
 
                 {/* Company Settings */}
                 <Route path="/company" element={<Company />} />
