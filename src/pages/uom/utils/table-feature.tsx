@@ -87,15 +87,27 @@ function UOMActions({ uom }: { uom: UOM }) {
 // UOM Card Component
 interface UOMCardProps {
   uom?: UOM;
+  hideActions?: boolean;
+  interactive?: boolean;
 }
 
-export function UOMCard({ uom }: UOMCardProps) {
+export function UOMCard({
+  uom,
+  hideActions = false,
+  interactive = true,
+}: UOMCardProps) {
   const deleteMutation = useDeleteUOM();
 
   if (!uom) return null;
 
   return (
-    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+    <Card
+      className={
+        interactive
+          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
+          : "border border-gray-200 dark:border-gray-700 rounded-lg"
+      }
+    >
       {/* Header */}
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
@@ -146,16 +158,18 @@ export function UOMCard({ uom }: UOMCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-end pt-0 pb-4">
-        <TableActions
-          viewDetailPath={`/uom/view/${uom.id}`}
-          editPath={`/uom/edit/${uom.id}`}
-          deleteHeading="Delete This Unit of Measurement"
-          deleteSubheading="Are you sure want to delete this Unit of Measurement? This action cannot be undone."
-          deleteTooltip="Delete UOM"
-          onDelete={() => deleteMutation.mutate(uom.id)}
-        />
-      </CardFooter>
+      {!hideActions && (
+        <CardFooter className="flex justify-end pt-0 pb-4">
+          <TableActions
+            viewDetailPath={`/uom/view/${uom.id}`}
+            editPath={`/uom/edit/${uom.id}`}
+            deleteHeading="Delete This Unit of Measurement"
+            deleteSubheading="Are you sure want to delete this Unit of Measurement? This action cannot be undone."
+            deleteTooltip="Delete UOM"
+            onDelete={() => deleteMutation.mutate(uom.id)}
+          />
+        </CardFooter>
+      )}
     </Card>
   );
 }

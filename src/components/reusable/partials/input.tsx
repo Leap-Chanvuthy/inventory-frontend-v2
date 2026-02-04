@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CalendarIcon } from "lucide-react";
+import { format, isValid } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,10 @@ import {
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 type TextInputProps = {
   type?: "text" | "email" | "password" | "tel" | "number";
@@ -93,9 +98,8 @@ export const TextInput = ({
           value={value}
           onChange={handleChange}
           maxLength={maxLength}
-          className={`pr-10 ${
-            error ? "border-red-500 focus-visible:ring-red-500" : ""
-          }`}
+          className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""
+            }`}
         />
 
         {/* Password Toggle */}
@@ -155,9 +159,8 @@ export const TextAreaInput = ({
           value={value}
           onChange={onChange}
           maxLength={maxLength}
-          className={`pr-10 ${
-            error ? "border-red-500 focus-visible:ring-red-500" : ""
-          }`}
+          className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""
+            }`}
         />
       </div>
 
@@ -208,3 +211,124 @@ export const SelectInput = ({
     </div>
   );
 };
+
+
+// Date Input Calender
+export type DateInputProps = {
+  id: string;
+  label?: string;
+  placeholder?: string;
+  error?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  required?: boolean;
+  disabled?: boolean;
+  className?: string;
+  buttonClassName?: string;
+  displayFormat?: string;
+};
+
+function pad2(n: number) {
+  return String(n).padStart(2, "0")
+}
+
+function formatISODateLocal(date: Date | undefined) {
+  if (!date) return ""
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+}
+
+function parseYMD(value: string) {
+  const match = value.match(/^\s*(\d{4})-(\d{2})-(\d{2})\s*$/)
+  if (!match) return undefined
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  if (!year || month < 1 || month > 12 || day < 1 || day > 31) return undefined
+  const date = new Date(year, month - 1, day)
+  return isValid(date) ? date : undefined
+}
+
+function coerceToDate(value?: string) {
+  if (!value) return undefined
+  const ymd = parseYMD(value)
+  if (ymd) return ymd
+  const parsed = new Date(value)
+  return isValid(parsed) ? parsed : undefined
+}
+
+export const DatePickerInput = ({
+  id,
+  label,
+  placeholder,
+  error,
+  value,
+  onChange,
+  required = false,
+  disabled = false,
+  className,
+  buttonClassName,
+  displayFormat = "PPP",
+}: DateInputProps) => {
+  const isControlled = value !== undefined
+
+  const [internalDate, setInternalDate] = React.useState<Date | undefined>(() =>
+    isControlled ? coerceToDate(value) : undefined,
+  )
+
+  React.useEffect(() => {
+    if (!isControlled) return
+    setInternalDate(coerceToDate(value))
+  }, [isControlled, value])
+
+  const selectedDate = isControlled ? coerceToDate(value) : internalDate
+  const triggerId = `${id}-date-trigger`
+
+  return (
+    <div className={cn("space-y-2 w-full", className)}>
+      {label && (
+        <Label
+          htmlFor={triggerId}
+          className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
+        >
+          {label}
+          {required && <span className="text-red-500 px-1">*</span>}
+        </Label>
+      )}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            id={triggerId}
+            variant={"outline"}
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !selectedDate && "text-muted-foreground",
+              error && "border-red-500 focus-visible:ring-red-500",
+              buttonClassName,
+            )}
+            type="button"
+            disabled={disabled}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDate ? format(selectedDate, displayFormat) : (
+              <span>{placeholder ?? "Pick a date"}</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => {
+              if (!isControlled) {
+                setInternalDate(date)
+              }
+              onChange?.(formatISODateLocal(date))
+            }}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  )
+}

@@ -111,9 +111,17 @@ export const COLUMNS : DataTableColumn<Warehouse>[] = [
 
 interface WarehouseCardProps {
   warehouse?: Warehouse;
+  hideActions?: boolean;
+  disableLink?: boolean;
+  interactive?: boolean;
 }
 
-export function WarehouseCard({ warehouse }: WarehouseCardProps) {
+export function WarehouseCard({
+  warehouse,
+  hideActions = false,
+  disableLink = false,
+  interactive = true,
+}: WarehouseCardProps) {
 
   if (!warehouse) return null;
 
@@ -126,29 +134,61 @@ export function WarehouseCard({ warehouse }: WarehouseCardProps) {
   }
 
   return (
-    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+    <Card
+      className={
+        interactive
+          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
+          : "border border-gray-200 dark:border-gray-700 rounded-lg"
+      }
+    >
       {/* Header */}
       <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        <Link to={`/warehouses/view/${warehouse.id}`} className="flex-1 min-w-0">
-          <div className="flex items-center gap-4 min-w-0">
-            <img
-              src={getWarehouseImageSrc(warehouse)}
-              alt={warehouse.warehouse_name}
-              className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover shrink-0"
-            />
-            <div className="min-w-0">
-              <div className="font-semibold text-lg truncate">
-                {shortenWarehouseName(warehouse.warehouse_name)}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                <span className="inline-flex items-center gap-1">
-                  <Building2 className="h-3.5 w-3.5" />
-                  ID: {warehouse.id}
-                </span>
+        {disableLink ? (
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-4 min-w-0">
+              <img
+                src={getWarehouseImageSrc(warehouse)}
+                alt={warehouse.warehouse_name}
+                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover shrink-0"
+              />
+              <div className="min-w-0">
+                <div className="font-semibold text-lg truncate">
+                  {shortenWarehouseName(warehouse.warehouse_name)}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                  <span className="inline-flex items-center gap-1">
+                    <Building2 className="h-3.5 w-3.5" />
+                    ID: {warehouse.id}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </Link>
+        ) : (
+          <Link
+            to={`/warehouses/view/${warehouse.id}`}
+            className="flex-1 min-w-0"
+          >
+            <div className="flex items-center gap-4 min-w-0">
+              <img
+                src={getWarehouseImageSrc(warehouse)}
+                alt={warehouse.warehouse_name}
+                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover shrink-0"
+              />
+              <div className="min-w-0">
+                <div className="font-semibold text-lg truncate">
+                  {shortenWarehouseName(warehouse.warehouse_name)}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                  <span className="inline-flex items-center gap-1">
+                    <Building2 className="h-3.5 w-3.5" />
+                    ID: {warehouse.id}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        )}
       </CardHeader>
 
       {/* Content */}
@@ -201,9 +241,11 @@ export function WarehouseCard({ warehouse }: WarehouseCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end pt-0">
-        <WarehouseActions warehouse={warehouse} />
-      </CardFooter>
+      {!hideActions && (
+        <CardFooter className="flex justify-end pt-0">
+          <WarehouseActions warehouse={warehouse} />
+        </CardFooter>
+      )}
     </Card>
   );
 }
