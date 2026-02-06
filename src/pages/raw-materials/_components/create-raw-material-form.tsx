@@ -293,16 +293,7 @@ export const CreateRawMaterialForm = () => {
                       isNumberOnly
                       required
                     />
-                    {/* <TextInput
-                      id="expiry_date"
-                      type="text"
-                      label="Expiry Date"
-                      placeholder="YYYY-MM-DD"
-                      value={form.expiry_date}
-                      error={fieldErrors?.expiry_date?.[0]}
-                      onChange={handleChange}
-                      required
-                    /> */}
+                    
                     <DatePickerInput
                       id="expiry_date"
                       label="Expiry Date"

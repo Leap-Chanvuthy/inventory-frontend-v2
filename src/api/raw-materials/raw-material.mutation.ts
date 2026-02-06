@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createRawMaterial, updateRawMaterial } from "./raw-material.api";
-import { CreateRawMaterialRequest, UpdateRawMaterialRequest } from "./raw-material.types";
+import { createRawMaterial, updateRawMaterial, deleteRawMaterialImages } from "./raw-material.api";
+import { CreateRawMaterialRequest } from "./raw-material.types";
 import { toast } from "sonner";
 
 export const useCreateRawMaterial = () => {
@@ -24,7 +24,7 @@ export const useUpdateRawMaterial = (id: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: Omit<UpdateRawMaterialRequest, "id">) => updateRawMaterial(id, payload),
+    mutationFn: (payload: FormData) => updateRawMaterial(id, payload),
     onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
       queryClient.invalidateQueries({ queryKey: ["raw-material", id] });
@@ -32,6 +32,21 @@ export const useUpdateRawMaterial = (id: number) => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to update raw material");
+    },
+  });
+};
+
+export const useDeleteRawMaterialImages = (rawMaterialId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (imageIds: number[]) => deleteRawMaterialImages(rawMaterialId, imageIds),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+      toast.success(response.message || "Image(s) deleted successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to delete image(s)");
     },
   });
 };

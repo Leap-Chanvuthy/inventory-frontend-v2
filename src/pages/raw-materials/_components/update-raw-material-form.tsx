@@ -1,4 +1,4 @@
-import { useUpdateRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import { useDeleteRawMaterialImages, useUpdateRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { useSingleRawMaterial } from "@/api/raw-materials/raw-material.query";
 import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 import { useSuppliers } from "@/api/suppliers/supplier.query";
@@ -7,7 +7,7 @@ import { useUOMs } from "@/api/uom/uom.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput, DatePickerInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.types";
 import { Text } from "@/components/ui/text/app-text";
@@ -17,20 +17,32 @@ import { SupplierCard } from "@/pages/supplier/utils/table-feature";
 import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
 import { UOMCard } from "@/pages/uom/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
+import SelectableImageDelete from "@/components/reusable/partials/selectable-image-delete";
+import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
 
 export const UpdateRawMaterialForm = () => {
   const { id } = useParams<{ id: string }>();
   const rawMaterialId = Number(id);
 
-  const { data: rawMaterialData, isLoading: rmLoading, isError: rmError } =
-    useSingleRawMaterial(rawMaterialId);
+  const { data: rawMaterialData, isLoading: rmLoading, isError: rmError } = useSingleRawMaterial(rawMaterialId);
 
   const updateMutation = useUpdateRawMaterial(rawMaterialId);
-  const error =
-    updateMutation.error as AxiosError<RawMaterialValidationErrors> | null;
+  const deleteImagesMutation = useDeleteRawMaterialImages(rawMaterialId);
+  const error = updateMutation.error as AxiosError<RawMaterialValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
 
   const navigate = useNavigate();
+
+  // Raw Material Image
+  const rawMaterialImage = rawMaterialData?.data?.raw_material?.rm_images || [];
+  const remainingImageSlots = Math.max(0, 4 - rawMaterialImage.length);
+
+  const handleDeleteImages = useCallback(
+    async (imageIds: number[]) => {
+      await deleteImagesMutation.mutateAsync(imageIds);
+    },
+    [deleteImagesMutation]
+  );
 
   // Fetch dropdown options
   const {
@@ -80,6 +92,7 @@ export const UpdateRawMaterialForm = () => {
     unit_price_in_usd: "",
     exchange_rate_from_usd_to_riel: "4100",
     note: "",
+    images: [] as File[],
   });
 
   useEffect(() => {
@@ -180,6 +193,10 @@ export const UpdateRawMaterialForm = () => {
     setForm(prev => ({ ...prev, [id]: value }));
   };
 
+  const handleImagesChange = (files: File[]) => {
+    setForm(prev => ({ ...prev, images: files }));
+  };
+
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setForm(prev => ({ ...prev, [id]: value }));
@@ -193,6 +210,7 @@ export const UpdateRawMaterialForm = () => {
     setForm(prev => ({ ...prev, expiry_date: value }));
   };
 
+  // Update Raw Material
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -201,26 +219,37 @@ export const UpdateRawMaterialForm = () => {
 
     const action = submitter?.value;
 
-    const payload = {
-      material_name: form.material_name,
-      material_sku_code: form.material_sku_code,
-      barcode: form.barcode || undefined,
-      minimum_stock_level: Number(form.minimum_stock_level),
-      expiry_date: form.expiry_date,
-      description: form.description || undefined,
-      raw_material_category_id: Number(form.raw_material_category_id),
-      uom_id: Number(form.uom_id),
-      supplier_id: Number(form.supplier_id),
-      warehouse_id: Number(form.warehouse_id),
-      // PURCHASE movement fields
-      quantity: toNumberOrNull(form.quantity),
-      unit_price_in_usd: toNumberOrNull(form.unit_price_in_usd),
-      exchange_rate_from_usd_to_riel: toNumberOrNull(form.exchange_rate_from_usd_to_riel),
-      note: form.note || undefined,
-    };
+    const fd = new FormData();
 
-    updateMutation.mutate(payload, {
+    // Raw material fields
+    fd.append("material_name", form.material_name);
+    fd.append("material_sku_code", form.material_sku_code);
+    fd.append("barcode", form.barcode ?? "");
+    fd.append("minimum_stock_level", String(Number(form.minimum_stock_level)));
+    fd.append("expiry_date", form.expiry_date);
+    fd.append("description", form.description ?? "");
+    fd.append("raw_material_category_id", String(Number(form.raw_material_category_id)));
+    fd.append("uom_id", String(Number(form.uom_id)));
+    fd.append("supplier_id", String(Number(form.supplier_id)));
+    fd.append("warehouse_id", String(Number(form.warehouse_id)));
+
+    // PURCHASE movement fields
+    const quantity = toNumberOrNull(form.quantity);
+    const unitPriceUsd = toNumberOrNull(form.unit_price_in_usd);
+    const exchangeRate = toNumberOrNull(form.exchange_rate_from_usd_to_riel);
+    fd.append("quantity", quantity == null ? "" : String(quantity));
+    fd.append("unit_price_in_usd", unitPriceUsd == null ? "" : String(unitPriceUsd));
+    fd.append("exchange_rate_from_usd_to_riel", exchangeRate == null ? "" : String(exchangeRate));
+    fd.append("note", form.note ?? "");
+
+    // Append images (add-one / append mode)
+    for (const file of form.images) {
+      fd.append("images[]", file);
+    }
+
+    updateMutation.mutate(fd, {
       onSuccess: () => {
+        setForm(prev => ({ ...prev, images: [] }));
         if (action === "save_and_close") {
           navigate("/raw-materials");
         }
@@ -231,7 +260,7 @@ export const UpdateRawMaterialForm = () => {
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
+        <div className="p-5">
           <Text.TitleMedium className="mb-2">Update Raw Material</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Update raw material info and its initial PURCHASE stock movement (qty/unit price/exchange rate).
@@ -241,7 +270,7 @@ export const UpdateRawMaterialForm = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left: Form inputs */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="rounded-xl border bg-card p-6 space-y-5">
+                <div className="rounded-xl border bg-card p-5 space-y-5">
                   <div>
                     <Text.TitleSmall>Basic Information</Text.TitleSmall>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -338,7 +367,7 @@ export const UpdateRawMaterialForm = () => {
                   />
                 </div>
 
-                <div className="rounded-xl border bg-card p-6 space-y-5">
+                <div className="rounded-xl border bg-card p-5 space-y-5">
                   <div>
                     <Text.TitleSmall>Purchase Stock Movement</Text.TitleSmall>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -389,9 +418,9 @@ export const UpdateRawMaterialForm = () => {
               </div>
 
               {/* Right: Selected cards preview */}
-              <div className="lg:col-span-5">
+              <div className="flex flex-col gap-5 lg:col-span-5">
                 <div className="lg:sticky lg:top-6 space-y-6">
-                  <div className="rounded-xl border bg-card p-6 h-[30rem] overflow-y-scroll">
+                  <div className="rounded-xl border bg-card p-5 h-[30rem] overflow-y-scroll">
                     <Text.TitleSmall className="mb-2">
                       Selected Data Preview
                     </Text.TitleSmall>
@@ -472,11 +501,29 @@ export const UpdateRawMaterialForm = () => {
                     </div>
                   </div>
                 </div>
+                                  <div className="rounded-xl border bg-card p-6">
+                                    <Text.TitleSmall className="mb-2">Images</Text.TitleSmall>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Upload up to {remainingImageSlots} more image{remainingImageSlots === 1 ? "" : "s"} (max 4 total).
+                                    </p>
+                                    <MultiImageUpload
+                                      label="Raw Material Images"
+                                      onChange={handleImagesChange}
+                                        maxImages={remainingImageSlots}
+                                    />
+                                  </div>
+
+                <SelectableImageDelete 
+                  title="Delete Raw Material Image"
+                  images={rawMaterialImage}
+                  onDelete={handleDeleteImages}
+                  isDeleting={deleteImagesMutation.isPending}
+                />
               </div>
             </div>
 
             <FormFooterActions
-              isSubmitting={updateMutation.isPending}
+              isSubmitting={updateMutation.isPending || deleteImagesMutation.isPending}
               saveAndCloseLabel="Save & Close"
               saveLabel="Save"
             />

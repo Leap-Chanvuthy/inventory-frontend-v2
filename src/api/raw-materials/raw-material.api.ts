@@ -6,7 +6,6 @@ import {
   RawMaterialQueryParams,
   CreateRawMaterialRequest,
   CreateRawMaterialResponse,
-  UpdateRawMaterialRequest,
 } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
@@ -46,8 +45,35 @@ export const createRawMaterial = async (
 // Update raw material
 export const updateRawMaterial = async (
   id: number,
-  data: Omit<UpdateRawMaterialRequest, "id">
+  data: FormData
 ): Promise<CreateRawMaterialResponse> => {
-  const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}`, data);
+  const response = await apiClient.post(`${BASE_API_URL}/raw-materials/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    params: {
+      _method: "PATCH",
+    }
+  });
+  return response.data;
+};
+
+export const deleteRawMaterialImages = async (
+  rawMaterialId: number,
+  imageIds: number[]
+): Promise<{
+  status: boolean;
+  message: string;
+  data: { deleted_image_ids: number[]; deleted_count: number };
+}> => {
+  const response = await apiClient.delete(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/images`,
+    {
+      data: {
+        image_ids: imageIds,
+      },
+    }
+  );
+
   return response.data;
 };
