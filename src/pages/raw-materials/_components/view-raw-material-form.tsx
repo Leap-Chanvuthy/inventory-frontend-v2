@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/table";
 import { RawMaterialBarchart } from "./charts/raw-material-barchart";
 import { RawMaterialAreachart } from "./charts/raw-material-areachart";
+import { formatDate } from "@/utils/date-format";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -364,7 +365,7 @@ export function ViewRawMaterialForm() {
                   {raw_material.rm_stock_movements.map(movement => (
                     <TableRow key={movement.id}>
                       <TableCell>
-                        {new Date(movement.movement_date).toLocaleDateString()}
+                        {formatDate(movement.movement_date)}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">
