@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
-import { confirmTwoFactor, forgotPassword, loginUser , logoutUser, resetPassword, setupTwoFactor, verifyEmail, verifyTwoFactorLogin } from "./auth.api";
+import { confirmTwoFactor, disableTwoFactor, forgotPassword, loginUser , logoutUser, resetPassword, setupTwoFactor, verifyEmail, verifyTwoFactorLogin } from "./auth.api";
 import { login, logout } from "@/redux/slices/auth-slice";
-import { ForgotPasswordPayload, LoginPayload, ResetPasswordPayload, TwoFactorConfirmPayload, TwoFactorLoginPayload, VerifyEmailPayload } from "./auth.type";
+import { DisableTwoFactorPayload, ForgotPasswordPayload, LoginPayload, ResetPasswordPayload, TwoFactorConfirmPayload, TwoFactorLoginPayload, VerifyEmailPayload } from "./auth.type";
 
 export const useLogin = () => {
   return useMutation({
@@ -72,5 +72,11 @@ export const useVerifyTwoFactorLogin = () => {
         onSuccess: (payload) => {
             dispatch(login({ token: payload.data.authorisation.token, user: payload.data.user }));
         },
+    });
+}
+
+export const useDisableTwoFactor = () => {
+    return useMutation({
+        mutationFn: (payload: DisableTwoFactorPayload) => disableTwoFactor(payload),
     });
 }

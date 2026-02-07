@@ -34,7 +34,7 @@ export interface TwoFactorChallengeResponse {
   status: boolean;
   message: string;
   data: {
-    two_factor_required: boolean;
+    two_factor_enabled: boolean;
     two_factor_token: string;
   };
 }
@@ -47,34 +47,29 @@ export interface TwoFactorLoginPayload {
 
 export type LoginApiResponse = LoginResponse | TwoFactorChallengeResponse;
 
-
 export type LoginValidationErrors = {
   message: string;
   errors?: Record<string, string[]>;
 };
 
-
-
 export interface VerifyEmailPayload {
-    token: string;
+  token: string;
 }
 
-
 export interface VerifyEmailSuccessResponse {
-    status: boolean,
-    message: string,
-    data?: null,
+  status: boolean;
+  message: string;
+  data?: null;
 }
 
 export interface VerifyEmailErrorResponse {
-    status: boolean,
-    message: string,
-    errors?: string,
+  status: boolean;
+  message: string;
+  errors?: string;
 }
 
-
 // Forgot Password Types
-export interface ForgotPasswordPayload  {
+export interface ForgotPasswordPayload {
   email: string;
 }
 
@@ -87,7 +82,6 @@ export interface ForgotPasswordErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
 }
-
 
 // Reset Password Types
 export interface ResetPasswordPayload {
@@ -119,7 +113,6 @@ export type ResetPasswordErrorResponse = {
 export type ResetPasswordResponse =
   | ResetPasswordSuccessResponse
   | ResetPasswordErrorResponse;
-
 
 // Two-Factor Authentication Types
 export interface TwoFactorSetupResponse {
@@ -153,4 +146,15 @@ export interface TwoFactorStatusResponse {
   data: {
     two_factor_enabled: boolean;
   };
+}
+
+export interface DisableTwoFactorPayload {
+  password: string;
+  code?: string;
+  recovery_code?: string;
+}
+
+export interface DisableTwoFactorResponse {
+  status: boolean;
+  message: string;
 }

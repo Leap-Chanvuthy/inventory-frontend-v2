@@ -16,17 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { Text } from "@/components/ui/text/app-text";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { RawMaterialBarchart } from "./charts/raw-material-barchart";
-import { RawMaterialAreachart } from "./charts/raw-material-areachart";
-import { formatDate } from "@/utils/date-format";
+import { RawMaterialPiechart } from "./charts/raw-material-piechart";
+import { StockMovementsTable } from "./stock-movements-table";
+import { ReorderDialog } from "./reorder-dialog";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -54,108 +46,19 @@ export function ViewRawMaterialForm() {
     );
   }
 
-  const { raw_material, current_qty_in_stock, raw_material_status } = data.data;
-
-  // Prepare bar chart data - group by movement type with in/out quantities
-  const movementTypeData = (() => {
-    const movements = raw_material.rm_stock_movements;
-    if (!movements?.length) return [];
-
-    const typeData: Record<string, { in: number; out: number }> = {};
-
-    movements.forEach(movement => {
-      const type = movement.movement_type.replace(/_/g, " ");
-      if (!typeData[type]) {
-        typeData[type] = { in: 0, out: 0 };
-      }
-      if (movement.direction === "IN") {
-        typeData[type].in += movement.quantity;
-      } else {
-        typeData[type].out += movement.quantity;
-      }
-    });
-
-    return Object.entries(typeData).map(([type, values]) => ({
-      type,
-      in: Number(values.in.toFixed(2)),
-      out: Number(values.out.toFixed(2)),
-    }));
-  })();
-
-  // Prepare area chart data - calculate running stock over time
-  const stockMovementTimeData = (() => {
-    const movements = raw_material.rm_stock_movements;
-    if (!movements?.length) return [];
-
-    const sortedMovements = [...movements].sort(
-      (a, b) =>
-        new Date(a.movement_date).getTime() -
-        new Date(b.movement_date).getTime(),
-    );
-
-    // Calculate backwards from current stock
-    const totalMovements = sortedMovements.reduce((sum, movement) => {
-      return (
-        sum +
-        (movement.direction === "IN" ? movement.quantity : -movement.quantity)
-      );
-    }, 0);
-
-    // Starting stock = current stock - all movements
-    let runningStock = current_qty_in_stock - totalMovements;
-
-    return sortedMovements.map(movement => {
-      runningStock +=
-        movement.direction === "IN" ? movement.quantity : -movement.quantity;
-      return {
-        date: new Date(movement.movement_date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        quantity: Number(runningStock.toFixed(2)),
-      };
-    });
-  })();
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; className: string }> = {
-      IN_STOCK: {
-        label: "In Stock",
-        className: "bg-green-500/10 text-green-600 dark:text-green-400",
-      },
-      LOW_STOCK: {
-        label: "Low Stock",
-        className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      },
-      OUT_OF_STOCK: {
-        label: "Out of Stock",
-        className: "bg-red-500/10 text-red-600 dark:text-red-400",
-      },
-    };
-    return statusMap[status] || statusMap["IN_STOCK"];
-  };
-
-  const statusInfo = getStatusBadge(raw_material_status);
+  const { raw_material, current_qty_in_stock, total_count_by_movement_type } =
+    data.data;
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <Text.TitleLarge className="mb-2">
-            {raw_material.material_name}
-          </Text.TitleLarge>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline">{raw_material.material_sku_code}</Badge>
-            <Badge className={statusInfo.className}>{statusInfo.label}</Badge>
-          </div>
-        </div>
-      </div>
-
       {/* Main Info Card */}
       <Card className="mb-6">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Raw Material Information</CardTitle>
+          <ReorderDialog
+            rawMaterialId={raw_material.id}
+            materialName={raw_material.material_name}
+          />
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-6">
@@ -313,94 +216,42 @@ export function ViewRawMaterialForm() {
           )}
         </CardContent>
       </Card>
-
-      {/* Charts Section */}
+      {/* Charts Section
       {raw_material.rm_stock_movements &&
         raw_material.rm_stock_movements.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <RawMaterialBarchart data={movementTypeData} />
-            <RawMaterialAreachart data={stockMovementTimeData} />
-          </div>
-        )}
-
-      {/* Images Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Raw Material Images</CardTitle>
-        </CardHeader>
-        <CardContent>
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <RawMaterialBarchart data={movementTypeData} />
+              <RawMaterialAreachart data={stockMovementTimeData} />
+            </div>
+          </>
+        )} */}
+      {/* Pie Chart + Images - same row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {total_count_by_movement_type &&
+          Object.keys(total_count_by_movement_type).length > 0 && (
+            <RawMaterialPiechart data={total_count_by_movement_type} />
+          )}
+        <div className="bg-card border border-border rounded-lg p-4 sm:p-6">
+          <Text.TitleMedium className="mb-2">
+            Raw Material Images
+          </Text.TitleMedium>
+          <p className="text-sm text-muted-foreground mb-4">
+            {raw_material.material_name}
+          </p>
           <HorizontalImageScroll
             images={raw_material.rm_images || []}
-            imageWidth="150px"
-            imageHeight="100px"
+            imageWidth="450px"
+            imageHeight="300px"
             gap="1.5rem"
             emptyMessage="No images available"
           />
-        </CardContent>
-      </Card>
-
+        </div>
+      </div>
       {/* Stock Movements Card */}
       {raw_material.rm_stock_movements &&
         raw_material.rm_stock_movements.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Stock Movements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Direction</TableHead>
-                    <TableHead className="text-right">Quantity</TableHead>
-                    <TableHead className="text-right">
-                      Unit Price (USD)
-                    </TableHead>
-                    <TableHead className="text-right">Total (USD)</TableHead>
-                    <TableHead>Note</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {raw_material.rm_stock_movements.map(movement => (
-                    <TableRow key={movement.id}>
-                      <TableCell>
-                        {formatDate(movement.movement_date)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {movement.movement_type.replace(/_/g, " ")}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={
-                            movement.direction === "IN"
-                              ? "bg-green-500/10 text-green-600"
-                              : "bg-red-500/10 text-red-600"
-                          }
-                        >
-                          {movement.direction}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {movement.quantity.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        ${movement.unit_price_in_usd.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        ${movement.total_value_in_usd.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {movement.note || "-"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <StockMovementsTable movements={raw_material.rm_stock_movements} />
         )}
     </div>
   );

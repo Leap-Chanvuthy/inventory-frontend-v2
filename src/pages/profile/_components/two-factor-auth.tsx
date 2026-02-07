@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { updateUserLoginInformation } from "@/redux/slices/auth-slice";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import {
   Smartphone,
   ShieldCheck,
-  Key,
   Copy,
   ShieldPlus,
   Download,
@@ -22,12 +22,23 @@ import {
 import { Text } from "@/components/ui/text/app-text";
 import {
   useConfirmTwoFactor,
+  useDisableTwoFactor,
   useSetupTwoFactor,
 } from "@/api/auth/auth.mutation";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function TwoFactorAuth() {
+  const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const [isEnabled, setIsEnabled] = useState(user?.two_factor_enabled || false);
   const [twoFactorData, setTwoFactorData] = useState<{
@@ -35,12 +46,21 @@ export function TwoFactorAuth() {
     secret: string;
     recovery_codes: string[];
   } | null>(null);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [showRecoveryCodes, setShowRecoveryCodes] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
 
+  // Disable dialog state
+  const [showDisableDialog, setShowDisableDialog] = useState(false);
+  const [disableTab, setDisableTab] = useState<"code" | "recovery">("code");
+  const [disablePassword, setDisablePassword] = useState("");
+  const [disableCode, setDisableCode] = useState("");
+  const [disableRecoveryCode, setDisableRecoveryCode] = useState("");
+
   const setupMutation = useSetupTwoFactor();
   const confirmMutation = useConfirmTwoFactor();
+  const disableMutation = useDisableTwoFactor();
 
   const handleToggle = async (checked: boolean) => {
     if (checked) {
@@ -57,11 +77,45 @@ export function TwoFactorAuth() {
         setIsEnabled(false);
       }
     } else {
+      // Show disable confirmation dialog
+      setShowDisableDialog(true);
+    }
+  };
+
+  const handleDisable = async () => {
+    const payload = {
+      password: disablePassword,
+      ...(disableTab === "code"
+        ? { code: disableCode }
+        : { recovery_code: disableRecoveryCode }),
+    };
+
+    try {
+      const response = await disableMutation.mutateAsync(payload);
       setIsEnabled(false);
       setTwoFactorData(null);
+      setRecoveryCodes([]);
       setShowRecoveryCodes(false);
       setVerificationCode("");
       setIsConfirmed(false);
+      setShowDisableDialog(false);
+      setDisablePassword("");
+      setDisableCode("");
+      setDisableRecoveryCode("");
+      dispatch(updateUserLoginInformation({ two_factor_enabled: false }));
+      toast.success(response.message || "2FA disabled successfully");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to disable 2FA");
+    }
+  };
+
+  const handleDisableDialogClose = (open: boolean) => {
+    if (!open) {
+      setShowDisableDialog(false);
+      setDisablePassword("");
+      setDisableCode("");
+      setDisableRecoveryCode("");
+      setDisableTab("code");
     }
   };
 
@@ -71,9 +125,9 @@ export function TwoFactorAuth() {
   };
 
   const downloadRecoveryCodes = () => {
-    if (!twoFactorData?.recovery_codes) return;
+    if (!recoveryCodes.length) return;
 
-    const codesText = twoFactorData.recovery_codes.join("\n");
+    const codesText = recoveryCodes.join("\n");
     const blob = new Blob([codesText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -96,7 +150,10 @@ export function TwoFactorAuth() {
       const response = await confirmMutation.mutateAsync({
         code: verificationCode,
       });
+      setRecoveryCodes(twoFactorData?.recovery_codes || []);
       setIsConfirmed(true);
+      setTwoFactorData(null);
+      dispatch(updateUserLoginInformation({ two_factor_enabled: true }));
       toast.success(response.message || "2FA enabled successfully");
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to confirm 2FA");
@@ -131,13 +188,13 @@ export function TwoFactorAuth() {
           <Switch
             checked={isEnabled}
             onCheckedChange={handleToggle}
-            disabled={setupMutation.isPending}
+            disabled={setupMutation.isPending || disableMutation.isPending}
           />
         </CardHeader>
       </Card>
 
-      {/* Conditional Setup UI */}
-      {isEnabled ? (
+      {/* Setup UI - Only show when newly setting up (twoFactorData exists) */}
+      {twoFactorData && (
         <div className="grid gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <Card className="">
             <CardContent className="pt-6">
@@ -155,17 +212,11 @@ export function TwoFactorAuth() {
 
                   {/* QR Code */}
                   <div className="bg-white p-4 w-40 h-40 rounded-md mx-auto">
-                    {twoFactorData?.qr_code ? (
-                      <img
-                        src={twoFactorData.qr_code}
-                        alt="2FA QR Code"
-                        className="w-full h-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-slate-200 flex items-center justify-center text-black text-xs text-center px-2">
-                        Loading...
-                      </div>
-                    )}
+                    <img
+                      src={twoFactorData.qr_code}
+                      alt="2FA QR Code"
+                      className="w-full h-full"
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -174,16 +225,12 @@ export function TwoFactorAuth() {
                     </Label>
                     <div className="flex gap-2">
                       <code className="flex-1 p-2 rounded text-sm border">
-                        {twoFactorData?.secret || "Loading..."}
+                        {twoFactorData.secret}
                       </code>
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() =>
-                          twoFactorData?.secret &&
-                          copyToClipboard(twoFactorData.secret)
-                        }
-                        disabled={!twoFactorData?.secret}
+                        onClick={() => copyToClipboard(twoFactorData.secret)}
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -230,71 +277,149 @@ export function TwoFactorAuth() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Recovery Codes - Only show after confirmation */}
-          {isConfirmed && (
-            <Card className="border-dashed">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-green-500" />
-                  <CardTitle className="text-md ">Recovery Codes</CardTitle>
-                </div>
-                <CardDescription>
-                  Store these in a safe place. They allow you to access your
-                  account if you lose your phone.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!showRecoveryCodes ? (
-                  <Button
-                    variant="secondary"
-                    className="w-full sm:w-auto"
-                    onClick={() => setShowRecoveryCodes(true)}
-                  >
-                    View Recovery Codes
-                  </Button>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-2">
-                      {twoFactorData?.recovery_codes.map((code, index) => (
-                        <code
-                          key={index}
-                          className="p-2 rounded text-sm border bg-muted"
-                        >
-                          {code}
-                        </code>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Save these codes securely. Each code can only be used
-                      once.
-                    </p>
-                    <Button
-                      variant="outline"
-                      className="w-full sm:w-auto"
-                      onClick={downloadRecoveryCodes}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Recovery Codes
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      ) : (
-        <div className="rounded-lg border p-8 flex flex-col items-center text-center">
-          <Key className="w-12 h-12 text-zinc-700 mb-4" />
-          <h4 className="text-zinc-400 font-medium">
-            2FA is currently disabled
-          </h4>
-          <p className="text-zinc-500 text-sm max-w-xs">
-            Switch the toggle above to start securing your account with
-            time-based one-time passwords (TOTP).
-          </p>
         </div>
       )}
+
+      {/* Recovery Codes - Show after confirmation */}
+      {isConfirmed && recoveryCodes.length > 0 && (
+        <Card className="border-dashed animate-in fade-in slide-in-from-top-2 duration-300">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-green-500" />
+              <CardTitle className="text-md ">Recovery Codes</CardTitle>
+            </div>
+            <CardDescription>
+              Store these in a safe place. They allow you to access your account
+              if you lose your phone.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!showRecoveryCodes ? (
+              <Button
+                variant="secondary"
+                className="w-full sm:w-auto"
+                onClick={() => setShowRecoveryCodes(true)}
+              >
+                View Recovery Codes
+              </Button>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-2">
+                  {recoveryCodes.map((code, index) => (
+                    <code
+                      key={index}
+                      className="p-2 rounded text-sm border bg-muted"
+                    >
+                      {code}
+                    </code>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Save these codes securely. Each code can only be used once.
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={downloadRecoveryCodes}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Recovery Codes
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Disable 2FA Dialog */}
+      <Dialog open={showDisableDialog} onOpenChange={handleDisableDialogClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Disable Two-Factor Authentication</DialogTitle>
+            <DialogDescription>
+              Enter your password and a verification code or recovery code to
+              disable 2FA.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={disablePassword}
+                onChange={e => setDisablePassword(e.target.value)}
+              />
+            </div>
+
+            <Tabs
+              value={disableTab}
+              onValueChange={value =>
+                setDisableTab(value as "code" | "recovery")
+              }
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="code">Authenticator Code</TabsTrigger>
+                <TabsTrigger value="recovery">Recovery Code</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="code" className="space-y-2 mt-3">
+                <Label>Verification Code</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={disableCode}
+                  onChange={e =>
+                    setDisableCode(
+                      e.target.value.replace(/\D/g, "").slice(0, 6),
+                    )
+                  }
+                  maxLength={6}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the 6-digit code from your authenticator app.
+                </p>
+              </TabsContent>
+
+              <TabsContent value="recovery" className="space-y-2 mt-3">
+                <Label>Recovery Code</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter recovery code"
+                  value={disableRecoveryCode}
+                  onChange={e => setDisableRecoveryCode(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter one of your recovery codes.
+                </p>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => handleDisableDialogClose(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDisable}
+              disabled={
+                disableMutation.isPending ||
+                !disablePassword ||
+                (disableTab === "code"
+                  ? disableCode.length !== 6
+                  : !disableRecoveryCode)
+              }
+            >
+              {disableMutation.isPending ? "Disabling..." : "Disable 2FA"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

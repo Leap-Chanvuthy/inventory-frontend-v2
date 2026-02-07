@@ -6,6 +6,8 @@ import {
   RawMaterialQueryParams,
   CreateRawMaterialRequest,
   CreateRawMaterialResponse,
+  ReorderRawMaterialPayload,
+  ReorderRawMaterialResponse,
 } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
@@ -55,6 +57,18 @@ export const updateRawMaterial = async (
       _method: "PATCH",
     }
   });
+  return response.data;
+};
+
+// Reorder raw material stock
+export const reorderRawMaterial = async (
+  rawMaterialId: number,
+  data: ReorderRawMaterialPayload
+): Promise<ReorderRawMaterialResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/reorder`,
+    data
+  );
   return response.data;
 };
 

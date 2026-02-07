@@ -1,6 +1,6 @@
 import { BASE_API_URL } from "@/consts/endpoints";
 import { apiClient } from "../client";
-import { ForgotPasswordPayload, ForgotPasswordResponse, LoginApiResponse, LoginPayload, LoginResponse, ResetPasswordPayload, ResetPasswordResponse, TwoFactorConfirmPayload, TwoFactorConfirmResponse, TwoFactorLoginPayload, TwoFactorSetupResponse, VerifyEmailPayload, VerifyEmailSuccessResponse } from "./auth.type";
+import { DisableTwoFactorPayload, DisableTwoFactorResponse, ForgotPasswordPayload, ForgotPasswordResponse, LoginApiResponse, LoginPayload, LoginResponse, ResetPasswordPayload, ResetPasswordResponse, TwoFactorConfirmPayload, TwoFactorConfirmResponse, TwoFactorLoginPayload, TwoFactorSetupResponse, VerifyEmailPayload, VerifyEmailSuccessResponse } from "./auth.type";
 
 
 
@@ -49,5 +49,10 @@ export const confirmTwoFactor = async (payload: TwoFactorConfirmPayload) => {
 
 export const verifyTwoFactorLogin = async (payload: TwoFactorLoginPayload) => {
   const { data } = await apiClient.post<LoginResponse>(`${BASE_API_URL}/login/2fa`, payload);
+  return data;
+}
+
+export const disableTwoFactor = async (payload: DisableTwoFactorPayload) => {
+  const { data } = await apiClient.post<DisableTwoFactorResponse>(`${BASE_API_URL}/two-factor/disable`, payload);
   return data;
 }

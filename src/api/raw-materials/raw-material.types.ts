@@ -100,13 +100,7 @@ export interface GetRawMaterialResponse {
     raw_material: RawMaterial;
     current_qty_in_stock: number;
     raw_material_status: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
-    total_count_by_movement_type: {
-      PURCHASE?: number;
-      PRODUCTION_SCRAP?: number;
-      ADJUSTMENT_IN?: number;
-      ADJUSTMENT_OUT?: number;
-      RE_ORDER?: number;
-    };
+    total_count_by_movement_type: Record<string, number>;
   };
 }
 
@@ -153,6 +147,21 @@ export interface CreateRawMaterialResponse {
 
 export interface UpdateRawMaterialRequest extends Partial<CreateRawMaterialRequest> {
   id: number;
+}
+
+// Reorder Raw Material
+export interface ReorderRawMaterialPayload {
+  quantity: number;
+  unit_price_in_usd: number;
+  exchange_rate_from_usd_to_riel: number;
+  movement_date: string;
+  note?: string;
+}
+
+export interface ReorderRawMaterialResponse {
+  status: boolean;
+  message: string;
+  data: RawMaterialStockMovement;
 }
 
 // Validation Errors
