@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RawMaterialPiechart } from "./charts/raw-material-piechart";
 import { StockMovementsTable } from "./stock-movements-table";
 import { ReorderDialog } from "./reorder-dialog";
+import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +52,18 @@ export function ViewRawMaterialForm() {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300">
+              {/* Header with Actions */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <Text.TitleLarge className="truncate">
+                  {raw_material?.material_name} - {raw_material?.material_sku_code}
+                </Text.TitleLarge>
+                <HeaderActionButtons
+                  editPath={`/raw-materials/update/${id}`}
+                  showEdit={true}
+                  showDelete={true}
+                />
+              </div>
+
       {/* Main Info Card */}
       <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">

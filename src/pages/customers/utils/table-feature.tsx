@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Mail, MapPin, Phone, ScanQrCode, Globe } from "lucide-react";
+import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteCustomer } from "@/api/customers/customer.mutation";
 
@@ -211,12 +211,6 @@ export function CustomerCard({ customer }: CustomerCardProps) {
               {customer.email_address}
             </div>
           )}
-          {customer.social_media && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Globe className="h-4 w-4 text-purple-500" />
-              {customer.social_media}
-            </div>
-          )}
         </div>
 
         {/* Address */}
@@ -239,12 +233,6 @@ export function CustomerCard({ customer }: CustomerCardProps) {
           </div>
         )}
 
-        {/* Note */}
-        {customer.customer_note && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-            Note: {customer.customer_note}
-          </div>
-        )}
       </CardContent>
  
       <CardFooter className="flex justify-end pt-0">

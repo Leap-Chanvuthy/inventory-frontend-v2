@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react";
 import { ReactNode, useState } from "react";
 import {
   Dialog,
@@ -62,7 +62,7 @@ export const HeaderActionButtons = ({
       onClick={handleEdit}
       disabled={disabled}
     >
-      <Pencil className="h-4 w-4" />
+      <SquarePen className="h-4 w-4" />
       <span className="hidden sm:inline">{editLabel}</span>
     </Button>
   );

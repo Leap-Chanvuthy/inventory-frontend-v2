@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,10 +17,11 @@ import {
   Package,
   DollarSign,
   ArrowRightLeft,
-  CalendarClock,
   FileText,
 } from "lucide-react";
 import { useReorderRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import { DatePickerInput } from "@/components/reusable/partials/input";
+import { ReorderRawMaterialPayload } from "@/api/raw-materials/raw-material.types";
 
 interface ReorderDialogProps {
   rawMaterialId: number;
@@ -28,30 +29,45 @@ interface ReorderDialogProps {
 }
 
 export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [quantity, setQuantity] = useState("");
-  const [unitPriceInUsd, setUnitPriceInUsd] = useState("");
-  const [exchangeRate, setExchangeRate] = useState("");
-  const [movementDate, setMovementDate] = useState("");
-  const [note, setNote] = useState("");
-
   const reorderMutation = useReorderRawMaterial(rawMaterialId);
 
-  const resetForm = () => {
-    setQuantity("");
-    setUnitPriceInUsd("");
-    setExchangeRate("");
-    setMovementDate("");
-    setNote("");
+  const INITIAL_FORM = useMemo(
+    () => ({
+      quantity: "",
+      unit_price_in_usd: "",
+      exchange_rate_from_usd_to_riel: "4100",
+      movement_date: "",
+      note: "",
+    }),
+    []
+  );
+
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState(INITIAL_FORM);
+
+  const resetForm = () => setForm(INITIAL_FORM);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) resetForm();
   };
 
-  const handleSubmit = async () => {
-    const payload = {
-      quantity: Number(quantity),
-      unit_price_in_usd: Number(unitPriceInUsd),
-      exchange_rate_from_usd_to_riel: Number(exchangeRate),
-      movement_date: movementDate,
-      ...(note && { note }),
+  const isValid = useMemo(() => {
+    const quantity = Number(form.quantity);
+    const unitPrice = Number(form.unit_price_in_usd);
+    const exchangeRate = Number(form.exchange_rate_from_usd_to_riel);
+    return quantity > 0 && unitPrice > 0 && exchangeRate > 0 && form.movement_date !== "";
+  }, [form]);
+
+  const handleSubmit = () => {
+    if (!isValid || reorderMutation.isPending) return;
+
+    const payload: ReorderRawMaterialPayload = {
+      quantity: Number(form.quantity),
+      unit_price_in_usd: Number(form.unit_price_in_usd),
+      exchange_rate_from_usd_to_riel: Number(form.exchange_rate_from_usd_to_riel),
+      movement_date: form.movement_date,
+      ...(form.note.trim() ? { note: form.note.trim() } : {}),
     };
 
     reorderMutation.mutate(payload, {
@@ -61,17 +77,6 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
       },
     });
   };
-
-  const handleOpenChange = (value: boolean) => {
-    setOpen(value);
-    if (!value) resetForm();
-  };
-
-  const isValid =
-    Number(quantity) > 0 &&
-    Number(unitPriceInUsd) > 0 &&
-    Number(exchangeRate) > 0 &&
-    movementDate !== "";
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -99,8 +104,8 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
             <Input
               type="number"
               placeholder="Enter quantity"
-              value={quantity}
-              onChange={e => setQuantity(e.target.value)}
+              value={form.quantity}
+              onChange={e => setForm(prev => ({ ...prev, quantity: e.target.value }))}
               min={0}
             />
           </div>
@@ -117,8 +122,8 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
                 <Input
                   type="number"
                   placeholder="0.00"
-                  value={unitPriceInUsd}
-                  onChange={e => setUnitPriceInUsd(e.target.value)}
+                  value={form.unit_price_in_usd}
+                  onChange={e => setForm(prev => ({ ...prev, unit_price_in_usd: e.target.value }))}
                   min={0}
                   step="0.01"
                   className="pl-7"
@@ -135,8 +140,8 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
                 <Input
                   type="number"
                   placeholder="e.g. 4100"
-                  value={exchangeRate}
-                  onChange={e => setExchangeRate(e.target.value)}
+                  value={form.exchange_rate_from_usd_to_riel}
+                  onChange={e => setForm(prev => ({ ...prev, exchange_rate_from_usd_to_riel: e.target.value }))}
                   min={0}
                   className="pl-7"
                 />
@@ -147,14 +152,12 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
 
           {/* Movement Date */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium flex items-center gap-1.5">
-              <CalendarClock className="w-3.5 h-3.5 text-muted-foreground" />
-              Movement Date <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="datetime-local"
-              value={movementDate}
-              onChange={e => setMovementDate(e.target.value)}
+            <DatePickerInput 
+              id="movement_date"
+              required={true}
+              label="Reorder Date"
+              value={form.movement_date}
+              onChange={value => setForm(prev => ({ ...prev, movement_date: value }))}
             />
           </div>
 
@@ -166,15 +169,15 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
             </Label>
             <Textarea
               placeholder="e.g. Reorder due to low stock"
-              value={note}
-              onChange={e => setNote(e.target.value)}
+              value={form.note}
+              onChange={e => setForm(prev => ({ ...prev, note: e.target.value }))}
               rows={2}
             />
           </div>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+          <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button
