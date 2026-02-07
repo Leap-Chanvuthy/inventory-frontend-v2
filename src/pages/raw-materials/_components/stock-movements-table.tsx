@@ -1,4 +1,5 @@
 import { RawMaterialStockMovement } from "@/api/raw-materials/raw-material.types";
+import { UOM } from "@/api/uom/uom.types";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -20,9 +21,10 @@ import { ArrowDownLeft, ArrowUpRight, History } from "lucide-react"; // UI Icons
 
 interface StockMovementsTableProps {
   movements: RawMaterialStockMovement[];
+  uom: UOM | null,
 }
 
-export function StockMovementsTable({ movements }: StockMovementsTableProps) {
+export function StockMovementsTable({ movements , uom }: StockMovementsTableProps) {
   if (!movements.length) {
     return (
       <Card className="border-dashed">
@@ -98,7 +100,7 @@ export function StockMovementsTable({ movements }: StockMovementsTableProps) {
                     {isStockIn ? "+" : "-"}
                     {movement.quantity.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
-                    })}
+                    })} {uom?.name}
                   </TableCell>
                   <TableCell className="text-right font-mono text-muted-foreground">
                     ${movement.unit_price_in_usd.toFixed(2)}

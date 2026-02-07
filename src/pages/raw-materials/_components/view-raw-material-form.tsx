@@ -264,7 +264,7 @@ export function ViewRawMaterialForm() {
       {/* Stock Movements Card */}
       {raw_material.rm_stock_movements &&
         raw_material.rm_stock_movements.length > 0 && (
-          <StockMovementsTable movements={raw_material.rm_stock_movements} />
+          <StockMovementsTable movements={raw_material?.rm_stock_movements} uom={raw_material?.uom || null} />
         )}
     </div>
   );
