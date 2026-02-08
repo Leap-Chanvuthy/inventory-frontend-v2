@@ -82,7 +82,7 @@ export const CreateRawMaterialForm = () => {
     );
   }
 
-  console.log('Form', form)
+  console.log("Form", form);
 
   // Error state
   if (hasError) {
@@ -133,11 +133,13 @@ export const CreateRawMaterialForm = () => {
     ) || null;
 
   const selectedSupplier =
-    suppliersData?.data?.data?.find(sup => String(sup.id) === form.supplier_id) ||
-    null;
+    suppliersData?.data?.data?.find(
+      sup => String(sup.id) === form.supplier_id,
+    ) || null;
 
   const selectedWarehouse =
-    warehousesData?.data?.find(wh => String(wh.id) === form.warehouse_id) || null;
+    warehousesData?.data?.find(wh => String(wh.id) === form.warehouse_id) ||
+    null;
 
   const selectedUOM =
     uomsData?.data?.find(uom => String(uom.id) === form.uom_id) || null;
@@ -289,11 +291,10 @@ export const CreateRawMaterialForm = () => {
                       value={form.minimum_stock_level}
                       error={fieldErrors?.minimum_stock_level?.[0]}
                       onChange={handleChange}
-
                       isNumberOnly
                       required
                     />
-                    
+
                     <DatePickerInput
                       id="expiry_date"
                       label="Expiry Date"
@@ -322,7 +323,8 @@ export const CreateRawMaterialForm = () => {
                       Initial Stock Movement (Purchase)
                     </Text.TitleSmall>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Sets the opening stock and valuation for this raw material.
+                      Sets the opening stock and valuation for this raw
+                      material.
                     </p>
                   </div>
 
@@ -407,7 +409,11 @@ export const CreateRawMaterialForm = () => {
                           <p className="text-xs font-medium text-muted-foreground mb-2">
                             Unit of Measurement
                           </p>
-                          <UOMCard uom={selectedUOM} hideActions={false} interactive={false} />
+                          <UOMCard
+                            uom={selectedUOM}
+                            hideActions={false}
+                            interactive={false}
+                          />
                         </div>
                       ) : (
                         <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
@@ -461,7 +467,7 @@ export const CreateRawMaterialForm = () => {
                     <MultiImageUpload
                       label="Raw Material Images"
                       onChange={handleImagesChange}
-                      maxImages={4}
+                      maxImages={3}
                     />
                   </div>
                 </div>

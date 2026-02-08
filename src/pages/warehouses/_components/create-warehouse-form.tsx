@@ -75,7 +75,7 @@ export const CreateWarehouseForm = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div>
               <TextInput
                 id="warehouse_name"
                 label="Warehouse Name"
@@ -88,28 +88,6 @@ export const CreateWarehouseForm = () => {
                 }
                 onChange={handleChange}
                 required={true}
-              />
-              <TextInput
-                id="latitude"
-                label="Latitude"
-                placeholder="e.g., 11.562108"
-                value={form.latitude}
-                error={
-                  fieldErrors?.latitude ? fieldErrors.latitude[0] : undefined
-                }
-                onChange={handleChange}
-                isNumberOnly={true}
-              />
-              <TextInput
-                id="longitude"
-                label="Longitude"
-                placeholder="e.g., 104.888535"
-                value={form.longitude}
-                error={
-                  fieldErrors?.longitude ? fieldErrors.longitude[0] : undefined
-                }
-                onChange={handleChange}
-                isNumberOnly={true}
               />
             </div>
 
@@ -198,7 +176,16 @@ export const CreateWarehouseForm = () => {
               </div>
 
               <div className="w-full lg:w-1/2">
-                <MapPicker label="Warehouse Location" />
+                <MapPicker
+                  label="Warehouse Location"
+                  onChange={(lat, lng) =>
+                    setForm(prev => ({
+                      ...prev,
+                      latitude: lat.toString(),
+                      longitude: lng.toString(),
+                    }))
+                  }
+                />
               </div>
             </div>
 
