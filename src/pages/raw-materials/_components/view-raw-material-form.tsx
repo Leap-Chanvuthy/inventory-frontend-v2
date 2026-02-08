@@ -21,6 +21,26 @@ import { StockMovementsTable } from "./stock-movements-table";
 import { ReorderDialog } from "./reorder-dialog";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 
+type IconBadgeVariant = "default" | "primary" | "info" | "success" | "warning";
+
+function iconBadgeClass(variant: IconBadgeVariant) {
+  const base =
+    "inline-flex h-7 w-7 items-center justify-center rounded-full ring-1";
+
+  switch (variant) {
+    case "primary":
+      return `${base} bg-primary/10 text-primary ring-primary/20`;
+    case "info":
+      return `${base} bg-sky-500/10 text-sky-600 ring-sky-500/20 dark:text-sky-400`;
+    case "success":
+      return `${base} bg-emerald-500/10 text-emerald-600 ring-emerald-500/20 dark:text-emerald-400`;
+    case "warning":
+      return `${base} bg-amber-500/10 text-amber-600 ring-amber-500/20 dark:text-amber-400`;
+    default:
+      return `${base} bg-muted text-muted-foreground ring-border`;
+  }
+}
+
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useSingleRawMaterial(Number(id));
@@ -79,7 +99,9 @@ export function ViewRawMaterialForm() {
             <div className="space-y-5">
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Package className="h-4 w-4" />
+                  <span className={iconBadgeClass("info")}>
+                    <Package className="h-4 w-4" />
+                  </span>
                   Material Name
                 </p>
                 <p className="font-medium">{raw_material.material_name}</p>
@@ -87,7 +109,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Barcode className="h-4 w-4" />
+                  <span className={iconBadgeClass("primary")}>
+                    <Barcode className="h-4 w-4" />
+                  </span>
                   SKU Code
                 </p>
                 <p className="font-medium">{raw_material.material_sku_code}</p>
@@ -95,7 +119,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Barcode className="h-4 w-4" />
+                  <span className={iconBadgeClass("primary")}>
+                    <Barcode className="h-4 w-4" />
+                  </span>
                   Barcode
                 </p>
                 <p className="font-medium">{raw_material.barcode || "-"}</p>
@@ -103,7 +129,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
+                  <span className={iconBadgeClass("warning")}>
+                    <Tag className="h-4 w-4" />
+                  </span>
                   Category
                 </p>
                 <Badge
@@ -126,7 +154,9 @@ export function ViewRawMaterialForm() {
             <div className="space-y-5">
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
+                  <span className={iconBadgeClass("success")}>
+                    <TrendingUp className="h-4 w-4" />
+                  </span>
                   Current Stock
                 </p>
                 <p className="font-medium text-lg">
@@ -137,7 +167,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <TrendingDown className="h-4 w-4" />
+                  <span className={iconBadgeClass("warning")}>
+                    <TrendingDown className="h-4 w-4" />
+                  </span>
                   Minimum Stock Level
                 </p>
                 <p className="font-medium">
@@ -148,7 +180,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Ruler className="h-4 w-4" />
+                  <span className={iconBadgeClass("info")}>
+                    <Ruler className="h-4 w-4" />
+                  </span>
                   Unit of Measure
                 </p>
                 <p className="font-medium">
@@ -158,7 +192,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                  <span className={iconBadgeClass("warning")}>
+                    <Calendar className="h-4 w-4" />
+                  </span>
                   Expiry Date
                 </p>
                 <p className="font-medium">
@@ -180,7 +216,9 @@ export function ViewRawMaterialForm() {
             <div className="space-y-5">
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <span className={iconBadgeClass("default")}>
+                    <User className="h-4 w-4" />
+                  </span>
                   Supplier
                 </p>
                 <p className="font-medium">
@@ -190,7 +228,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Warehouse className="h-4 w-4" />
+                  <span className={iconBadgeClass("info")}>
+                    <Warehouse className="h-4 w-4" />
+                  </span>
                   Warehouse
                 </p>
                 <p className="font-medium">
@@ -200,7 +240,9 @@ export function ViewRawMaterialForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                  <span className={iconBadgeClass("default")}>
+                    <Calendar className="h-4 w-4" />
+                  </span>
                   Created At
                 </p>
                 <p className="font-medium">
@@ -221,7 +263,9 @@ export function ViewRawMaterialForm() {
           {raw_material.description && (
             <div className="mt-6 pt-6 border-t">
               <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
+                <span className={iconBadgeClass("info")}>
+                  <FileText className="h-4 w-4" />
+                </span>
                 Description
               </p>
               <p className="font-medium">{raw_material.description}</p>

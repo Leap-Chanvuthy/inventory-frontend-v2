@@ -61,8 +61,8 @@ export function StockMovementsTable({ movements , uom }: StockMovementsTableProp
               <TableHead>Type</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead className="text-right">Quantity</TableHead>
-              <TableHead className="text-right">Unit Price</TableHead>
-              <TableHead className="text-right">Total Value</TableHead>
+              <TableHead className="text-right">Purchasing Unit Price</TableHead>
+              <TableHead className="text-right">Purchasing Total Value</TableHead>
               <TableHead className="hidden md:table-cell">Notes</TableHead>
             </TableRow>
           </TableHeader>
