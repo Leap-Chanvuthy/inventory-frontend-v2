@@ -88,84 +88,72 @@ export const BankPaymentSection = ({
               )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Upload Section */}
-              <div className="lg:col-span-1">
-                <ImageUpload
-                  label="QR Code Image (Optional)"
-                  onChange={file =>
-                    handleBankChange(index, "qr_code_image", file)
-                  }
-                  defaultImage={bank.existing_qr_code}
+            {/* QR Code Image at Top */}
+            <div className="mb-6">
+              <ImageUpload
+                label="QR Code Image (Optional)"
+                onChange={file => handleBankChange(index, "qr_code_image", file)}
+                defaultImage={bank.existing_qr_code}
+              />
+              {fieldErrors?.[`banks.${index}.qr_code_image`]?.[0] && (
+                <p className="text-sm text-red-500 mt-2">
+                  {fieldErrors[`banks.${index}.qr_code_image`][0]}
+                </p>
+              )}
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <BankSelect
+                  id={`bank_name_${index}`}
+                  label="Bank Name"
+                  placeholder="Select bank"
+                  excludeBanks={getExcludedBanks(index)}
+                  value={bank.bank_name}
+                  onChange={value => handleBankChange(index, "bank_name", value)}
+                  error={fieldErrors?.[`banks.${index}.bank_name`]?.[0]}
+                  required={true}
                 />
-                {fieldErrors?.[`banks.${index}.qr_code_image`]?.[0] && (
-                  <p className="text-sm text-red-500 mt-2">
-                    {fieldErrors[`banks.${index}.qr_code_image`][0]}
-                  </p>
-                )}
+
+                <TextInput
+                  id={`account_number_${index}`}
+                  label="Account Number"
+                  type="tel"
+                  placeholder="Enter account number"
+                  value={bank.account_number}
+                  onChange={e =>
+                    handleBankChange(index, "account_number", e.target.value)
+                  }
+                  error={fieldErrors?.[`banks.${index}.account_number`]?.[0]}
+                  isNumberOnly={true}
+                  required={true}
+                />
               </div>
 
-              {/* Form Fields */}
-              <div className="lg:col-span-2 space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <BankSelect
-                    id={`bank_name_${index}`}
-                    label="Bank Name"
-                    placeholder="Select bank"
-                    excludeBanks={getExcludedBanks(index)}
-                    value={bank.bank_name}
-                    onChange={value =>
-                      handleBankChange(index, "bank_name", value)
-                    }
-                    error={fieldErrors?.[`banks.${index}.bank_name`]?.[0]}
-                    required={true}
-                  />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <TextInput
+                  id={`account_holder_name_${index}`}
+                  label="Account Holder Name"
+                  placeholder="Enter account holder name"
+                  value={bank.account_holder_name}
+                  onChange={e =>
+                    handleBankChange(index, "account_holder_name", e.target.value)
+                  }
+                  error={fieldErrors?.[`banks.${index}.account_holder_name`]?.[0]}
+                  required={true}
+                />
 
-                  <TextInput
-                    id={`account_number_${index}`}
-                    label="Account Number"
-                    type="tel"
-                    placeholder="Enter account number"
-                    value={bank.account_number}
-                    onChange={e =>
-                      handleBankChange(index, "account_number", e.target.value)
-                    }
-                    error={fieldErrors?.[`banks.${index}.account_number`]?.[0]}
-                    isNumberOnly={true}
-                    required={true}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <TextInput
-                    id={`account_holder_name_${index}`}
-                    label="Account Holder Name"
-                    placeholder="Enter account holder name"
-                    value={bank.account_holder_name}
-                    onChange={e =>
-                      handleBankChange(
-                        index,
-                        "account_holder_name",
-                        e.target.value,
-                      )
-                    }
-                    error={
-                      fieldErrors?.[`banks.${index}.account_holder_name`]?.[0]
-                    }
-                    required={true}
-                  />
-
-                  <TextInput
-                    id={`payment_link_${index}`}
-                    label="Payment Link"
-                    placeholder="Enter payment link"
-                    value={bank.payment_link}
-                    onChange={e =>
-                      handleBankChange(index, "payment_link", e.target.value)
-                    }
-                    error={fieldErrors?.[`banks.${index}.payment_link`]?.[0]}
-                  />
-                </div>
+                <TextInput
+                  id={`payment_link_${index}`}
+                  label="Payment Link"
+                  placeholder="Enter payment link"
+                  value={bank.payment_link}
+                  onChange={e =>
+                    handleBankChange(index, "payment_link", e.target.value)
+                  }
+                  error={fieldErrors?.[`banks.${index}.payment_link`]?.[0]}
+                />
               </div>
             </div>
           </div>
