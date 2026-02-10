@@ -19,6 +19,7 @@ import {
   ValidationErrors,
 } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
+import MapPicker from "@/components/reusable/map-picker/map-picker";
 
 export const CreateSupplierForm = () => {
   const supplierMutation = useCreateSupplier();
@@ -96,6 +97,8 @@ export const CreateSupplierForm = () => {
     // Create payload with proper typing
     const payload: CreateSupplierFormPayload = {
       ...form,
+      latitude: form.latitude || undefined,
+      longitude: form.longitude || undefined,
       image,
       banks: filledBanks,
     };
@@ -113,7 +116,9 @@ export const CreateSupplierForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-8">
-          <Text.TitleMedium className="mb-2">Create a new Supplier</Text.TitleMedium>
+          <Text.TitleMedium className="mb-2">
+            Create a new Supplier
+          </Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Manage supplier details and roles within the application.{" "}
           </p>
@@ -178,7 +183,9 @@ export const CreateSupplierForm = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Business Information</CardTitle>
-                    <CardDescription>Legal and business details</CardDescription>
+                    <CardDescription>
+                      Legal and business details
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <TextInput
@@ -228,7 +235,9 @@ export const CreateSupplierForm = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Address Information</CardTitle>
-                    <CardDescription>Supplier's location details</CardDescription>
+                    <CardDescription>
+                      Supplier's location details
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <TextInput
@@ -310,26 +319,16 @@ export const CreateSupplierForm = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id="latitude"
-                        label="Latitude"
-                        type="number"
-                        placeholder="e.g., 11.562108"
-                        value={form.latitude}
-                        error={fieldErrors?.latitude?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        id="longitude"
-                        label="Longitude"
-                        type="number"
-                        placeholder="e.g., 104.927734"
-                        value={form.longitude}
-                        error={fieldErrors?.longitude?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
+                    <MapPicker
+                      label="Supplier Location"
+                      onChange={(lat, lng) =>
+                        setForm(prev => ({
+                          ...prev,
+                          latitude: lat.toString(),
+                          longitude: lng.toString(),
+                        }))
+                      }
+                    />
                   </CardContent>
                 </Card>
               </div>

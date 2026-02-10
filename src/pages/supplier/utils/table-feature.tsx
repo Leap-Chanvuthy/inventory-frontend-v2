@@ -12,6 +12,7 @@ import {
 import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteSupplier } from "@/api/suppliers/supplier.mutation";
+import { Text } from "@/components/ui/text/app-text";
 
 const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
   const deleteMutation = useDeleteSupplier();
@@ -51,7 +52,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   const statusInfo = statusMap[status.toLowerCase()] || statusMap["active"];
 
   return (
-    <Badge variant="secondary" className={statusInfo.className}>
+    <Badge variant="secondary" className={`min-w-[80px] justify-center ${statusInfo.className}`}>
       {statusInfo.label}
     </Badge>
   );
@@ -176,112 +177,114 @@ export function SupplierCard({
 
   return (
     <Card
-      className={
-        interactive
-          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
-          : "border border-gray-200 dark:border-gray-700 rounded-lg"
-      }
+      className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}
     >
       {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        {disableLink ? (
-          <div className="flex-1">
-            <div className="flex items-center gap-4">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {disableLink ? (
+            <>
               <img
                 src={supplier.image || "/supplier-placeholder.png"}
                 alt={supplier.official_name}
-                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
-              <div className="font-semibold text-lg truncate text-wrap">
-                {supplier.official_name}
+              <div className="min-w-0 flex-1">
+                <Text.Small
+                  color="default"
+                  fontWeight="medium"
+                  overflow="ellipsis"
+                >
+                  {supplier.official_name}
+                </Text.Small>
               </div>
-            </div>
-          </div>
-        ) : (
-          <Link to={`/supplier/view/${supplier.id}`} className="flex-1">
-            <div className="flex items-center gap-4">
+            </>
+          ) : (
+            <Link
+              to={`/supplier/view/${supplier.id}`}
+              className="flex items-center gap-3 min-w-0 hover:text-primary"
+            >
               <img
                 src={supplier.image || "/supplier-placeholder.png"}
                 alt={supplier.official_name}
-                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
-              <div className="font-semibold text-lg truncate text-wrap">
-                {supplier.official_name}
+              <div className="min-w-0 flex-1">
+                <Text.Small
+                  color="default"
+                  fontWeight="medium"
+                  overflow="ellipsis"
+                >
+                  {supplier.official_name}
+                </Text.Small>
               </div>
-            </div>
-          </Link>
-        )}
+            </Link>
+          )}
+        </div>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm">
-        {/* Supplier Info */}
-        <div className="flex flex-wrap gap-2 mt-1">
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+        <div className="flex flex-wrap gap-2">
           <SupplierCategoryBadge category={supplier.supplier_category} />
-          {/* <StatusBadge status="active" /> */}
         </div>
 
-        {/* Contact */}
-        <div className="flex flex-col gap-1">
-          {supplier.supplier_code && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <ScanQrCode className="h-4 w-4" />
+        {supplier.supplier_code && (
+          <div className="flex items-center gap-2">
+            <ScanQrCode className="h-4 w-4 text-indigo-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
               {supplier.supplier_code}
-            </div>
-          )}
-          {supplier.phone && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Phone className="h-4 w-4 text-blue-500" />
-              {supplier.phone}
-            </div>
-          )}
-          {supplier.email && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Mail className="h-4 w-4 text-green-500" />
-              {supplier.email}
-            </div>
-          )}
-          {supplier.banks && supplier.banks.length > 0 && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Banknote className="h-4 w-4 text-purple-500" />
-              <div className="flex items-center gap-1 flex-wrap">
-                {supplier.banks
-                  .filter(bank => Boolean(bank.bank_label))
-                  .map(bank => (
-                    <img
-                      key={bank.id}
-                      src={bank.bank_label}
-                      alt={`${bank.bank_name} label`}
-                      title={bank.bank_name}
-                      className="h-4 w-4 shrink-0 rounded-full"
-                    />
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Address */}
-        <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
-          <MapPin className="h-4 w-4 text-red-400 mt-0.5" />
-          <div
-            className="text-xs leading-snug break-words"
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 2,
-              overflow: "hidden",
-              whiteSpace: "pre-line",
-            }}
-            title={addressText || "-"}
-          >
-            {addressText || "-"}
+            </Text.Small>
           </div>
+        )}
+
+        {supplier.phone && (
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4 text-blue-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
+              {supplier.phone}
+            </Text.Small>
+          </div>
+        )}
+
+        {supplier.email && (
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-green-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
+              {supplier.email}
+            </Text.Small>
+          </div>
+        )}
+
+        {supplier.banks && supplier.banks.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Banknote className="h-4 w-4 text-purple-500 shrink-0" />
+            <div className="flex items-center gap-1 flex-wrap">
+              {supplier.banks
+                .filter(bank => Boolean(bank.bank_label))
+                .map(bank => (
+                  <img
+                    key={bank.id}
+                    src={bank.bank_label}
+                    alt={`${bank.bank_name} label`}
+                    title={bank.bank_name}
+                    className="h-4 w-4 shrink-0 rounded-full"
+                  />
+                ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2">
+          <MapPin className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+          <Text.Small color="muted" maxLines={2}>
+            {addressText || "-"}
+          </Text.Small>
         </div>
       </CardContent>
 
       {!hideActions && (
-        <CardFooter className="flex justify-end pt-0">
+        <CardFooter className="flex justify-end pt-0 pb-4">
           <SupplierActions supplier={supplier} />
         </CardFooter>
       )}

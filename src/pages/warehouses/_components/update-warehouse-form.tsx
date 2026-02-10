@@ -10,6 +10,7 @@ import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
+import MapPicker from "@/components/reusable/map-picker/map-picker";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -73,7 +74,7 @@ export const UpdateWarehouseForm = () => {
 
       // Set existing images
       setExistingImages(
-        warehouse.images?.map(img => ({ id: img.id, url: img.image })) || []
+        warehouse.images?.map(img => ({ id: img.id, url: img.image })) || [],
       );
     }
   }, [warehouse]);
@@ -122,7 +123,13 @@ export const UpdateWarehouseForm = () => {
     }
 
     // Then update the warehouse
-    warehouseMutation.mutate(form, {
+    const payload = {
+      ...form,
+      latitude: form.latitude || undefined,
+      longitude: form.longitude || undefined,
+    };
+
+    warehouseMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/warehouses");
@@ -151,8 +158,7 @@ export const UpdateWarehouseForm = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Row 1: Warehouse Name, Latitude, Longitude */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div>
               <TextInput
                 id="warehouse_name"
                 label="Warehouse Name"
@@ -165,26 +171,6 @@ export const UpdateWarehouseForm = () => {
                 }
                 onChange={handleChange}
                 required={true}
-              />
-              <TextInput
-                id="latitude"
-                label="Latitude"
-                placeholder="e.g., 11.562108"
-                value={form.latitude}
-                error={
-                  fieldErrors?.latitude ? fieldErrors.latitude[0] : undefined
-                }
-                onChange={handleChange}
-              />
-              <TextInput
-                id="longitude"
-                label="Longitude"
-                placeholder="e.g., 104.888535"
-                value={form.longitude}
-                error={
-                  fieldErrors?.longitude ? fieldErrors.longitude[0] : undefined
-                }
-                onChange={handleChange}
               />
             </div>
 
@@ -230,7 +216,7 @@ export const UpdateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
-                isNumberOnly={false}
+                isNumberOnly={true}
               />
               <TextInput
                 id="warehouse_manager_email"
@@ -263,16 +249,36 @@ export const UpdateWarehouseForm = () => {
               />
             </div>
 
-            {/* Warehouse Images */}
-            <div>
-              <MultiImageUpload
-                label="Warehouse Images"
-                defaultImages={existingImages.map(img => img.url)}
-                defaultImageIds={existingImages.map(img => img.id)}
-                onChange={handleImagesChange}
-                onDeleteExisting={handleDeleteExistingImage}
-                maxImages={3}
-              />
+            {/* Warehouse Images & Map */}
+            <div className="flex flex-col lg:flex-row w-full gap-4">
+              <div className="w-full lg:w-1/2">
+                <MultiImageUpload
+                  label="Warehouse Images"
+                  defaultImages={existingImages.map(img => img.url)}
+                  defaultImageIds={existingImages.map(img => img.id)}
+                  onChange={handleImagesChange}
+                  onDeleteExisting={handleDeleteExistingImage}
+                  maxImages={3}
+                />
+              </div>
+
+              <div className="w-full lg:w-1/2">
+                <MapPicker
+                  label="Warehouse Location"
+                  defaultPosition={
+                    form.latitude && form.longitude
+                      ? [parseFloat(form.latitude), parseFloat(form.longitude)]
+                      : undefined
+                  }
+                  onChange={(lat, lng) =>
+                    setForm(prev => ({
+                      ...prev,
+                      latitude: lat.toString(),
+                      longitude: lng.toString(),
+                    }))
+                  }
+                />
+              </div>
             </div>
 
             <FormFooterActions

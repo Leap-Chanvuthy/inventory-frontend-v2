@@ -27,6 +27,7 @@ type TextInputProps = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isNumberOnly?: boolean;
   maxLength?: number;
+  allowPaste?: boolean;
 };
 
 type TextAreaInputProps = {
@@ -62,6 +63,7 @@ export const TextInput = ({
   onChange,
   isNumberOnly = false,
   maxLength,
+  allowPaste = true,
 }: TextInputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -98,6 +100,7 @@ export const TextInput = ({
           value={value}
           onChange={handleChange}
           maxLength={maxLength}
+          onPaste={!allowPaste ? (e) => e.preventDefault() : undefined}
           className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""
             }`}
         />

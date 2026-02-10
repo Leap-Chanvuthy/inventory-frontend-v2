@@ -20,6 +20,7 @@ import {
   ValidationErrors,
 } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
+import MapPicker from "@/components/reusable/map-picker/map-picker";
 
 export const UpdateSupplierForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -154,6 +155,8 @@ export const UpdateSupplierForm = () => {
     // Create payload with proper typing
     const payload: CreateSupplierFormPayload = {
       ...form,
+      latitude: form.latitude || undefined,
+      longitude: form.longitude || undefined,
       image,
       banks: filledBanks,
     };
@@ -389,26 +392,21 @@ export const UpdateSupplierForm = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id="latitude"
-                        label="Latitude"
-                        type="number"
-                        placeholder="e.g., 11.562108"
-                        value={form.latitude}
-                        error={fieldErrors?.latitude?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        id="longitude"
-                        label="Longitude"
-                        type="number"
-                        placeholder="e.g., 104.927734"
-                        value={form.longitude}
-                        error={fieldErrors?.longitude?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
+                    <MapPicker
+                      label="Supplier Location"
+                      defaultPosition={
+                        form.latitude && form.longitude
+                          ? [parseFloat(form.latitude), parseFloat(form.longitude)]
+                          : undefined
+                      }
+                      onChange={(lat, lng) =>
+                        setForm(prev => ({
+                          ...prev,
+                          latitude: lat.toString(),
+                          longitude: lng.toString(),
+                        }))
+                      }
+                    />
                   </CardContent>
                 </Card>
               </div>

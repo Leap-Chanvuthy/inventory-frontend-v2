@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Package, Warehouse, User, Ruler } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Text } from "@/components/ui/text/app-text";
 
 // Category Badge Component
 export const CategoryBadge = ({
@@ -22,7 +23,7 @@ export const CategoryBadge = ({
   return (
     <Badge
       variant="outline"
-      className="whitespace-nowrap"
+      className="whitespace-nowrap min-w-[140px] justify-center"
       style={{
         backgroundColor: color ? `${color}20` : undefined,
         borderColor: color || undefined,
@@ -65,7 +66,7 @@ export const StockStatusBadge = ({
   }
 
   return (
-    <Badge variant="outline" className={status.className}>
+    <Badge variant="outline" className={`min-w-[90px] justify-center ${status.className}`}>
       {status.label}
     </Badge>
   );
@@ -181,25 +182,24 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
   if (!rawMaterial) return null;
 
   return (
-    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+    <Card className="h-full flex flex-col transition-shadow hover:shadow-md">
       {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        <Link to={`/raw-materials/view/${rawMaterial.id}`} className="flex-1">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full border-2 border-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-              <Package className="h-7 w-7 text-indigo-500" />
-            </div>
-            <div className="font-semibold text-lg truncate text-wrap">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <Link to={`/raw-materials/view/${rawMaterial.id}`} className="flex items-center gap-3 min-w-0 hover:text-primary">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center shrink-0">
+            <Package className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
               {rawMaterial.material_name}
-            </div>
+            </Text.Small>
           </div>
         </Link>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm">
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2 mt-1">
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+        <div className="flex flex-wrap gap-2">
           <CategoryBadge
             category={rawMaterial.raw_material_category_name}
             color={rawMaterial.rm_category?.label_color}
@@ -210,35 +210,37 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
           />
         </div>
 
-        {/* Details */}
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            <Package className="h-4 w-4 text-blue-500" />
-            <span className="text-xs">{rawMaterial.material_sku_code}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            <Ruler className="h-4 w-4 text-green-500" />
-            <span className="text-xs">
-              {rawMaterial.minimum_stock_level}{" "}
-              {rawMaterial.uom?.symbol || rawMaterial.uom_name}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            <User className="h-4 w-4 text-purple-500" />
-            <span className="text-xs truncate">
-              {rawMaterial.official_name}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            <Warehouse className="h-4 w-4 text-orange-500" />
-            <span className="text-xs truncate">
-              {rawMaterial.warehouse_name}
-            </span>
-          </div>
+        <div className="flex items-center gap-2">
+          <Package className="h-4 w-4 text-blue-500 shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            {rawMaterial.material_sku_code}
+          </Text.Small>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Ruler className="h-4 w-4 text-green-500 shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            {rawMaterial.minimum_stock_level}{" "}
+            {rawMaterial.uom?.symbol || rawMaterial.uom_name}
+          </Text.Small>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-purple-500 shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            {rawMaterial.official_name}
+          </Text.Small>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Warehouse className="h-4 w-4 text-orange-500 shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            {rawMaterial.warehouse_name}
+          </Text.Small>
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end pt-0">
+      <CardFooter className="flex justify-end pt-0 pb-4">
         <RawMaterialActions rawMaterial={rawMaterial} />
       </CardFooter>
     </Card>

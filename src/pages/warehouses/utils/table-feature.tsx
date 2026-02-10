@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteWarehouse } from "@/api/warehouses/warehouses.mutation";
+import { Text } from "@/components/ui/text/app-text";
 
 // Sort Options
 export const SORT_OPTIONS = [
@@ -122,127 +123,96 @@ export function WarehouseCard({
   disableLink = false,
   interactive = true,
 }: WarehouseCardProps) {
-
   if (!warehouse) return null;
 
   const addressText = warehouse.warehouse_address || "-";
-  const updatedText = formatDate(warehouse.updated_at);
-
-  const shortenWarehouseName = (name: string) => {
-    if (name.length <= 20) return name;
-    return name.slice(0, 20) + "...";
-  }
 
   return (
-    <Card
-      className={
-        interactive
-          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
-          : "border border-gray-200 dark:border-gray-700 rounded-lg"
-      }
-    >
+    <Card className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}>
       {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        {disableLink ? (
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-4 min-w-0">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {disableLink ? (
+            <>
               <img
                 src={getWarehouseImageSrc(warehouse)}
                 alt={warehouse.warehouse_name}
-                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover shrink-0"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
-              <div className="min-w-0">
-                <div className="font-semibold text-lg truncate">
-                  {shortenWarehouseName(warehouse.warehouse_name)}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                  <span className="inline-flex items-center gap-1">
-                    <Building2 className="h-3.5 w-3.5" />
+              <div className="min-w-0 flex-1">
+                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                  {warehouse.warehouse_name}
+                </Text.Small>
+                <div className="flex items-center gap-1">
+                  <Building2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <Text.Small color="muted" overflow="ellipsis">
                     ID: {warehouse.id}
-                  </span>
+                  </Text.Small>
                 </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <Link
-            to={`/warehouses/view/${warehouse.id}`}
-            className="flex-1 min-w-0"
-          >
-            <div className="flex items-center gap-4 min-w-0">
+            </>
+          ) : (
+            <Link to={`/warehouses/view/${warehouse.id}`} className="flex items-center gap-3 min-w-0 hover:text-primary">
               <img
                 src={getWarehouseImageSrc(warehouse)}
                 alt={warehouse.warehouse_name}
-                className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover shrink-0"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
-              <div className="min-w-0">
-                <div className="font-semibold text-lg truncate">
-                  {shortenWarehouseName(warehouse.warehouse_name)}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                  <span className="inline-flex items-center gap-1">
-                    <Building2 className="h-3.5 w-3.5" />
+              <div className="min-w-0 flex-1">
+                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                  {warehouse.warehouse_name}
+                </Text.Small>
+                <div className="flex items-center gap-1">
+                  <Building2 className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <Text.Small color="muted" overflow="ellipsis">
                     ID: {warehouse.id}
-                  </span>
+                  </Text.Small>
                 </div>
               </div>
-            </div>
-          </Link>
-        )}
+            </Link>
+          )}
+        </div>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm">
-        {/* Capacity */}
-
-        {/* Manager + Contact */}
-        <div className="flex flex-col gap-1">
-          {warehouse.warehouse_manager && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <UserRound className="h-4 w-4 text-indigo-500" />
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+        {warehouse.warehouse_manager && (
+          <div className="flex items-center gap-2">
+            <UserRound className="h-4 w-4 text-indigo-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
               {warehouse.warehouse_manager}
-            </div>
-          )}
-          {warehouse.warehouse_manager_contact && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Phone className="h-4 w-4 text-blue-500" />
-              {warehouse.warehouse_manager_contact}
-            </div>
-          )}
-          {warehouse.warehouse_manager_email && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Mail className="h-4 w-4 text-green-500" />
-              {warehouse.warehouse_manager_email}
-            </div>
-          )}
-        </div>
-
-        {/* Address */}
-        <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
-          <MapPin className="h-4 w-4 text-red-400 mt-0.5" />
-          <div
-            className="text-xs leading-snug break-words"
-            style={{
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 2,
-              overflow: "hidden",
-              whiteSpace: "pre-line",
-            }}
-            title={addressText}
-          >
-            {addressText}
+            </Text.Small>
           </div>
-        </div>
+        )}
 
-        {/* Meta */}
-        <div className="text-xs text-muted-foreground">
-          Last updated: {updatedText}
+        {warehouse.warehouse_manager_contact && (
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4 text-blue-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
+              {warehouse.warehouse_manager_contact}
+            </Text.Small>
+          </div>
+        )}
+
+        {warehouse.warehouse_manager_email && (
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-green-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
+              {warehouse.warehouse_manager_email}
+            </Text.Small>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2">
+          <MapPin className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+          <Text.Small color="muted" maxLines={2}>
+            {addressText}
+          </Text.Small>
         </div>
       </CardContent>
 
       {!hideActions && (
-        <CardFooter className="flex justify-end pt-0">
+        <CardFooter className="flex justify-end pt-0 pb-4">
           <WarehouseActions warehouse={warehouse} />
         </CardFooter>
       )}

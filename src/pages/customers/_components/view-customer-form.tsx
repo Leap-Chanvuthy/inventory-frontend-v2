@@ -1,51 +1,14 @@
 import { useSingleCustomer } from "@/api/customers/customer.query";
 import { useParams, useNavigate } from "react-router-dom";
 import { Phone, Mail, Calendar, MapPin, Globe, User } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { ViewCustomerTabs } from "./view-customer-tabs";
 import { Text } from "@/components/ui/text/app-text";
-import { CustomerStatus } from "@/api/customers/customer.types";
 import { useDeleteCustomer } from "@/api/customers/customer.mutation";
-
-const StatusBadge = ({ status }: { status: CustomerStatus }) => {
-  const statusMap: Record<
-    CustomerStatus,
-    { label: string; className: string }
-  > = {
-    [CustomerStatus.ACTIVE]: {
-      label: "Active",
-      className: "bg-green-500/10 text-green-600 dark:text-green-400",
-    },
-    [CustomerStatus.INACTIVE]: {
-      label: "Inactive",
-      className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    },
-    [CustomerStatus.PROSPECTIVE]: {
-      label: "Prospective",
-      className: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    },
-  };
-
-  const statusInfo = statusMap[status] || statusMap[CustomerStatus.ACTIVE];
-
-  return (
-    <Badge variant="secondary" className={statusInfo.className}>
-      {statusInfo.label}
-    </Badge>
-  );
-};
-
-const CustomerCategoryBadge = ({ categoryName }: { categoryName: string }) => {
-  return (
-    <Badge
-      variant="secondary"
-      className="bg-purple-500/10 text-purple-600 dark:text-purple-400"
-    >
-      {categoryName}
-    </Badge>
-  );
-};
+import {
+  CustomerCategoryBadge,
+  CustomerStatusBadge,
+} from "../utils/customer-status";
 
 export function ViewCustomerForm() {
   const { id } = useParams<{ id: string }>();
@@ -168,7 +131,7 @@ export function ViewCustomerForm() {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Status</p>
-                <StatusBadge status={customer.customer_status} />
+                <CustomerStatusBadge status={customer.customer_status} />
               </div>
             </div>
 

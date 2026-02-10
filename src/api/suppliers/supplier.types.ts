@@ -167,8 +167,8 @@ export interface CreateSupplierFormPayload {
   city: string;
   province: string;
   postal_code: string;
-  latitude: string;
-  longitude: string;
+  latitude?: string;
+  longitude?: string;
   image: File | null;
   banks: BankDetails[];
 }

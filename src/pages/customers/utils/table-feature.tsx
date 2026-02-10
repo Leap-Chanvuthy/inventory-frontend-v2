@@ -1,6 +1,5 @@
-import { Customer, CustomerStatus } from "@/api/customers/customer.types";
+import { Customer } from "@/api/customers/customer.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
-import { Badge } from "@/components/ui/badge";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
   Card,
@@ -11,6 +10,11 @@ import {
 import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteCustomer } from "@/api/customers/customer.mutation";
+import { Text } from "@/components/ui/text/app-text";
+import {
+  CustomerCategoryBadge,
+  CustomerStatusBadge,
+} from "./customer-status";
 
 const CustomerActions = ({ customer }: { customer: Customer }) => {
   const deleteMutation = useDeleteCustomer();
@@ -28,45 +32,6 @@ const CustomerActions = ({ customer }: { customer: Customer }) => {
         }}
       />
     </div>
-  );
-};
-
-const StatusBadge = ({ status }: { status: CustomerStatus }) => {
-  const statusMap: Record<
-    CustomerStatus,
-    { label: string; className: string }
-  > = {
-    [CustomerStatus.ACTIVE]: {
-      label: "Active",
-      className: "bg-green-500/10 text-green-600 dark:text-green-400",
-    },
-    [CustomerStatus.INACTIVE]: {
-      label: "Inactive",
-      className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    },
-    [CustomerStatus.PROSPECTIVE]: {
-      label: "Prospective",
-      className: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    },
-  };
-
-  const statusInfo = statusMap[status] || statusMap[CustomerStatus.ACTIVE];
-
-  return (
-    <Badge variant="secondary" className={statusInfo.className}>
-      {statusInfo.label}
-    </Badge>
-  );
-};
-
-const CustomerCategoryBadge = ({ categoryName }: { categoryName: string }) => {
-  return (
-    <Badge
-      variant="secondary"
-      className="bg-purple-500/10 text-purple-600 dark:text-purple-400"
-    >
-      {categoryName}
-    </Badge>
   );
 };
 
@@ -136,7 +101,7 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
     key: "customer_status",
     header: "Status",
     className: "whitespace-nowrap py-6",
-    render: customer => <StatusBadge status={customer.customer_status} />,
+    render: customer => <CustomerStatusBadge status={customer.customer_status} />,
   },
   {
     key: "address",
@@ -158,86 +123,104 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
 
 interface CustomerCardProps {
   customer?: Customer;
+  hideActions?: boolean;
+  disableLink?: boolean;
+  interactive?: boolean;
 }
 
-export function CustomerCard({ customer }: CustomerCardProps) {
+export function CustomerCard({
+  customer,
+  hideActions = false,
+  disableLink = false,
+  interactive = true,
+}: CustomerCardProps) {
   if (!customer) return null;
 
   return (
-    <Card className="transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg">
+    <Card className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}>
       {/* Header */}
-      <CardHeader className="flex items-start justify-between gap-4 pb-3">
-        <Link to={`/customer/view/${customer.id}`} className="flex-1">
-          <div className="flex items-center gap-4">
-            <img
-              src={customer.image || "/placeholder-avatar.png"}
-              alt={customer.fullname}
-              className="h-14 w-14 rounded-full border-2 border-indigo-300 object-cover"
-            />
-            <div className="font-semibold text-lg truncate text-wrap">
-              {customer.fullname}
-            </div>
-          </div>
-        </Link>
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {disableLink ? (
+            <>
+              <img
+                src={customer.image || "/placeholder-avatar.png"}
+                alt={customer.fullname}
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                  {customer.fullname}
+                </Text.Small>
+                <div className="flex items-center gap-1">
+                  <ScanQrCode className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <Text.Small color="muted" overflow="ellipsis">
+                    {customer.customer_code}
+                  </Text.Small>
+                </div>
+              </div>
+            </>
+          ) : (
+            <Link to={`/customer/view/${customer.id}`} className="flex items-center gap-3 min-w-0 hover:text-primary">
+              <img
+                src={customer.image || "/placeholder-avatar.png"}
+                alt={customer.fullname}
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                  {customer.fullname}
+                </Text.Small>
+                <div className="flex items-center gap-1">
+                  <ScanQrCode className="h-3 w-3 shrink-0 text-muted-foreground" />
+                  <Text.Small color="muted" overflow="ellipsis">
+                    {customer.customer_code}
+                  </Text.Small>
+                </div>
+              </div>
+            </Link>
+          )}
+        </div>
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm">
-        {/* Customer Info */}
-        <div className="flex flex-wrap gap-2 mt-1">
-          <CustomerCategoryBadge
-            categoryName={customer.customer_category_name}
-          />
-          <StatusBadge status={customer.customer_status} />
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <CustomerCategoryBadge categoryName={customer.customer_category_name} />
+          <CustomerStatusBadge status={customer.customer_status} />
         </div>
 
-        {/* Contact */}
-        <div className="flex flex-col gap-1">
-          {customer.customer_code && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <ScanQrCode className="h-4 w-4" />
-              {customer.customer_code}
-            </div>
-          )}
-          {customer.phone_number && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Phone className="h-4 w-4 text-blue-500" />
+        {customer.phone_number && (
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4 text-blue-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
               {customer.phone_number}
-            </div>
-          )}
-          {customer.email_address && (
-            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-              <Mail className="h-4 w-4 text-green-500" />
-              {customer.email_address}
-            </div>
-          )}
-        </div>
-
-        {/* Address */}
-        {customer.customer_address && (
-          <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
-            <MapPin className="h-4 w-4 text-red-400 mt-0.5" />
-            <div
-              className="text-xs leading-snug break-words"
-              style={{
-                display: "-webkit-box",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-                overflow: "hidden",
-                whiteSpace: "pre-line",
-              }}
-              title={customer.customer_address}
-            >
-              {customer.customer_address}
-            </div>
+            </Text.Small>
           </div>
         )}
 
+        {customer.email_address && (
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-green-500 shrink-0" />
+            <Text.Small color="muted" overflow="ellipsis">
+              {customer.email_address}
+            </Text.Small>
+          </div>
+        )}
+
+        <div className="flex items-start gap-2">
+          <MapPin className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+          <Text.Small color="muted" maxLines={2}>
+            {customer.customer_address || "-"}
+          </Text.Small>
+        </div>
       </CardContent>
- 
-      <CardFooter className="flex justify-end pt-0">
-        <CustomerActions customer={customer} />
-      </CardFooter>
+
+      {!hideActions && (
+        <CardFooter className="flex justify-end pt-0 pb-4">
+          <CustomerActions customer={customer} />
+        </CardFooter>
+      )}
     </Card>
   );
 }

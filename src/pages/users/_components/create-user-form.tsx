@@ -51,8 +51,17 @@ export const CreateUserForm = () => {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/users");
+        } else {
+          setForm({
+            name: "",
+            email: "",
+            password: "",
+            password_confirmation: "",
+            role: "",
+            phone_number: "",
+            profile_picture: null,
+          });
         }
-        // save → stay, data auto-refreshed
       },
     });
   };
@@ -106,6 +115,7 @@ export const CreateUserForm = () => {
                     onChange={value =>
                       setForm(prev => ({ ...prev, role: value }))
                     }
+                    required={true}
                   />
                 </div>
 
@@ -167,6 +177,8 @@ export const CreateUserForm = () => {
                     placeholder="Re-enter password"
                     value={form.password_confirmation}
                     onChange={handleChange}
+                    required={true}
+                    allowPaste={false}
                   />
                 </div>
               </div>

@@ -53,7 +53,13 @@ export const CreateWarehouseForm = () => {
 
     const action = submitter?.value;
 
-    warehouseMutation.mutate(form, {
+    const payload = {
+      ...form,
+      latitude: form.latitude || undefined,
+      longitude: form.longitude || undefined,
+    };
+
+    warehouseMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/warehouses");

@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Package } from "lucide-react";
+import { Package, Hash, Layers, FileText } from "lucide-react";
 import TableActions from "@/components/reusable/partials/table-actions";
 import { useDeleteUOM } from "@/api/uom/uom.mutation";
 import { UOMStatusBadge } from "./uom-status";
@@ -31,7 +31,7 @@ export const COLUMNS: DataTableColumn<UOM>[] = [
     className: "whitespace-nowrap py-6",
     render: uom => <span className="font-medium">{uom.id}</span>,
   },
-    {
+  {
     key: "uom_code",
     header: "UOM Code",
     className: "whitespace-nowrap py-6",
@@ -102,62 +102,50 @@ export function UOMCard({
 
   return (
     <Card
-      className={
-        interactive
-          ? "transition-transform hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg"
-          : "border border-gray-200 dark:border-gray-700 rounded-lg"
-      }
+      className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}
     >
       {/* Header */}
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="h-16 w-16 rounded-xl border-2 border-indigo-200 bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center shrink-0">
-              <Package className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <Text.TitleSmall className="truncate">{uom.name}</Text.TitleSmall>
-              <p className="text-sm text-muted-foreground mt-1">
-                {uom.symbol} - {uom.uom_type}
-              </p>
-            </div>
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center shrink-0">
+            <Package className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <div className="shrink-0">
-            <UOMStatusBadge isActive={uom.is_active} />
+
+          <div className="min-w-0 flex-1">
+            <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+              {uom.name}
+            </Text.Small>
+            <div className="flex items-center gap-1">
+              <Hash className="h-3 w-3 shrink-0 text-muted-foreground" />
+              <Text.Small color="muted" overflow="ellipsis">
+                {uom.uom_code}
+              </Text.Small>
+            </div>
           </div>
         </div>
+
+        <UOMStatusBadge isActive={uom.is_active} />
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm pb-4">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start gap-2">
-            <span className="font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
-              UOM Code:
-            </span>
-            <span className="text-gray-600 dark:text-gray-400">
-              {uom.uom_code}
-            </span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
-              Type:
-            </span>
-            <span className="text-gray-600 dark:text-gray-400">
-              {uom.uom_type}
-            </span>
-          </div>
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+        <div className="flex items-center gap-2">
+          <Layers className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            {uom.uom_type} ({uom.symbol})
+          </Text.Small>
         </div>
 
-        {/* Description */}
         {uom.description && (
-          <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+          <div className="flex items-start gap-2">
+            <FileText className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+            <Text.Small color="muted" maxLines={2}>
               {uom.description}
-            </p>
+            </Text.Small>
           </div>
         )}
       </CardContent>
+
       {!hideActions && (
         <CardFooter className="flex justify-end pt-0 pb-4">
           <TableActions

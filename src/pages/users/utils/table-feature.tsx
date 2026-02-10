@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BadgeCheck, Calendar, Mail, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import TableActions from "@/components/reusable/partials/table-actions";
+import { Text } from "@/components/ui/text/app-text";
 
 export const RoleBadge = ({ role }: { role: string }) => {
   const map: Record<string, string> = {
@@ -128,26 +129,27 @@ export function UserCard({ user }: { user?: User }) {
   if (!user) return null;
 
   return (
-    <Card className="transition-shadow hover:shadow-md">
+    <Card className="h-full flex flex-col transition-shadow hover:shadow-md">
       {/* Header */}
-      <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
-        <div className="flex items-center gap-3">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
           <img
             src={user.profile_picture || "/avatar-placeholder.png"}
             alt={user.name}
-            className="h-12 w-12 rounded-full border object-cover"
+            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
           />
 
-          <div className="min-w-0">
-            <Link
-              to={`/users/update/${user.id}`}
-              className="block font-medium truncate hover:text-primary"
-            >
-              {user.name}
+          <div className="min-w-0 flex-1">
+            <Link to={`/users/update/${user.id}`} className="block hover:text-primary">
+              <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                {user.name}
+              </Text.Small>
             </Link>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Mail className="h-3 w-3" />
-              <span className="truncate">{user.email}</span>
+            <div className="flex items-center gap-1">
+              <Mail className="h-3 w-3 shrink-0 text-muted-foreground" />
+              <Text.Small color="muted" overflow="ellipsis">
+                {user.email}
+              </Text.Small>
             </div>
           </div>
         </div>
@@ -158,20 +160,24 @@ export function UserCard({ user }: { user?: User }) {
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="space-y-3 text-sm">
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
         <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-muted-foreground" />
+          <Shield className="h-4 w-4 text-muted-foreground shrink-0" />
           <RoleBadge role={user.role} />
         </div>
 
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>Created {formatDate(user.created_at)}</span>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            Created {formatDate(user.created_at)}
+          </Text.Small>
         </div>
 
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          <span>Updated {formatDate(user.updated_at)}</span>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            Updated {formatDate(user.updated_at)}
+          </Text.Small>
         </div>
       </CardContent>
     </Card>
