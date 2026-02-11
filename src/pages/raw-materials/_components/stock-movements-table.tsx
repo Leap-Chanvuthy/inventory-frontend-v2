@@ -1,5 +1,6 @@
 import { RawMaterialStockMovement } from "@/api/raw-materials/raw-material.types";
 import { UOM } from "@/api/uom/uom.types";
+import { DataTable } from "@/components/reusable/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -8,16 +9,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatDate } from "@/utils/date-format";
-import { ArrowDownLeft, ArrowUpRight, History } from "lucide-react"; // UI Icons
+import { History } from "lucide-react"; 
+import { RM_STOCK_MOVEMENT_COLUMNS } from "../utils/table-feature";
 
 interface StockMovementsTableProps {
   movements: RawMaterialStockMovement[];
@@ -54,76 +47,10 @@ export function StockMovementsTable({ movements , uom }: StockMovementsTableProp
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-transparent">
-              <TableHead className="w-[120px]">Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Direction</TableHead>
-              <TableHead className="text-right">Quantity</TableHead>
-              <TableHead className="text-right">Purchasing Unit Price</TableHead>
-              <TableHead className="text-right">Purchasing Total Value</TableHead>
-              <TableHead className="hidden md:table-cell">Notes</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {movements.map(movement => {
-              const isStockIn = movement.direction === "IN";
-
-              return (
-                <TableRow key={movement.id} className="group transition-colors">
-                  <TableCell className="font-medium text-muted-foreground">
-                    {formatDate(movement.movement_date)}
-                  </TableCell>
-                  <TableCell>
-                    <span className="capitalize text-xs font-semibold tracking-wide">
-                      {movement.movement_type.replace(/_/g, " ")}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div
-                      className={`flex items-center gap-1.5 font-bold ${
-                        isStockIn ? "text-emerald-600" : "text-rose-600"
-                      }`}
-                    >
-                      {isStockIn ? (
-                        <ArrowDownLeft className="h-3.5 w-3.5" />
-                      ) : (
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      )}
-                      <span className="text-xs uppercase tracking-wider">
-                        {movement.direction}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-mono font-medium">
-                    {isStockIn ? "+" : "-"}
-                    {movement.quantity.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })} {uom?.name}
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
-                    ${movement.unit_price_in_usd.toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right font-mono font-semibold">
-                    $
-                    {movement.total_value_in_usd.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                    })}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell max-w-[150px]">
-                    <span
-                      className="text-xs text-muted-foreground line-clamp-1 italic"
-                      title={movement?.note || ""}
-                    >
-                      {movement.note || "No notes"}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+        <DataTable 
+          columns={RM_STOCK_MOVEMENT_COLUMNS(uom?.symbol || uom?.name)}
+          data={movements}
+        />
       </CardContent>
     </Card>
   );

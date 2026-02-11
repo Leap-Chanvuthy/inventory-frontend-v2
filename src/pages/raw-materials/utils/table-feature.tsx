@@ -1,4 +1,4 @@
-import { RawMaterial } from "@/api/raw-materials/raw-material.types";
+import { RawMaterial, RawMaterialStockMovement } from "@/api/raw-materials/raw-material.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
 import TableActions from "@/components/reusable/partials/table-actions";
@@ -8,8 +8,9 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Package, Warehouse, User, Ruler } from "lucide-react";
+import { Package, Warehouse, User, Ruler, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatDate } from "@/utils/date-format";
 import { Text } from "@/components/ui/text/app-text";
 
 // Category Badge Component
@@ -152,10 +153,23 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     ),
   },
   {
+    key: "production_method",
+    header: "Production Method",
+    className: "whitespace-nowrap py-6",
+    render: rawMaterial => <div>
+      {rawMaterial.production_method == 'FIFO' && 'FIFO (First In First Out)'}
+      {rawMaterial.production_method == 'LIFO' && 'LIFO (Last In First Out)'}
+    </div>,
+  },
+  {
     key: "quantity",
     header: "Quantity",
     className: "whitespace-nowrap py-6",
-    render: rawMaterial => <span>{rawMaterial.minimum_stock_level}</span>,
+    render: rawMaterial => (
+      <span className="font-mono">
+        {rawMaterial.minimum_stock_level} {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
+      </span>
+    ),
   },
   {
     key: "uom",
@@ -246,3 +260,114 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
     </Card>
   );
 }
+
+
+
+
+// Raw Material Stock Movement Table Columns (for DataTable-style usage)
+// Note: UOM is a property of the Raw Material, so we pass it in.
+export const RM_STOCK_MOVEMENT_COLUMNS = (
+  uomLabel?: string
+): DataTableColumn<RawMaterialStockMovement>[] => [
+  {
+    key: "movement_date",
+    header: "Movement Date",
+    className: "whitespace-nowrap py-6",
+    render: movement => (
+      <span className="font-medium whitespace-nowrap text-muted-foreground">
+        {formatDate(movement.movement_date)}
+      </span>
+    ),
+  },
+  {
+    key: "movement_type",
+    header: "Movement Type",
+    className: "whitespace-nowrap py-6",
+    render: movement => (
+      <span className="text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
+        {movement.movement_type.replace(/_/g, " ")}
+      </span>
+    ),
+  },
+  {
+    key: "direction",
+    header: "Direction",
+    className: "whitespace-nowrap py-6",
+    render: movement => {
+      const isStockIn = movement.direction === "IN";
+
+      return (
+        <div
+          className={`flex items-center gap-1.5 font-bold ${
+            isStockIn ? "text-emerald-600" : "text-rose-600"
+          }`}
+        >
+          {isStockIn ? (
+            <ArrowDownLeft className="h-3.5 w-3.5" />
+          ) : (
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          )}
+          <span className="text-xs uppercase tracking-wider">
+            {movement.direction}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    key: "quantity",
+    header: "Quantity",
+    className: "whitespace-nowrap py-6 text-right",
+    render: movement => {
+      const isStockIn = movement.direction === "IN";
+      const formattedQty = movement.quantity.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+      });
+      const label = uomLabel ? ` ${uomLabel}` : "";
+
+      return (
+        <span className="font-mono font-medium">
+          {isStockIn ? "+" : "-"}
+          {formattedQty}
+          {label}
+        </span>
+      );
+    },
+  },
+  {
+    key: "unit_price_in_usd",
+    header: "Purchasing Unit Price",
+    className: "whitespace-nowrap py-6 text-right",
+    render: movement => (
+      <span className="font-mono text-muted-foreground">
+        ${movement.unit_price_in_usd.toFixed(2)}
+      </span>
+    ),
+  },
+  {
+    key: "total_value_in_usd",
+    header: "Purchasing Total Value",
+    className: "whitespace-nowrap py-6 text-right",
+    render: movement => (
+      <span className="font-mono font-semibold">
+        $
+        {movement.total_value_in_usd.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        })}
+      </span>
+    ),
+  },
+  {
+    key: "note",
+    header: "Notes",
+    className: "whitespace-nowrap py-6",
+    render: movement => (
+      <span
+        className="text-xs text-muted-foreground line-clamp-1 italic"
+        title={movement.note || ""}
+      >
+        {movement.note || "No notes"}
+      </span>
+    ),
+  },
+];

@@ -5,7 +5,7 @@ import { useSuppliers } from "@/api/suppliers/supplier.query";
 import { useWarehouses } from "@/api/warehouses/warehouses.query";
 import { useUOMs } from "@/api/uom/uom.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { TextInput, TextAreaInput, DatePickerInput } from "@/components/reusable/partials/input";
+import { TextInput, TextAreaInput, DatePickerInput, SelectInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,6 +19,7 @@ import { UOMCard } from "@/pages/uom/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
 import SelectableImageDelete from "@/components/reusable/partials/selectable-image-delete";
 import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
+import { PRODCUTION_METHOD } from "../utils/const";
 
 export const UpdateRawMaterialForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -92,6 +93,7 @@ export const UpdateRawMaterialForm = () => {
     unit_price_in_usd: "",
     exchange_rate_from_usd_to_riel: "4100",
     note: "",
+    production_method: "",
     images: [] as File[],
   });
 
@@ -119,6 +121,7 @@ export const UpdateRawMaterialForm = () => {
         purchaseMovement?.exchange_rate_from_usd_to_riel != null
           ? String(purchaseMovement.exchange_rate_from_usd_to_riel)
           : prev.exchange_rate_from_usd_to_riel,
+      production_method: rawMaterial.production_method ?? "",
       note: purchaseMovement?.note ?? "",
     }));
   }, [rawMaterial, purchaseMovement]);
@@ -232,6 +235,8 @@ export const UpdateRawMaterialForm = () => {
     fd.append("uom_id", String(Number(form.uom_id)));
     fd.append("supplier_id", String(Number(form.supplier_id)));
     fd.append("warehouse_id", String(Number(form.warehouse_id)));
+    fd.append("production_method", form.production_method);
+
 
     // PURCHASE movement fields
     const quantity = toNumberOrNull(form.quantity);
@@ -249,7 +254,6 @@ export const UpdateRawMaterialForm = () => {
 
     updateMutation.mutate(fd, {
       onSuccess: () => {
-        setForm(prev => ({ ...prev, images: [] }));
         if (action === "save_and_close") {
           navigate("/raw-materials");
         }
@@ -278,15 +282,30 @@ export const UpdateRawMaterialForm = () => {
                     </p>
                   </div>
 
-                  <TextInput
-                    id="material_name"
-                    label="Material Name"
-                    placeholder="e.g., Steel Sheet"
-                    value={form.material_name}
-                    error={fieldErrors?.material_name?.[0]}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <TextInput
+                      id="material_name"
+                      label="Material Name"
+                      placeholder="e.g., Steel Sheet"
+                      value={form.material_name}
+                      error={fieldErrors?.material_name?.[0]}
+                      onChange={handleChange}
+                      required
+                    />
+
+                    <SelectInput 
+                      id="production_method"
+                      label="Production Method (Default FIFO)"
+                      placeholder="Select production method"
+                      error={fieldErrors?.production_method?.[0]}
+                      options={PRODCUTION_METHOD}
+                      value={form.production_method}
+                      onChange={handleSelectChange("production_method")}
+                      required
+                    />
+
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SearchableSelect
