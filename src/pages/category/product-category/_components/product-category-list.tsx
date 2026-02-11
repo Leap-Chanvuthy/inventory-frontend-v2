@@ -4,7 +4,7 @@ import { useDeleteProductCategory } from "@/api/categories/product-categories/pr
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
+import { createColumns, SORT_OPTIONS } from "../../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { ProductCategory } from "@/api/categories/types/category.type";
 import SingleCard from "../../_components/category-single-card";
@@ -33,8 +33,6 @@ export const ProductCategoryList = () => {
 
   return (
     <div className="mt-8">
-      {/* Toolbar */}
-
       <TableToolbar
         searchPlaceholder="Search category..."
         onSearch={setSearch}
@@ -52,7 +50,11 @@ export const ProductCategoryList = () => {
         items={categories}
         isLoading={isLoading}
         emptyText="No categories found"
-        columns={COLUMNS}
+        columns={createColumns({
+          viewRoute: "/product-categories/view",
+          editRoute: "/product-categories/edit",
+          onDelete: id => deleteMutation.mutate(id),
+        })}
         renderItem={category => (
           <SingleCard
             category={category}
@@ -65,17 +67,6 @@ export const ProductCategoryList = () => {
         )}
       />
 
-      {/* Categories Grid
-      <CategoryCard
-        data={categories}
-        isLoading={isLoading}
-        emptyText="No categories found"
-        onDelete={onDelete}
-        viewRoute="/product-categories/view"
-        editRoute="/product-categories/edit"
-      /> */}
-
-      {/* Pagination */}
       {data?.data && (
         <div className="flex justify-center mt-6">
           <div className="flex items-center gap-1 border border-border rounded-lg p-1">

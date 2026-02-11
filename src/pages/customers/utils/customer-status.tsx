@@ -23,7 +23,7 @@ export const CustomerCategoryBadge = ({
   return (
     <Badge
       variant="secondary"
-      className={`min-w-[110px] justify-center ${colorClass}`}
+      className={`min-w-[120px] justify-center ${colorClass}`}
     >
       {categoryName}
     </Badge>
@@ -46,17 +46,13 @@ const statusMap: Record<CustomerStatus, { label: string; className: string }> =
     },
   };
 
-export const CustomerStatusBadge = ({
-  status,
-}: {
-  status: CustomerStatus;
-}) => {
+export const CustomerStatusBadge = ({ status }: { status: CustomerStatus }) => {
   const statusInfo = statusMap[status] || statusMap[CustomerStatus.ACTIVE];
 
   return (
     <Badge
       variant="secondary"
-      className={`min-w-[90px] justify-center ${statusInfo.className}`}
+      className={`min-w-[110px] justify-center ${statusInfo.className}`}
     >
       {statusInfo.label}
     </Badge>

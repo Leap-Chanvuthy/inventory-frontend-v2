@@ -175,7 +175,7 @@ export function WarehouseCard({
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
+      <CardContent className="flex-1 space-y-2.5 sm:space-y-3 min-h-[120px]">
         {warehouse.warehouse_manager && (
           <div className="flex items-center gap-2">
             <UserRound className="h-4 w-4 text-indigo-500 shrink-0" />

@@ -4,7 +4,7 @@ import SingleCard from "../../_components/category-single-card";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
-import { COLUMNS, SORT_OPTIONS } from "../../utils/table-feature";
+import { createColumns, SORT_OPTIONS } from "../../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { CustomerCategory } from "@/api/categories/types/category.type";
 import { useDeleteCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
@@ -21,7 +21,6 @@ export const CustomerCategoryList = () => {
   } = useTableQueryParams();
 
   const { data, isLoading, error } = useCustomerCategories(apiParams);
-
   const deleteMutation = useDeleteCustomerCategory();
 
   const categories = data?.data?.data || [];
@@ -34,7 +33,6 @@ export const CustomerCategoryList = () => {
 
   return (
     <div className="mt-8">
-      {/* Toolbar */}
       <TableToolbar
         searchPlaceholder="Search category..."
         onSearch={setSearch}
@@ -48,12 +46,15 @@ export const CustomerCategoryList = () => {
         isListOptionDisplayed={true}
       />
 
-      {/* Toggleable List with Card and List View */}
       <ToggleableList<CustomerCategory>
         items={categories}
         isLoading={isLoading}
         emptyText="No categories found"
-        columns={COLUMNS}
+        columns={createColumns({
+          viewRoute: "/customer-categories/view",
+          editRoute: "/customer-categories/edit",
+          onDelete: id => deleteMutation.mutate(id),
+        })}
         renderItem={category => (
           <SingleCard
             category={category}
@@ -66,7 +67,6 @@ export const CustomerCategoryList = () => {
         )}
       />
 
-      {/* Pagination */}
       {data?.data && (
         <div className="flex justify-center mt-6">
           <div className="flex items-center gap-1 border border-border rounded-lg p-1">

@@ -74,8 +74,8 @@ function UOMActions({ uom }: { uom: UOM }) {
 
   return (
     <TableActions
-      viewDetailPath={`/uom/view/${uom.id}`}
-      editPath={`/uom/edit/${uom.id}`}
+      viewDetailPath={`/unit-of-measurement/view/${uom.id}`}
+      editPath={`/unit-of-measurement/edit/${uom.id}`}
       deleteHeading="Delete This UOM"
       deleteSubheading="Are you sure want to delete this unit of measurement? This action cannot be undone."
       deleteTooltip="Delete UOM"

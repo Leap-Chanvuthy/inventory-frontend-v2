@@ -19,7 +19,7 @@ export const SupplierCategoryBadge = ({
   return (
     <Badge
       variant="secondary"
-      className={`min-w-[100px] justify-center ${map[category] || map["OTHERS"]}`}
+      className={`min-w-[110px] justify-center ${map[category] || map["OTHERS"]}`}
     >
       {category}
     </Badge>

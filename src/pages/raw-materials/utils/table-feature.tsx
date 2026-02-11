@@ -1,6 +1,5 @@
 import { RawMaterial, RawMaterialStockMovement } from "@/api/raw-materials/raw-material.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
-import { Badge } from "@/components/ui/badge";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
   Card,
@@ -16,66 +15,7 @@ import { UpdateReorderDialog } from "../_components/update-reorder-dialog";
 
 const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
-
-// Category Badge Component
-export const CategoryBadge = ({
-  category,
-  color,
-}: {
-  category: string;
-  color?: string;
-}) => {
-  return (
-    <Badge
-      variant="outline"
-      className="whitespace-nowrap min-w-[140px] justify-center"
-      style={{
-        backgroundColor: color ? `${color}20` : undefined,
-        borderColor: color || undefined,
-        color: color || undefined,
-      }}
-    >
-      {category}
-    </Badge>
-  );
-};
-
-// Status Badge Component based on stock level
-export const StockStatusBadge = ({
-  quantity,
-  minimumStock,
-}: {
-  quantity: number;
-  minimumStock: number;
-}) => {
-  let status: { label: string; className: string };
-
-  if (quantity === 0) {
-    status = {
-      label: "Out of Stock",
-      className:
-        "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-    };
-  } else if (quantity <= minimumStock) {
-    status = {
-      label: "Low Stock",
-      className:
-        "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    };
-  } else {
-    status = {
-      label: "Available",
-      className:
-        "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20",
-    };
-  }
-
-  return (
-    <Badge variant="outline" className={`min-w-[90px] justify-center ${status.className}`}>
-      {status.label}
-    </Badge>
-  );
-};
+import { CategoryBadge, StockStatusBadge } from "./raw-material-status";
 
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {

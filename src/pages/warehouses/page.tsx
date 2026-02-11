@@ -13,6 +13,8 @@ export default function Warehouses() {
   ];
 
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div>
@@ -21,8 +23,8 @@ export default function Warehouses() {
       </div>
       <Text.TitleLarge className="mx-6">Warehouse Inventory</Text.TitleLarge>
       {/* <h1 className="text-3xl font-bold mx-6">Warehouse Inventory</h1> */}
-      <WarehousesList onWarehousesChange={setWarehouses} />
-      <WarehousesOpenMap warehouses={warehouses} />
+      <WarehousesList onWarehousesChange={setWarehouses} onErrorChange={setHasError} onLoadingChange={setIsLoading} />
+      {!hasError && !isLoading && <WarehousesOpenMap warehouses={warehouses} />}
     </div>
   );
 }

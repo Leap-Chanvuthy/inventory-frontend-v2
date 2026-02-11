@@ -74,7 +74,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
       )}
 
       <div
-        className="w-full rounded-lg overflow-hidden border"
+        className="w-full rounded-lg overflow-hidden border isolate"
         style={{ height }}
       >
         <MapContainer
