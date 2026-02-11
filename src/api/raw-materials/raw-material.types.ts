@@ -61,6 +61,7 @@ export interface RawMaterial {
   rm_category?: RawMaterialCategory;
   supplier?: Supplier;
   warehouse?: Omit<Warehouse, "images">;
+  production_method: string;
   uom?: UOM;
   // Detail view relations
   rm_stock_movements?: RawMaterialStockMovement[];
@@ -126,6 +127,7 @@ export interface CreateRawMaterialRequest {
   uom_id: number;
   supplier_id: number;
   warehouse_id: number;
+  production_method: string;
   // Initial stock movement fields
   quantity: number | null;
   unit_price_in_usd: number | null;
@@ -178,6 +180,7 @@ export interface RawMaterialValidationErrors {
     uom_id?: string[];
     supplier_id?: string[];
     warehouse_id?: string[];
+    production_method?: string[];
     quantity?: string[];
     unit_price_in_usd?: string[];
     total_value_in_usd?: string[];

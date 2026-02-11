@@ -9,6 +9,7 @@ import {
   TextInput,
   TextAreaInput,
   DatePickerInput,
+  SelectInput,
 } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -21,6 +22,7 @@ import { SupplierCard } from "@/pages/supplier/utils/table-feature";
 import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
 import { UOMCard } from "@/pages/uom/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
+import { PRODCUTION_METHOD } from "../utils/const";
 
 export const CreateRawMaterialForm = () => {
   const rawMaterialMutation = useCreateRawMaterial();
@@ -64,6 +66,7 @@ export const CreateRawMaterialForm = () => {
     unit_price_in_usd: "",
     exchange_rate_from_usd_to_riel: "4100",
     note: "",
+    production_method : "",
     images: [] as File[],
   });
 
@@ -81,8 +84,6 @@ export const CreateRawMaterialForm = () => {
       </div>
     );
   }
-
-  console.log("Form", form);
 
   // Error state
   if (hasError) {
@@ -168,6 +169,25 @@ export const CreateRawMaterialForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
+  const clearForm = () => {
+    setForm({
+          material_name: "",
+    minimum_stock_level: "",
+    expiry_date: "",
+    description: "",
+    raw_material_category_id: "",
+    uom_id: "",
+    supplier_id: "",
+    warehouse_id: "",
+    quantity: "",
+    unit_price_in_usd: "",
+    exchange_rate_from_usd_to_riel: "4100",
+    note: "",
+    production_method : "",
+    images: [] as File[],
+    });
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -191,11 +211,13 @@ export const CreateRawMaterialForm = () => {
         form.exchange_rate_from_usd_to_riel,
       ),
       note: form.note || undefined,
+      production_method : form.production_method,
       images: form.images.length > 0 ? form.images : undefined,
     };
 
     rawMaterialMutation.mutate(payload, {
       onSuccess: () => {
+        clearForm();
         if (action === "save_and_close") {
           navigate("/raw-materials");
         }
@@ -227,15 +249,29 @@ export const CreateRawMaterialForm = () => {
                     </p>
                   </div>
 
-                  <TextInput
-                    id="material_name"
-                    label="Material Name"
-                    placeholder="e.g., Steel Sheet"
-                    value={form.material_name}
-                    error={fieldErrors?.material_name?.[0]}
-                    onChange={handleChange}
-                    required
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <TextInput
+                      id="material_name"
+                      label="Material Name"
+                      placeholder="e.g., Steel Sheet"
+                      value={form.material_name}
+                      error={fieldErrors?.material_name?.[0]}
+                      onChange={handleChange}
+                      required
+                    />
+
+                    <SelectInput 
+                      id="production_method"
+                      label="Production Method (Default FIFO)"
+                      placeholder="Select production method"
+                      error={fieldErrors?.production_method?.[0]}
+                      options={PRODCUTION_METHOD}
+                      value={form.production_method}
+                      onChange={handleSelectChange("production_method")}
+                    />
+
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SearchableSelect
