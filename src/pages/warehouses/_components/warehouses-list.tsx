@@ -10,10 +10,14 @@ import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 
 interface WarehousesListProps {
   onWarehousesChange: (warehouses: Warehouse[]) => void;
+  onErrorChange: (hasError: boolean) => void;
+  onLoadingChange: (isLoading: boolean) => void;
 }
 
 export default function WarehousesList({
   onWarehousesChange,
+  onErrorChange,
+  onLoadingChange,
 }: WarehousesListProps) {
   const {
     page,
@@ -40,12 +44,16 @@ export default function WarehousesList({
     onWarehousesChange(warehouses);
   }, [warehouses, onWarehousesChange]);
 
+  useEffect(() => {
+    onLoadingChange(isLoading);
+    onErrorChange(isError);
+  }, [isError, onErrorChange, isLoading, onLoadingChange]);
+
   if (isError) {
     return (
       <p className="text-center text-red-500">Failed to load warehouses</p>
     );
   }
-
 
   return (
     <div className="w-full p-4 sm:p-8 bg-background">

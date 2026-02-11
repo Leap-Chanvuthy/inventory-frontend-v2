@@ -140,8 +140,15 @@ export function UserCard({ user }: { user?: User }) {
           />
 
           <div className="min-w-0 flex-1">
-            <Link to={`/users/update/${user.id}`} className="block hover:text-primary">
-              <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+            <Link
+              to={`/users/update/${user.id}`}
+              className="block hover:text-primary"
+            >
+              <Text.Small
+                color="default"
+                fontWeight="medium"
+                overflow="ellipsis"
+              >
                 {user.name}
               </Text.Small>
             </Link>

@@ -34,7 +34,7 @@ export default function UOMList() {
   const totalPages = data?.last_page || 1;
 
   if (isError) {
-    return <UnexpectedError kind="fetch" />
+    return <UnexpectedError kind="fetch" />;
   }
 
   return (
@@ -47,7 +47,7 @@ export default function UOMList() {
           search={search}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
-          createHref="/uom/create"
+          createHref="/unit-of-measurement/create"
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}

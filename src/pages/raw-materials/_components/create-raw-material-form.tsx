@@ -328,7 +328,7 @@ export const CreateRawMaterialForm = () => {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <TextInput
                       id="quantity"
                       label="Initial Quantity"
@@ -348,17 +348,17 @@ export const CreateRawMaterialForm = () => {
                       required
                       error={fieldErrors?.unit_price_in_usd?.[0]}
                     />
-                    <TextInput
-                      id="exchange_rate_from_usd_to_riel"
-                      label="Exchange Rate (USD to KHR)"
-                      placeholder="e.g., 4100"
-                      value={form.exchange_rate_from_usd_to_riel}
-                      onChange={handleChange}
-                      isNumberOnly
-                      required
-                      error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
-                    />
                   </div>
+                  <TextInput
+                    id="exchange_rate_from_usd_to_riel"
+                    label="Exchange Rate (USD - KHR)"
+                    placeholder="e.g., 4100"
+                    value={form.exchange_rate_from_usd_to_riel}
+                    onChange={handleChange}
+                    isNumberOnly
+                    required
+                    error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
+                  />
                   <div className="w-full">
                     <TextAreaInput
                       id="note"

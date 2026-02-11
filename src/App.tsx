@@ -155,7 +155,7 @@ export default function App() {
                 />
                 <Route
                   path="/product-categories/view/:id"
-                  element={<ViewProductCategories />} 
+                  element={<ViewProductCategories />}
                 />
                 <Route
                   path="/product-categories/edit/:id"
@@ -177,15 +177,33 @@ export default function App() {
                 />
 
                 <Route path="/unit-of-measurement" element={<UOM />} />
-                <Route path="/uom/create" element={<CreateUOM />} />
-                <Route path="/uom/view/:id" element={<ViewUOM />} />
-                <Route path="/uom/edit/:id" element={<EditUOM />} />
+                <Route
+                  path="/unit-of-measurement/create"
+                  element={<CreateUOM />}
+                />
+                <Route
+                  path="/unit-of-measurement/view/:id"
+                  element={<ViewUOM />}
+                />
+                <Route
+                  path="/unit-of-measurement/edit/:id"
+                  element={<EditUOM />}
+                />
 
                 {/* Raw Materials */}
                 <Route path="/raw-materials" element={<RawMaterials />} />
-                <Route path="/raw-materials/create" element={<CreateRawMaterial />} />
-                <Route path="/raw-materials/view/:id" element={<RawMaterialDetail />} />
-                <Route path="/raw-materials/update/:id" element={<UpdateRawMaterial />} />
+                <Route
+                  path="/raw-materials/create"
+                  element={<CreateRawMaterial />}
+                />
+                <Route
+                  path="/raw-materials/view/:id"
+                  element={<RawMaterialDetail />}
+                />
+                <Route
+                  path="/raw-materials/update/:id"
+                  element={<UpdateRawMaterial />}
+                />
 
                 {/* Company Settings */}
                 <Route path="/company" element={<Company />} />

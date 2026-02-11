@@ -52,7 +52,10 @@ const StatusBadge = ({ status }: { status: string }) => {
   const statusInfo = statusMap[status.toLowerCase()] || statusMap["active"];
 
   return (
-    <Badge variant="secondary" className={`min-w-[80px] justify-center ${statusInfo.className}`}>
+    <Badge
+      variant="secondary"
+      className={`min-w-[80px] justify-center ${statusInfo.className}`}
+    >
       {statusInfo.label}
     </Badge>
   );
@@ -122,12 +125,12 @@ export const COLUMNS: DataTableColumn<Supplier>[] = [
       <SupplierCategoryBadge category={supplier.supplier_category} />
     ),
   },
-  {
-    key: "active_status",
-    header: "Active Status",
-    className: "whitespace-nowrap py-6",
-    render: () => <StatusBadge status="active" />,
-  },
+  // {
+  //   key: "active_status",
+  //   header: "Active Status",
+  //   className: "whitespace-nowrap py-6",
+  //   render: () => <StatusBadge status="active" />,
+  // },
   {
     key: "address",
     header: "Address",

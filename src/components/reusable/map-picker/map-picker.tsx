@@ -38,6 +38,13 @@ export default function MapPicker({
     defaultPosition ?? null,
   );
 
+  // Sync when defaultPosition arrives asynchronously (e.g. update forms)
+  useEffect(() => {
+    if (defaultPosition && !position) {
+      setPosition(defaultPosition);
+    }
+  }, [defaultPosition]);
+
   const update = (lat: number, lng: number) => {
     setPosition([lat, lng]);
     onChange?.(lat, lng);

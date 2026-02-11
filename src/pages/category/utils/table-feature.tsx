@@ -1,9 +1,8 @@
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
-import { Edit2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import TableActions from "@/components/reusable/partials/table-actions";
 import { formatDate } from "@/utils/date-format";
 
-interface Category {
+export interface Category {
   id: number;
   category_name: string;
   label_color: string;
@@ -12,7 +11,30 @@ interface Category {
   updated_at: string;
 }
 
-export const COLUMNS: DataTableColumn<Category>[] = [
+function CategoryActions({
+  category,
+  viewRoute,
+  editRoute,
+  onDelete,
+}: {
+  category: Category;
+  viewRoute: string;
+  editRoute: string;
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <TableActions
+      viewDetailPath={`${viewRoute}/${category.id}`}
+      editPath={`${editRoute}/${category.id}`}
+      deleteHeading="Delete This Category"
+      deleteSubheading="Are you sure want to delete this category? This action cannot be undone."
+      deleteTooltip="Delete Category"
+      onDelete={() => onDelete(category.id)}
+    />
+  );
+}
+
+const BASE_COLUMNS: DataTableColumn<Category>[] = [
   {
     key: "label_color",
     header: "Color",
@@ -28,7 +50,9 @@ export const COLUMNS: DataTableColumn<Category>[] = [
     key: "category_name",
     header: "Category Name",
     className: "whitespace-nowrap py-6",
-    render: category => <span className="font-medium">{category.category_name}</span>,
+    render: category => (
+      <span className="font-medium">{category.category_name}</span>
+    ),
   },
   {
     key: "description",
@@ -48,18 +72,29 @@ export const COLUMNS: DataTableColumn<Category>[] = [
       </span>
     ),
   },
+];
+
+export const createColumns = ({
+  viewRoute,
+  editRoute,
+  onDelete,
+}: {
+  viewRoute: string;
+  editRoute: string;
+  onDelete: (id: number) => void;
+}): DataTableColumn<Category>[] => [
+  ...BASE_COLUMNS,
   {
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: category => (
-      <Link
-        to={`/customer-categories/edit/${category.id}`}
-        className="flex items-center gap-1 text-sm text-foreground hover:text-primary transition-colors"
-      >
-        <Edit2 className="w-4 h-4" />
-        <span>Edit</span>
-      </Link>
+      <CategoryActions
+        category={category}
+        viewRoute={viewRoute}
+        editRoute={editRoute}
+        onDelete={onDelete}
+      />
     ),
   },
 ];
