@@ -72,26 +72,28 @@ export function ViewRawMaterialForm() {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300">
-              {/* Header with Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <Text.TitleLarge className="truncate">
-                  {raw_material?.material_name} - {raw_material?.material_sku_code}
-                </Text.TitleLarge>
-                <HeaderActionButtons
-                  editPath={`/raw-materials/update/${id}`}
-                  showEdit={true}
-                  showDelete={true}
-                />
-              </div>
+      {/* Header with Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <Text.TitleLarge className="truncate">
+          {raw_material?.material_name} - {raw_material?.material_sku_code}
+        </Text.TitleLarge>
+        <HeaderActionButtons
+          editPath={`/raw-materials/update/${id}`}
+          showEdit={true}
+          showDelete={true}
+          customUI={
+          <ReorderDialog
+            rawMaterialId={raw_material.id}
+            materialName={raw_material.material_name}
+          />
+        }
+        />
+      </div>
 
       {/* Main Info Card */}
       <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Raw Material Information</CardTitle>
-          <ReorderDialog
-            rawMaterialId={raw_material.id}
-            materialName={raw_material.material_name}
-          />
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-16 gap-y-6">
@@ -200,13 +202,13 @@ export function ViewRawMaterialForm() {
                 <p className="font-medium">
                   {raw_material.expiry_date
                     ? new Date(raw_material.expiry_date).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        },
-                      )
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )
                     : "-"}
                 </p>
               </div>
@@ -308,7 +310,12 @@ export function ViewRawMaterialForm() {
       {/* Stock Movements Card */}
       {raw_material.rm_stock_movements &&
         raw_material.rm_stock_movements.length > 0 && (
-          <StockMovementsTable movements={raw_material?.rm_stock_movements} uom={raw_material?.uom || null} />
+          <StockMovementsTable
+            movements={raw_material.rm_stock_movements}
+            rawMaterialId={raw_material.id}
+            materialName={raw_material.material_name}
+            uom={raw_material.uom || null}
+          />
         )}
     </div>
   );

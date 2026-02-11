@@ -8,6 +8,7 @@ export interface RawMaterialStockMovement {
   id: number;
   raw_material_id: number;
   quantity: number;
+  in_used?: boolean;
   direction: "IN" | "OUT";
   movement_type:
     | "PURCHASE"
@@ -159,7 +160,6 @@ export interface ReorderRawMaterialPayload {
   movement_date: string;
   note?: string;
 }
-
 export interface ReorderRawMaterialResponse {
   status: boolean;
   message: string;

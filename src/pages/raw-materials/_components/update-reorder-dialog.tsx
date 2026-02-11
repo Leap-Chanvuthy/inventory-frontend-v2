@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   RefreshCw,
@@ -18,28 +17,46 @@ import {
   DollarSign,
   ArrowRightLeft,
   FileText,
+  PenSquare,
 } from "lucide-react";
-import { useReorderRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import { useUpdateReorderRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { DatePickerInput } from "@/components/reusable/partials/input";
 import { ReorderRawMaterialPayload } from "@/api/raw-materials/raw-material.types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-interface ReorderDialogProps {
+interface UpdateReorderDialogProps {
+  isDisabled?: boolean;
   rawMaterialId: number;
+  movementId: number;
   materialName: string;
+  payload: ReorderRawMaterialPayload;
 }
 
-export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProps) {
-  const reorderMutation = useReorderRawMaterial(rawMaterialId);
+export function UpdateReorderDialog({ isDisabled , rawMaterialId , movementId , materialName , payload }: UpdateReorderDialogProps) {
+  const reorderMutation = useUpdateReorderRawMaterial(rawMaterialId, movementId);
+  const disabled = isDisabled === true;
+  const tooltipText = disabled
+    ? "This reorder qty is already in used. Data cannot be updated to avoid stock qty inconsistency. Please update before the qty is used."
+    : "Update reorder";
 
   const INITIAL_FORM = useMemo(
     () => ({
-      quantity: "",
-      unit_price_in_usd: "",
-      exchange_rate_from_usd_to_riel: "4100",
-      movement_date: "",
-      note: "",
+      quantity: payload?.quantity != null ? String(payload.quantity) : "",
+      unit_price_in_usd:
+        payload?.unit_price_in_usd != null ? String(payload.unit_price_in_usd) : "",
+      exchange_rate_from_usd_to_riel:
+        payload?.exchange_rate_from_usd_to_riel != null
+          ? String(payload.exchange_rate_from_usd_to_riel)
+          : "4100",
+      movement_date: payload?.movement_date ?? "",
+      note: payload?.note ?? "",
     }),
-    []
+    [payload]
   );
 
   const [open, setOpen] = useState(false);
@@ -47,7 +64,14 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
 
   const resetForm = () => setForm(INITIAL_FORM);
 
+  const openDialog = () => {
+    if (disabled) return;
+    setForm(INITIAL_FORM);
+    setOpen(true);
+  };
+
   const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen && isDisabled === true) return;
     setOpen(nextOpen);
     if (!nextOpen) resetForm();
   };
@@ -59,10 +83,12 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
     return quantity > 0 && unitPrice > 0 && exchangeRate > 0 && form.movement_date !== "";
   }, [form]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!isValid || reorderMutation.isPending) return;
 
-    const payload: ReorderRawMaterialPayload = {
+    const submitPayload: ReorderRawMaterialPayload = {
       quantity: Number(form.quantity),
       unit_price_in_usd: Number(form.unit_price_in_usd),
       exchange_rate_from_usd_to_riel: Number(form.exchange_rate_from_usd_to_riel),
@@ -70,7 +96,7 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
       ...(form.note.trim() ? { note: form.note.trim() } : {}),
     };
 
-    reorderMutation.mutate(payload, {
+    reorderMutation.mutate(submitPayload, {
       onSuccess: () => {
         resetForm();
         setOpen(false);
@@ -80,17 +106,41 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Reorder Stock
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {disabled ? (
+              <span className="inline-flex cursor-not-allowed">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-disabled={true}
+                  tabIndex={-1}
+                  className="pointer-events-none opacity-50"
+                >
+                  <PenSquare className="w-4 h-4" />
+                </Button>
+              </span>
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={openDialog}
+              >
+                <PenSquare className="w-4 h-4" />
+              </Button>
+            )}
+          </TooltipTrigger>
+          <TooltipContent side="top">{tooltipText}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Reorder Raw Material</DialogTitle>
+          <DialogTitle>Update Reorder Raw Material</DialogTitle>
           <DialogDescription>
-            Create a reorder stock movement for <strong>{materialName}</strong>.
+            Update a reorder stock movement for <strong>{materialName}</strong>.
           </DialogDescription>
         </DialogHeader>
 
@@ -182,15 +232,16 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!isValid || reorderMutation.isPending}
+            type="submit"
+            disabled={!isValid || reorderMutation.isPending || disabled}
           >
             {reorderMutation.isPending ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                Reordering...
+                Updating...
               </>
             ) : (
-              "Confirm Reorder"
+              "Confirm Update"
             )}
           </Button>
         </DialogFooter>

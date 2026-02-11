@@ -27,6 +27,7 @@ interface HeaderActionButtonsProps {
   disabled?: boolean;
   children?: ReactNode;
   customButtonsPosition?: "before" | "after" | "between";
+  customUI?: ReactNode;
 }
 
 export const HeaderActionButtons = ({
@@ -43,6 +44,7 @@ export const HeaderActionButtons = ({
   disabled = false,
   children,
   customButtonsPosition = "after",
+  customUI
 }: HeaderActionButtonsProps) => {
   const navigate = useNavigate();
 
@@ -132,6 +134,7 @@ export const HeaderActionButtons = ({
 
   return (
     <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
+      {customUI}
       {customButtonsPosition === "before" && children}
       {editButton}
       {customButtonsPosition === "between" && children}

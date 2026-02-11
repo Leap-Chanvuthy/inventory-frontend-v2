@@ -447,7 +447,7 @@ export const UpdateRawMaterialForm = () => {
                       Review the full details of what you selected.
                     </p>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-4 my-5">
                       {selectedCategory ? (
                         <div>
                           <p className="text-xs font-medium text-muted-foreground mb-2">

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createRawMaterial, updateRawMaterial, deleteRawMaterialImages, reorderRawMaterial } from "./raw-material.api";
+import { createRawMaterial, updateRawMaterial, deleteRawMaterialImages, reorderRawMaterial, updateReorderRawMaterial } from "./raw-material.api";
 import { CreateRawMaterialRequest, ReorderRawMaterialPayload } from "./raw-material.types";
 import { toast } from "sonner";
 
@@ -51,6 +51,24 @@ export const useReorderRawMaterial = (rawMaterialId: number) => {
     },
   });
 };
+
+
+export const useUpdateReorderRawMaterial = (rawMaterialId: number, movementId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: ReorderRawMaterialPayload) =>
+      updateReorderRawMaterial(rawMaterialId, movementId, payload),
+    onSuccess: response => {
+    queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
+    queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+    toast.success(response.message || "Reorder updated successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to update reorder");
+    },
+  });
+
+}
 
 export const useDeleteRawMaterialImages = (rawMaterialId: number) => {
   const queryClient = useQueryClient();

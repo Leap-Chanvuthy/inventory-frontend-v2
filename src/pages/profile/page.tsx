@@ -4,7 +4,6 @@ import { ProfileSidebar } from "@/components/reusable/partials/profile-sidebar";
 import {
   User,
   Palette,
-  Bell,
   LockKeyhole,
   MailCheck,
   SquareTerminal,
@@ -38,11 +37,6 @@ export const PROFILE_SIDEBAR_MENU_ITEMS: {
     title: "Appearance",
     tab: "appearance",
     icon: <Palette className="w-4 h-4" />,
-  },
-  {
-    title: "Notifications",
-    tab: "notifications",
-    icon: <Bell className="w-4 h-4" />,
   },
   {
     title: "API Docs",
@@ -89,7 +83,6 @@ const Profile = () => {
           {activeTab === "two-factor-auth" && <TwoFactorAuth />}
           {activeTab === "forget-password" && <ForgetPassword />}
           {activeTab === "appearance" && <AppearanceSetting />}
-          {activeTab === "notifications" && <div>Notifications</div>}
           {activeTab === "api-docs" && <ApiDocsGuide />}
         </div>
       </div>

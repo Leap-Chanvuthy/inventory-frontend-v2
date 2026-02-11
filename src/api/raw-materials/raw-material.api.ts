@@ -72,6 +72,15 @@ export const reorderRawMaterial = async (
   return response.data;
 };
 
+export const updateReorderRawMaterial = async (rawMaterialId: number , movementId: number , data: ReorderRawMaterialPayload): Promise<ReorderRawMaterialResponse> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/reorder/${movementId}`,
+    data
+  );
+  return response.data;
+}
+
+
 export const deleteRawMaterialImages = async (
   rawMaterialId: number,
   imageIds: number[]

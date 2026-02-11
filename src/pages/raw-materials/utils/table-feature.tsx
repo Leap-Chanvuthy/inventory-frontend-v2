@@ -8,10 +8,14 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Package, Warehouse, User, Ruler, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { Package, Warehouse, User, Ruler, ArrowDownLeft, ArrowUpRight, Lock, LockOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatDate } from "@/utils/date-format";
 import { Text } from "@/components/ui/text/app-text";
+import { UpdateReorderDialog } from "../_components/update-reorder-dialog";
+
+const isInUsed = (value: unknown): boolean =>
+  value === true || value === 1 || value === "1" || value === "true";
 
 // Category Badge Component
 export const CategoryBadge = ({
@@ -267,6 +271,8 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
 // Raw Material Stock Movement Table Columns (for DataTable-style usage)
 // Note: UOM is a property of the Raw Material, so we pass it in.
 export const RM_STOCK_MOVEMENT_COLUMNS = (
+  materialName: string,
+  rawMaterialId: number,
   uomLabel?: string
 ): DataTableColumn<RawMaterialStockMovement>[] => [
   {
@@ -283,11 +289,31 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "movement_type",
     header: "Movement Type",
     className: "whitespace-nowrap py-6",
-    render: movement => (
-      <span className="text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
+    render: movement => {
+      
+      const IS_IN_USED = isInUsed(movement.in_used as unknown);
+      const IS_RE_ORDER = movement.movement_type === "RE_ORDER";
+      
+
+      return (
+        <span className="flex items-center gap-1.5 text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
         {movement.movement_type.replace(/_/g, " ")}
+          {IS_RE_ORDER && (
+            IS_IN_USED ? (
+              <Badge variant="destructive" className="flex items-center gap-1.5 text-white">
+                <Lock className="w-3 h-3" />
+                In Used
+              </Badge>
+            ) : (
+              <Badge variant="default" className="flex items-center gap-1.5 text-white">
+                <LockOpen className="w-3 h-3" />
+                Not In Used
+              </Badge>
+            )
+          )}
       </span>
-    ),
+      )
+    },
   },
   {
     key: "direction",
@@ -369,5 +395,39 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
         {movement.note || "No notes"}
       </span>
     ),
+  },
+  {
+    key: "actions",
+    header: "Actions",
+    className: "whitespace-nowrap py-6",
+    render: movement => {
+
+      const IS_RE_ORDER = movement.movement_type === "RE_ORDER";
+
+      const payload = {
+        quantity: movement.quantity,
+        unit_price_in_usd: movement.unit_price_in_usd,
+        exchange_rate_from_usd_to_riel: movement.exchange_rate_from_usd_to_riel,
+        movement_date: movement.movement_date,
+        note: movement.note ?? undefined,
+      };
+
+
+      
+      return (
+        <span className="font-mono font-medium">
+          {
+            IS_RE_ORDER && 
+            <UpdateReorderDialog
+              isDisabled={isInUsed(movement.in_used as unknown)}
+              rawMaterialId={rawMaterialId}
+              movementId={movement.id}
+              materialName={materialName}
+              payload={payload}
+            />
+          }
+        </span>
+      );
+    },
   },
 ];
