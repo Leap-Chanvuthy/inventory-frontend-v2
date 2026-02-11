@@ -16,6 +16,7 @@ import { UpdateReorderDialog } from "../_components/update-reorder-dialog";
 const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
 import { CategoryBadge, StockStatusBadge } from "./raw-material-status";
+import { Badge } from "@/components/ui/badge";
 
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
