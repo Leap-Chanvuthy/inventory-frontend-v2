@@ -204,14 +204,14 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
     if (remainingSlots <= 0) return;
 
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
-    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml"];
+    const ALLOWED_TYPES = ["image/png", "image/jpeg"];
     const allFiles = Array.from(files);
 
     const invalidTypeFiles = allFiles.filter(file => !ALLOWED_TYPES.includes(file.type));
     const oversizedFiles = allFiles.filter(file => ALLOWED_TYPES.includes(file.type) && file.size > MAX_FILE_SIZE);
 
     if (invalidTypeFiles.length > 0) {
-      toast.error("Only PNG, JPG, and SVG files are allowed.");
+      toast.error("Only PNG and JPG files are allowed.");
     }
 
     if (oversizedFiles.length > 0) {
@@ -306,13 +306,13 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           Click to upload or drag and drop
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          SVG, PNG, JPG | Max 2 MB each
+          PNG, JPG | Max 2 MB each
         </p>
         <input
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept=".png,.jpg,.jpeg,.svg"
+          accept=".png,.jpg,.jpeg"
           multiple
           onChange={e => handleFilesSelect(e.target.files)}
         />
