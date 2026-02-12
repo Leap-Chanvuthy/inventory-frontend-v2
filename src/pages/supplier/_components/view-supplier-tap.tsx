@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Building2 } from "lucide-react";
+import { MapPin, Building2, FileText } from "lucide-react";
 import { Supplier } from "@/api/suppliers/supplier.types";
 import ReusableTabs from "@/components/reusable/partials/tabs";
 import { Text } from "@/components/ui/text/app-text";
@@ -22,7 +22,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* <div>
+            <div>
               <p className="text-sm text-muted-foreground">
                 Business Registration Number
               </p>
@@ -39,7 +39,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
               <p className="font-medium whitespace-pre-wrap">
                 {supplier.business_description || "-"}
               </p>
-            </div> */}
+            </div>
           </CardContent>
         </Card>
       ),
@@ -56,9 +56,7 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                   <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_1fr] gap-8 items-start">
                     {/* Left Section */}
                     <div className="space-y-2">
-                      <Text.TitleSmall>
-                        Banking Information
-                      </Text.TitleSmall>
+                      <Text.TitleSmall>Banking Information</Text.TitleSmall>
                       <p className="text-sm text-muted-foreground">
                         Details for direct bank transfers and KHQR payments.
                       </p>
@@ -79,27 +77,21 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         <p className="text-sm text-muted-foreground mb-1">
                           Supplier Bank Account Name
                         </p>
-                        <p className="">
-                          {bank.account_holder_name}
-                        </p>
+                        <p className="">{bank.account_holder_name}</p>
                       </div>
 
                       <div>
                         <p className="text-sm text-muted-foreground mb-1">
                           Bank Account Number
                         </p>
-                        <p className="">
-                          {bank.account_number}
-                        </p>
+                        <p className="">{bank.account_number}</p>
                       </div>
 
                       <div>
                         <p className="text-sm text-muted-foreground mb-1">
                           Name of the Bank
                         </p>
-                        <p className="">
-                          {bank.bank_name}
-                        </p>
+                        <p className="">{bank.bank_name}</p>
                       </div>
                     </div>
 

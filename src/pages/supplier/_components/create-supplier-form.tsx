@@ -27,7 +27,7 @@ export const CreateSupplierForm = () => {
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
+  const initialForm = {
     official_name: "",
     contact_person: "",
     phone: "",
@@ -47,10 +47,9 @@ export const CreateSupplierForm = () => {
     postal_code: "",
     latitude: "",
     longitude: "",
-  });
+  };
 
-  const [image, setImage] = useState<File | null>(null);
-  const [banks, setBanks] = useState<BankDetails[]>([
+  const initialBanks: BankDetails[] = [
     {
       bank_name: "",
       account_number: "",
@@ -58,7 +57,11 @@ export const CreateSupplierForm = () => {
       payment_link: "",
       qr_code_image: null,
     },
-  ]);
+  ];
+
+  const [form, setForm] = useState(initialForm);
+  const [image, setImage] = useState<File | null>(null);
+  const [banks, setBanks] = useState(initialBanks);
 
   /* ---------- Handlers ---------- */
 
@@ -107,6 +110,10 @@ export const CreateSupplierForm = () => {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/supplier");
+        } else {
+          setForm(initialForm);
+          setImage(null);
+          setBanks(initialBanks);
         }
       },
     });

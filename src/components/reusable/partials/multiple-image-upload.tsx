@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, Maximize2, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type Position = { x: number; y: number };
 type AspectType = "avatar" | "landscape" | "portrait";
@@ -202,7 +203,26 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
 
     if (remainingSlots <= 0) return;
 
-    const acceptedFiles = Array.from(files).slice(0, remainingSlots);
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+    const ALLOWED_TYPES = ["image/png", "image/jpeg"];
+    const allFiles = Array.from(files);
+
+    const invalidTypeFiles = allFiles.filter(file => !ALLOWED_TYPES.includes(file.type));
+    const oversizedFiles = allFiles.filter(file => ALLOWED_TYPES.includes(file.type) && file.size > MAX_FILE_SIZE);
+
+    if (invalidTypeFiles.length > 0) {
+      toast.error("Only PNG and JPG files are allowed.");
+    }
+
+    if (oversizedFiles.length > 0) {
+      toast.error(`${oversizedFiles.length} file(s) exceed 2 MB and were not uploaded.`);
+    }
+
+    const acceptedFiles = allFiles
+      .filter(file => ALLOWED_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE)
+      .slice(0, remainingSlots);
+
+    if (acceptedFiles.length === 0) return;
 
     const newImages: ImageItem[] = acceptedFiles.map((file, idx) => ({
       id: `img-${Date.now()}-${idx}`,
@@ -286,13 +306,13 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           Click to upload or drag and drop
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          SVG, PNG, JPG | Max 2 MB each
+          PNG, JPG | Max 2 MB each
         </p>
         <input
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept="image/*"
+          accept=".png,.jpg,.jpeg"
           multiple
           onChange={e => handleFilesSelect(e.target.files)}
         />
