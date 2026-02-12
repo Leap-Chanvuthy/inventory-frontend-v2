@@ -72,17 +72,17 @@ export function ViewRawMaterialForm() {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300">
-              {/* Header with Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <Text.TitleLarge className="truncate">
-                  {raw_material?.material_name} - {raw_material?.material_sku_code}
-                </Text.TitleLarge>
-                <HeaderActionButtons
-                  editPath={`/raw-materials/update/${id}`}
-                  showEdit={true}
-                  showDelete={true}
-                />
-              </div>
+      {/* Header with Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <Text.TitleLarge className="truncate">
+          {raw_material?.material_name} - {raw_material?.material_sku_code}
+        </Text.TitleLarge>
+        <HeaderActionButtons
+          editPath={`/raw-materials/update/${id}`}
+          showEdit={true}
+          showDelete={true}
+        />
+      </div>
 
       {/* Main Info Card */}
       <Card className="mb-6">
@@ -308,7 +308,10 @@ export function ViewRawMaterialForm() {
       {/* Stock Movements Card */}
       {raw_material.rm_stock_movements &&
         raw_material.rm_stock_movements.length > 0 && (
-          <StockMovementsTable movements={raw_material?.rm_stock_movements} uom={raw_material?.uom || null} />
+          <StockMovementsTable
+            movements={raw_material?.rm_stock_movements}
+            uom={raw_material?.uom || null}
+          />
         )}
     </div>
   );

@@ -117,6 +117,7 @@ const loginForm = () => {
         id="password"
         label="Your Password"
         type="password"
+        placeholder="Please enter your password"
         value={values.password}
         error={fieldErrors?.password?.[0]}
         onChange={handleChange}

@@ -1,8 +1,10 @@
 import { useSingleProductCategory } from "@/api/categories/product-categories/product-category.query";
+import { useDeleteProductCategory } from "@/api/categories/product-categories/product-category.mutation";
 import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { Text } from "@/components/ui/text/app-text";
+import { useNavigate } from "react-router-dom";
 
 interface ViewCategoryFormProps {
   categoryId: string;
@@ -10,12 +12,22 @@ interface ViewCategoryFormProps {
 
 export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
   const id = Number(categoryId);
+  const navigate = useNavigate();
+  const deleteMutation = useDeleteProductCategory();
 
   const {
     data: categoryResponse,
     isLoading,
     isError,
   } = useSingleProductCategory(id);
+
+  const handleDelete = () => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        navigate("/categories?tab=product-category");
+      },
+    });
+  };
 
   const category = categoryResponse?.data;
 
@@ -65,6 +77,9 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
             editPath={`/product-categories/edit/${id}`}
             showEdit={true}
             showDelete={true}
+            onDelete={handleDelete}
+            deleteHeading="Delete This Product Category"
+            deleteSubheading="Are you sure you want to delete this product category? This action cannot be undone."
           />
         </div>
 
@@ -74,85 +89,58 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               {/* Left Side - Category Details */}
-              <div className="space-y-6">
-                {/* Category Name with Color */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category Name
-                  </label>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <div
-                      className="w-4 h-4 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: category.label_color }}
-                    />
-                    <span className="text-base font-medium">
+              <div className="space-y-5">
+                {/* Category Name & Color Header */}
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-11 h-11 rounded-xl flex-shrink-0 shadow-sm"
+                    style={{ backgroundColor: category.label_color }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
                       {category.category_name}
+                    </p>
+                    <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                      {category.label_color}
                     </span>
                   </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                    Active
+                  </span>
                 </div>
 
-                {/* Status */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  </div>
-                </div>
+                <hr className="border-gray-200 dark:border-gray-700" />
 
-                {/* Created At */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Created At
-                  </label>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <span className="text-sm text-gray-600">
+                {/* Dates Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Created At
+                    </label>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {formatDate(category.created_at)}
                     </span>
                   </div>
-                </div>
-
-                {/* Updated At */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Updated At
-                  </label>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <span className="text-sm text-gray-600">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Updated At
+                    </label>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                       {formatDate(category.updated_at)}
                     </span>
                   </div>
                 </div>
 
-                {/* Label Color */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Label Colour
-                  </label>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <div
-                      className="w-10 h-10 rounded-lg border-2 border-white shadow-sm flex-shrink-0"
-                      style={{ backgroundColor: category.label_color }}
-                    />
-                    <span className="text-sm font-mono text-gray-600">
-                      {category.label_color}
-                    </span>
-                  </div>
-                </div>
+                <hr className="border-gray-200 dark:border-gray-700" />
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Description
                   </label>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-                    <p className="text-sm text-gray-600 whitespace-pre-wrap">
-                      {category.description || "No description provided"}
-                    </p>
-                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    {category.description || "No description provided"}
+                  </p>
                 </div>
               </div>
 

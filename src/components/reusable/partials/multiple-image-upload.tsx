@@ -46,7 +46,7 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       zoom: 1,
       position: { x: 0, y: 0 },
       aspect: "avatar",
-    }))
+    })),
   );
 
   const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -69,7 +69,7 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           zoom: 1,
           position: { x: 0, y: 0 },
           aspect: "avatar" as AspectType,
-        }))
+        })),
       );
       setHasInitialized(true);
     }
@@ -142,7 +142,7 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   // --- Generate high-res edited image
   const generateEditedImage = (
     imgItem: ImageItem,
-    outputWidth = 1200
+    outputWidth = 1200,
   ): Promise<File> => {
     return new Promise(resolve => {
       const img = new Image();
@@ -160,7 +160,7 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
 
         const scale = Math.max(
           canvasWidth / img.width,
-          canvasHeight / img.height
+          canvasHeight / img.height,
         );
         const drawWidth = img.width * scale * imgItem.zoom;
         const drawHeight = img.height * scale * imgItem.zoom;
@@ -183,12 +183,12 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
               new File(
                 [blob],
                 imgItem.file?.name || `image-${Date.now()}.png`,
-                { type: imgItem.file?.type || "image/png" }
-              )
+                { type: imgItem.file?.type || "image/png" },
+              ),
             );
           },
           imgItem.file?.type || "image/png",
-          1
+          1,
         );
       };
     });
@@ -207,19 +207,27 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
     const ALLOWED_TYPES = ["image/png", "image/jpeg"];
     const allFiles = Array.from(files);
 
-    const invalidTypeFiles = allFiles.filter(file => !ALLOWED_TYPES.includes(file.type));
-    const oversizedFiles = allFiles.filter(file => ALLOWED_TYPES.includes(file.type) && file.size > MAX_FILE_SIZE);
+    const invalidTypeFiles = allFiles.filter(
+      file => !ALLOWED_TYPES.includes(file.type),
+    );
+    const oversizedFiles = allFiles.filter(
+      file => ALLOWED_TYPES.includes(file.type) && file.size > MAX_FILE_SIZE,
+    );
 
     if (invalidTypeFiles.length > 0) {
       toast.error("Only PNG and JPG files are allowed.");
     }
 
     if (oversizedFiles.length > 0) {
-      toast.error(`${oversizedFiles.length} file(s) exceed 2 MB and were not uploaded.`);
+      toast.error(
+        `${oversizedFiles.length} file(s) exceed 2 MB and were not uploaded.`,
+      );
     }
 
     const acceptedFiles = allFiles
-      .filter(file => ALLOWED_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE)
+      .filter(
+        file => ALLOWED_TYPES.includes(file.type) && file.size <= MAX_FILE_SIZE,
+      )
       .slice(0, remainingSlots);
 
     if (acceptedFiles.length === 0) return;

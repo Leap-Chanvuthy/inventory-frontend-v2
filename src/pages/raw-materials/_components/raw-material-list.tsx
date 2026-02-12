@@ -30,7 +30,7 @@ export function RawMaterialList() {
     "filter[raw_material_category_id]": filter ? Number(filter) : undefined,
   });
 
-  if (isError) {
+  if (isError && !data) {
     return (
       <p className="text-center text-red-500">Failed to load raw materials</p>
     );
