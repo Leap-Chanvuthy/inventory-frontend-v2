@@ -53,7 +53,7 @@ export const CreateRawMaterialForm = () => {
     isError: uomsError,
   } = useUOMs({ per_page: 100 });
 
-  const [form, setForm] = useState({
+  const initialForm = {
     material_name: "",
     minimum_stock_level: "",
     expiry_date: "",
@@ -66,9 +66,11 @@ export const CreateRawMaterialForm = () => {
     unit_price_in_usd: "",
     exchange_rate_from_usd_to_riel: "4100",
     note: "",
-    production_method : "",
+    production_method: "",
     images: [] as File[],
-  });
+  };
+
+  const [form, setForm] = useState(initialForm);
 
   // Combined loading and error states
   const isLoading =
@@ -169,25 +171,6 @@ export const CreateRawMaterialForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
-  const clearForm = () => {
-    setForm({
-          material_name: "",
-    minimum_stock_level: "",
-    expiry_date: "",
-    description: "",
-    raw_material_category_id: "",
-    uom_id: "",
-    supplier_id: "",
-    warehouse_id: "",
-    quantity: "",
-    unit_price_in_usd: "",
-    exchange_rate_from_usd_to_riel: "4100",
-    note: "",
-    production_method : "",
-    images: [] as File[],
-    });
-  }
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -211,15 +194,16 @@ export const CreateRawMaterialForm = () => {
         form.exchange_rate_from_usd_to_riel,
       ),
       note: form.note || undefined,
-      production_method : form.production_method,
+      production_method: form.production_method,
       images: form.images.length > 0 ? form.images : undefined,
     };
 
     rawMaterialMutation.mutate(payload, {
       onSuccess: () => {
-        clearForm();
         if (action === "save_and_close") {
           navigate("/raw-materials");
+        } else {
+          setForm(initialForm);
         }
       },
     });
@@ -250,7 +234,6 @@ export const CreateRawMaterialForm = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <TextInput
                       id="material_name"
                       label="Material Name"
@@ -261,7 +244,7 @@ export const CreateRawMaterialForm = () => {
                       required
                     />
 
-                    <SelectInput 
+                    <SelectInput
                       id="production_method"
                       label="Production Method (Default FIFO)"
                       placeholder="Select production method"
@@ -270,7 +253,6 @@ export const CreateRawMaterialForm = () => {
                       value={form.production_method}
                       onChange={handleSelectChange("production_method")}
                     />
-
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

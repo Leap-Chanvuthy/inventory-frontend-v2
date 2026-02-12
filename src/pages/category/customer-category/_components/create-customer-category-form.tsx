@@ -14,11 +14,13 @@ export const CreateCustomerCategoryForm = () => {
     categoryMutation.error as AxiosError<CreateCustomerCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const initialForm = {
     category_name: "",
     label_color: "#6366F1",
     description: "",
-  });
+  };
+
+  const [form, setForm] = useState(initialForm);
 
   /* ---------- Handlers ---------- */
 
@@ -48,8 +50,9 @@ export const CreateCustomerCategoryForm = () => {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/categories?tab=customer-category");
+        } else {
+          setForm(initialForm);
         }
-        // save → stay, data auto-refreshed
       },
     });
   };

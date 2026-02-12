@@ -47,13 +47,15 @@ export const COLUMNS: DataTableColumn<UOM>[] = [
     key: "symbol",
     header: "Symbol",
     className: "whitespace-nowrap py-6",
-    render: uom => <span>{uom.symbol}</span>,
+    render: uom => <span>{uom.symbol ?? "-"}</span>,
   },
   {
     key: "description",
     header: "Description",
     className: "whitespace-nowrap py-6 max-w-md",
-    render: uom => <span className="line-clamp-2">{uom.description}</span>,
+    render: uom => (
+      <span className="line-clamp-2">{uom.description ?? "-"}</span>
+    ),
   },
   {
     key: "is_active",

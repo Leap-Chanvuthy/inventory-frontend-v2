@@ -140,7 +140,7 @@ export function ViewCustomerForm() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Category</p>
                 <CustomerCategoryBadge
-                  categoryName={customer.customer_category_name}
+                  categoryName={customer.customer_category.category_name}
                 />
               </div>
 

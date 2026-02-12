@@ -18,7 +18,7 @@ export const CreateUserForm = () => {
   const navigate = useNavigate();
   // console.log(fieldErrors);
 
-  const [form, setForm] = useState({
+  const initialForm = {
     name: "",
     email: "",
     password: "",
@@ -26,7 +26,9 @@ export const CreateUserForm = () => {
     role: "",
     phone_number: "",
     profile_picture: null as File | null,
-  });
+  };
+
+  const [form, setForm] = useState(initialForm);
 
   /* ---------- Handlers ---------- */
 
@@ -52,15 +54,7 @@ export const CreateUserForm = () => {
         if (action === "save_and_close") {
           navigate("/users");
         } else {
-          setForm({
-            name: "",
-            email: "",
-            password: "",
-            password_confirmation: "",
-            role: "",
-            phone_number: "",
-            profile_picture: null,
-          });
+          setForm(initialForm);
         }
       },
     });

@@ -15,7 +15,7 @@ export const CreateWarehouseForm = () => {
     warehouseMutation.error as AxiosError<CreateWarehouseValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const initialForm = {
     warehouse_name: "",
     warehouse_manager: "",
     warehouse_manager_contact: "",
@@ -25,9 +25,10 @@ export const CreateWarehouseForm = () => {
     longitude: "",
     warehouse_description: "",
     images: [] as File[],
-  });
+  };
 
-  console.log("Form State: ", form);
+  const [form, setForm] = useState(initialForm);
+  const [formKey, setFormKey] = useState(0);
 
   /* ---------- Handlers ---------- */
 
@@ -63,8 +64,10 @@ export const CreateWarehouseForm = () => {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/warehouses");
+        } else {
+          setForm(initialForm);
+          setFormKey(prev => prev + 1);
         }
-        // save → stay, data auto-refreshed
       },
     });
   };
@@ -175,6 +178,7 @@ export const CreateWarehouseForm = () => {
             <div className="flex flex-col lg:flex-row w-full gap-4">
               <div className="w-full lg:w-1/2">
                 <MultiImageUpload
+                  key={formKey}
                   label="Warehouse Images"
                   onChange={handleImagesChange}
                   maxImages={3}
