@@ -61,7 +61,7 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
           {uom.symbol ? ` | ${uom.symbol}` : ""}
         </Text.TitleLarge>
         <HeaderActionButtons
-          editPath={`/uom/edit/${uom.id}`}
+          editPath={`/unit-of-measurement/edit/${uom.id}`}
           onDelete={() => deleteMutation.mutate(uom.id)}
           deleteHeading="Delete This UOM"
           deleteSubheading="Are you sure you want to delete this unit of measurement? This action cannot be undone."

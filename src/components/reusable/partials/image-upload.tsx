@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, Crop, Maximize2, Trash2, Check, Move, RotateCw, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const ALLOWED_TYPES = ["image/png", "image/jpeg"];
 
 type Position = { x: number; y: number };
 type AspectType = "avatar" | "landscape" | "portrait";
@@ -53,6 +57,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
   const selectedFile = e.target.files?.[0];
   if (!selectedFile) return;
 
+  if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+    toast.error("Only PNG and JPG files are allowed.");
+    return;
+  }
+  if (selectedFile.size > MAX_FILE_SIZE) {
+    toast.error("File exceeds 2 MB and was not uploaded.");
+    return;
+  }
+
   setHasRemovedDefault(false);
   setFile(selectedFile);
 
@@ -73,6 +86,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files?.[0];
     if (!droppedFile) return;
+
+    if (!ALLOWED_TYPES.includes(droppedFile.type)) {
+      toast.error("Only PNG and JPG files are allowed.");
+      return;
+    }
+    if (droppedFile.size > MAX_FILE_SIZE) {
+      toast.error("File exceeds 2 MB and was not uploaded.");
+      return;
+    }
+
     setFile(droppedFile);
     const objectUrl = URL.createObjectURL(droppedFile);
     setPreview(objectUrl);
@@ -226,8 +249,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
             <Upload className="w-6 h-6 text-gray-500 dark:text-gray-300" />
           </div>
           <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Click to upload or drag and drop</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">SVG, PNG, JPG | Max 2 MB</p>
-          <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG | Max 2 MB</p>
+          <input ref={fileInputRef} type="file" className="hidden" accept=".png,.jpg,.jpeg" onChange={handleFileSelect} />
         </div>
       ) : (
         <div className=" flex-row items-start gap-4 p-4 border rounded-xl border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
