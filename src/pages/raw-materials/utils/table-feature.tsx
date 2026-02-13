@@ -243,7 +243,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
             IS_IN_USED ? (
               <Badge variant="destructive" className="flex items-center gap-1.5 text-white">
                 <Lock className="w-3 h-3" />
-                In Used
+                WIP (In Used)
               </Badge>
             ) : (
               <Badge variant="default" className="flex items-center gap-1.5 text-white">
