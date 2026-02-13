@@ -3,6 +3,7 @@ import { HeaderActionButtons } from "@/components/reusable/partials/header-actio
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { formatDate } from "@/utils/date-format";
 import { Text } from "@/components/ui/text/app-text";
+import { IconBadge } from "@/components/ui/icons-badge";
 
 interface ViewWarehouseFormProps {
   warehouseId: string;
@@ -72,11 +73,12 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
               Warehouse Information
             </Text.TitleMedium>
 
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-5">
               {/* Warehouse Name */}
               <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                  Warehouse Name:
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="name" variant="info" />
+                  Warehouse Name
                 </p>
                 <p className="text-base sm:text-lg font-semibold break-words">
                   {warehouse.warehouse_name}
@@ -85,8 +87,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
 
               {/* Address */}
               <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                  Address:
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="address" variant="danger" />
+                  Address
                 </p>
                 <p className="text-sm sm:text-base break-words">
                   {warehouse.warehouse_address}
@@ -98,24 +101,27 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
                 )}
               </div>
 
-              {/* Capacity */}
-
               {/* Contact Person */}
               <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                  Contact Person:
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="supplier" />
+                  Contact Person
                 </p>
                 <p className="text-base sm:text-lg font-semibold break-words">
                   {warehouse.warehouse_manager} (Manager)
                 </p>
+
                 {warehouse.warehouse_manager_contact && (
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-all">
-                    Phone: {warehouse.warehouse_manager_contact}
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-all flex items-center gap-1">
+                    <IconBadge label="phone" size={12} />
+                    {warehouse.warehouse_manager_contact}
                   </p>
                 )}
+
                 {warehouse.warehouse_manager_email && (
-                  <p className="text-xs sm:text-sm text-muted-foreground break-all">
-                    Email: {warehouse.warehouse_manager_email}
+                  <p className="text-xs sm:text-sm text-muted-foreground break-all flex items-center gap-1">
+                    <IconBadge label="email" size={12} />
+                    {warehouse.warehouse_manager_email}
                   </p>
                 )}
               </div>
@@ -123,8 +129,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
               {/* Description */}
               {warehouse.warehouse_description && (
                 <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                    Description:
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="description" variant="info" />
+                    Description
                   </p>
                   <p className="text-sm sm:text-base break-words">
                     {warehouse.warehouse_description}
@@ -134,8 +141,9 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
 
               {/* Last Updated */}
               <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                  Last Updated:
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="updated_date" />
+                  Last Updated
                 </p>
                 <p className="text-sm sm:text-base font-medium">
                   {formatDate(warehouse.updated_at)}

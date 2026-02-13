@@ -1,6 +1,5 @@
 import { useSingleCustomer } from "@/api/customers/customer.query";
 import { useParams, useNavigate } from "react-router-dom";
-import { Phone, Mail, Calendar, MapPin, Globe, User } from "lucide-react";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { ViewCustomerTabs } from "./view-customer-tabs";
 import { Text } from "@/components/ui/text/app-text";
@@ -9,6 +8,7 @@ import {
   CustomerCategoryBadge,
   CustomerStatusBadge,
 } from "../utils/customer-status";
+import { IconBadge } from "@/components/ui/icons-badge";
 
 export function ViewCustomerForm() {
   const { id } = useParams<{ id: string }>();
@@ -62,7 +62,8 @@ export function ViewCustomerForm() {
           deleteSubheading="Are you sure want to delete this customer? This action cannot be undone."
         />
       </div>
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto p-8  ">
+
+      <div className="rounded-2xl shadow-sm border max-w-full mx-auto p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <Text.TitleLarge className="mb-2">
@@ -89,48 +90,52 @@ export function ViewCustomerForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
             <div className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="code" variant="warning" />
                   Customer Code
                 </p>
                 <p className="font-medium">{customer.customer_code}</p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Full Name</p>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <p className="font-medium">{customer.fullname}</p>
-                </div>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="name" variant="info" />
+                  Full Name
+                </p>
+                <p className="font-medium">{customer.fullname}</p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Email</p>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-blue-600" />
-                  <a
-                    href={`mailto:${customer.email_address}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {customer.email_address || "-"}
-                  </a>
-                </div>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="email" variant="info" />
+                  Email
+                </p>
+                <a
+                  href={`mailto:${customer.email_address}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  {customer.email_address || "-"}
+                </a>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Phone</p>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-blue-600" />
-                  <a
-                    href={`tel:${customer.phone_number}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {customer.phone_number || "-"}
-                  </a>
-                </div>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="phone" variant="success" />
+                  Phone
+                </p>
+                <a
+                  href={`tel:${customer.phone_number}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  {customer.phone_number || "-"}
+                </a>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Status</p>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="status" variant="success" />
+                  Status
+                </p>
                 <CustomerStatusBadge status={customer.customer_status} />
               </div>
             </div>
@@ -138,80 +143,75 @@ export function ViewCustomerForm() {
             {/* Right Column */}
             <div className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Category</p>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="category" variant="warning" />
+                  Category
+                </p>
                 <CustomerCategoryBadge
                   categoryName={customer.customer_category.category_name}
                 />
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="website" variant="indigo" />
                   Social Media
                 </p>
                 {customer.social_media ? (
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-blue-600" />
-                    <a
-                      href={customer.social_media}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-blue-600 hover:underline"
-                    >
-                      {customer.social_media}
-                    </a>
-                  </div>
+                  <a
+                    href={customer.social_media}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-blue-600 hover:underline"
+                  >
+                    {customer.social_media}
+                  </a>
                 ) : (
                   <p className="font-medium">-</p>
                 )}
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Address</p>
-                {customer.customer_address ? (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-red-600" />
-                    <p className="font-medium">{customer.customer_address}</p>
-                  </div>
-                ) : (
-                  <p className="font-medium">-</p>
-                )}
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="address" variant="danger" />
+                  Address
+                </p>
+                <p className="font-medium">
+                  {customer.customer_address || "-"}
+                </p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="address" variant="success" />
                   Google Map Link
                 </p>
                 {customer.google_map_link ? (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-green-600" />
-                    <a
-                      href={customer.google_map_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-blue-600 hover:underline"
-                    >
-                      View on Google Maps
-                    </a>
-                  </div>
+                  <a
+                    href={customer.google_map_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-blue-600 hover:underline"
+                  >
+                    View on Google Maps
+                  </a>
                 ) : (
                   <p className="font-medium">-</p>
                 )}
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="created_date" />
                   Registration Date
                 </p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <p className="font-medium">
-                    {new Date(customer.created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
+                <p className="font-medium">
+                  {new Date(customer.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
               </div>
             </div>
           </div>
