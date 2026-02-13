@@ -233,13 +233,13 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     render: movement => {
       
       const IS_IN_USED = isInUsed(movement.in_used as unknown);
-      const IS_RE_ORDER = movement.movement_type === "RE_ORDER";
+      const IS_RE_ORDER_PURCHASED = movement.movement_type === "RE_ORDER" || movement.movement_type === "PURCHASE";
       
 
       return (
         <span className="flex items-center gap-1.5 text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
         {movement.movement_type.replace(/_/g, " ")}
-          {IS_RE_ORDER && (
+          {IS_RE_ORDER_PURCHASED && (
             IS_IN_USED ? (
               <Badge variant="destructive" className="flex items-center gap-1.5 text-white">
                 <Lock className="w-3 h-3" />
