@@ -4,6 +4,9 @@ import { useSingleUOM } from "@/api/uom/uom.query";
 import { useDeleteUOM } from "@/api/uom/uom.mutation";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { Text } from "@/components/ui/text/app-text";
+import { PieChart, BoxIcon } from "lucide-react";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { IconBadge } from "@/components/ui/icons-badge";
 
 interface ViewUOMProps {
   id: number;
@@ -53,10 +56,10 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
   }
 
   return (
-    <div>
+    <div className="animate-in slide-in-from-right-8 duration-300">
       {/* Title and Actions */}
-      <div className="mx-6 mb-6 flex items-center justify-between">
-        <Text.TitleLarge>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <Text.TitleLarge className="truncate">
           {uom.name}
           {uom.symbol ? ` | ${uom.symbol}` : ""}
         </Text.TitleLarge>
@@ -68,99 +71,129 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
         />
       </div>
 
-      {/* Main Content */}
-      <div>
-        <div className="rounded-2xl shadow-sm border p-8 mb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Main Content - Side by Side */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left Section - Unit Information */}
-            <div>
-              <Text.TitleMedium className="mb-6">
-                Unit Information
-              </Text.TitleMedium>
+            <div className="p-6 sm:p-8">
+              <CardTitle className="mb-6">Unit Information</CardTitle>
 
-              <div className="space-y-8">
-                {/* Unit Name, Symbol, and Status - Horizontal */}
-                <div className="grid grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Unit Name
-                    </p>
-                    <p className="text-xl font-semibold">{uom.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Symbol</p>
-                    <p className="text-xl font-semibold">{uom.symbol || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">Status</p>
-                    <UOMStatusBadge isActive={uom.is_active} />
-                  </div>
-                </div>
-
-                {/* Created At and Updated At */}
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Created At
-                    </p>
-                    <p className="font-medium">
-                      {formatDate(uom.created_at, "MMM dd, yyyy, h:mm a")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Updated At
-                    </p>
-                    <p className="font-medium">
-                      {formatDate(uom.updated_at, "MMM dd, yyyy, h:mm a")}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Description */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Description
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="name" variant="info" />
+                    Unit Name
                   </p>
-                  <p className="text-sm leading-relaxed">
-                    {uom.description ||
-                      "No description provided for this unit of measurement."}
+                  <p className="font-medium">{uom.name}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="symbol" variant="primary" />
+                    Symbol
+                  </p>
+                  <p className="font-medium">{uom.symbol || "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="status" variant="success" />
+                    Status
+                  </p>
+                  <UOMStatusBadge isActive={uom.is_active} />
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="code" variant="warning" />
+                    UOM Code
+                  </p>
+                  <p className="font-medium">{uom.uom_code || "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="type" variant="cyan" />
+                    UOM Type
+                  </p>
+                  <p className="font-medium">{uom.uom_type || "-"}</p>
+                </div>
+              </div>
+
+              {/* Created At and Updated At - Same Row */}
+              <div className="grid grid-cols-2 gap-x-12 gap-y-5 mt-5">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="created_date" />
+                    Created At
+                  </p>
+                  <p className="font-medium">
+                    {formatDate(uom.created_at, "MMM dd, yyyy, h:mm a")}
                   </p>
                 </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="updated_date" />
+                    Updated At
+                  </p>
+                  <p className="font-medium">
+                    {formatDate(uom.updated_at, "MMM dd, yyyy, h:mm a")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="mt-6 pt-6 border-t">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="description" variant="info" />
+                  Description
+                </p>
+                <p className="font-medium leading-relaxed">
+                  {uom.description ||
+                    "No description provided for this unit of measurement."}
+                </p>
               </div>
             </div>
 
             {/* Right Section - Distribution Chart */}
-            <div>
-              <Text.TitleMedium className="mb-6">
+            <div className="p-6 sm:p-8 border-t lg:border-t-0 lg:border-l">
+              <CardTitle className="mb-6 flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-muted-foreground" />
                 Distribution of Unit of Measurement
-              </Text.TitleMedium>
+              </CardTitle>
 
-              {/* Placeholder for Pie Chart */}
-              <div className="flex items-center justify-center h-[300px] bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-center h-[280px] bg-muted/20 rounded-lg border border-dashed border-muted-foreground/25">
                 <div className="text-center">
-                  <p className="text-muted-foreground">Chart Placeholder</p>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <BoxIcon className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+                  <p className="text-muted-foreground font-medium">
+                    Chart Placeholder
+                  </p>
+                  <p className="text-sm text-muted-foreground/70 mt-1">
                     Distribution chart will be displayed here
                   </p>
                 </div>
               </div>
 
-              {/* Legend */}
-              <div className="mt-6 flex items-center justify-center gap-6">
+              <div className="mt-6 flex items-center justify-center gap-8">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-indigo-700"></div>
-                  <span className="text-sm">Total Raw Material</span>
+                  <div className="w-3 h-3 rounded-full bg-indigo-600"></div>
+                  <span className="text-sm text-muted-foreground">
+                    Total Raw Material
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-indigo-400"></div>
-                  <span className="text-sm">Total Of Final Product</span>
+                  <div className="w-3 h-3 rounded-full bg-indigo-400"></div>
+                  <span className="text-sm text-muted-foreground">
+                    Total Of Final Product
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

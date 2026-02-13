@@ -151,8 +151,8 @@ export function UOMCard({
       {!hideActions && (
         <CardFooter className="flex justify-end pt-0 pb-4">
           <TableActions
-            viewDetailPath={`/uom/view/${uom.id}`}
-            editPath={`/uom/edit/${uom.id}`}
+            viewDetailPath={`/unit-of-measurement/view/${uom.id}`}
+            editPath={`/unit-of-measurement/edit/${uom.id}`}
             deleteHeading="Delete This Unit of Measurement"
             deleteSubheading="Are you sure want to delete this Unit of Measurement? This action cannot be undone."
             deleteTooltip="Delete UOM"

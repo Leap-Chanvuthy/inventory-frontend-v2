@@ -5,6 +5,7 @@ import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { Text } from "@/components/ui/text/app-text";
 import { useNavigate } from "react-router-dom";
+import { IconBadge } from "@/components/ui/icons-badge";
 
 interface ViewCategoryFormProps {
   categoryId: string;
@@ -97,48 +98,61 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
                     style={{ backgroundColor: category.label_color }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                      <IconBadge label="name" variant="info" />
+                      Category Name
+                    </p>
+                    <p className="text-lg font-semibold truncate">
                       {category.category_name}
                     </p>
-                    <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+                    <span className="text-xs font-mono text-muted-foreground">
                       {category.label_color}
                     </span>
                   </div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                    Active
-                  </span>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                      <IconBadge label="status" variant="success" />
+                      Status
+                    </p>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      Active
+                    </span>
+                  </div>
                 </div>
 
-                <hr className="border-gray-200 dark:border-gray-700" />
+                <hr className="border-border" />
 
                 {/* Dates Row */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                      <IconBadge label="created_date" />
                       Created At
-                    </label>
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    </p>
+                    <p className="font-medium">
                       {formatDate(category.created_at)}
-                    </span>
+                    </p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                      <IconBadge label="updated_date" />
                       Updated At
-                    </label>
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    </p>
+                    <p className="font-medium">
                       {formatDate(category.updated_at)}
-                    </span>
+                    </p>
                   </div>
                 </div>
 
-                <hr className="border-gray-200 dark:border-gray-700" />
+                <hr className="border-border" />
 
                 {/* Description */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="description" variant="info" />
                     Description
-                  </label>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                  </p>
+                  <p className="font-medium whitespace-pre-wrap">
                     {category.description || "No description provided"}
                   </p>
                 </div>
@@ -146,12 +160,14 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
 
               {/* Right Side - Chart Placeholder */}
               <div>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 h-full flex items-center justify-center">
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 h-full flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-gray-500 font-medium mb-2">
+                    <p className="text-muted-foreground font-medium mb-2">
                       Product Count by Category
                     </p>
-                    <p className="text-sm text-gray-400">Chart coming soon</p>
+                    <p className="text-sm text-muted-foreground/70">
+                      Chart coming soon
+                    </p>
                   </div>
                 </div>
               </div>

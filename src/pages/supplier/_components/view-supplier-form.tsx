@@ -1,11 +1,11 @@
 import { useSingleSupplier } from "@/api/suppliers/supplier.query";
 import { useParams } from "react-router-dom";
-import { Phone, Mail, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { ViewSupplierTap } from "./view-supplier-tap";
 import { SupplierCategoryBadge } from "../utils/supplier-status";
 import { Text } from "@/components/ui/text/app-text";
+import { IconBadge } from "@/components/ui/icons-badge";
 
 export function ViewSupplierForm() {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,9 @@ export function ViewSupplierForm() {
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 ">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <Text.TitleLarge className="mb-2">{supplier.official_name}</Text.TitleLarge>
+        <Text.TitleLarge className="mb-2">
+          {supplier.official_name}
+        </Text.TitleLarge>
 
         <HeaderActionButtons
           editPath={`/supplier/update/${supplier.id}`}
@@ -44,60 +46,66 @@ export function ViewSupplierForm() {
           showDelete={true}
         />
       </div>
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto p-8  ">
+
+      <div className="rounded-2xl shadow-sm border max-w-full mx-auto p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <Text.TitleLarge className="mb-2">Supplier Information</Text.TitleLarge>
+            <Text.TitleLarge className="mb-2">
+              Supplier Information
+            </Text.TitleLarge>
           </div>
         </div>
 
-        {/* Content Section */}
         <div className="space-y-6">
-          {/* Supplier Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6">
             <div className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="code" variant="warning" />
                   Supplier ID
                 </p>
                 <p className="font-medium">{supplier.supplier_code}</p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="supplier" />
                   Contact Person
                 </p>
                 <p className="font-medium">{supplier.contact_person || "-"}</p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Email</p>
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-blue-600" />
-                  <a
-                    href={`mailto:${supplier.email}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {supplier.email || "-"}
-                  </a>
-                </div>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="email" variant="info" />
+                  Email
+                </p>
+                <a
+                  href={`mailto:${supplier.email}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  {supplier.email || "-"}
+                </a>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Phone</p>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-blue-600" />
-                  <a
-                    href={`tel:${supplier.phone}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {supplier.phone || "-"}
-                  </a>
-                </div>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="phone" variant="success" />
+                  Phone
+                </p>
+                <a
+                  href={`tel:${supplier.phone}`}
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  {supplier.phone || "-"}
+                </a>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Status</p>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="status" variant="success" />
+                  Status
+                </p>
                 <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500/20">
                   Active
                 </Badge>
@@ -107,7 +115,8 @@ export function ViewSupplierForm() {
             {/* Right Column */}
             <div className="space-y-5">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="name" variant="info" />
                   Legal Business Name
                 </p>
                 <p className="font-medium">
@@ -116,39 +125,40 @@ export function ViewSupplierForm() {
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Category</p>
-                <p className="font-medium">
-                  <SupplierCategoryBadge
-                    category={supplier.supplier_category}
-                  />
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="category" variant="warning" />
+                  Category
                 </p>
+                <SupplierCategoryBadge category={supplier.supplier_category} />
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="created_date" />
                   Registration Date
                 </p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <p className="font-medium">
-                    {new Date(supplier.created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
+                <p className="font-medium">
+                  {new Date(supplier.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Tax ID</p>
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="barcode" variant="primary" />
+                  Tax ID
+                </p>
                 <p className="font-medium">
                   {supplier.tax_identification_number || "-"}
                 </p>
               </div>
 
               <div>
-                <p className="text-sm text-muted-foreground mb-1">
+                <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                  <IconBadge label="barcode" variant="primary" />
                   Business Registration Number
                 </p>
                 <p className="font-medium">
@@ -160,7 +170,6 @@ export function ViewSupplierForm() {
         </div>
       </div>
 
-      {/* Tabs Section */}
       <ViewSupplierTap supplier={supplier} />
     </div>
   );
