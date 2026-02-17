@@ -34,7 +34,7 @@ export function ViewSupplierForm() {
     );
   }
 
-  if (isError || !data?.data) {
+  if (isError || !data?.data?.supplier) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center p-8 border-2 border-dashed rounded-xl">
@@ -49,7 +49,7 @@ export function ViewSupplierForm() {
     );
   }
 
-  const supplier = data.data;
+  const supplier = data.data.supplier;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
