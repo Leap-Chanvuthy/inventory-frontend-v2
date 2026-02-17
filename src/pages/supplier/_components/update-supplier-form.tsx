@@ -66,8 +66,8 @@ export const UpdateSupplierForm = () => {
 
   // Populate form with existing supplier data
   useEffect(() => {
-    if (data?.data) {
-      const supplier = data.data;
+    if (data?.data?.supplier) {
+      const supplier = data.data.supplier;
       setForm({
         official_name: supplier.official_name || "",
         contact_person: supplier.contact_person || "",

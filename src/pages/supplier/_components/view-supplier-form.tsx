@@ -21,7 +21,7 @@ export function ViewSupplierForm() {
     );
   }
 
-  if (isError || !data?.data) {
+  if (isError || !data?.data?.supplier) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -31,7 +31,7 @@ export function ViewSupplierForm() {
     );
   }
 
-  const supplier = data.data;
+  const supplier = data.data.supplier;
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 ">

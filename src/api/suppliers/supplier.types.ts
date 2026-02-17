@@ -86,7 +86,76 @@ export interface GetSuppliersResponse {
 export interface GetSupplierResponse {
   status: boolean;
   message: string;
-  data: Supplier;
+  data: {
+    supplier: Supplier;
+    statistics: SupplierDetailStatistics;
+  };
+}
+
+// --- Supplier Detail Statistics (new response shape for GET /suppliers/{id})
+export interface SupplierFinancials {
+  total_spend_usd: number;
+  total_spend_khr: number;
+  avarage_exchange_rate_usd_to_khr: number;
+  average_unit_price_usd: number;
+}
+
+export interface SupplierCounts {
+  purchase_count: number;
+  reorder_count: number;
+}
+
+export interface UOM {
+  id: number;
+  uom_code: string;
+  name: string;
+  symbol: string;
+  uom_type: string;
+  description: string | null;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string | null;
+}
+
+export interface TopRawMaterial {
+  raw_material_id: number;
+  material_name: string;
+  material_sku_code: string;
+  spend_usd: number;
+  spend_khr: number;
+  total_quantity: number;
+  uom: UOM;
+}
+
+export interface SupplyTrendMetric {
+  current: number;
+  previous: number;
+  delta: number;
+  percent: number;
+  direction: "up" | "down";
+}
+
+export interface SupplyTrendPeriod {
+  this_month_start: string;
+  this_month_end: string;
+  last_month_start: string;
+  last_month_end: string;
+}
+
+export interface SupplierSupplyTrend {
+  period: SupplyTrendPeriod;
+  usd: SupplyTrendMetric;
+  khr: SupplyTrendMetric;
+  raw_materials: SupplyTrendMetric;
+}
+
+export interface SupplierDetailStatistics {
+  total_raw_materials: number;
+  financials: SupplierFinancials;
+  counts: SupplierCounts;
+  top_raw_materials: TopRawMaterial[];
+  supply_trend: SupplierSupplyTrend;
 }
 
 // Create/Update Supplier Request
