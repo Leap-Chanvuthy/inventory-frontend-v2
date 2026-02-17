@@ -1,4 +1,8 @@
-import { RawMaterial, RawMaterialStockMovement } from "@/api/raw-materials/raw-material.types";
+import {
+  RawMaterial,
+  RawMaterialStockMovement,
+} from "@/api/raw-materials/raw-material.types";
+import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
@@ -7,7 +11,16 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Package, Warehouse, User, Ruler, ArrowDownLeft, ArrowUpRight, Lock, LockOpen } from "lucide-react";
+import {
+  Package,
+  Warehouse,
+  User,
+  Ruler,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Lock,
+  LockOpen,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatDate } from "@/utils/date-format";
 import { Text } from "@/components/ui/text/app-text";
@@ -20,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
-  // const deleteMutation = useDeleteRawMaterial();
+  const deleteMutation = useDeleteRawMaterial();
 
   return (
     <div className="flex items-center gap-2">
@@ -30,10 +43,7 @@ const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
         deleteHeading="Delete This Raw Material"
         deleteSubheading="Are you sure you want to delete this raw material? This action cannot be undone."
         deleteTooltip="Delete Raw Material"
-        onDelete={() => {
-          // deleteMutation.mutate(rawMaterial.id);
-          console.log("Delete raw material:", rawMaterial.id);
-        }}
+        // onDelete={() => deleteMutation.mutate(rawMaterial.id)}
       />
     </div>
   );
@@ -101,10 +111,12 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "production_method",
     header: "Production Method",
     className: "whitespace-nowrap py-6",
-    render: rawMaterial => <div>
-      {rawMaterial.production_method == 'FIFO' && 'FIFO (First In First Out)'}
-      {rawMaterial.production_method == 'LIFO' && 'LIFO (Last In First Out)'}
-    </div>,
+    render: rawMaterial => (
+      <div>
+        {rawMaterial.production_method == "FIFO" && "FIFO (First In First Out)"}
+        {rawMaterial.production_method == "LIFO" && "LIFO (Last In First Out)"}
+      </div>
+    ),
   },
   {
     key: "quantity",
@@ -112,7 +124,8 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     className: "whitespace-nowrap py-6",
     render: rawMaterial => (
       <span className="font-mono">
-        {rawMaterial.minimum_stock_level} {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
+        {rawMaterial.minimum_stock_level}{" "}
+        {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
       </span>
     ),
   },
@@ -144,7 +157,10 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
     <Card className="h-full flex flex-col transition-shadow hover:shadow-md">
       {/* Header */}
       <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
-        <Link to={`/raw-materials/view/${rawMaterial.id}`} className="flex items-center gap-3 min-w-0 hover:text-primary">
+        <Link
+          to={`/raw-materials/view/${rawMaterial.id}`}
+          className="flex items-center gap-3 min-w-0 hover:text-primary"
+        >
           <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center shrink-0">
             <Package className="h-5 w-5 sm:h-6 sm:w-6 text-indigo-600 dark:text-indigo-400" />
           </div>
@@ -206,15 +222,12 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
   );
 }
 
-
-
-
 // Raw Material Stock Movement Table Columns (for DataTable-style usage)
 // Note: UOM is a property of the Raw Material, so we pass it in.
 export const RM_STOCK_MOVEMENT_COLUMNS = (
   materialName: string,
   rawMaterialId: number,
-  uomLabel?: string
+  uomLabel?: string,
 ): DataTableColumn<RawMaterialStockMovement>[] => [
   {
     key: "movement_date",
@@ -231,29 +244,34 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Movement Type",
     className: "whitespace-nowrap py-6",
     render: movement => {
-      
       const IS_IN_USED = isInUsed(movement.in_used as unknown);
-      const IS_RE_ORDER_PURCHASED = movement.movement_type === "RE_ORDER" || movement.movement_type === "PURCHASE";
-      
+      const IS_RE_ORDER_PURCHASED =
+        movement.movement_type === "RE_ORDER" ||
+        movement.movement_type === "PURCHASE";
 
       return (
         <span className="flex items-center gap-1.5 text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
-        {movement.movement_type.replace(/_/g, " ")}
-          {IS_RE_ORDER_PURCHASED && (
-            IS_IN_USED ? (
-              <Badge variant="destructive" className="flex items-center gap-1.5 text-white">
+          {movement.movement_type.replace(/_/g, " ")}
+          {IS_RE_ORDER_PURCHASED &&
+            (IS_IN_USED ? (
+              <Badge
+                variant="destructive"
+                className="flex items-center gap-1.5 text-white"
+              >
                 <Lock className="w-3 h-3" />
                 WIP (In Used)
               </Badge>
             ) : (
-              <Badge variant="default" className="flex items-center gap-1.5 text-white">
+              <Badge
+                variant="default"
+                className="flex items-center gap-1.5 text-white"
+              >
                 <LockOpen className="w-3 h-3" />
                 Not In Used
               </Badge>
-            )
-          )}
-      </span>
-      )
+            ))}
+        </span>
+      );
     },
   },
   {
@@ -342,7 +360,6 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Actions",
     className: "whitespace-nowrap py-6",
     render: movement => {
-
       const IS_RE_ORDER = movement.movement_type === "RE_ORDER";
 
       const payload = {
@@ -353,12 +370,9 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
         note: movement.note ?? undefined,
       };
 
-
-      
       return (
         <span className="font-mono font-medium">
-          {
-            IS_RE_ORDER && 
+          {IS_RE_ORDER && (
             <UpdateReorderDialog
               isDisabled={isInUsed(movement.in_used as unknown)}
               rawMaterialId={rawMaterialId}
@@ -366,7 +380,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
               materialName={materialName}
               payload={payload}
             />
-          }
+          )}
         </span>
       );
     },

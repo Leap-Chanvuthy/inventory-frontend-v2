@@ -2,6 +2,7 @@ import { useCreateCustomer } from "@/api/customers/customer.mutation";
 import { useCustomerCategories } from "@/api/categories/customer-categories/customer-category.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput, SelectInput } from "@/components/reusable/partials/input";
+import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -184,7 +185,7 @@ export const CreateCustomerForm = () => {
                         error={fieldErrors?.customer_status?.[0]}
                         onChange={handleSelectChange("customer_status")}
                       />
-                      <SelectInput
+                      <SearchableSelect
                         required={true}
                         id="customer_category_id"
                         label="Customer Category"

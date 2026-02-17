@@ -1,5 +1,6 @@
 import { useSingleRawMaterial } from "@/api/raw-materials/raw-material.query";
-import { useParams } from "react-router-dom";
+import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import { useParams, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { Text } from "@/components/ui/text/app-text";
@@ -12,7 +13,15 @@ import { IconBadge } from "@/components/ui/icons-badge";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useSingleRawMaterial(Number(id));
+  const deleteMutation = useDeleteRawMaterial();
+
+  const handleDelete = () => {
+    deleteMutation.mutate(Number(id), {
+      onSuccess: () => navigate("/raw-materials"),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -50,12 +59,15 @@ export function ViewRawMaterialForm() {
           editPath={`/raw-materials/update/${id}`}
           showEdit={true}
           showDelete={true}
+          // onDelete={handleDelete}
+          // deleteHeading="Delete Raw Material"
+          // deleteSubheading={`Are you sure you want to delete "${raw_material?.material_name}"? This action cannot be undone.`}
           customUI={
-          <ReorderDialog
-            rawMaterialId={raw_material.id}
-            materialName={raw_material.material_name}
-          />
-        }
+            <ReorderDialog
+              rawMaterialId={raw_material.id}
+              materialName={raw_material.material_name}
+            />
+          }
         />
       </div>
 
@@ -155,13 +167,13 @@ export function ViewRawMaterialForm() {
                 <p className="font-medium">
                   {raw_material.expiry_date
                     ? new Date(raw_material.expiry_date).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )
                     : "-"}
                 </p>
               </div>

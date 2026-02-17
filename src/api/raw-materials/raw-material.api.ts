@@ -81,6 +81,12 @@ export const updateReorderRawMaterial = async (rawMaterialId: number , movementI
 }
 
 
+// Delete raw material
+export const deleteRawMaterial = async (id: number): Promise<{ status: boolean; message: string }> => {
+  const response = await apiClient.delete(`${BASE_API_URL}/raw-materials/${id}`);
+  return response.data;
+};
+
 export const deleteRawMaterialImages = async (
   rawMaterialId: number,
   imageIds: number[]
