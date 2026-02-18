@@ -1,6 +1,5 @@
 import { useSingleRawMaterial } from "@/api/raw-materials/raw-material.query";
-import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { Text } from "@/components/ui/text/app-text";
@@ -10,6 +9,7 @@ import { StockMovementsTable } from "./stock-movements-table";
 import { ReorderDialog } from "./reorder-dialog";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { IconBadge } from "@/components/ui/icons-badge";
+import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -59,9 +59,9 @@ export function ViewRawMaterialForm() {
           editPath={`/raw-materials/update/${id}`}
           showEdit={true}
           showDelete={true}
-          // onDelete={handleDelete}
-          // deleteHeading="Delete Raw Material"
-          // deleteSubheading={`Are you sure you want to delete "${raw_material?.material_name}"? This action cannot be undone.`}
+          onDelete={handleDelete}
+          deleteHeading="Delete Raw Material"
+          deleteSubheading={`Are you sure you want to delete "${raw_material?.material_name}"? This action cannot be undone.`}
           customUI={
             <ReorderDialog
               rawMaterialId={raw_material.id}

@@ -315,7 +315,11 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         openGoogleMaps({
                           latitude: supplier.latitude,
                           longitude: supplier.longitude,
-                          address: [supplier.address_line1, supplier.city, supplier.province],
+                          address: [
+                            supplier.address_line1,
+                            supplier.city,
+                            supplier.province,
+                          ],
                         })
                       }
                       className="bg-white text-black hover:bg-white/90"

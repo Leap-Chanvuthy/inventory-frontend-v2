@@ -1,5 +1,5 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
-import { ViewSupplierForm } from "../_components/view-supplier-form";
+import { ViewSupplierForm } from "../_components/view-detail/view-supplier-form";
 
 export function SupplierDetail() {
   const breadcrumbItems = [

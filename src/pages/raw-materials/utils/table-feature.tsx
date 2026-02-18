@@ -2,7 +2,7 @@ import {
   RawMaterial,
   RawMaterialStockMovement,
 } from "@/api/raw-materials/raw-material.types";
-import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+// import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
@@ -30,6 +30,7 @@ const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
 import { CategoryBadge, StockStatusBadge } from "./raw-material-status";
 import { Badge } from "@/components/ui/badge";
+import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
@@ -43,7 +44,7 @@ const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
         deleteHeading="Delete This Raw Material"
         deleteSubheading="Are you sure you want to delete this raw material? This action cannot be undone."
         deleteTooltip="Delete Raw Material"
-        // onDelete={() => deleteMutation.mutate(rawMaterial.id)}
+        onDelete={() => deleteMutation.mutate(rawMaterial.id)}
       />
     </div>
   );

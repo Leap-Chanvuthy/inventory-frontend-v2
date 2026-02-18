@@ -35,7 +35,7 @@ export function OverviewItem({
           onClick={onCopy}
           className="flex items-center justify-between w-full px-2 py-1.5 bg-muted rounded-md hover:bg-muted/70 transition-colors group text-left"
         >
-          <span className="font-mono text-xs font-semibold">
+          <span className="text-xs font-semibold">
             {value || "N/A"}
           </span>
           <Copy className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0" />
