@@ -28,7 +28,7 @@ interface SupplyTrendData {
 }
 
 interface SupplierSupplyTrendCardProps {
-  supplyTrend: SupplyTrendData;
+  supplyTrend?: SupplyTrendData | null;
 }
 
 function getTrendColor(dir: string) {
@@ -40,6 +40,8 @@ function getTrendColor(dir: string) {
 export function SupplierSupplyTrendCard({
   supplyTrend,
 }: SupplierSupplyTrendCardProps) {
+  if (!supplyTrend) return null;
+
   return (
     <Card className="shadow-sm">
       <CardHeader className="pb-3">

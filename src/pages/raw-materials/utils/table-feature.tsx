@@ -1,8 +1,8 @@
+import { useState } from "react";
 import {
   RawMaterial,
   RawMaterialStockMovement,
 } from "@/api/raw-materials/raw-material.types";
-// import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
@@ -16,21 +16,42 @@ import {
   Warehouse,
   User,
   Ruler,
+  RotateCcw,
   ArrowDownLeft,
   ArrowUpRight,
   Lock,
   LockOpen,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Link } from "react-router-dom";
 import { formatDate } from "@/utils/date-format";
 import { Text } from "@/components/ui/text/app-text";
 import { UpdateReorderDialog } from "../_components/update-reorder-dialog";
+import { CategoryBadge, StockStatusBadge } from "./raw-material-status";
+import { Badge } from "@/components/ui/badge";
+import {
+  useDeleteRawMaterial,
+  useRecoverRawMaterial,
+} from "@/api/raw-materials/raw-material.mutation";
 
 const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
-import { CategoryBadge, StockStatusBadge } from "./raw-material-status";
-import { Badge } from "@/components/ui/badge";
-import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
@@ -50,6 +71,64 @@ const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
   );
 };
 
+// Recover Action Component (for deleted raw materials)
+export const RecoverAction = ({
+  rawMaterial,
+}: {
+  rawMaterial: RawMaterial;
+}) => {
+  const recoverMutation = useRecoverRawMaterial();
+  const [open, setOpen] = useState(false);
+
+  const handleConfirmRecover = () => {
+    recoverMutation.mutate(rawMaterial.id);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <button type="button" className="inline-flex items-center">
+                <RotateCcw className="w-4 h-4 text-emerald-500 cursor-pointer" />
+              </button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="top">Recover Raw Material</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <DialogContent
+        className="sm:max-w-lg"
+        onPointerDownOutside={e => e.preventDefault()}
+        onEscapeKeyDown={e => e.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle>Recover This Raw Material</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to recover "{rawMaterial.material_name}"? It
+            will be restored to the active raw materials list.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </DialogClose>
+
+          <Button type="button" onClick={handleConfirmRecover}>
+            Recover
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 // Filter Options
 export const FILTER_OPTIONS = [{ value: " ", label: "All" }];
 
@@ -59,9 +138,6 @@ export const SORT_OPTIONS = [
   { value: "created_at", label: "Oldest" },
   { value: "material_name", label: "Name (A-Z)" },
   { value: "-material_name", label: "Name (Z-A)" },
-  // { value: "material_sku_code", label: "SKU Code" },
-  // { value: "-minimum_stock_level", label: "Stock Level (High)" },
-  // { value: "minimum_stock_level", label: "Stock Level (Low)" },
 ];
 
 // Table Columns
@@ -149,15 +225,19 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
 // Card Component for Grid View
 interface RawMaterialCardProps {
   rawMaterial?: RawMaterial;
+  isDeleted?: boolean;
 }
 
-export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
+export function RawMaterialCard({
+  rawMaterial,
+  isDeleted = false,
+}: RawMaterialCardProps) {
   if (!rawMaterial) return null;
 
   return (
     <Card className="h-full flex flex-col transition-shadow hover:shadow-md">
       {/* Header */}
-      <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 sm:gap-4 pb-3">
         <Link
           to={`/raw-materials/view/${rawMaterial.id}`}
           className="flex items-center gap-3 min-w-0 hover:text-primary"
@@ -171,6 +251,7 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
             </Text.Small>
           </div>
         </Link>
+        {isDeleted && <RecoverAction rawMaterial={rawMaterial} />}
       </CardHeader>
 
       {/* Content */}
@@ -216,9 +297,11 @@ export function RawMaterialCard({ rawMaterial }: RawMaterialCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end pt-0 pb-4">
-        <RawMaterialActions rawMaterial={rawMaterial} />
-      </CardFooter>
+      {!isDeleted && (
+        <CardFooter className="flex justify-end pt-0 pb-4">
+          <RawMaterialActions rawMaterial={rawMaterial} />
+        </CardFooter>
+      )}
     </Card>
   );
 }

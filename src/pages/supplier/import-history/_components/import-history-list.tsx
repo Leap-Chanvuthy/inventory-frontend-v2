@@ -6,6 +6,9 @@ import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { Link } from "react-router-dom";
+import { Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function ImportHistoryList() {
   const {
@@ -43,7 +46,14 @@ export function ImportHistoryList() {
           perPage={perPage}
           selectedFilter={filter}
           onPerPageChange={setPerPage}
-          importHref="/supplier/create?tab=import"
+          extraActions={
+            <Button variant="outline" asChild>
+              <Link to="/supplier/create?tab=import">
+                <Upload className="h-4 w-4 mr-1.5" />
+                Import
+              </Link>
+            </Button>
+          }
         />
 
         {/* Data Table */}

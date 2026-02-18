@@ -55,6 +55,7 @@ import RawMaterials from "./pages/raw-materials/page";
 import { RawMaterialDetail } from "./pages/raw-materials/view/page";
 import CreateRawMaterial from "./pages/raw-materials/create/page";
 import UpdateRawMaterial from "./pages/raw-materials/update/page";
+import DeletedRawMaterials from "./pages/raw-materials/deleted/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -203,6 +204,10 @@ export default function App() {
                 <Route
                   path="/raw-materials/update/:id"
                   element={<UpdateRawMaterial />}
+                />
+                <Route
+                  path="/raw-materials/deleted"
+                  element={<DeletedRawMaterials />}
                 />
 
                 {/* Company Settings */}

@@ -182,25 +182,28 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         </div>
                       </div>
 
-                      {/* QR Code */}
-                      {bank.qr_code_image && (
+                      {/* QR Code / Payment Link */}
+                      {(bank.qr_code_image || bank.payment_link) && (
                         <div className="flex items-center gap-4 md:justify-end md:border-l md:pl-6 border-dashed">
-                          <div className="text-right hidden sm:block"></div>
                           <div className="flex flex-col items-center gap-1.5">
-                            <Text.Small
-                              fontWeight="semibold"
-                              color="default"
-                              className="text-xs"
-                            >
-                              Scan to Pay
-                            </Text.Small>
-                            <div className="p-2 bg-white rounded-lg shadow-sm border">
-                              <img
-                                src={bank.qr_code_image}
-                                alt="QR Code"
-                                className="w-20 h-20 object-contain"
-                              />
-                            </div>
+                            {bank.qr_code_image && (
+                              <>
+                                <Text.Small
+                                  fontWeight="semibold"
+                                  color="default"
+                                  className="text-xs"
+                                >
+                                  Scan to Pay
+                                </Text.Small>
+                                <div className="p-2 bg-white rounded-lg shadow-sm border">
+                                  <img
+                                    src={bank.qr_code_image}
+                                    alt="QR Code"
+                                    className="w-20 h-20 object-contain"
+                                  />
+                                </div>
+                              </>
+                            )}
                             {bank.payment_link && (
                               <a
                                 href={bank.payment_link}
