@@ -185,7 +185,8 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                       {/* QR Code */}
                       {bank.qr_code_image && (
                         <div className="flex items-center gap-4 md:justify-end md:border-l md:pl-6 border-dashed">
-                          <div className="text-right hidden sm:block">
+                          <div className="text-right hidden sm:block"></div>
+                          <div className="flex flex-col items-center gap-1.5">
                             <Text.Small
                               fontWeight="semibold"
                               color="default"
@@ -193,14 +194,23 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                             >
                               Scan to Pay
                             </Text.Small>
-                            <Text.Small className="text-xs">KHQR</Text.Small>
-                          </div>
-                          <div className="p-2 bg-white rounded-lg shadow-sm border">
-                            <img
-                              src={bank.qr_code_image}
-                              alt="QR Code"
-                              className="w-20 h-20 object-contain"
-                            />
+                            <div className="p-2 bg-white rounded-lg shadow-sm border">
+                              <img
+                                src={bank.qr_code_image}
+                                alt="QR Code"
+                                className="w-20 h-20 object-contain"
+                              />
+                            </div>
+                            {bank.payment_link && (
+                              <a
+                                href={bank.payment_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-primary hover:underline font-semibold"
+                              >
+                                Click here to pay via KHQR
+                              </a>
+                            )}
                           </div>
                         </div>
                       )}
