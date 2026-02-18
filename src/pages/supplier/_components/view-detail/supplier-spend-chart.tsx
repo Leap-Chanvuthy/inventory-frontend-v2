@@ -35,7 +35,7 @@ export function SupplierSpendChart({
           <div className="p-1.5 bg-indigo-500/10 rounded-md">
             <Package className="w-4 h-4 text-indigo-500" />
           </div>
-          Top Raw Materials by Spend
+          Top 5 Most Expensive Raw Materials
         </CardTitle>
       </CardHeader>
       <CardContent>

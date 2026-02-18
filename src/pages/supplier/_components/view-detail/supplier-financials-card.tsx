@@ -42,7 +42,7 @@ export function SupplierFinancialsCard({ financials }: SupplierFinancialsCardPro
           <div className="p-1.5 bg-green-500/10 rounded-md">
             <DollarSign className="w-4 h-4 text-green-500" />
           </div>
-          Financials
+          Total Spent to Supplier
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col justify-center space-y-3">

@@ -6,6 +6,7 @@ import {
   DollarSign,
   RefreshCw,
 } from "lucide-react";
+import { formatDate } from "@/utils/date-format";
 
 interface TrendMetric {
   current: number;
@@ -50,17 +51,17 @@ export function SupplierSupplyTrendCard({
             <div className="p-1.5 bg-orange-500/10 rounded-md">
               <RefreshCw className="w-4 h-4 text-orange-500" />
             </div>
-            Supply Trend
+            Supply Trend Compare to Last Month
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-muted text-muted-foreground border">
-              {supplyTrend.period.last_month_start} –{" "}
-              {supplyTrend.period.last_month_end}
+              {formatDate(supplyTrend.period.last_month_start)} –{" "}
+              {formatDate(supplyTrend.period.last_month_end)}
             </span>
             <span className="text-xs text-muted-foreground font-bold">vs</span>
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-orange-500/10 text-orange-600 border border-orange-200">
-              {supplyTrend.period.this_month_start} –{" "}
-              {supplyTrend.period.this_month_end}
+              {formatDate(supplyTrend.period.this_month_start)} –{" "}
+              {formatDate(supplyTrend.period.this_month_end)}
             </span>
           </div>
         </CardTitle>
@@ -122,7 +123,7 @@ export function SupplierSupplyTrendCard({
                       {fmt(metric.current)}
                     </Text.Small>
                     <Text.Small className="text-xs text-muted-foreground block">
-                      prev: {fmt(metric.previous)}
+                      last month: {fmt(metric.previous)}
                     </Text.Small>
                   </div>
                   <div className="h-1.5 rounded-full bg-muted overflow-hidden">
