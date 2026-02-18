@@ -81,6 +81,22 @@ export const updateReorderRawMaterial = async (rawMaterialId: number , movementI
 }
 
 
+// Get deleted (soft-deleted) raw materials
+export const getDeletedRawMaterials = async (
+  params?: RawMaterialQueryParams
+): Promise<GetRawMaterialsResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/raw-materials/deleted`, {
+    params,
+  });
+  return response.data;
+};
+
+// Recover (restore) a soft-deleted raw material
+export const recoverRawMaterial = async (id: number): Promise<{ status: boolean; message: string }> => {
+  const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}/recover`);
+  return response.data;
+};
+
 // Delete raw material
 export const deleteRawMaterial = async (id: number): Promise<{ status: boolean; message: string }> => {
   const response = await apiClient.delete(`${BASE_API_URL}/raw-materials/${id}`);

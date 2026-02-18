@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createRawMaterial, updateRawMaterial, deleteRawMaterial, deleteRawMaterialImages, reorderRawMaterial, updateReorderRawMaterial } from "./raw-material.api";
+import { createRawMaterial, updateRawMaterial, deleteRawMaterial, deleteRawMaterialImages, reorderRawMaterial, updateReorderRawMaterial, recoverRawMaterial } from "./raw-material.api";
 import { CreateRawMaterialRequest, ReorderRawMaterialPayload } from "./raw-material.types";
 import { toast } from "sonner";
 
@@ -81,6 +81,22 @@ export const useDeleteRawMaterial = () => {
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || "Failed to delete raw material");
+    },
+  });
+};
+
+export const useRecoverRawMaterial = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => recoverRawMaterial(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
+      queryClient.invalidateQueries({ queryKey: ["raw-materials-deleted"] });
+      toast.success("Raw material recovered successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to recover raw material");
     },
   });
 };

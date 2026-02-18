@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, ArrowUpDown, Download, X, CirclePlus, Upload, History } from "lucide-react";
+import { Search, ArrowUpDown, Download, X, CirclePlus } from "lucide-react";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import ListOptionToggle from "./list-option-toggle";
 
@@ -64,11 +64,10 @@ interface TableToolbarProps {
 
   /* Actions */
   onExport?: () => void;
-  importHref?: string;
-  historyHref?: string;
   createHref?: string;
   onCreate?: () => void;
   isListOptionDisplayed?: boolean;
+  extraActions?: React.ReactNode;
 }
 
 /* ===================== Component ===================== */
@@ -92,11 +91,10 @@ export const TableToolbar = ({
   onFilterChange,
 
   onExport,
-  importHref,
-  historyHref,
   createHref,
   onCreate,
   isListOptionDisplayed = false,
+  extraActions,
 }: TableToolbarProps) => {
   const [searchValue, setSearchValue] = useState<string>(search || "");
   const [sortValues, setSortValues] = useState<string[]>(selectedSort || []);
@@ -296,25 +294,8 @@ export const TableToolbar = ({
 
       {/* RIGHT */}
       <div className="flex items-center gap-2">
-        {/* Import Button */}
-        {importHref && (
-          <Link to={importHref}>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Upload className="h-4 w-4" />
-              Import
-            </Button>
-          </Link>
-        )}
-
-        {/* History Button */}
-        {historyHref && (
-          <Link to={historyHref}>
-            <Button variant="outline" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              History
-            </Button>
-          </Link>
-        )}
+        {/* Extra Actions */}
+        {extraActions}
 
         {/* Create Button */}
         {createHref && (

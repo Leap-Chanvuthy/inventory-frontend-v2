@@ -133,7 +133,7 @@ export interface SupplyTrendMetric {
   previous: number;
   delta: number;
   percent: number;
-  direction: "up" | "down";
+  direction: "up" | "down" | "flat";
 }
 
 export interface SupplyTrendPeriod {

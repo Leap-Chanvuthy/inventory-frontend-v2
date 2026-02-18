@@ -11,6 +11,9 @@ import {
   SORT_OPTIONS,
   RawMaterialCard,
 } from "../utils/table-feature";
+import { Link } from "react-router-dom";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function RawMaterialList() {
   const {
@@ -54,6 +57,14 @@ export function RawMaterialList() {
           onPerPageChange={setPerPage}
           createHref="/raw-materials/create"
           isListOptionDisplayed={true}
+          extraActions={
+            <Button variant="outline" asChild>
+              <Link to="/raw-materials/deleted">
+                <Trash2 className="w-4 h-4 mr-1.5 text-red-500" />
+                Recently Deleted
+              </Link>
+            </Button>
+          }
         />
 
         <ToggleableList<RawMaterial>

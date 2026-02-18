@@ -182,25 +182,38 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         </div>
                       </div>
 
-                      {/* QR Code */}
-                      {bank.qr_code_image && (
+                      {/* QR Code / Payment Link */}
+                      {(bank.qr_code_image || bank.payment_link) && (
                         <div className="flex items-center gap-4 md:justify-end md:border-l md:pl-6 border-dashed">
-                          <div className="text-right hidden sm:block">
-                            <Text.Small
-                              fontWeight="semibold"
-                              color="default"
-                              className="text-xs"
-                            >
-                              Scan to Pay
-                            </Text.Small>
-                            <Text.Small className="text-xs">KHQR</Text.Small>
-                          </div>
-                          <div className="p-2 bg-white rounded-lg shadow-sm border">
-                            <img
-                              src={bank.qr_code_image}
-                              alt="QR Code"
-                              className="w-20 h-20 object-contain"
-                            />
+                          <div className="flex flex-col items-center gap-1.5">
+                            {bank.qr_code_image && (
+                              <>
+                                <Text.Small
+                                  fontWeight="semibold"
+                                  color="default"
+                                  className="text-xs"
+                                >
+                                  Scan to Pay
+                                </Text.Small>
+                                <div className="p-2 bg-white rounded-lg shadow-sm border">
+                                  <img
+                                    src={bank.qr_code_image}
+                                    alt="QR Code"
+                                    className="w-20 h-20 object-contain"
+                                  />
+                                </div>
+                              </>
+                            )}
+                            {bank.payment_link && (
+                              <a
+                                href={bank.payment_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-primary hover:underline font-semibold"
+                              >
+                                Click here to pay via KHQR
+                              </a>
+                            )}
                           </div>
                         </div>
                       )}
@@ -315,7 +328,11 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
                         openGoogleMaps({
                           latitude: supplier.latitude,
                           longitude: supplier.longitude,
-                          address: [supplier.address_line1, supplier.city, supplier.province],
+                          address: [
+                            supplier.address_line1,
+                            supplier.city,
+                            supplier.province,
+                          ],
                         })
                       }
                       className="bg-white text-black hover:bg-white/90"
