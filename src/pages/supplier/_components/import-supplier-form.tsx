@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { ValidationErrors } from "@/api/suppliers/supplier.types";
 import { downloadCSVTemplate } from "@/utils/download-csv-template";
 import { Text } from "@/components/ui/text/app-text";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export const ImportSupplierForm = () => {
   const importMutation = useImportSuppliers();
@@ -89,6 +90,23 @@ export const ImportSupplierForm = () => {
                   onFileChange={handleFileChange}
                   error={fileError || fieldErrors?.supplier_file?.[0]}
                 />
+
+                {fieldErrors && Object.keys(fieldErrors).length > 0 && (
+                  <div className="mt-4">
+                    <Alert variant="destructive">
+                      <AlertTitle>Import validation failed</AlertTitle>
+                      <AlertDescription>
+                        <ul className="list-disc ml-5">
+                          {Object.entries(fieldErrors).map(([k, v]) => (
+                            <li key={k}>
+                              <strong className="capitalize">{k.replace(/_/g, " ")}</strong>: {Array.isArray(v) ? v.join(', ') : v}
+                            </li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
