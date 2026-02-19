@@ -10,7 +10,7 @@ export const RoleBadge = ({ role }: { role: string }) => {
   return (
     <Badge
       variant="secondary"
-      className={`min-w-[90px] justify-center ${map[role]}`}
+      className={`min-w-[155px] justify-center ${map[role]}`}
     >
       {role}
     </Badge>

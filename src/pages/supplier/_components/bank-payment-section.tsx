@@ -12,6 +12,7 @@ import { BankSelect } from "@/components/reusable/partials/bank-select";
 import { Plus, Trash2 } from "lucide-react";
 import { BankDetails, ValidationErrors } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
+import { cleanError } from "../import-history/utils/bank-error-text";
 
 export interface BankPaymentSectionProps {
   banks: BankDetails[];
@@ -92,12 +93,14 @@ export const BankPaymentSection = ({
             <div className="mb-6">
               <ImageUpload
                 label="QR Code Image (Optional)"
-                onChange={file => handleBankChange(index, "qr_code_image", file)}
+                onChange={file =>
+                  handleBankChange(index, "qr_code_image", file)
+                }
                 defaultImage={bank.existing_qr_code}
               />
               {fieldErrors?.[`banks.${index}.qr_code_image`]?.[0] && (
                 <p className="text-sm text-red-500 mt-2">
-                  {fieldErrors[`banks.${index}.qr_code_image`][0]}
+                  {cleanError(fieldErrors[`banks.${index}.qr_code_image`][0])}
                 </p>
               )}
             </div>
@@ -111,8 +114,12 @@ export const BankPaymentSection = ({
                   placeholder="Select bank"
                   excludeBanks={getExcludedBanks(index)}
                   value={bank.bank_name}
-                  onChange={value => handleBankChange(index, "bank_name", value)}
-                  error={fieldErrors?.[`banks.${index}.bank_name`]?.[0]}
+                  onChange={value =>
+                    handleBankChange(index, "bank_name", value)
+                  }
+                  error={cleanError(
+                    fieldErrors?.[`banks.${index}.bank_name`]?.[0],
+                  )}
                   required={true}
                 />
 
@@ -125,7 +132,9 @@ export const BankPaymentSection = ({
                   onChange={e =>
                     handleBankChange(index, "account_number", e.target.value)
                   }
-                  error={fieldErrors?.[`banks.${index}.account_number`]?.[0]}
+                  error={cleanError(
+                    fieldErrors?.[`banks.${index}.account_number`]?.[0],
+                  )}
                   isNumberOnly={true}
                   required={true}
                 />
@@ -138,9 +147,15 @@ export const BankPaymentSection = ({
                   placeholder="Enter account holder name"
                   value={bank.account_holder_name}
                   onChange={e =>
-                    handleBankChange(index, "account_holder_name", e.target.value)
+                    handleBankChange(
+                      index,
+                      "account_holder_name",
+                      e.target.value,
+                    )
                   }
-                  error={fieldErrors?.[`banks.${index}.account_holder_name`]?.[0]}
+                  error={cleanError(
+                    fieldErrors?.[`banks.${index}.account_holder_name`]?.[0],
+                  )}
                   required={true}
                 />
 
@@ -152,7 +167,9 @@ export const BankPaymentSection = ({
                   onChange={e =>
                     handleBankChange(index, "payment_link", e.target.value)
                   }
-                  error={fieldErrors?.[`banks.${index}.payment_link`]?.[0]}
+                  error={cleanError(
+                    fieldErrors?.[`banks.${index}.payment_link`]?.[0],
+                  )}
                 />
               </div>
             </div>

@@ -200,7 +200,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     header: "Quantity",
     className: "whitespace-nowrap py-6",
     render: rawMaterial => (
-      <span className="font-mono">
+      <span>
         {rawMaterial.minimum_stock_level}{" "}
         {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
       </span>
@@ -318,9 +318,13 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Movement Date",
     className: "whitespace-nowrap py-6",
     render: movement => (
-      <span className="font-medium whitespace-nowrap text-muted-foreground">
+      <Text.Small
+        color="muted"
+        fontWeight="medium"
+        className="whitespace-nowrap"
+      >
         {formatDate(movement.movement_date)}
-      </span>
+      </Text.Small>
     ),
   },
   {
@@ -334,7 +338,12 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
         movement.movement_type === "PURCHASE";
 
       return (
-        <span className="flex items-center gap-1.5 text-muted-foreground whitespace-nowrap text-xs font-semibold tracking-wide capitalize">
+        <Text.Small
+          color="muted"
+          fontWeight="semibold"
+          letterSpacing="wide"
+          className="flex items-center gap-1.5 whitespace-nowrap capitalize"
+        >
           {movement.movement_type.replace(/_/g, " ")}
           {IS_RE_ORDER_PURCHASED &&
             (IS_IN_USED ? (
@@ -354,7 +363,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
                 Not In Used
               </Badge>
             ))}
-        </span>
+        </Text.Small>
       );
     },
   },
@@ -376,9 +385,13 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
           ) : (
             <ArrowUpRight className="h-3.5 w-3.5" />
           )}
-          <span className="text-xs uppercase tracking-wider">
+          <Text.Small
+            fontWeight="bold"
+            letterSpacing="wide"
+            className="uppercase"
+          >
             {movement.direction}
-          </span>
+          </Text.Small>
         </div>
       );
     },
@@ -395,11 +408,11 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       const label = uomLabel ? ` ${uomLabel}` : "";
 
       return (
-        <span className="font-mono font-medium">
+        <Text.Small color="default" fontWeight="medium">
           {isStockIn ? "+" : "-"}
           {formattedQty}
           {label}
-        </span>
+        </Text.Small>
       );
     },
   },
@@ -408,9 +421,9 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Purchasing Unit Price",
     className: "whitespace-nowrap py-6 text-right",
     render: movement => (
-      <span className="font-mono text-muted-foreground">
+      <Text.Small color="muted">
         ${movement.unit_price_in_usd.toFixed(2)}
-      </span>
+      </Text.Small>
     ),
   },
   {
@@ -418,12 +431,12 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Purchasing Total Value",
     className: "whitespace-nowrap py-6 text-right",
     render: movement => (
-      <span className="font-mono font-semibold">
+      <Text.Small color="default" fontWeight="semibold">
         $
         {movement.total_value_in_usd.toLocaleString(undefined, {
           minimumFractionDigits: 2,
         })}
-      </span>
+      </Text.Small>
     ),
   },
   {
@@ -431,12 +444,9 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Notes",
     className: "whitespace-nowrap py-6",
     render: movement => (
-      <span
-        className="text-xs text-muted-foreground line-clamp-1 italic"
-        title={movement.note || ""}
-      >
+      <Text.Small color="muted" fontStyle="italic" maxLines={1}>
         {movement.note || "No notes"}
-      </span>
+      </Text.Small>
     ),
   },
   {
@@ -455,7 +465,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       };
 
       return (
-        <span className="font-mono font-medium">
+        <span>
           {IS_RE_ORDER && (
             <UpdateReorderDialog
               isDisabled={isInUsed(movement.in_used as unknown)}
