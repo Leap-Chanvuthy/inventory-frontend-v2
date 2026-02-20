@@ -10,10 +10,14 @@ const UserAvatar = () => {
     <Link to="/profile?tab=profile">
       <Avatar>
         <AvatarImage
-          src={user?.profile_picture || "https://leapchanvuthy.vercel.app/images/Leapchanvuthy.png"}
+          src={user?.profile_picture || ""}
           alt="User avatar"
         />
-        <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+        <AvatarFallback>
+          {user?.name
+            ? user.name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join("")
+            : "U"}
+        </AvatarFallback>
       </Avatar>
     </Link>
   );
