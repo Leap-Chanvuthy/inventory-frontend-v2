@@ -8,6 +8,8 @@ import {
   GetImportHistoriesResponse,
   ImportHistoryQueryParams,
   GetSupplierStatisticsResponse,
+  SupplierTransactionHistoryQueryParams,
+  SupplierTransactionResponse,
 } from "./supplier.types";
 import { apiClient } from "@/api/client";
 
@@ -28,6 +30,19 @@ export const getSupplierById = async (
   const response = await apiClient.get(`${BASE_API_URL}/suppliers/${id}`);
   return response.data;
 };
+
+
+export const getSupplierTransactionHistory = async (
+  supplierId: number,
+  params?: SupplierTransactionHistoryQueryParams
+) : Promise<SupplierTransactionResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/suppliers/${supplierId}/transactions`,
+    { params }
+  );
+  return response.data;
+}
+
 
 // Create new supplier
 export const createSupplier = async (

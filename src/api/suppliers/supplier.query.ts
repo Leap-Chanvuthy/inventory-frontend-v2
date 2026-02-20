@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSuppliers, getSupplierById, getImportHistories, getSupplierStatistics } from "./supplier.api";
-import { SupplierQueryParams, ImportHistoryQueryParams } from "./supplier.types";
+import { getSuppliers, getSupplierById, getImportHistories, getSupplierStatistics, getSupplierTransactionHistory } from "./supplier.api";
+import { SupplierQueryParams, ImportHistoryQueryParams, SupplierTransactionHistoryQueryParams } from "./supplier.types";
 
 // Get all suppliers with pagination and filters
 export const useSuppliers = (params?: SupplierQueryParams) => {
@@ -34,3 +34,12 @@ export const useSupplierStatistics = () => {
     queryFn: () => getSupplierStatistics(),
   });
 };
+
+
+export const useSupplierTransactions = (supplierId: number , params: SupplierTransactionHistoryQueryParams) => {
+  return useQuery({
+    queryKey: ["supplier-transactions", supplierId, params],
+    queryFn: () => getSupplierTransactionHistory(supplierId , params),
+    enabled: !!supplierId,
+  });
+}
