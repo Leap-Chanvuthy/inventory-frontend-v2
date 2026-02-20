@@ -39,7 +39,7 @@ export const ProductCategoryList = () => {
         search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/product-categories/create"
+        createHref="product-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
@@ -51,8 +51,8 @@ export const ProductCategoryList = () => {
         isLoading={isLoading}
         emptyText="No categories found"
         columns={createColumns({
-          viewRoute: "/product-categories/view",
-          editRoute: "/product-categories/edit",
+          viewRoute: "product-categories/view",
+          editRoute: "product-categories/edit",
           onDelete: id => deleteMutation.mutate(id),
         })}
         renderItem={category => (
@@ -61,8 +61,8 @@ export const ProductCategoryList = () => {
             onDelete={id => {
               deleteMutation.mutate(Number(id));
             }}
-            viewRoute="/product-categories/view"
-            editRoute="/product-categories/edit"
+            viewRoute="product-categories/view"
+            editRoute="product-categories/edit"
           />
         )}
       />

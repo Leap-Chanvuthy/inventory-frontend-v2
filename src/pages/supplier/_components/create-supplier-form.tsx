@@ -61,6 +61,7 @@ export const CreateSupplierForm = () => {
 
   const [form, setForm] = useState(initialForm);
   const [image, setImage] = useState<File | null>(null);
+  const [imageKey, setImageKey] = useState(0);
   const [banks, setBanks] = useState(initialBanks);
 
   /* ---------- Handlers ---------- */
@@ -113,6 +114,7 @@ export const CreateSupplierForm = () => {
         } else {
           setForm(initialForm);
           setImage(null);
+          setImageKey(prev => prev + 1);
           setBanks(initialBanks);
         }
       },
@@ -352,6 +354,7 @@ export const CreateSupplierForm = () => {
                     </CardHeader>
                     <CardContent>
                       <ImageUpload
+                        key={imageKey}
                         label="Supplier Image"
                         onChange={handleImageChange}
                       />

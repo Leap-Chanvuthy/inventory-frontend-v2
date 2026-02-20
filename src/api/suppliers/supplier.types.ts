@@ -1,3 +1,5 @@
+import { RawMaterialStockMovement, PaginatedData, RawMaterial } from "../raw-materials/raw-material.types";
+
 // Supplier Category Enum (common values)
 export enum SupplierCategory {
   PRODUCTS = "PRODUCTS",
@@ -204,6 +206,16 @@ export interface SupplierQueryParams {
   sort?: string;
 }
 
+// Query Params for Supplier Transactions
+export interface SupplierTransactionHistoryQueryParams {
+  "filter[search]" :  string;
+  "filter[movement_type]"?:string;
+  "filter[direction]"?:string;
+  page?: number;
+  per_page?: number;
+  sort?: string;
+}
+
 export interface ValidationErrors {
   status: boolean;
   message: string;
@@ -365,3 +377,16 @@ export interface GetSupplierStatisticsResponse {
   message: string;
   data: SupplierStatisticsData;
 }
+
+
+
+// Supplier Transactions Response
+export type SupplierTransactionItem = RawMaterialStockMovement & {
+  raw_material: RawMaterial;
+};
+
+export type SupplierTransactionResponse = {
+  status: boolean;
+  message: string;
+  data: PaginatedData<SupplierTransactionItem>;
+};

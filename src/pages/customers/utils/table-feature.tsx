@@ -11,10 +11,7 @@ import { Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteCustomer } from "@/api/customers/customer.mutation";
 import { Text } from "@/components/ui/text/app-text";
-import {
-  CustomerCategoryBadge,
-  CustomerStatusBadge,
-} from "./customer-status";
+import { CustomerCategoryBadge, CustomerStatusBadge } from "./customer-status";
 
 const CustomerActions = ({ customer }: { customer: Customer }) => {
   const deleteMutation = useDeleteCustomer();
@@ -22,8 +19,8 @@ const CustomerActions = ({ customer }: { customer: Customer }) => {
   return (
     <div className="flex items-center gap-2">
       <TableActions
-        viewDetailPath={`/customer/view/${customer.id}`}
-        editPath={`/customer/update/${customer.id}`}
+        viewDetailPath={`customer/view/${customer.id}`}
+        editPath={`customer/update/${customer.id}`}
         deleteHeading="Delete This Customer"
         deleteSubheading="Are you sure want to delete this customer? This action cannot be undone."
         deleteTooltip="Delete Customer"
@@ -101,7 +98,9 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
     key: "customer_status",
     header: "Status",
     className: "whitespace-nowrap py-6",
-    render: customer => <CustomerStatusBadge status={customer.customer_status} />,
+    render: customer => (
+      <CustomerStatusBadge status={customer.customer_status} />
+    ),
   },
   {
     key: "address",
@@ -137,7 +136,9 @@ export function CustomerCard({
   if (!customer) return null;
 
   return (
-    <Card className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}>
+    <Card
+      className={`h-full flex flex-col transition-shadow ${interactive ? "hover:shadow-md" : ""}`}
+    >
       {/* Header */}
       <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -149,7 +150,11 @@ export function CustomerCard({
                 className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                <Text.Small
+                  color="default"
+                  fontWeight="medium"
+                  overflow="ellipsis"
+                >
                   {customer.fullname}
                 </Text.Small>
                 <div className="flex items-center gap-1">
@@ -161,14 +166,21 @@ export function CustomerCard({
               </div>
             </>
           ) : (
-            <Link to={`/customer/view/${customer.id}`} className="flex items-center gap-3 min-w-0 hover:text-primary">
+            <Link
+              to={`/customer/view/${customer.id}`}
+              className="flex items-center gap-3 min-w-0 hover:text-primary"
+            >
               <img
                 src={customer.image || "/placeholder-avatar.png"}
                 alt={customer.fullname}
                 className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border object-cover shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <Text.Small color="default" fontWeight="medium" overflow="ellipsis">
+                <Text.Small
+                  color="default"
+                  fontWeight="medium"
+                  overflow="ellipsis"
+                >
                   {customer.fullname}
                 </Text.Small>
                 <div className="flex items-center gap-1">
@@ -186,7 +198,9 @@ export function CustomerCard({
       {/* Content */}
       <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
         <div className="flex flex-wrap gap-2">
-          <CustomerCategoryBadge categoryName={customer.customer_category_name} />
+          <CustomerCategoryBadge
+            categoryName={customer.customer_category_name}
+          />
           <CustomerStatusBadge status={customer.customer_status} />
         </div>
 

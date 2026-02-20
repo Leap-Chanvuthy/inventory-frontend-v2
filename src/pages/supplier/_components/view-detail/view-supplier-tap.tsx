@@ -17,6 +17,7 @@ import { Text } from "@/components/ui/text/app-text";
 import { toast } from "sonner";
 import { OverviewItem } from "./overview-item";
 import { openGoogleMaps } from "@/utils/maps";
+import { SupplierTransactionTab } from "./supplier-transaction-tab";
 
 interface ViewSupplierTapProps {
   supplier: Supplier;
@@ -345,6 +346,13 @@ export function ViewSupplierTap({ supplier }: ViewSupplierTapProps) {
             </CardContent>
           </Card>
         </div>
+      ),
+    },
+    {
+      label: "Transactions",
+      value: "transactions",
+      content: (
+        <SupplierTransactionTab supplierId={supplier.id} />
       ),
     },
   ];

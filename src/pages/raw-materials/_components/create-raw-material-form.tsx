@@ -1,8 +1,15 @@
 import { useCreateRawMaterial } from "@/api/raw-materials/raw-material.mutation";
-import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
-import { useSuppliers } from "@/api/suppliers/supplier.query";
-import { useWarehouses } from "@/api/warehouses/warehouses.query";
-import { useUOMs } from "@/api/uom/uom.query";
+import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
+import {
+  fetchCategories,
+  fetchSuppliers,
+  fetchWarehouses,
+  fetchUOMs,
+} from "../utils/fetch-select-options";
+import { useSingleSupplier } from "@/api/suppliers/supplier.query";
+import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
+import { useSingleUOM } from "@/api/uom/uom.query";
+import type { UOM } from "@/api/uom/uom.types";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
 import {
@@ -31,28 +38,6 @@ export const CreateRawMaterialForm = () => {
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
 
-  // Fetch dropdown options
-  const {
-    data: categoriesData,
-    isPending: categoriesLoading,
-    isError: categoriesError,
-  } = useRawMaterialCategories({ per_page: 100 });
-  const {
-    data: suppliersData,
-    isPending: suppliersLoading,
-    isError: suppliersError,
-  } = useSuppliers({ per_page: 100 });
-  const {
-    data: warehousesData,
-    isPending: warehousesLoading,
-    isError: warehousesError,
-  } = useWarehouses({ per_page: 100 });
-  const {
-    data: uomsData,
-    isPending: uomsLoading,
-    isError: uomsError,
-  } = useUOMs({ per_page: 100 });
-
   const initialForm = {
     material_name: "",
     minimum_stock_level: "",
@@ -72,80 +57,24 @@ export const CreateRawMaterialForm = () => {
 
   const [form, setForm] = useState(initialForm);
 
-  // Combined loading and error states
-  const isLoading =
-    categoriesLoading || suppliersLoading || warehousesLoading || uomsLoading;
-  const hasError =
-    categoriesError || suppliersError || warehousesError || uomsError;
+  // Fetch selected items for preview cards
+  const { data: selectedCategoryData } = useSingleRawMaterialCategory(
+    Number(form.raw_material_category_id),
+  );
+  const { data: selectedSupplierData } = useSingleSupplier(
+    Number(form.supplier_id),
+  );
+  const { data: selectedWarehouseData } = useSingleWarehouse(
+    Number(form.warehouse_id),
+  );
+  const { data: selectedUOMData } = useSingleUOM(Number(form.uom_id));
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">Loading Raw Material...</p>
-      </div>
-    );
-  }
-
-  // Error state
-  if (hasError) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8 flex flex-col items-center justify-center min-h-[400px]">
-            <div className="text-red-500 text-center">
-              <p className="text-lg font-medium">Failed to load form data</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Please refresh the page or try again later.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Transform data for select options
-  const categoryOptions =
-    categoriesData?.data?.data.map(cat => ({
-      value: cat.id.toString(),
-      label: cat.category_name,
-    })) || [];
-
-  const supplierOptions =
-    suppliersData?.data?.data.map(sup => ({
-      value: sup.id.toString(),
-      label: sup.official_name,
-    })) || [];
-
-  const warehouseOptions =
-    warehousesData?.data?.map(wh => ({
-      value: wh.id.toString(),
-      label: wh.warehouse_name,
-    })) || [];
-
-  const uomOptions =
-    uomsData?.data?.map(uom => ({
-      value: uom.id.toString(),
-      label: `${uom.name} (${uom.symbol})`,
-    })) || [];
-
-  const selectedCategory =
-    categoriesData?.data?.data?.find(
-      cat => String(cat.id) === form.raw_material_category_id,
-    ) || null;
-
-  const selectedSupplier =
-    suppliersData?.data?.data?.find(
-      sup => String(sup.id) === form.supplier_id,
-    ) || null;
-
-  const selectedWarehouse =
-    warehousesData?.data?.find(wh => String(wh.id) === form.warehouse_id) ||
-    null;
-
-  const selectedUOM =
-    uomsData?.data?.find(uom => String(uom.id) === form.uom_id) || null;
+  const selectedCategory = selectedCategoryData?.data ?? null;
+  const selectedSupplier = selectedSupplierData?.data?.supplier ?? null;
+  const selectedWarehouse = selectedWarehouseData ?? null;
+  const selectedUOM = (selectedUOMData?.data ??
+    selectedUOMData ??
+    null) as UOM | null;
 
   /* ---------- Handlers ---------- */
 
@@ -260,20 +189,26 @@ export const CreateRawMaterialForm = () => {
                       id="raw_material_category_id"
                       label="Category"
                       placeholder="Select category"
-                      options={categoryOptions}
+                      fetchFn={fetchCategories}
                       value={form.raw_material_category_id}
                       onChange={handleSelectChange("raw_material_category_id")}
                       error={fieldErrors?.raw_material_category_id?.[0]}
+                      selectedLabel={selectedCategory?.category_name}
                       required
                     />
                     <SearchableSelect
                       id="uom_id"
                       label="Unit of Measurement"
                       placeholder="Select UOM"
-                      options={uomOptions}
+                      fetchFn={fetchUOMs}
                       value={form.uom_id}
                       onChange={handleSelectChange("uom_id")}
                       error={fieldErrors?.uom_id?.[0]}
+                      selectedLabel={
+                        selectedUOM
+                          ? `${selectedUOM.name} (${selectedUOM.symbol})`
+                          : undefined
+                      }
                       required
                     />
                   </div>
@@ -283,20 +218,22 @@ export const CreateRawMaterialForm = () => {
                       id="supplier_id"
                       label="Supplier"
                       placeholder="Select supplier"
-                      options={supplierOptions}
+                      fetchFn={fetchSuppliers}
                       value={form.supplier_id}
                       onChange={handleSelectChange("supplier_id")}
                       error={fieldErrors?.supplier_id?.[0]}
+                      selectedLabel={selectedSupplier?.official_name}
                       required
                     />
                     <SearchableSelect
                       id="warehouse_id"
                       label="Warehouse"
                       placeholder="Select warehouse"
-                      options={warehouseOptions}
+                      fetchFn={fetchWarehouses}
                       value={form.warehouse_id}
                       onChange={handleSelectChange("warehouse_id")}
                       error={fieldErrors?.warehouse_id?.[0]}
+                      selectedLabel={selectedWarehouse?.warehouse_name}
                       required
                     />
                   </div>
@@ -429,8 +366,8 @@ export const CreateRawMaterialForm = () => {
                           </p>
                           <UOMCard
                             uom={selectedUOM}
-                            hideActions={false}
-                            interactive={false}
+                            hideActions={true}
+                            interactive={true}
                           />
                         </div>
                       ) : (

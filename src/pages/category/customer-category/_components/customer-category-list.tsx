@@ -39,7 +39,7 @@ export const CustomerCategoryList = () => {
         search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/customer-categories/create"
+        createHref="customer-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
@@ -51,15 +51,15 @@ export const CustomerCategoryList = () => {
         isLoading={isLoading}
         emptyText="No categories found"
         columns={createColumns({
-          viewRoute: "/customer-categories/view",
-          editRoute: "/customer-categories/edit",
+          viewRoute: "customer-categories/view",
+          editRoute: "customer-categories/edit",
           onDelete: id => deleteMutation.mutate(id),
         })}
         renderItem={category => (
           <SingleCard
             category={category}
-            viewRoute="/customer-categories/view"
-            editRoute="/customer-categories/edit"
+            viewRoute="customer-categories/view"
+            editRoute="customer-categories/edit"
             onDelete={id => {
               deleteMutation.mutate(Number(id));
             }}

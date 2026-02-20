@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Upload, Crop, Maximize2, Trash2, Check, Move, RotateCw, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -304,9 +305,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
       )}
 
       {/* Edit Modal */}
-      {isEditModalOpen && tempPreview && (
+      {isEditModalOpen && tempPreview && createPortal(
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-auto">
-          <div className="rounded-2xl shadow-2xl w-full max-w-5xl sm:h-[65vh] flex flex-col sm:flex-row overflow-hidden">
+          <div className="rounded-2xl shadow-2xl w-full max-w-5xl sm:h-[65vh] flex flex-col sm:flex-row overflow-hidden bg-white dark:bg-gray-900">
             {/* Left: Image */}
             <div className="flex-1 bg-gray-100 dark:bg-gray-800 relative flex items-center justify-center p-4 sm:p-8 overflow-auto">
               <div className={`relative overflow-hidden rounded-lg ${getModalAspectClass().class}`}>
@@ -400,7 +401,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ label, defaultImage, o
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

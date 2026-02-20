@@ -141,8 +141,6 @@ export const CreateWarehouseForm = () => {
                     : undefined
                 }
                 onChange={handleChange}
-                isNumberOnly={true}
-                maxLength={10}
               />
               <TextInput
                 id="warehouse_manager_email"

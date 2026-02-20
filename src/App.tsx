@@ -133,47 +133,47 @@ export default function App() {
 
                 {/* Raw Material Categories */}
                 <Route
-                  path="/raw-material-categories/create"
+                  path="categories/raw-material-categories/create"
                   element={<CreateCategories />}
                 />
                 <Route
-                  path="/raw-material-categories/view/:id"
+                  path="categories/raw-material-categories/view/:id"
                   element={<ViewCategories />}
                 />
                 <Route
-                  path="/raw-material-categories/edit/:id"
+                  path="categories/raw-material-categories/edit/:id"
                   element={<EditCategories />}
                 />
 
                 {/* Product Categories */}
                 <Route
-                  path="/product-categories"
+                  path="categories/product-categories"
                   element={<ProductCategories />}
                 />
                 <Route
-                  path="/product-categories/create"
+                  path="categories/product-categories/create"
                   element={<CreateProductCategories />}
                 />
                 <Route
-                  path="/product-categories/view/:id"
+                  path="categories/product-categories/view/:id"
                   element={<ViewProductCategories />}
                 />
                 <Route
-                  path="/product-categories/edit/:id"
+                  path="categories/product-categories/edit/:id"
                   element={<EditProductCategories />}
                 />
 
                 {/* Customer Categories */}
                 <Route
-                  path="/customer-categories/create"
+                  path="categories/customer-categories/create"
                   element={<CreateCustomerCategories />}
                 />
                 <Route
-                  path="/customer-categories/view/:id"
+                  path="categories/customer-categories/view/:id"
                   element={<ViewCustomerCategories />}
                 />
                 <Route
-                  path="/customer-categories/edit/:id"
+                  path="categories/customer-categories/edit/:id"
                   element={<EditCustomerCategories />}
                 />
 

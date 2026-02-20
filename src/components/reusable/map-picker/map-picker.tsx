@@ -8,7 +8,8 @@ import {
 } from "react-leaflet";
 import { useEffect, useRef, useState } from "react";
 import { MapSearch } from "./map-search";
-import { MapPin } from "lucide-react";
+import { MapPin, LocateFixed, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 function LocationPicker({
   onPick,
@@ -39,8 +40,10 @@ export default function MapPicker({
   );
 
   // Sync when defaultPosition arrives asynchronously (e.g. update forms)
+  const hasInitialized = useRef(false);
   useEffect(() => {
-    if (defaultPosition && !position) {
+    if (defaultPosition && !hasInitialized.current) {
+      hasInitialized.current = true;
       setPosition(defaultPosition);
     }
   }, [defaultPosition]);
@@ -51,6 +54,42 @@ export default function MapPicker({
   };
 
   const mapCenter = position ?? DEFAULT_CENTER;
+
+  // Current location
+  const [locating, setLocating] = useState(false);
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        update(pos.coords.latitude, pos.coords.longitude);
+        setLocating(false);
+        toast.success("Location found!");
+      },
+      (err) => {
+        setLocating(false);
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            toast.error("Location permission denied. Please allow location access in your browser settings.");
+            break;
+          case err.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable.");
+            break;
+          case err.TIMEOUT:
+            toast.error("Location request timed out.");
+            break;
+          default:
+            toast.error("Failed to get your location.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
 
   return (
     <div className="space-y-2">
@@ -73,9 +112,7 @@ export default function MapPicker({
             <ZoomControl position="bottomright" />
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            {position && (
-              <MapController lat={position[0]} lng={position[1]} />
-            )}
+            {position && <MapController lat={position[0]} lng={position[1]} />}
 
             <LocationPicker onPick={update} />
 
@@ -87,6 +124,21 @@ export default function MapPicker({
               update(lat, lng);
             }}
           />
+
+          {/* My Location button */}
+          <button
+            type="button"
+            onClick={handleLocateMe}
+            disabled={locating}
+            className="absolute top-2.5 right-2.5 z-[1000] bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-md p-2 shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+            title="Go to my current location"
+          >
+            {locating ? (
+              <Loader2 className="w-4 h-4 text-primary animate-spin" />
+            ) : (
+              <LocateFixed className="w-4 h-4 text-primary" />
+            )}
+          </button>
 
           {/* Coordinates overlay */}
           {position && (
@@ -122,9 +174,16 @@ export function MapController({
   zoom?: number;
 }) {
   const map = useMap();
+  const isFirstRender = useRef(true);
   const prevRef = useRef({ lat, lng });
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      map.setView([lat, lng], zoom, { animate: true });
+      prevRef.current = { lat, lng };
+      return;
+    }
     if (prevRef.current.lat !== lat || prevRef.current.lng !== lng) {
       map.setView([lat, lng], zoom, { animate: true });
       prevRef.current = { lat, lng };

@@ -39,7 +39,7 @@ export const RawMaterialCategoryList = () => {
         search={search}
         sortOptions={SORT_OPTIONS}
         onSortChange={values => setSort(values[0])}
-        createHref="/raw-material-categories/create"
+        createHref="raw-material-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
@@ -51,8 +51,8 @@ export const RawMaterialCategoryList = () => {
         isLoading={isLoading}
         emptyText="No categories found"
         columns={createColumns({
-          viewRoute: "/raw-material-categories/view",
-          editRoute: "/raw-material-categories/edit",
+          viewRoute: "raw-material-categories/view",
+          editRoute: "raw-material-categories/edit",
           onDelete: id => deleteMutation.mutate(id),
         })}
         renderItem={category => (
@@ -61,8 +61,8 @@ export const RawMaterialCategoryList = () => {
             onDelete={id => {
               deleteMutation.mutate(Number(id));
             }}
-            viewRoute="/raw-material-categories/view"
-            editRoute="/raw-material-categories/edit"
+            viewRoute="raw-material-categories/view"
+            editRoute="raw-material-categories/edit"
           />
         )}
       />

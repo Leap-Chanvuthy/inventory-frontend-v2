@@ -1,4 +1,4 @@
-import { Supplier } from "@/api/suppliers/supplier.types";
+import { Supplier, SupplierTransactionItem } from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { SupplierCategoryBadge } from "./supplier-status";
 import TableActions from "@/components/reusable/partials/table-actions";
@@ -12,6 +12,12 @@ import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteSupplier } from "@/api/suppliers/supplier.mutation";
 import { Text } from "@/components/ui/text/app-text";
+import { formatDate } from "@/utils/date-format";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
   const deleteMutation = useDeleteSupplier();
@@ -32,33 +38,6 @@ const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
   );
 };
 
-// const StatusBadge = ({ status }: { status: string }) => {
-//   const statusMap: Record<string, { label: string; className: string }> = {
-//     active: {
-//       label: "Active",
-//       className: "bg-green-500/10 text-green-600 dark:text-green-400",
-//     },
-//     inactive: {
-//       label: "Inactive",
-//       className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-//     },
-//     suspended: {
-//       label: "Suspended",
-//       className: "bg-red-500/10 text-red-600 dark:text-red-400",
-//     },
-//   };
-
-//   const statusInfo = statusMap[status.toLowerCase()] || statusMap["active"];
-
-//   return (
-//     <Badge
-//       variant="secondary"
-//       className={`min-w-[80px] justify-center ${statusInfo.className}`}
-//     >
-//       {statusInfo.label}
-//     </Badge>
-//   );
-// };
 
 export const FILTER_OPTIONS = [
   { value: " ", label: "All" },
@@ -293,3 +272,125 @@ export function SupplierCard({
     </Card>
   );
 }
+
+
+
+
+/// Table feature for supplier transactions
+export const TRANSACTION_SORT_OPTIONS = [
+  { value: "-movement_date", label: "Newest First" },
+  { value: "movement_date", label: "Oldest First" },
+  { value: "direction", label: "Direction" },
+  { value: "movement_type", label: "Movement Type" },
+];
+
+export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
+  {
+    key: "raw_material_id",
+    header: "Material",
+    className: "whitespace-nowrap py-4",
+    render: (item) => (
+      <div className="flex flex-col gap-0.5">
+        <Text.Small fontWeight="semibold" color="default" className="whitespace-nowrap">
+          {item.raw_material?.material_name ?? "—"}
+        </Text.Small>
+        <Text.Small color="muted" className="text-xs font-mono whitespace-nowrap">
+          {item.raw_material?.material_sku_code ?? "—"}
+        </Text.Small>
+      </div>
+    ),
+  },
+  {
+    key: "movement_date",
+    header: "Movement Date",
+    className: "whitespace-nowrap py-4",
+    render: (item) => (
+      <Text.Small color="muted" fontWeight="medium" className="whitespace-nowrap">
+        {formatDate(item.movement_date)}
+      </Text.Small>
+    ),
+  },
+  {
+    key: "movement_type",
+    header: "Type",
+    className: "whitespace-nowrap py-4",
+    render: (item) => (
+      <Badge variant="secondary" className="whitespace-nowrap font-mono text-xs">
+        {item.movement_type.replace(/_/g, " ")}
+      </Badge>
+    ),
+  },
+  {
+    key: "direction",
+    header: "Direction",
+    className: "whitespace-nowrap py-4",
+    render: (item) => {
+      const isIn = item.direction === "IN";
+      return (
+        <div
+          className={`flex items-center gap-1.5 font-bold ${
+            isIn ? "text-emerald-600" : "text-rose-600"
+          }`}
+        >
+          {isIn ? (
+            <ArrowDownLeft className="h-3.5 w-3.5" />
+          ) : (
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          )}
+          <Text.Small fontWeight="bold" letterSpacing="wide" className="uppercase">
+            {item.direction}
+          </Text.Small>
+        </div>
+      );
+    },
+  },
+  {
+    key: "quantity",
+    header: "Quantity",
+    className: "whitespace-nowrap py-4 text-right",
+    render: (item) => {
+      const isIn = item.direction === "IN";
+      const uomLabel = item.raw_material?.uom?.symbol ?? item.raw_material?.uom?.name ?? "";
+      return (
+        <Text.Small color="default" fontWeight="medium">
+          {isIn ? "+" : "-"}
+          {item.quantity.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          {uomLabel ? ` ${uomLabel}` : ""}
+        </Text.Small>
+      );
+    },
+  },
+  {
+    key: "unit_price_in_usd",
+    header: "Unit Price",
+    className: "whitespace-nowrap py-4 text-right",
+    render: (item) => (
+      <Text.Small color="muted">
+        ${item.unit_price_in_usd.toFixed(2)}
+      </Text.Small>
+    ),
+  },
+  {
+    key: "total_value_in_usd",
+    header: "Total Value",
+    className: "whitespace-nowrap py-4 text-right",
+    render: (item) => (
+      <Text.Small color="default" fontWeight="semibold">
+        $
+        {item.total_value_in_usd.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+        })}
+      </Text.Small>
+    ),
+  },
+  {
+    key: "note",
+    header: "Notes",
+    className: "whitespace-nowrap py-4",
+    render: (item) => (
+      <Text.Small color="muted" fontStyle="italic" maxLines={1}>
+        {item.note || "No notes"}
+      </Text.Small>
+    ),
+  },
+];
