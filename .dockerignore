@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output (builder stage handles this)
+dist/
+
+# Environment files — never bake secrets into the image
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor artefacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# CI / docs
+.github/
+README.md
+*.md
+
+# Docker files (not needed inside the image)
+docker-compose*.yml
+Dockerfile*
