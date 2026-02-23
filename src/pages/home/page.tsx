@@ -1,10 +1,16 @@
 import { Text } from "@/components/ui/text/app-text";
+import QuickMenuDashboard from "./_components/quick-menu-dashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 const Home = () => {
+
+  const { user } = useAuth();
+
   return (
-    <div>
-      <Text.TitleLarge>Welcome to the Home Page</Text.TitleLarge>
-      <h1 className="md:text-3xl font-bold">Welcome to the Home Page</h1>
+    <div className="space-y-6">
+      <Text.Large>Hi {user?.name}, Welcome Back.</Text.Large>
+
+      <QuickMenuDashboard />
     </div>
   );
 };

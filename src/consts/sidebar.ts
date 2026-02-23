@@ -15,15 +15,17 @@ import {
   CircleDollarSign,
   NotepadText,
   Tag,
+  type LucideIcon,
 } from "lucide-react";
 import { ROLES, Role } from "./role";
 
 export interface SidebarItem {
   title: string;
   url: string;
-  icon: any;
+  icon: LucideIcon;
   roles?: Role[];
   isLocked?: boolean | false;
+  isQuickMenu?: boolean | false;
 }
 
 export interface SidebarGroup {
@@ -49,6 +51,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/users",
         icon: User,
         roles: [ROLES.ADMIN], // ⛔ ADMIN ONLY
+        isQuickMenu: true,
       },
     ],
   },
@@ -60,6 +63,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/supplier",
         icon: Truck,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        isQuickMenu: true,
       },
       {
         title: "Raw Materials",
@@ -67,13 +71,15 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         icon: Tag,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
         isLocked: false,
+        isQuickMenu: true,
       },
       {
-        title: "Production",
-        url: "/production",
+        title: "Products",
+        url: "/products",
         icon: PackageSearch,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
         isLocked: true,
+        isQuickMenu: true,
       },
     ],
   },
@@ -85,19 +91,21 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/warehouses",
         icon: Warehouse,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        isQuickMenu: true,
       },
       {
         title: "Categories",
         url: "/categories",
         icon: Boxes,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        isQuickMenu: true,
       },
       {
         title: "Unit of Measurement",
         url: "/unit-of-measurement",
         icon: PencilRuler,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
-        isLocked: false,
+        isQuickMenu: true,
       },
     ],
   },
@@ -117,6 +125,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         icon: CircleDollarSign,
         roles: [ROLES.ADMIN, ROLES.VENDER],
         isLocked: true,
+        isQuickMenu: true,
       },
     ],
   },
@@ -148,6 +157,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         icon: User,
         roles: [ROLES.ADMIN],
         isLocked: false,
+        isQuickMenu: true,
       },
       {
         title: "Profile",
@@ -161,3 +171,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     items: [{ title: "Help", url: "/help", icon: HelpCircle }],
   },
 ];
+
+export const quickMenu: SidebarItem[] = SIDEBAR_CONFIG.flatMap((group) =>
+  group.items.filter((item) => item.isQuickMenu),
+);
