@@ -2,6 +2,7 @@ import { Supplier } from "../suppliers/supplier.types";
 import { Warehouse } from "../warehouses/warehouses.types";
 import { UOM } from "../uom/uom.types";
 import { RawMaterialCategory } from "../categories/types/category.type";
+import { User } from "../users/user.types";
 
 // Stock Movement Types
 export interface RawMaterialStockMovement {
@@ -23,6 +24,8 @@ export interface RawMaterialStockMovement {
   total_value_in_riel: number;
   exchange_rate_from_riel_to_usd: number;
   movement_date: string;
+  created_by?: User;
+  last_updated_by?: User;
   note: string | null;
   created_at: string;
   updated_at: string;
