@@ -24,6 +24,7 @@ export interface RawMaterialStockMovement {
   total_value_in_riel: number;
   exchange_rate_from_riel_to_usd: number;
   movement_date: string;
+  expiry_date: string | null;
   created_by?: User;
   last_updated_by?: User;
   note: string | null;
@@ -161,6 +162,7 @@ export interface ReorderRawMaterialPayload {
   unit_price_in_usd: number;
   exchange_rate_from_usd_to_riel: number;
   movement_date: string;
+  expiry_date: string;
   note?: string;
 }
 export interface ReorderRawMaterialResponse {

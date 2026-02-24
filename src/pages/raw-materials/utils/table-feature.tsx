@@ -54,6 +54,49 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
 
+const getExpiryDayStatus = (
+  expiryDate?: string | null,
+): { text: string; tone: "positive" | "negative" | "neutral" } => {
+  if (!expiryDate) {
+    return { text: "No expiry date", tone: "neutral" };
+  }
+
+  const parsed = new Date(expiryDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return { text: "Invalid expiry date", tone: "neutral" };
+  }
+
+  const today = new Date();
+  const todayStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const expiryStart = new Date(
+    parsed.getFullYear(),
+    parsed.getMonth(),
+    parsed.getDate(),
+  );
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const dayDiff = Math.floor(
+    (expiryStart.getTime() - todayStart.getTime()) / msPerDay,
+  );
+
+  if (dayDiff >= 0) {
+    return {
+      text: `Expires in ${dayDiff} day${dayDiff === 1 ? "" : "s"}`,
+      tone: "positive",
+    };
+  }
+
+  const expiredDays = Math.abs(dayDiff);
+  return {
+    text: `Expired ${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`,
+    tone: "negative",
+  };
+};
+
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
   const deleteMutation = useDeleteRawMaterial();
@@ -397,6 +440,28 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       );
     },
   },
+    {
+    key: "expiry_date",
+    header: "Expiry Date",
+    className: "whitespace-nowrap py-6",
+      render: (movement) => {
+        const expiryStatus = getExpiryDayStatus(movement.expiry_date);
+
+        return (
+          <div
+            className={
+              expiryStatus.tone === "negative"
+                ? "ctext-red-600 dark:text-red-400"
+                : expiryStatus.tone === "positive"
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-muted-foreground"
+            }
+          >
+            {expiryStatus.text}
+          </div>
+        );
+      },
+  },
   {
     key: "quantity",
     header: "Quantity",
@@ -530,6 +595,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
         unit_price_in_usd: movement.unit_price_in_usd,
         exchange_rate_from_usd_to_riel: movement.exchange_rate_from_usd_to_riel,
         movement_date: movement.movement_date,
+        expiry_date: movement.expiry_date ?? "",
         note: movement.note ?? undefined,
       };
 

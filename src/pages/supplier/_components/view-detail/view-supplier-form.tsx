@@ -108,7 +108,7 @@ export function ViewSupplierForm() {
         <SupplierDetailCard
           icon={<DollarSign className="w-4 h-4 text-green-500" />}
           iconBg="bg-green-500/10"
-          label="Total Spend"
+          label="Total Earnings"
           value={
             <div className="space-y-0.5">
               <div className="flex items-baseline gap-1">

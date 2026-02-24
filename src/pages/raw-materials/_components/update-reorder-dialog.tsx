@@ -54,6 +54,7 @@ export function UpdateReorderDialog({ isDisabled , rawMaterialId , movementId , 
           ? String(payload.exchange_rate_from_usd_to_riel)
           : "4100",
       movement_date: payload?.movement_date ?? "",
+      expiry_date: payload?.expiry_date ?? "",
       note: payload?.note ?? "",
     }),
     [payload]
@@ -93,6 +94,7 @@ export function UpdateReorderDialog({ isDisabled , rawMaterialId , movementId , 
       unit_price_in_usd: Number(form.unit_price_in_usd),
       exchange_rate_from_usd_to_riel: Number(form.exchange_rate_from_usd_to_riel),
       movement_date: form.movement_date,
+      expiry_date: form.expiry_date,
       ...(form.note.trim() ? { note: form.note.trim() } : {}),
     };
 
@@ -145,19 +147,34 @@ export function UpdateReorderDialog({ isDisabled , rawMaterialId , movementId , 
         </DialogHeader>
 
         <div className="space-y-5 py-2">
+          
+          <div className="grid grid-cols-2 gap-4">
+            
           {/* Quantity */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium flex items-center gap-1.5">
-              <Package className="w-3.5 h-3.5 text-muted-foreground" />
-              Quantity <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
-              placeholder="Enter quantity"
-              value={form.quantity}
-              onChange={e => setForm(prev => ({ ...prev, quantity: e.target.value }))}
-              min={0}
-            />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium flex items-center gap-1.5">
+                <Package className="w-3.5 h-3.5 text-muted-foreground" />
+                Quantity <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="number"
+                placeholder="Enter quantity"
+                value={form.quantity}
+                onChange={e => setForm(prev => ({ ...prev, quantity: e.target.value }))}
+                min={0}
+              />
+            </div>
+            
+            {/* Expiry Date */}
+            <div className="space-y-2">
+              <DatePickerInput
+                id="expiry_date"
+                required={false}
+                label="Expiry Date"
+                value={form.expiry_date}
+                onChange={value => setForm(prev => ({ ...prev, expiry_date: value }))}
+              />
+            </div>
           </div>
 
           {/* Price row */}

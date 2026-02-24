@@ -106,7 +106,7 @@ export const UpdateRawMaterialForm = () => {
       material_sku_code: rawMaterial.material_sku_code ?? "",
       barcode: rawMaterial.barcode ?? "",
       minimum_stock_level: String(rawMaterial.minimum_stock_level ?? ""),
-      expiry_date: rawMaterial.expiry_date ?? "",
+      expiry_date: purchaseMovement?.expiry_date ?? "",
       description: rawMaterial.description ?? "",
       raw_material_category_id: rawMaterial.raw_material_category_id
         ? String(rawMaterial.raw_material_category_id)
