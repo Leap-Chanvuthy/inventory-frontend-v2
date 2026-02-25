@@ -77,7 +77,7 @@ export const ViewCustomerCategoryForm = ({
             {category.category_name}
           </Text.TitleLarge>
           <HeaderActionButtons
-            editPath={`/customer-categories/edit/${id}`}
+            editPath={`/categories/customer-categories/edit/${id}`}
             showEdit={true}
             showDelete={true}
             onDelete={handleDelete}

@@ -75,7 +75,7 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
             {category.category_name}
           </Text.TitleLarge>
           <HeaderActionButtons
-            editPath={`/product-categories/edit/${id}`}
+            editPath={`/categories/product-categories/edit/${id}`}
             showEdit={true}
             showDelete={true}
             onDelete={handleDelete}
