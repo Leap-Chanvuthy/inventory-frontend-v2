@@ -9,7 +9,7 @@ export const EditProductCategories = () => {
       label: "Product Categories",
       link: "/categories?tab=product-category",
     },
-    { name: "edit-category", label: "Edit Product Category" },
+    { name: "update-category", label: "Update Product Category" },
   ];
 
   return (

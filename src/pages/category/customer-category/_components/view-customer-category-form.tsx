@@ -1,11 +1,13 @@
 import { useSingleCustomerCategory } from "@/api/categories/customer-categories/customer-category.query";
 import { useDeleteCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
-import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { Text } from "@/components/ui/text/app-text";
 import { useNavigate } from "react-router-dom";
 import { IconBadge } from "@/components/ui/icons-badge";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 interface ViewCustomerCategoryFormProps {
   categoryId: string;
@@ -21,6 +23,7 @@ export const ViewCustomerCategoryForm = ({
   const {
     data: categoryResponse,
     isLoading,
+    isFetching,
     isError,
   } = useSingleCustomerCategory(id);
 
@@ -34,39 +37,16 @@ export const ViewCustomerCategoryForm = ({
 
   const category = categoryResponse?.data;
 
-  if (isLoading) {
+  if (isLoading || isFetching)
+    return <DataCardLoading text="Loading category..." />;
+  if (isError)
     return (
-      <div className="w-full p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="rounded-2xl shadow-sm border bg-card">
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="flex min-h-[400px] w-full items-center justify-center">
-                <DataTableLoading />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnexpectedError
+        kind="fetch"
+        homeTo="/categories?tab=customer-category"
+      />
     );
-  }
-
-  if (isError || !category) {
-    return (
-      <div className="w-full p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="rounded-2xl shadow-sm border bg-card">
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="flex min-h-[400px] w-full items-center justify-center">
-                <p className="text-center text-red-500">
-                  Failed to load category data
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!category) return <DataCardEmpty emptyText="Category not found." />;
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8">
@@ -77,7 +57,7 @@ export const ViewCustomerCategoryForm = ({
             {category.category_name}
           </Text.TitleLarge>
           <HeaderActionButtons
-            editPath={`/customer-categories/edit/${id}`}
+            editPath={`/categories/customer-categories/edit/${id}`}
             showEdit={true}
             showDelete={true}
             onDelete={handleDelete}

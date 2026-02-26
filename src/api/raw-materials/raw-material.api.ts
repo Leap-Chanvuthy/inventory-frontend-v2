@@ -6,6 +6,7 @@ import {
   RawMaterialQueryParams,
   CreateRawMaterialRequest,
   CreateRawMaterialResponse,
+  UpdateRawMaterialRequest,
   ReorderRawMaterialPayload,
   ReorderRawMaterialResponse,
 } from "./raw-material.types";
@@ -47,16 +48,9 @@ export const createRawMaterial = async (
 // Update raw material
 export const updateRawMaterial = async (
   id: number,
-  data: FormData
+  data: UpdateRawMaterialRequest
 ): Promise<CreateRawMaterialResponse> => {
-  const response = await apiClient.post(`${BASE_API_URL}/raw-materials/${id}`, data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-    params: {
-      _method: "PATCH",
-    }
-  });
+  const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}`, data);
   return response.data;
 };
 

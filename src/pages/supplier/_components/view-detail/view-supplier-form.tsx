@@ -14,11 +14,16 @@ import { Text } from "@/components/ui/text/app-text";
 import { IconBadge } from "@/components/ui/icons-badge";
 import { Separator } from "@/components/ui/separator";
 import { Package, DollarSign, ShoppingCart, RefreshCw } from "lucide-react";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 
 export function ViewSupplierForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSingleSupplier(Number(id));
+  const { data, isLoading, isFetching, isError } = useSingleSupplier(
+    Number(id),
+  );
   const deleteMutation = useDeleteSupplier();
 
   const handleDelete = () => {
@@ -27,30 +32,16 @@ export function ViewSupplierForm() {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-muted-foreground animate-pulse">
-          Loading supplier details...
-        </p>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading supplier details..." />;
   }
 
-  if (isError || !data?.data?.supplier) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center p-8 border-2 border-dashed rounded-xl">
-          <p className="text-destructive font-medium">
-            Failed to load supplier details
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Please check your connection or try again later.
-          </p>
-        </div>
-      </div>
-    );
+  if (isError) {
+    return <UnexpectedError kind="fetch" homeTo="/supplier" />;
+  }
+
+  if (!data?.data?.supplier) {
+    return <DataCardEmpty emptyText="Supplier not found." />;
   }
 
   const supplier = data.data.supplier;

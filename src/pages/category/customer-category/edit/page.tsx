@@ -9,7 +9,7 @@ export const EditCustomerCategories = () => {
       label: "Customer Categories",
       link: "/categories?tab=customer-category",
     },
-    { name: "edit-category", label: "Edit Customer Category" },
+    { name: "update-category", label: "Update Customer Category" },
   ];
 
   return (

@@ -9,15 +9,17 @@ import { USER_ROLES } from "@/consts/role";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
 import { Info } from "lucide-react";
-import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { Text } from "@/components/ui/text/app-text";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export const UpdateUserForm = () => {
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
   const navigate = useNavigate();
 
-  const { data: user, isError, isLoading } = useSingleUser(userId);
+  const { data: user, isError, isLoading, isFetching } = useSingleUser(userId);
 
   const updateMutation = useUpdateUser(userId);
 
@@ -34,16 +36,16 @@ export const UpdateUserForm = () => {
   });
 
   useEffect(() => {
-    if (!user) return;
-
-    setForm(prev => ({
-      ...prev,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone_number: user.phone_number || "",
-      profile_picture: null,
-    }));
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone_number: user.phone_number || "",
+        profile_picture: null,
+      }));
+    }
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,34 +78,16 @@ export const UpdateUserForm = () => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8">
-            <div className="flex min-h-[400px] w-full items-center justify-center">
-              <DataTableLoading />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading user details..." />;
   }
 
   if (isError) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8">
-            <div className="flex min-h-[400px] w-full items-center justify-center">
-              <p className="text-center text-red-500">
-                Failed to load user data
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <UnexpectedError kind="fetch" homeTo="/users" />;
+  }
+
+  if (!user) {
+    return <DataCardEmpty emptyText="User not found." />;
   }
 
   return (

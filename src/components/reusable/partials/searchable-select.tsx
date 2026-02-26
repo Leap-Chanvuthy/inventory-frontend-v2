@@ -53,6 +53,8 @@ type SearchableSelectProps = {
   fetchPerPage?: number;
   /** Label to display for the currently selected value (needed for fetchFn mode when options aren't loaded yet) */
   selectedLabel?: string;
+  /** Called when a fetch fails — use to show a page-level error */
+  onFetchError?: () => void;
 };
 
 export const SearchableSelect = ({
@@ -69,6 +71,7 @@ export const SearchableSelect = ({
   fetchFn,
   fetchPerPage = 10,
   selectedLabel: selectedLabelProp,
+  onFetchError,
 }: SearchableSelectProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -91,11 +94,14 @@ export const SearchableSelect = ({
   }, [search, isApiMode]);
 
   // API fetch query
-  const {
-    data: fetchedData,
-    isLoading: isFetching,
-  } = useQuery({
-    queryKey: ["searchable-select", id, debouncedSearch, currentPage, fetchPerPage],
+  const { data: fetchedData, isLoading: isFetching, isError: isFetchError } = useQuery({
+    queryKey: [
+      "searchable-select",
+      id,
+      debouncedSearch,
+      currentPage,
+      fetchPerPage,
+    ],
     queryFn: () =>
       fetchFn!({
         page: currentPage,
@@ -105,28 +111,40 @@ export const SearchableSelect = ({
     enabled: isApiMode && open,
   });
 
+  useEffect(() => {
+    if (isFetchError) onFetchError?.();
+  }, [isFetchError, onFetchError]);
+
   // Resolve displayed options and pagination based on mode
-  const resolvedOptions = isApiMode ? (fetchedData?.data ?? []) : (() => {
-    const filtered = search.trim()
-      ? options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase()))
-      : options;
-    const start = (currentPage - 1) * itemsPerPage;
-    return filtered.slice(start, start + itemsPerPage);
-  })();
+  const resolvedOptions = isApiMode
+    ? (fetchedData?.data ?? [])
+    : (() => {
+        const filtered = search.trim()
+          ? options.filter(opt =>
+              opt.label.toLowerCase().includes(search.toLowerCase()),
+            )
+          : options;
+        const start = (currentPage - 1) * itemsPerPage;
+        return filtered.slice(start, start + itemsPerPage);
+      })();
 
   const totalPages = isApiMode
     ? (fetchedData?.last_page ?? 1)
     : Math.ceil(
         (search.trim()
-          ? options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase()))
+          ? options.filter(opt =>
+              opt.label.toLowerCase().includes(search.toLowerCase()),
+            )
           : options
-        ).length / itemsPerPage
+        ).length / itemsPerPage,
       );
 
   const totalItems = isApiMode
     ? undefined
     : (search.trim()
-        ? options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase()))
+        ? options.filter(opt =>
+            opt.label.toLowerCase().includes(search.toLowerCase()),
+          )
         : options
       ).length;
 
@@ -145,17 +163,21 @@ export const SearchableSelect = ({
   }, [open, search, value, options, itemsPerPage, isApiMode]);
 
   // Get selected option label
-  const displayLabel = selectedLabelProp
-    || options.find(opt => opt.value === value)?.label
-    || fetchedData?.data.find(opt => opt.value === value)?.label;
+  const displayLabel =
+    selectedLabelProp ||
+    options.find(opt => opt.value === value)?.label ||
+    fetchedData?.data.find(opt => opt.value === value)?.label;
 
   // Reset page when search changes (static mode)
-  const handleSearchChange = useCallback((newSearch: string) => {
-    setSearch(newSearch);
-    if (!isApiMode) {
-      setCurrentPage(1);
-    }
-  }, [isApiMode]);
+  const handleSearchChange = useCallback(
+    (newSearch: string) => {
+      setSearch(newSearch);
+      if (!isApiMode) {
+        setCurrentPage(1);
+      }
+    },
+    [isApiMode],
+  );
 
   const handleSelect = (selectedValue: string) => {
     onChange?.(selectedValue);
@@ -177,7 +199,9 @@ export const SearchableSelect = ({
       {label && (
         <Label
           htmlFor={id}
-          className={error ? "text-red-500" : "text-gray-700 dark:text-gray-300"}
+          className={
+            error ? "text-red-500" : "text-gray-700 dark:text-gray-300"
+          }
         >
           {label}
           {required && <span className="text-red-500 px-1">*</span>}
@@ -194,12 +218,10 @@ export const SearchableSelect = ({
             className={cn(
               "w-full justify-between font-normal",
               !value && "text-muted-foreground",
-              error && "border-red-500"
+              error && "border-red-500",
             )}
           >
-            <span className="truncate">
-              {displayLabel || placeholder}
-            </span>
+            <span className="truncate">{displayLabel || placeholder}</span>
             <div className="flex items-center gap-1">
               {value && (
                 <X
@@ -212,7 +234,10 @@ export const SearchableSelect = ({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          align="start"
+        >
           {/* Search Input */}
           <div className="p-2 border-b">
             <div className="relative">
@@ -239,6 +264,10 @@ export const SearchableSelect = ({
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Loading...
               </div>
+            ) : isFetchError ? (
+              <div className="p-4 text-center text-sm text-destructive">
+                Failed to load options. Try again.
+              </div>
             ) : resolvedOptions.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 No results found
@@ -250,7 +279,7 @@ export const SearchableSelect = ({
                   onClick={() => handleSelect(option.value)}
                   className={cn(
                     "flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-accent",
-                    value === option.value && "bg-accent"
+                    value === option.value && "bg-accent",
                   )}
                 >
                   <span className="truncate">{option.label}</span>

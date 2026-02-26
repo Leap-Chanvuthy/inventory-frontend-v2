@@ -1,15 +1,32 @@
-import { useDeleteRawMaterialImages, useUpdateRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import {
+  useDeleteRawMaterialImages,
+  useUpdateRawMaterial,
+} from "@/api/raw-materials/raw-material.mutation";
 import { useSingleRawMaterial } from "@/api/raw-materials/raw-material.query";
-import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
-import { useSuppliers } from "@/api/suppliers/supplier.query";
-import { useWarehouses } from "@/api/warehouses/warehouses.query";
-import { useUOMs } from "@/api/uom/uom.query";
+import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
+import { useSingleSupplier } from "@/api/suppliers/supplier.query";
+import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
+import { useSingleUOM } from "@/api/uom/uom.query";
+import {
+  fetchCategories,
+  fetchSuppliers,
+  fetchWarehouses,
+  fetchUOMs,
+} from "../utils/fetch-select-options";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { TextInput, TextAreaInput, DatePickerInput, SelectInput } from "@/components/reusable/partials/input";
+import {
+  TextInput,
+  TextAreaInput,
+  DatePickerInput,
+} from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.types";
+import {
+  RawMaterialValidationErrors,
+  UpdateRawMaterialRequest,
+} from "@/api/raw-materials/raw-material.types";
+import type { UOM } from "@/api/uom/uom.types";
 import { Text } from "@/components/ui/text/app-text";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { toNumberOrNull } from "../utils/check_num_null";
@@ -18,58 +35,37 @@ import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
 import { UOMCard } from "@/pages/uom/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
 import SelectableImageDelete from "@/components/reusable/partials/selectable-image-delete";
-import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
-import { PRODCUTION_METHOD } from "../utils/const";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export const UpdateRawMaterialForm = () => {
   const { id } = useParams<{ id: string }>();
   const rawMaterialId = Number(id);
 
-  const { data: rawMaterialData, isLoading: rmLoading, isError: rmError } = useSingleRawMaterial(rawMaterialId);
+  const {
+    data: rawMaterialData,
+    isLoading: rmLoading,
+    isError: rmError,
+  } = useSingleRawMaterial(rawMaterialId);
 
   const updateMutation = useUpdateRawMaterial(rawMaterialId);
   const deleteImagesMutation = useDeleteRawMaterialImages(rawMaterialId);
-  const error = updateMutation.error as AxiosError<RawMaterialValidationErrors> | null;
+  const error =
+    updateMutation.error as AxiosError<RawMaterialValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
 
   const navigate = useNavigate();
 
   // Raw Material Image
   const rawMaterialImage = rawMaterialData?.data?.raw_material?.rm_images || [];
-  const remainingImageSlots = Math.max(0, 4 - rawMaterialImage.length);
 
   const handleDeleteImages = useCallback(
     async (imageIds: number[]) => {
       await deleteImagesMutation.mutateAsync(imageIds);
     },
-    [deleteImagesMutation]
+    [deleteImagesMutation],
   );
-
-  // Fetch dropdown options
-  const {
-    data: categoriesData,
-    isPending: categoriesLoading,
-    isError: categoriesError,
-  } = useRawMaterialCategories({ per_page: 100 });
-  const {
-    data: suppliersData,
-    isPending: suppliersLoading,
-    isError: suppliersError,
-  } = useSuppliers({ per_page: 100 });
-  const {
-    data: warehousesData,
-    isPending: warehousesLoading,
-    isError: warehousesError,
-  } = useWarehouses({ per_page: 100 });
-  const {
-    data: uomsData,
-    isPending: uomsLoading,
-    isError: uomsError,
-  } = useUOMs({ per_page: 100 });
-
-  const isLoading =
-    rmLoading || categoriesLoading || suppliersLoading || warehousesLoading || uomsLoading;
-  const hasError = rmError || categoriesError || suppliersError || warehousesError || uomsError;
 
   const rawMaterial = rawMaterialData?.data?.raw_material;
 
@@ -80,7 +76,6 @@ export const UpdateRawMaterialForm = () => {
 
   const [form, setForm] = useState({
     material_name: "",
-    material_sku_code: "",
     barcode: "",
     minimum_stock_level: "",
     expiry_date: "",
@@ -92,10 +87,24 @@ export const UpdateRawMaterialForm = () => {
     quantity: "",
     unit_price_in_usd: "",
     exchange_rate_from_usd_to_riel: "4100",
+    movement_date: "",
     note: "",
-    production_method: "",
-    images: [] as File[],
   });
+
+  const [dropdownError, setDropdownError] = useState(false);
+  const handleDropdownError = useCallback(() => setDropdownError(true), []);
+
+  // Single-item hooks for preview cards (called unconditionally)
+  const { data: selectedCategoryData } = useSingleRawMaterialCategory(
+    Number(form.raw_material_category_id),
+  );
+  const { data: selectedSupplierData } = useSingleSupplier(
+    Number(form.supplier_id),
+  );
+  const { data: selectedWarehouseData } = useSingleWarehouse(
+    Number(form.warehouse_id),
+  );
+  const { data: selectedUOMData } = useSingleUOM(Number(form.uom_id));
 
   useEffect(() => {
     if (!rawMaterial) return;
@@ -103,7 +112,6 @@ export const UpdateRawMaterialForm = () => {
     setForm(prev => ({
       ...prev,
       material_name: rawMaterial.material_name ?? "",
-      material_sku_code: rawMaterial.material_sku_code ?? "",
       barcode: rawMaterial.barcode ?? "",
       minimum_stock_level: String(rawMaterial.minimum_stock_level ?? ""),
       expiry_date: purchaseMovement?.expiry_date ?? "",
@@ -112,92 +120,58 @@ export const UpdateRawMaterialForm = () => {
         ? String(rawMaterial.raw_material_category_id)
         : "",
       uom_id: rawMaterial.uom_id ? String(rawMaterial.uom_id) : "",
-      supplier_id: rawMaterial.supplier_id ? String(rawMaterial.supplier_id) : "",
-      warehouse_id: rawMaterial.warehouse_id ? String(rawMaterial.warehouse_id) : "",
-      quantity: purchaseMovement?.quantity != null ? String(purchaseMovement.quantity) : "",
+      supplier_id: rawMaterial.supplier_id
+        ? String(rawMaterial.supplier_id)
+        : "",
+      warehouse_id: rawMaterial.warehouse_id
+        ? String(rawMaterial.warehouse_id)
+        : "",
+      quantity:
+        purchaseMovement?.quantity != null
+          ? String(purchaseMovement.quantity)
+          : "",
       unit_price_in_usd:
-        purchaseMovement?.unit_price_in_usd != null ? String(purchaseMovement.unit_price_in_usd) : "",
+        purchaseMovement?.unit_price_in_usd != null
+          ? String(purchaseMovement.unit_price_in_usd)
+          : "",
       exchange_rate_from_usd_to_riel:
         purchaseMovement?.exchange_rate_from_usd_to_riel != null
           ? String(purchaseMovement.exchange_rate_from_usd_to_riel)
           : prev.exchange_rate_from_usd_to_riel,
-      production_method: rawMaterial.production_method ?? "",
+      movement_date: purchaseMovement?.movement_date ?? "",
       note: purchaseMovement?.note ?? "",
     }));
   }, [rawMaterial, purchaseMovement]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">Loading Raw Material...</p>
-      </div>
-    );
+  if (rmLoading) {
+    return <DataCardLoading text="Loading raw material..." />;
   }
 
-  if (hasError || !rawMaterial) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8 flex flex-col items-center justify-center min-h-[400px]">
-            <div className="text-red-500 text-center">
-              <p className="text-lg font-medium">Failed to load form data</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Please refresh the page or try again later.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (rmError) {
+    return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
   }
 
-  // Transform data for select options
-  const categoryOptions =
-    categoriesData?.data?.data.map(cat => ({
-      value: cat.id.toString(),
-      label: cat.category_name,
-    })) || [];
+  if (!rawMaterial) {
+    return <DataCardEmpty emptyText="Raw material not found." />;
+  }
 
-  const supplierOptions =
-    suppliersData?.data?.data.map(sup => ({
-      value: sup.id.toString(),
-      label: sup.official_name,
-    })) || [];
+  if (dropdownError) {
+    return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
+  }
 
-  const warehouseOptions =
-    warehousesData?.data?.map(wh => ({
-      value: wh.id.toString(),
-      label: wh.warehouse_name,
-    })) || [];
+  // Derived preview data from single-item hooks
+  const selectedCategory = selectedCategoryData?.data ?? null;
+  const selectedSupplier = selectedSupplierData?.data?.supplier ?? null;
+  const selectedWarehouse = selectedWarehouseData ?? null;
+  const selectedUOM = (selectedUOMData?.data ??
+    selectedUOMData ??
+    null) as UOM | null;
 
-  const uomOptions =
-    uomsData?.data?.map(uom => ({
-      value: uom.id.toString(),
-      label: `${uom.name} (${uom.symbol})`,
-    })) || [];
-
-  const selectedCategory =
-    categoriesData?.data?.data?.find(
-      cat => String(cat.id) === form.raw_material_category_id,
-    ) || null;
-
-  const selectedSupplier =
-    suppliersData?.data?.data?.find(sup => String(sup.id) === form.supplier_id) ||
-    null;
-
-  const selectedWarehouse =
-    warehousesData?.data?.find(wh => String(wh.id) === form.warehouse_id) || null;
-
-  const selectedUOM =
-    uomsData?.data?.find(uom => String(uom.id) === form.uom_id) || null;
+  /* ---------- Handlers ---------- */
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setForm(prev => ({ ...prev, [id]: value }));
-  };
-
-  const handleImagesChange = (files: File[]) => {
-    setForm(prev => ({ ...prev, images: files }));
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -213,6 +187,10 @@ export const UpdateRawMaterialForm = () => {
     setForm(prev => ({ ...prev, expiry_date: value }));
   };
 
+  const handleMovementDateChange = (value: string) => {
+    setForm(prev => ({ ...prev, movement_date: value }));
+  };
+
   // Update Raw Material
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -222,37 +200,26 @@ export const UpdateRawMaterialForm = () => {
 
     const action = submitter?.value;
 
-    const fd = new FormData();
+    const payload: UpdateRawMaterialRequest = {
+      material_name: form.material_name,
+      barcode: form.barcode || undefined,
+      minimum_stock_level: Number(form.minimum_stock_level),
+      expiry_date: form.expiry_date,
+      description: form.description || undefined,
+      raw_material_category_id: Number(form.raw_material_category_id),
+      uom_id: Number(form.uom_id),
+      supplier_id: Number(form.supplier_id),
+      warehouse_id: Number(form.warehouse_id),
+      quantity: toNumberOrNull(form.quantity),
+      unit_price_in_usd: toNumberOrNull(form.unit_price_in_usd),
+      exchange_rate_from_usd_to_riel: toNumberOrNull(
+        form.exchange_rate_from_usd_to_riel,
+      ),
+      movement_date: form.movement_date,
+      note: form.note || undefined,
+    };
 
-    // Raw material fields
-    fd.append("material_name", form.material_name);
-    fd.append("material_sku_code", form.material_sku_code);
-    fd.append("barcode", form.barcode ?? "");
-    fd.append("minimum_stock_level", String(Number(form.minimum_stock_level)));
-    fd.append("expiry_date", form.expiry_date);
-    fd.append("description", form.description ?? "");
-    fd.append("raw_material_category_id", String(Number(form.raw_material_category_id)));
-    fd.append("uom_id", String(Number(form.uom_id)));
-    fd.append("supplier_id", String(Number(form.supplier_id)));
-    fd.append("warehouse_id", String(Number(form.warehouse_id)));
-    fd.append("production_method", form.production_method);
-
-
-    // PURCHASE movement fields
-    const quantity = toNumberOrNull(form.quantity);
-    const unitPriceUsd = toNumberOrNull(form.unit_price_in_usd);
-    const exchangeRate = toNumberOrNull(form.exchange_rate_from_usd_to_riel);
-    fd.append("quantity", quantity == null ? "" : String(quantity));
-    fd.append("unit_price_in_usd", unitPriceUsd == null ? "" : String(unitPriceUsd));
-    fd.append("exchange_rate_from_usd_to_riel", exchangeRate == null ? "" : String(exchangeRate));
-    fd.append("note", form.note ?? "");
-
-    // Append images (add-one / append mode)
-    for (const file of form.images) {
-      fd.append("images[]", file);
-    }
-
-    updateMutation.mutate(fd, {
+    updateMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/raw-materials");
@@ -265,9 +232,12 @@ export const UpdateRawMaterialForm = () => {
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
         <div className="p-5">
-          <Text.TitleMedium className="mb-2">Update Raw Material</Text.TitleMedium>
+          <Text.TitleMedium className="mb-2">
+            Update Raw Material
+          </Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
-            Update raw material info and its initial PURCHASE stock movement (qty/unit price/exchange rate).
+            Update raw material info and its initial PURCHASE stock movement
+            (qty/unit price/exchange rate).
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -283,7 +253,6 @@ export const UpdateRawMaterialForm = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <TextInput
                       id="material_name"
                       label="Material Name"
@@ -294,17 +263,14 @@ export const UpdateRawMaterialForm = () => {
                       required
                     />
 
-                    <SelectInput 
-                      id="production_method"
-                      label="Production Method (Default FIFO)"
-                      placeholder="Select production method"
-                      error={fieldErrors?.production_method?.[0]}
-                      options={PRODCUTION_METHOD}
-                      value={form.production_method}
-                      onChange={handleSelectChange("production_method")}
-                      required
+                    <TextInput
+                      id="barcode"
+                      label="Barcode"
+                      placeholder="e.g., 123456789"
+                      value={form.barcode}
+                      error={fieldErrors?.barcode?.[0]}
+                      onChange={handleChange}
                     />
-
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -312,20 +278,28 @@ export const UpdateRawMaterialForm = () => {
                       id="raw_material_category_id"
                       label="Category"
                       placeholder="Select category"
-                      options={categoryOptions}
+                      fetchFn={fetchCategories}
                       value={form.raw_material_category_id}
                       onChange={handleSelectChange("raw_material_category_id")}
                       error={fieldErrors?.raw_material_category_id?.[0]}
+                      selectedLabel={selectedCategory?.category_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                     <SearchableSelect
                       id="uom_id"
                       label="Unit of Measurement"
                       placeholder="Select UOM"
-                      options={uomOptions}
+                      fetchFn={fetchUOMs}
                       value={form.uom_id}
                       onChange={handleSelectChange("uom_id")}
                       error={fieldErrors?.uom_id?.[0]}
+                      selectedLabel={
+                        selectedUOM
+                          ? `${selectedUOM.name} (${selectedUOM.symbol})`
+                          : undefined
+                      }
+                      onFetchError={handleDropdownError}
                       required
                     />
                   </div>
@@ -335,20 +309,24 @@ export const UpdateRawMaterialForm = () => {
                       id="supplier_id"
                       label="Supplier"
                       placeholder="Select supplier"
-                      options={supplierOptions}
+                      fetchFn={fetchSuppliers}
                       value={form.supplier_id}
                       onChange={handleSelectChange("supplier_id")}
                       error={fieldErrors?.supplier_id?.[0]}
+                      selectedLabel={selectedSupplier?.official_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                     <SearchableSelect
                       id="warehouse_id"
                       label="Warehouse"
                       placeholder="Select warehouse"
-                      options={warehouseOptions}
+                      fetchFn={fetchWarehouses}
                       value={form.warehouse_id}
                       onChange={handleSelectChange("warehouse_id")}
                       error={fieldErrors?.warehouse_id?.[0]}
+                      selectedLabel={selectedWarehouse?.warehouse_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                   </div>
@@ -390,8 +368,21 @@ export const UpdateRawMaterialForm = () => {
                   <div>
                     <Text.TitleSmall>Purchase Stock Movement</Text.TitleSmall>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Purchase movement type is locked to PURCHASE, but you can update quantity and pricing.
+                      Purchase movement type is locked to PURCHASE, but you can
+                      update quantity and pricing.
                     </p>
+                  </div>
+
+                  <div className="mb-2">
+                    <DatePickerInput
+                      id="movement_date"
+                      label="Movement Date"
+                      placeholder="Pick a date"
+                      error={fieldErrors?.movement_date?.[0]}
+                      value={form.movement_date}
+                      onChange={handleMovementDateChange}
+                      required
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -474,7 +465,11 @@ export const UpdateRawMaterialForm = () => {
                           <p className="text-xs font-medium text-muted-foreground mb-2">
                             Unit of Measurement
                           </p>
-                          <UOMCard uom={selectedUOM} hideActions={false} interactive={false} />
+                          <UOMCard
+                            uom={selectedUOM}
+                            hideActions={false}
+                            interactive={false}
+                          />
                         </div>
                       ) : (
                         <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
@@ -520,19 +515,8 @@ export const UpdateRawMaterialForm = () => {
                     </div>
                   </div>
                 </div>
-                                  <div className="rounded-xl border bg-card p-6">
-                                    <Text.TitleSmall className="mb-2">Images</Text.TitleSmall>
-                                    <p className="text-sm text-muted-foreground mb-4">
-                                        Upload up to {remainingImageSlots} more image{remainingImageSlots === 1 ? "" : "s"} (max 4 total).
-                                    </p>
-                                    <MultiImageUpload
-                                      label="Raw Material Images"
-                                      onChange={handleImagesChange}
-                                        maxImages={remainingImageSlots}
-                                    />
-                                  </div>
 
-                <SelectableImageDelete 
+                <SelectableImageDelete
                   title="Delete Raw Material Image"
                   images={rawMaterialImage}
                   onDelete={handleDeleteImages}
@@ -542,7 +526,9 @@ export const UpdateRawMaterialForm = () => {
             </div>
 
             <FormFooterActions
-              isSubmitting={updateMutation.isPending || deleteImagesMutation.isPending}
+              isSubmitting={
+                updateMutation.isPending || deleteImagesMutation.isPending
+              }
               saveAndCloseLabel="Save & Close"
               saveLabel="Save"
             />

@@ -21,10 +21,15 @@ import {
 } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
 import MapPicker from "@/components/reusable/map-picker/map-picker";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export const UpdateSupplierForm = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useSingleSupplier(Number(id));
+  const { data, isLoading, isFetching, isError } = useSingleSupplier(
+    Number(id),
+  );
   const supplierMutation = useUpdateSupplier();
   const error = supplierMutation.error as AxiosError<ValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
@@ -105,7 +110,7 @@ export const UpdateSupplierForm = () => {
             payment_link: bank.payment_link || "",
             qr_code_image: null, // New image file (if user uploads)
             existing_qr_code: bank.qr_code_image || undefined, // Existing QR code URL
-          }))
+          })),
         );
       }
     }
@@ -161,13 +166,13 @@ export const UpdateSupplierForm = () => {
       banks: filledBanks,
     };
 
-    console.log("=== UPDATE SUPPLIER PAYLOAD ===");
-    console.log("Supplier ID:", id);
-    console.log("Form data:", form);
-    console.log("Image:", image);
-    console.log("Filtered banks:", filledBanks);
-    console.log("Full payload:", payload);
-    console.log("===============================");
+    // console.log("=== UPDATE SUPPLIER PAYLOAD ===");
+    // console.log("Supplier ID:", id);
+    // console.log("Form data:", form);
+    // console.log("Image:", image);
+    // console.log("Filtered banks:", filledBanks);
+    // console.log("Full payload:", payload);
+    // console.log("===============================");
 
     supplierMutation.mutate(
       { id: Number(id), data: payload },
@@ -177,18 +182,20 @@ export const UpdateSupplierForm = () => {
             navigate("/supplier");
           }
         },
-      }
+      },
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading supplier details...</p>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading supplier details..." />;
+  }
+
+  if (isError) {
+    return <UnexpectedError kind="fetch" homeTo="/supplier" />;
+  }
+
+  if (!data?.data?.supplier) {
+    return <DataCardEmpty emptyText="Supplier not found." />;
   }
 
   return (
@@ -260,7 +267,9 @@ export const UpdateSupplierForm = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Business Information</CardTitle>
-                    <CardDescription>Legal and business details</CardDescription>
+                    <CardDescription>
+                      Legal and business details
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <TextInput
@@ -310,7 +319,9 @@ export const UpdateSupplierForm = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Address Information</CardTitle>
-                    <CardDescription>Supplier's location details</CardDescription>
+                    <CardDescription>
+                      Supplier's location details
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <TextInput
@@ -396,7 +407,10 @@ export const UpdateSupplierForm = () => {
                       label="Supplier Location"
                       defaultPosition={
                         form.latitude && form.longitude
-                          ? [parseFloat(form.latitude), parseFloat(form.longitude)]
+                          ? [
+                              parseFloat(form.latitude),
+                              parseFloat(form.longitude),
+                            ]
                           : undefined
                       }
                       onChange={(lat, lng) =>

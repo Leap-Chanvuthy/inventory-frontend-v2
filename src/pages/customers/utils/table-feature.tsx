@@ -19,8 +19,8 @@ const CustomerActions = ({ customer }: { customer: Customer }) => {
   return (
     <div className="flex items-center gap-2">
       <TableActions
-        viewDetailPath={`customer/view/${customer.id}`}
-        editPath={`customer/update/${customer.id}`}
+        viewDetailPath={`/customer/view/${customer.id}`}
+        editPath={`/customer/update/${customer.id}`}
         deleteHeading="Delete This Customer"
         deleteSubheading="Are you sure want to delete this customer? This action cannot be undone."
         deleteTooltip="Delete Customer"

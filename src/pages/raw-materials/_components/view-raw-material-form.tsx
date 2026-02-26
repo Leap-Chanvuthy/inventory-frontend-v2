@@ -10,6 +10,9 @@ import { ReorderDialog } from "./reorder-dialog";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { IconBadge } from "@/components/ui/icons-badge";
 import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -24,26 +27,11 @@ export function ViewRawMaterialForm() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">
-            Loading raw material details...
-          </p>
-        </div>
-      </div>
-    );
+    return <DataCardLoading text="Loading raw material..." />;
   }
 
-  if (isError || !data?.data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-500">Failed to load raw material details</p>
-        </div>
-      </div>
-    );
-  }
+  if (isError) return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
+  if (!data?.data) return <DataCardEmpty emptyText="Raw material not found." />;
 
   const { raw_material, current_qty_in_stock, total_count_by_movement_type } =
     data.data;

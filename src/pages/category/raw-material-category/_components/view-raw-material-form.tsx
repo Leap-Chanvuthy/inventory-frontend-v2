@@ -1,11 +1,13 @@
 import { useSingleRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 import { useDeleteRawMaterialCategory } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
-import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { formatDate } from "@/utils/date-format";
 import { HeaderActionButtons } from "@/components/reusable/partials/header-action-buttons";
 import { Text } from "@/components/ui/text/app-text";
 import { useNavigate } from "react-router-dom";
 import { IconBadge } from "@/components/ui/icons-badge";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 interface ViewCategoryFormProps {
   categoryId: string;
@@ -19,6 +21,7 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
   const {
     data: categoryResponse,
     isLoading,
+    isFetching,
     isError,
   } = useSingleRawMaterialCategory(id);
 
@@ -32,39 +35,18 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
 
   const category = categoryResponse?.data;
 
-  if (isLoading) {
-    return (
-      <div className="w-full p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="rounded-2xl shadow-sm border bg-card">
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="flex min-h-[400px] w-full items-center justify-center">
-                <DataTableLoading />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading category..." />;
   }
 
-  if (isError || !category) {
+  if (isError)
     return (
-      <div className="w-full p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-[1600px]">
-          <div className="rounded-2xl shadow-sm border bg-card">
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="flex min-h-[400px] w-full items-center justify-center">
-                <p className="text-center text-red-500">
-                  Failed to load category data
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnexpectedError
+        kind="fetch"
+        homeTo="/categories?tab=raw-material-category"
+      />
     );
-  }
+  if (!category) return <DataCardEmpty emptyText="Category not found." />;
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8">
@@ -75,7 +57,7 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
             {category.category_name}
           </Text.TitleLarge>
           <HeaderActionButtons
-            editPath={`/raw-material-categories/edit/${id}`}
+            editPath={`/categories/raw-material-categories/edit/${id}`}
             showEdit={true}
             showDelete={true}
             onDelete={handleDelete}
