@@ -4,6 +4,7 @@ import DataCardEmpty from "./data-card-empty";
 type Props<T> = {
   data?: T[];
   isLoading?: boolean;
+  loadingText?: string;
   emptyText?: string;
   renderItem: (item: T) => React.ReactNode;
 };
@@ -11,11 +12,12 @@ type Props<T> = {
 export function DataCard<T>({
   data,
   isLoading,
+  loadingText,
   emptyText,
   renderItem,
 }: Props<T>) {
   if (isLoading) {
-    return <DataCardLoading />;
+    return <DataCardLoading text={loadingText} />;
   }
 
   if (!data?.length) {

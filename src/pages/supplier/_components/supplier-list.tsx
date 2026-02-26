@@ -5,10 +5,16 @@ import { Supplier } from "@/api/suppliers/supplier.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
-import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS, SupplierCard } from "../utils/table-feature";
+import {
+  COLUMNS,
+  FILTER_OPTIONS,
+  SORT_OPTIONS,
+  SupplierCard,
+} from "../utils/table-feature";
 import { Link } from "react-router-dom";
 import { History } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function SupplierList() {
   const {
@@ -23,13 +29,13 @@ export function SupplierList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useSuppliers({
+  const { data, isLoading, isError, isFetching } = useSuppliers({
     ...apiParams,
     "filter[supplier_category]": filter,
   });
 
-  if (isError) {
-    return <p className="text-center text-red-500">Failed to load suppliers</p>;
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -63,6 +69,7 @@ export function SupplierList() {
         <ToggleableList<Supplier>
           items={data?.data?.data || []}
           isLoading={isLoading}
+          loadingText="Loading supplier data..."
           emptyText="No suppliers found"
           columns={COLUMNS}
           renderItem={supplier => <SupplierCard supplier={supplier} />}

@@ -146,11 +146,11 @@ export const UpdateWarehouseForm = () => {
     });
   };
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading warehouse details..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading warehouse details data..." />;
   }
 
-  if (isError) {
+  if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" homeTo="/warehouses" />;
   }
 

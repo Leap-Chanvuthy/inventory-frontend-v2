@@ -10,6 +10,7 @@ import {
   DELETED_SORT_OPTIONS,
   DELETED_COLUMNS,
 } from "../utils/deleted-table-feature";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function DeletedRawMaterialList() {
   const {
@@ -24,17 +25,13 @@ export function DeletedRawMaterialList() {
     apiParams,
   } = useTableQueryParams({ defaultSort: "-deleted_at" });
 
-  const { data, isLoading, isError } = useDeletedRawMaterials({
+  const { data, isLoading, isFetching, isError } = useDeletedRawMaterials({
     ...apiParams,
     "filter[raw_material_category_id]": filter ? Number(filter) : undefined,
   });
 
-  if (isError && !data) {
-    return (
-      <p className="text-center text-red-500">
-        Failed to load deleted raw materials
-      </p>
-    );
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -58,6 +55,7 @@ export function DeletedRawMaterialList() {
         <ToggleableList<RawMaterial>
           items={data?.data || []}
           isLoading={isLoading}
+          loadingText="Loading deleted raw materials data..."
           emptyText="No deleted raw materials found"
           columns={DELETED_COLUMNS}
           renderItem={rawMaterial => (

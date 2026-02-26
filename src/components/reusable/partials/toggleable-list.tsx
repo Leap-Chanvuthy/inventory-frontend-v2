@@ -31,6 +31,9 @@ export interface ToggleableListProps<T> {
   /** Text shown when items is empty */
   emptyText?: string;
 
+  /** Text shown while loading */
+  loadingText?: string;
+
   /** Table view */
   columns: DataTableColumn<T>[];
 
@@ -49,6 +52,7 @@ export interface ToggleableListProps<T> {
 export function ToggleableList<T>({
   items,
   isLoading,
+  loadingText = "Loading data...",
   emptyText = "No data found",
   columns,
   renderItem,
@@ -58,12 +62,12 @@ export function ToggleableList<T>({
   const dispatch = useDispatch();
 
   const { option: optionFromStore } = useSelector(
-    (state: RootState) => state.listOptions
+    (state: RootState) => state.listOptions,
   );
 
   // Selection scope state from Redux (optional)
   const scopeState = useSelector((state: RootState) =>
-    selection ? state.selection.scopes[selection.scope] : undefined
+    selection ? state.selection.scopes[selection.scope] : undefined,
   );
 
   // Ensure scope exists (and apply mode if provided) without resetting existing selection
@@ -94,27 +98,29 @@ export function ToggleableList<T>({
     if (!selection || !items?.length || !scopeState?.ids?.length) return [];
 
     const idSet = new Set(scopeState.ids);
-    return items.filter((row) => idSet.has(String(selection.getRowId(row))));
+    return items.filter(row => idSet.has(String(selection.getRowId(row))));
   }, [items, scopeState?.ids, selection]);
 
   const rowSelection: RowSelection<T> | undefined = React.useMemo(() => {
     if (!selection) return undefined;
 
-    const mode = (scopeState?.mode ?? selection.mode ?? "multiple") as SelectionMode;
+    const mode = (scopeState?.mode ??
+      selection.mode ??
+      "multiple") as SelectionMode;
 
     return {
       mode,
       selected: selectedRows,
       getRowId: selection.getRowId,
-      onChange: (rows) => {
+      onChange: rows => {
         dispatch(
           setSelection({
             scope: selection.scope,
-            items: rows.map((r) => ({
+            items: rows.map(r => ({
               id: String(selection.getRowId(r)),
               payload: r,
             })),
-          })
+          }),
         );
       },
     };
@@ -127,6 +133,7 @@ export function ToggleableList<T>({
           columns={columns}
           data={items}
           isLoading={isLoading}
+          loadingText={loadingText}
           emptyText={emptyText}
           rowSelection={rowSelection}
         />
@@ -136,6 +143,7 @@ export function ToggleableList<T>({
         <DataCard<T>
           data={items}
           isLoading={isLoading}
+          loadingText={loadingText}
           emptyText={emptyText}
           renderItem={renderItem}
         />

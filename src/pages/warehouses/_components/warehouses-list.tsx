@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { COLUMNS, SORT_OPTIONS, WarehouseCard } from "../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 interface WarehousesListProps {
   onWarehousesChange: (warehouses: Warehouse[]) => void;
@@ -31,7 +32,7 @@ export default function WarehousesList({
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useWarehouses({
+  const { data, isLoading, isFetching, isError } = useWarehouses({
     ...apiParams,
     "filter[status]": filter,
   });
@@ -49,10 +50,8 @@ export default function WarehousesList({
     onErrorChange(isError);
   }, [isError, onErrorChange, isLoading, onLoadingChange]);
 
-  if (isError) {
-    return (
-      <p className="text-center text-red-500">Failed to load warehouses</p>
-    );
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -75,6 +74,7 @@ export default function WarehousesList({
         <ToggleableList<Warehouse>
           items={data?.data || []}
           isLoading={isLoading}
+          loadingText="Loading warehouses data..."
           emptyText="No warehouses found"
           columns={COLUMNS}
           renderItem={warehouse => <WarehouseCard warehouse={warehouse} />}

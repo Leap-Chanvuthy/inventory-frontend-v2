@@ -21,7 +21,7 @@ export default function UOMList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useUOMs({
+  const { data, isLoading, isFetching, isError } = useUOMs({
     ...apiParams,
     "filter[is_active]": filter
       ? filter === "active"
@@ -33,8 +33,8 @@ export default function UOMList() {
   const uoms = data?.data || [];
   const totalPages = data?.last_page || 1;
 
-  if (isError) {
-    return <UnexpectedError kind="fetch" />;
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -58,6 +58,7 @@ export default function UOMList() {
         <ToggleableList<UOM>
           items={uoms}
           isLoading={isLoading}
+          loadingText="Loading UOMs data..."
           emptyText="No UOMs found"
           columns={COLUMNS}
           renderItem={uom => <UOMCard uom={uom} />}

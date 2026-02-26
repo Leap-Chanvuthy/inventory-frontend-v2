@@ -8,6 +8,7 @@ import { createColumns, SORT_OPTIONS } from "../../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { ProductCategory } from "@/api/categories/types/category.type";
 import SingleCard from "../../_components/category-single-card";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export const ProductCategoryList = () => {
   const {
@@ -20,15 +21,14 @@ export const ProductCategoryList = () => {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, error } = useProductCategories(apiParams);
+  const { data, isLoading, isFetching, isError } =
+    useProductCategories(apiParams);
   const deleteMutation = useDeleteProductCategory();
 
   const categories = data?.data?.data || [];
 
-  if (error) {
-    return (
-      <p className="text-center text-red-500">Failed to load categories</p>
-    );
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -49,6 +49,7 @@ export const ProductCategoryList = () => {
       <ToggleableList<ProductCategory>
         items={categories}
         isLoading={isLoading}
+        loadingText="Loading categories data..."
         emptyText="No categories found"
         columns={createColumns({
           viewRoute: "product-categories/view",

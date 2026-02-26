@@ -74,14 +74,12 @@ export const UpdateCategoryForm = () => {
         if (action === "save_and_close") {
           navigate("/categories?tab=product-category");
         }
-        // save → stay, data auto-refreshed
       },
     });
   };
 
-  if (isLoading || isFetching)
-    return <DataCardLoading text="Loading category..." />;
-  if (isError)
+  if (isLoading) return <DataCardLoading text="Loading category data..." />;
+  if (isError && !isFetching)
     return (
       <UnexpectedError kind="fetch" homeTo="/categories?tab=product-category" />
     );

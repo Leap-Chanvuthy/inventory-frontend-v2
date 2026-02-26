@@ -8,13 +8,14 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumn, RowSelection } from "./data-table.type";
-import DataTableLoading from "./data-table-loading";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import DataTableEmpty from "./data-table-empty";
 
 type DataTableProps<T> = {
     columns: DataTableColumn<T>[];
     data?: T[];
     isLoading?: boolean;
+    loadingText?: string;
     emptyText?: string;
 
     /** Optional row selection */
@@ -26,6 +27,7 @@ export function DataTable<T>({
     columns,
     data,
     isLoading = false,
+    loadingText,
     emptyText = "No data found",
     rowSelection,
 }: DataTableProps<T>) {
@@ -108,9 +110,7 @@ export function DataTable<T>({
                                 colSpan={columns.length + (hasSelection ? 1 : 0)}
                                 className="p-0"
                             >
-                                <div className="flex min-h-[220px] w-full items-center justify-center text-center">
-                                    <DataTableLoading />
-                                </div>
+                                <DataCardLoading text={loadingText} />
                             </TableCell>
                         </TableRow>
                     ) : data?.length ? (
