@@ -33,9 +33,10 @@ export const ViewWarehouseForm = ({ warehouseId }: ViewWarehouseFormProps) => {
     });
   };
 
-  if (isLoading || isFetching)
-    return <DataCardLoading text="Loading warehouse details..." />;
-  if (isError) return <UnexpectedError kind="fetch" homeTo="/warehouses" />;
+  if (isLoading)
+    return <DataCardLoading text="Loading warehouse details data..." />;
+  if (isError && !isFetching)
+    return <UnexpectedError kind="fetch" homeTo="/warehouses" />;
   if (!warehouse) return <DataCardEmpty emptyText="Warehouse not found." />;
 
   const hasCoordinates = !!(warehouse.latitude && warehouse.longitude);

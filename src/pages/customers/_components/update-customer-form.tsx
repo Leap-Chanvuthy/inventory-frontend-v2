@@ -151,11 +151,11 @@ export const UpdateCustomerForm = () => {
       label: category.category_name,
     })) || [];
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading customer details..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading customer details data..." />;
   }
 
-  if (isError) {
+  if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" homeTo="/customers" />;
   }
   if (!data?.data) {

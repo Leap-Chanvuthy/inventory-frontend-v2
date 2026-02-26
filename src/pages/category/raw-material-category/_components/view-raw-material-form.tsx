@@ -35,11 +35,11 @@ export const ViewCategoryForm = ({ categoryId }: ViewCategoryFormProps) => {
 
   const category = categoryResponse?.data;
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading category..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading category data..." />;
   }
 
-  if (isError)
+  if (isError && !isFetching)
     return (
       <UnexpectedError
         kind="fetch"

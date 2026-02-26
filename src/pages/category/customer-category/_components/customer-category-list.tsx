@@ -8,6 +8,7 @@ import { createColumns, SORT_OPTIONS } from "../../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { CustomerCategory } from "@/api/categories/types/category.type";
 import { useDeleteCustomerCategory } from "@/api/categories/customer-categories/customer-category.mutation";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export const CustomerCategoryList = () => {
   const {
@@ -20,15 +21,14 @@ export const CustomerCategoryList = () => {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, error } = useCustomerCategories(apiParams);
+  const { data, isLoading, isFetching, isError } =
+    useCustomerCategories(apiParams);
   const deleteMutation = useDeleteCustomerCategory();
 
   const categories = data?.data?.data || [];
 
-  if (error) {
-    return (
-      <p className="text-center text-red-500">Failed to load categories</p>
-    );
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -49,6 +49,7 @@ export const CustomerCategoryList = () => {
       <ToggleableList<CustomerCategory>
         items={categories}
         isLoading={isLoading}
+        loadingText="Loading categories data..."
         emptyText="No categories found"
         columns={createColumns({
           viewRoute: "customer-categories/view",

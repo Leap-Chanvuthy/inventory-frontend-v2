@@ -186,11 +186,11 @@ export const UpdateSupplierForm = () => {
     );
   };
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading supplier details..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading supplier details data..." />;
   }
 
-  if (isError) {
+  if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" homeTo="/supplier" />;
   }
 

@@ -14,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function RawMaterialList() {
   const {
@@ -28,15 +29,13 @@ export function RawMaterialList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useRawMaterials({
+  const { data, isLoading, isError, isFetching } = useRawMaterials({
     ...apiParams,
     "filter[raw_material_category_id]": filter ? Number(filter) : undefined,
   });
 
-  if (isError && !data) {
-    return (
-      <p className="text-center text-red-500">Failed to load raw materials</p>
-    );
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -70,6 +69,7 @@ export function RawMaterialList() {
         <ToggleableList<RawMaterial>
           items={data?.data || []}
           isLoading={isLoading}
+          loadingText="Loading raw materials data..."
           emptyText="No raw materials found"
           columns={COLUMNS}
           renderItem={rawMaterial => (

@@ -31,11 +31,11 @@ export function ViewCustomerForm() {
     }
   };
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading customer details..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading customer details data..." />;
   }
 
-  if (isError) {
+  if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" homeTo="/customers" />;
   }
 

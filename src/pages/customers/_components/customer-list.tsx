@@ -11,6 +11,7 @@ import {
   SORT_OPTIONS,
   CustomerCard,
 } from "../utils/table-feature";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function CustomerList() {
   const {
@@ -25,13 +26,13 @@ export function CustomerList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useCustomers({
+  const { data, isLoading, isFetching, isError } = useCustomers({
     ...apiParams,
     "filter[customer_status]": filter,
   });
 
-  if (isError) {
-    return <p className="text-center text-red-500">Failed to load customers</p>;
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
   }
 
   return (
@@ -57,6 +58,7 @@ export function CustomerList() {
         <ToggleableList<Customer>
           items={data?.data?.data || []}
           isLoading={isLoading}
+          loadingText="Loading customers data..."
           emptyText="No customers found"
           columns={COLUMNS}
           renderItem={customer => <CustomerCard customer={customer} />}

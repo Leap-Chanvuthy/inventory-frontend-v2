@@ -79,9 +79,8 @@ export const UpdateCustomerCategoryForm = () => {
     });
   };
 
-  if (isLoading || isFetching)
-    return <DataCardLoading text="Loading category..." />;
-  if (isError)
+  if (isLoading) return <DataCardLoading text="Loading category data..." />;
+  if (isError && !isFetching)
     return (
       <UnexpectedError
         kind="fetch"

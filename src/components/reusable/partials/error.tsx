@@ -18,6 +18,8 @@ type ErrorProps = {
   onRetry?: () => void;
   homeTo?: string;
   minHeight?: string;
+  hideHomeButton?: boolean;
+  hideBackButton?: boolean;
 };
 
 const copyByKind: Record<
@@ -58,6 +60,8 @@ export default function UnexpectedError({
   onRetry,
   homeTo = "/",
   minHeight = "calc(100svh - 200px)",
+  hideHomeButton = false,
+  hideBackButton = false,
 }: ErrorProps) {
   const navigate = useNavigate();
   const goBack = () => navigate(-1);
@@ -95,23 +99,27 @@ export default function UnexpectedError({
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className={`flex flex-wrap gap-3 ${hideHomeButton && hideBackButton ? "justify-center" : ""}`}>
               <Button onClick={handleRetry}>
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Retry
               </Button>
 
-              <Button asChild variant="outline">
-                <Link to={homeTo}>
-                  <Home className="mr-2 h-4 w-4" />
-                  Go Home
-                </Link>
-              </Button>
+              {!hideHomeButton && (
+                <Button asChild variant="outline">
+                  <Link to={homeTo}>
+                    <Home className="mr-2 h-4 w-4" />
+                    Go Home
+                  </Link>
+                </Button>
+              )}
 
-              <Button variant="ghost" onClick={goBack}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Go Back
-              </Button>
+              {!hideBackButton && (
+                <Button variant="ghost" onClick={goBack}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Go Back
+                </Button>
+              )}
             </div>
 
             <div className="text-sm text-muted-foreground">{content.tip}</div>

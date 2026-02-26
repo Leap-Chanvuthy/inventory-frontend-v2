@@ -78,11 +78,11 @@ export const UpdateUserForm = () => {
     });
   };
 
-  if (isLoading || isFetching) {
-    return <DataCardLoading text="Loading user details..." />;
+  if (isLoading) {
+    return <DataCardLoading text="Loading user details data..." />;
   }
 
-  if (isError) {
+  if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" homeTo="/users" />;
   }
 
