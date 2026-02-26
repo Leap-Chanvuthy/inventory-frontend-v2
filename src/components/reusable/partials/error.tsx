@@ -8,7 +8,7 @@ import {
   WifiOff,
 } from "lucide-react";
 
-type ErrorKind = "network" | "fetch" | "unexpected";
+export type ErrorKind = "network" | "fetch" | "unexpected";
 
 type ErrorProps = {
   kind?: ErrorKind;
@@ -17,6 +17,7 @@ type ErrorProps = {
   code?: string;
   onRetry?: () => void;
   homeTo?: string;
+  minHeight?: string;
 };
 
 const copyByKind: Record<
@@ -56,6 +57,7 @@ export default function UnexpectedError({
   code,
   onRetry,
   homeTo = "/",
+  minHeight = "calc(100svh - 200px)",
 }: ErrorProps) {
   const navigate = useNavigate();
   const goBack = () => navigate(-1);
@@ -74,8 +76,8 @@ export default function UnexpectedError({
   const Icon = kind === "network" ? WifiOff : TriangleAlert;
 
   return (
-    <div className="min-h-[100svh] bg-background">
-      <div className="mx-auto flex min-h-[100svh] max-w-6xl items-center px-6 py-12">
+    <div className="bg-background" style={{ minHeight }}>
+      <div className="mx-auto flex max-w-6xl items-center px-6 py-12" style={{ minHeight }}>
         <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-2">
           {/* Left: Content */}
           <div className="space-y-6">

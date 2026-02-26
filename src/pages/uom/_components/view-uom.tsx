@@ -7,6 +7,7 @@ import { Text } from "@/components/ui/text/app-text";
 import { PieChart, BoxIcon } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { IconBadge } from "@/components/ui/icons-badge";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 
 interface ViewUOMProps {
   id: number;
@@ -17,11 +18,7 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
   const deleteMutation = useDeleteUOM();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Loading UOM details...</p>
-      </div>
-    );
+    return <DataCardLoading text="Loading UOM details..." />;
   }
 
   if (isError || !data) {

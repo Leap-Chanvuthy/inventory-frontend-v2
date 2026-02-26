@@ -11,6 +11,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
 import MapPicker from "@/components/reusable/map-picker/map-picker";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -31,7 +34,12 @@ export const UpdateWarehouseForm = () => {
   const { id } = useParams<{ id: string }>();
   const warehouseId = String(id);
   // const navigate = useNavigate();
-  const { data: warehouse, isLoading } = useSingleWarehouse(warehouseId);
+  const {
+    data: warehouse,
+    isLoading,
+    isFetching,
+    isError,
+  } = useSingleWarehouse(warehouseId);
   const warehouseMutation = useUpdateWarehouse(warehouseId);
   const deleteImageMutation = useDeleteWarehouseImage(warehouseId);
   const error =
@@ -138,15 +146,15 @@ export const UpdateWarehouseForm = () => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <p className="text-muted-foreground">Loading warehouse data...</p>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading warehouse details..." />;
   }
+
+  if (isError) {
+    return <UnexpectedError kind="fetch" homeTo="/warehouses" />;
+  }
+
+  if (!warehouse) return <DataCardEmpty emptyText="Warehouse not found." />;
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">

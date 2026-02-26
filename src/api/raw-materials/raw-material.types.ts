@@ -152,8 +152,21 @@ export interface CreateRawMaterialResponse {
   };
 }
 
-export interface UpdateRawMaterialRequest extends Partial<CreateRawMaterialRequest> {
-  id: number;
+export interface UpdateRawMaterialRequest {
+  material_name: string;
+  barcode?: string;
+  minimum_stock_level: number;
+  expiry_date: string;
+  description?: string;
+  raw_material_category_id: number;
+  uom_id: number;
+  supplier_id: number;
+  warehouse_id: number;
+  quantity: number | null;
+  unit_price_in_usd: number | null;
+  exchange_rate_from_usd_to_riel: number | null;
+  movement_date: string;
+  note?: string;
 }
 
 // Reorder Raw Material
@@ -186,6 +199,7 @@ export interface RawMaterialValidationErrors {
     supplier_id?: string[];
     warehouse_id?: string[];
     production_method?: string[];
+    movement_date?: string[];
     quantity?: string[];
     unit_price_in_usd?: string[];
     total_value_in_usd?: string[];

@@ -24,10 +24,15 @@ import {
   CustomerStatus,
 } from "@/api/customers/customer.types";
 import { Text } from "@/components/ui/text/app-text";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export const UpdateCustomerForm = () => {
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError } = useSingleCustomer(Number(id));
+  const { data, isLoading, isFetching, isError } = useSingleCustomer(
+    Number(id),
+  );
   const customerMutation = useUpdateCustomer();
   const { data: categoriesData, isLoading: categoriesLoading } =
     useCustomerCategories();
@@ -146,24 +151,15 @@ export const UpdateCustomerForm = () => {
       label: category.category_name,
     })) || [];
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading customer details...</p>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading customer details..." />;
   }
 
-  if (isError || !data?.data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-500">Failed to load customer details</p>
-        </div>
-      </div>
-    );
+  if (isError) {
+    return <UnexpectedError kind="fetch" homeTo="/customers" />;
+  }
+  if (!data?.data) {
+    return <DataCardEmpty emptyText="Customer not found." />;
   }
 
   return (

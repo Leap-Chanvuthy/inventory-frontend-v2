@@ -9,11 +9,16 @@ import {
   CustomerStatusBadge,
 } from "../utils/customer-status";
 import { IconBadge } from "@/components/ui/icons-badge";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export function ViewCustomerForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSingleCustomer(Number(id));
+  const { data, isLoading, isFetching, isError } = useSingleCustomer(
+    Number(id),
+  );
   const deleteMutation = useDeleteCustomer();
 
   const handleDelete = () => {
@@ -26,24 +31,16 @@ export function ViewCustomerForm() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading customer details...</p>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <DataCardLoading text="Loading customer details..." />;
   }
 
-  if (isError || !data?.data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-500">Failed to load customer details</p>
-        </div>
-      </div>
-    );
+  if (isError) {
+    return <UnexpectedError kind="fetch" homeTo="/customers" />;
+  }
+
+  if (!data?.data) {
+    return <DataCardEmpty emptyText="Customer not found." />;
   }
 
   const customer = data.data;

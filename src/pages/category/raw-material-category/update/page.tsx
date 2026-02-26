@@ -9,7 +9,7 @@ export const EditCategories = () => {
       label: "Category",
       link: "/categories?tab=raw-material-category",
     },
-    { name: "edit-category", label: "Edit Raw Material Category" },
+    { name: "update-category", label: "Update Raw Material Category" },
   ];
 
   return (

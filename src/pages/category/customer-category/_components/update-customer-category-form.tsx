@@ -5,10 +5,12 @@ import { ColorPickerInput } from "@/components/reusable/partials/color-picker-in
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import DataTableLoading from "@/components/reusable/data-table/data-table-loading";
 import { useSingleCustomerCategory } from "@/api/categories/customer-categories/customer-category.query";
 import { CreateCustomerCategoryValidationErrors } from "@/api/categories/types/category.type";
 import { Text } from "@/components/ui/text/app-text";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
+import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 export const UpdateCustomerCategoryForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +20,7 @@ export const UpdateCustomerCategoryForm = () => {
     data: categoryData,
     isLoading,
     isError,
+    isFetching,
   } = useSingleCustomerCategory(categoryId);
   const categoryMutation = useUpdateCustomerCategory(categoryId);
 
@@ -76,35 +79,17 @@ export const UpdateCustomerCategoryForm = () => {
     });
   };
 
-  if (isError) {
+  if (isLoading || isFetching)
+    return <DataCardLoading text="Loading category..." />;
+  if (isError)
     return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8">
-            <div className="flex min-h-[400px] w-full items-center justify-center">
-              <p className="text-center text-red-500">
-                Failed to load category data
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UnexpectedError
+        kind="fetch"
+        homeTo="/categories?tab=customer-category"
+      />
     );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-        <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-          <div className="p-8">
-            <div className="flex min-h-[400px] w-full items-center justify-center">
-              <DataTableLoading />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!categoryData?.data)
+    return <DataCardEmpty emptyText="Category not found." />;
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">

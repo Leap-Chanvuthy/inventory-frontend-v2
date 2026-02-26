@@ -9,6 +9,7 @@ import {
 import { useSingleSupplier } from "@/api/suppliers/supplier.query";
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
 import { useSingleUOM } from "@/api/uom/uom.query";
+import UnexpectedError from "@/components/reusable/partials/error";
 import type { UOM } from "@/api/uom/uom.types";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
@@ -19,7 +20,7 @@ import {
   SelectInput,
 } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.types";
 import { Text } from "@/components/ui/text/app-text";
@@ -56,6 +57,8 @@ export const CreateRawMaterialForm = () => {
   };
 
   const [form, setForm] = useState(initialForm);
+  const [dropdownError, setDropdownError] = useState(false);
+  const handleDropdownError = useCallback(() => setDropdownError(true), []);
 
   // Fetch selected items for preview cards
   const { data: selectedCategoryData } = useSingleRawMaterialCategory(
@@ -75,6 +78,10 @@ export const CreateRawMaterialForm = () => {
   const selectedUOM = (selectedUOMData?.data ??
     selectedUOMData ??
     null) as UOM | null;
+
+  if (dropdownError) {
+    return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
+  }
 
   /* ---------- Handlers ---------- */
 
@@ -194,6 +201,7 @@ export const CreateRawMaterialForm = () => {
                       onChange={handleSelectChange("raw_material_category_id")}
                       error={fieldErrors?.raw_material_category_id?.[0]}
                       selectedLabel={selectedCategory?.category_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                     <SearchableSelect
@@ -209,6 +217,7 @@ export const CreateRawMaterialForm = () => {
                           ? `${selectedUOM.name} (${selectedUOM.symbol})`
                           : undefined
                       }
+                      onFetchError={handleDropdownError}
                       required
                     />
                   </div>
@@ -223,6 +232,7 @@ export const CreateRawMaterialForm = () => {
                       onChange={handleSelectChange("supplier_id")}
                       error={fieldErrors?.supplier_id?.[0]}
                       selectedLabel={selectedSupplier?.official_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                     <SearchableSelect
@@ -234,6 +244,7 @@ export const CreateRawMaterialForm = () => {
                       onChange={handleSelectChange("warehouse_id")}
                       error={fieldErrors?.warehouse_id?.[0]}
                       selectedLabel={selectedWarehouse?.warehouse_name}
+                      onFetchError={handleDropdownError}
                       required
                     />
                   </div>

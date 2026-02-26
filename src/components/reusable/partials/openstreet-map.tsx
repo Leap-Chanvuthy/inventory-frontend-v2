@@ -130,7 +130,7 @@ export const OpenStreetMap: React.FC<OpenStreetMapProps> = ({
                     {marker.viewLink && (
                       <Link
                         to={marker.viewLink}
-                        className="w-full py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg text-center"
+                        className="w-full py-2 bg-blue-600 !text-white text-xs font-semibold rounded-lg text-center block"
                       >
                         View Details
                       </Link>
