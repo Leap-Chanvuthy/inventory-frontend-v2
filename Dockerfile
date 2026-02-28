@@ -8,9 +8,7 @@ LABEL stage="builder"
 WORKDIR /app
 
 # Declare build-time env vars (Vite requires VITE_* to be available during `npm run build`)
-ARG VITE_API_URL
 ARG VITE_BASE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_BASE_API_URL=$VITE_BASE_API_URL
 
 # Install dependencies first (layer-cached unless package files change)
