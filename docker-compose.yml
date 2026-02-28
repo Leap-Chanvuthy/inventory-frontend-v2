@@ -1,42 +1,9 @@
-# ─────────────────────────────────────────────────────────────
-# Docker Compose — Frontend production deployment
-# Domain  : client-inventory-v2.camsmeinventory.com
-# VPS dir : /var/www/inventory/frontend-v2
-# The VPS Nginx (nginx.vps.conf) terminates SSL and proxies to
-# this container on port 3000.
-# ─────────────────────────────────────────────────────────────
-
 services:
-  frontend:
+  react-app:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
-      # Vite env vars are baked in at build time via build args.
-      # Values are read from the .env file in this directory.
-      args:
-        - VITE_BASE_API_URL=${VITE_BASE_API_URL}
-    image: inventory-v2-frontend:latest
-    container_name: inventory-frontend
+    container_name: our-pharmacy-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"   # VPS Nginx proxies client-inventory-v2.camsmeinventory.com → localhost:3000
-    environment:
-      - TZ=UTC
-    healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    networks:
-      - frontend-net
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-networks:
-  frontend-net:
-    driver: bridge
+      - "80:80"
