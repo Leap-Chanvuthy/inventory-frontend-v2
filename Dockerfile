@@ -1,6 +1,14 @@
 # Stage 1: Build React App (Vite)
 FROM node:20-alpine AS builder
 
+# Declare build-time variables (values come from docker-compose args)
+ARG VITE_API_URL
+ARG VITE_BASE_API_URL
+
+# Make them available to Vite during the build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_BASE_API_URL=$VITE_BASE_API_URL
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -8,7 +16,6 @@ RUN npm install
 
 COPY . .
 
-# Vite automatically loads .env or .env.production
 RUN npm run build
 
 # Stage 2: Serve with Nginx
