@@ -60,7 +60,7 @@ export function SupplierList() {
               <Button variant="outline" asChild>
                 <Link to="/supplier/deleted">
                   <Trash2 className="h-4 w-4 mr-1.5 text-red-500" />
-                  Recently Deleted
+                  Recovery
                 </Link>
               </Button>
             </>
