@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSuppliers, getSupplierById, getImportHistories, getSupplierStatistics, getSupplierTransactionHistory } from "./supplier.api";
+import { getSuppliers, getSupplierById, getImportHistories, getSupplierStatistics, getSupplierTransactionHistory, getDeletedSuppliers } from "./supplier.api";
 import { SupplierQueryParams, ImportHistoryQueryParams, SupplierTransactionHistoryQueryParams } from "./supplier.types";
 
 // Get all suppliers with pagination and filters
@@ -42,4 +42,12 @@ export const useSupplierTransactions = (supplierId: number , params: SupplierTra
     queryFn: () => getSupplierTransactionHistory(supplierId , params),
     enabled: !!supplierId,
   });
-}
+};
+
+// Get deleted (soft-deleted) suppliers
+export const useDeletedSuppliers = (params?: SupplierQueryParams) => {
+  return useQuery({
+    queryKey: ["suppliers-deleted", params],
+    queryFn: () => getDeletedSuppliers(params),
+  });
+};

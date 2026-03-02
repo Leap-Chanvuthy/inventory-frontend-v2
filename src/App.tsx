@@ -42,6 +42,7 @@ import UpdateSupplier from "./pages/supplier/update/page";
 import { SupplierDetail } from "./pages/supplier/view/page";
 import ImportSuppliers from "./pages/supplier/import/page";
 import ImportHistory from "./pages/supplier/import-history/page";
+import DeletedSuppliers from "./pages/supplier/deleted/page";
 import { Customers } from "./pages/customers/page";
 import CreateCustomer from "./pages/customers/create/page";
 import UpdateCustomer from "./pages/customers/update/page";
@@ -103,6 +104,7 @@ export default function App() {
                   element={<UpdateSupplier />}
                 />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
+                <Route path="/supplier/deleted" element={<DeletedSuppliers />} />
 
                 {/* Customer Routes */}
                 <Route path="/customer" element={<Customers />} />

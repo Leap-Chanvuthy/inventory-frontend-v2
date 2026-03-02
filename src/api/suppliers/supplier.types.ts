@@ -50,6 +50,7 @@ export interface Supplier {
   banks_count?: number; // Optional field present in create/update responses
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
   banks: SupplierBank[];
 }
 

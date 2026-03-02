@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Supplier, SupplierTransactionItem } from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { SupplierCategoryBadge } from "./supplier-status";
@@ -10,14 +11,32 @@ import {
 } from "@/components/ui/card";
 import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useDeleteSupplier } from "@/api/suppliers/supplier.mutation";
+import { useDeleteSupplier, useRecoverSupplier } from "@/api/suppliers/supplier.mutation";
 import { Text } from "@/components/ui/text/app-text";
 import { formatDate } from "@/utils/date-format";
 import {
   ArrowDownLeft,
   ArrowUpRight,
+  RotateCcw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
   const deleteMutation = useDeleteSupplier();
@@ -35,6 +54,58 @@ const SupplierActions = ({ supplier }: { supplier: Supplier }) => {
         }}
       />
     </div>
+  );
+};
+
+export const RecoverSupplierAction = ({ supplier }: { supplier: Supplier }) => {
+  const recoverMutation = useRecoverSupplier();
+  const [open, setOpen] = useState(false);
+
+  const handleConfirmRecover = () => {
+    recoverMutation.mutate(supplier.id);
+    setOpen(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <button type="button" className="inline-flex items-center">
+                <RotateCcw className="w-4 h-4 text-emerald-500 cursor-pointer" />
+              </button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="top">Recover Supplier</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <DialogContent
+        className="sm:max-w-lg"
+        onPointerDownOutside={e => e.preventDefault()}
+        onEscapeKeyDown={e => e.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle>Recover This Supplier</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to recover "{supplier.official_name}"? It will
+            be restored to the active suppliers list.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="button" onClick={handleConfirmRecover}>
+            Recover
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -134,6 +205,7 @@ interface SupplierCardProps {
   hideActions?: boolean;
   disableLink?: boolean;
   interactive?: boolean;
+  isDeleted?: boolean;
 }
 
 export function SupplierCard({
@@ -141,6 +213,7 @@ export function SupplierCard({
   hideActions = false,
   disableLink = false,
   interactive = true,
+  isDeleted = false,
 }: SupplierCardProps) {
   if (!supplier) return null;
 
@@ -163,7 +236,7 @@ export function SupplierCard({
       {/* Header */}
       <CardHeader className="flex flex-row items-start justify-between gap-3 sm:gap-4 pb-3">
         <div className="flex items-center gap-3 min-w-0">
-          {disableLink ? (
+          {disableLink || isDeleted ? (
             <>
               <img
                 src={supplier.image || "/supplier-placeholder.png"}
@@ -202,6 +275,7 @@ export function SupplierCard({
             </Link>
           )}
         </div>
+        {isDeleted && <RecoverSupplierAction supplier={supplier} />}
       </CardHeader>
 
       {/* Content */}
@@ -264,7 +338,7 @@ export function SupplierCard({
         </div>
       </CardContent>
 
-      {!hideActions && (
+      {!hideActions && !isDeleted && (
         <CardFooter className="flex justify-end pt-0 pb-4">
           <SupplierActions supplier={supplier} />
         </CardFooter>

@@ -4,6 +4,7 @@ import {
   updateSupplier,
   deleteSupplier,
   importSuppliers,
+  recoverSupplier,
 } from "./supplier.api";
 import {
   CreateSupplierRequest,
@@ -94,6 +95,22 @@ export const useImportSuppliers = () => {
       toast.error(
         error.response?.data?.message || "Failed to import suppliers"
       );
+    },
+  });
+};
+
+export const useRecoverSupplier = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => recoverSupplier(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      queryClient.invalidateQueries({ queryKey: ["suppliers-deleted"] });
+      toast.success("Supplier recovered successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to recover supplier");
     },
   });
 };

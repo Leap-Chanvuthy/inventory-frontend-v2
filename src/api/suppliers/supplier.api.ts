@@ -122,3 +122,19 @@ export const getSupplierStatistics = async (): Promise<GetSupplierStatisticsResp
   const response = await apiClient.get(`${BASE_API_URL}/suppliers/statistics`);
   return response.data;
 };
+
+// Get deleted (soft-deleted) suppliers
+export const getDeletedSuppliers = async (
+  params?: SupplierQueryParams
+): Promise<GetSuppliersResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/suppliers/deleted`, {
+    params,
+  });
+  return response.data;
+};
+
+// Recover (restore) a soft-deleted supplier
+export const recoverSupplier = async (id: number): Promise<{ status: boolean; message: string }> => {
+  const response = await apiClient.patch(`${BASE_API_URL}/suppliers/${id}/recover`);
+  return response.data;
+};
