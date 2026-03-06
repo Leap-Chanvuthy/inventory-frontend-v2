@@ -1,87 +1,72 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-]
+import { GlobalPagination } from "@/components/reusable/partials/pagination";
+import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
+import { useProducts } from "@/api/product/product.query";
+import { Product } from "@/api/product/product.type";
+import { useTableQueryParams } from "@/hooks/use-table-query-params";
+import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
+import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
+import { COLUMNS, SORT_OPTIONS, ProductCard } from "../utils/table-feature";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 export function ProductList() {
+  const {
+    setPage,
+    setSearch,
+    setSort,
+    setPerPage,
+    setFilter,
+    perPage,
+    filter,
+    search,
+    apiParams,
+  } = useTableQueryParams();
+
+  const { data, isLoading, isError, isFetching } = useProducts({
+    ...apiParams,
+    "filter[product_category_id]": filter ? Number(filter) : undefined,
+  });
+
+  if (isError && !isFetching) {
+    return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
+  }
+
   return (
-    <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.invoice}>
-            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-            <TableCell>{invoice.paymentStatus}</TableCell>
-            <TableCell>{invoice.paymentMethod}</TableCell>
-            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
-  )
+    <div className="min-h-screen w-full p-4 sm:p-8 bg-background">
+      <div className="mx-auto max-w-[1600px]">
+        <TableToolbar
+          searchPlaceholder="Search products..."
+          onSearch={setSearch}
+          search={search}
+          selectedFilter={filter}
+          onFilterChange={(val) => setFilter(val || undefined)}
+          sortOptions={SORT_OPTIONS}
+          onSortChange={(values) => setSort(values[0])}
+          requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
+          perPage={perPage}
+          onPerPageChange={setPerPage}
+          createHref="/products/create"
+          isListOptionDisplayed={true}
+        />
+
+        <ToggleableList<Product>
+          items={data?.data || []}
+          isLoading={isLoading}
+          loadingText="Loading products..."
+          emptyText="No products found"
+          columns={COLUMNS}
+          renderItem={(product) => <ProductCard product={product} />}
+        />
+
+        <div className="flex justify-center mt-6">
+          <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+            <GlobalPagination
+              currentPage={data?.current_page || 1}
+              lastPage={data?.last_page || 1}
+              onPageChange={setPage}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

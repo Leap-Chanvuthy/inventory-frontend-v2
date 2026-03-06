@@ -1,29 +1,25 @@
-import { ChartAreaStacked } from '@/components/reusable/charts/chart-area-stack'
-import ProductCard from './_components/product-card'
-import { Barchart } from '@/components/reusable/charts/barchart'
-import { Piechart } from '@/components/reusable/charts/piechart'
+import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { Text } from "@/components/ui/text/app-text";
+import { ProductList } from './_components/product-list'
 
 const Product = () => {
+  const breadcrumbItems = [
+    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "products", label: "Products", link: "/products" },
+    { name: "list", label: "List of Products" },
+  ];
+
   return (
     <div>
-      <ProductCard />  
-      <div className='w-full my-4 grid grid-col-1 lg:md:grid-cols-3 gap-4'>
-        <ChartAreaStacked />
-        <Barchart />
-        <Piechart/>
+      <div className="mx-6 mb-5">
+        <BreadCrumb items={breadcrumbItems} />
       </div>
-            <div className='w-full my-4 grid grid-col-1 lg:md:grid-cols-3 gap-4'>
-        <ChartAreaStacked />
-        <Barchart />
-        <Piechart/>
-      </div>
-            <div className='w-full my-4 grid grid-col-1 lg:md:grid-cols-3 gap-4'>
-        <ChartAreaStacked />
-        <Barchart />
-        <Piechart/>
-      </div>
+
+      <Text.TitleLarge className="mx-6">Product Management</Text.TitleLarge>
+
+      <ProductList />
     </div>
-  )
+  );
 }
 
 export default Product

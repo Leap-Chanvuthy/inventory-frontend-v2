@@ -38,7 +38,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     label: "Application",
     items: [
       { title: "Dashboard", url: "/", icon: Home },
-      { title: "Products", url: "/products", icon: Inbox },
+      // { title: "Products", url: "/products", icon: Inbox },
       { title: "Calendar", url: "/calendar", icon: Calendar },
       { title: "Search", url: "/search", icon: Search },
     ],
@@ -78,7 +78,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         url: "/products",
         icon: PackageSearch,
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
-        isLocked: true,
+        isLocked: false,
         isQuickMenu: true,
       },
     ],
@@ -172,6 +172,6 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
   },
 ];
 
-export const quickMenu: SidebarItem[] = SIDEBAR_CONFIG.flatMap((group) =>
-  group.items.filter((item) => item.isQuickMenu),
+export const quickMenu: SidebarItem[] = SIDEBAR_CONFIG.flatMap(group =>
+  group.items.filter(item => item.isQuickMenu),
 );
