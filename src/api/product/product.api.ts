@@ -6,6 +6,8 @@ import {
   ProductQueryParams,
   CreateProductRequest,
   UpdateProductRequest,
+  CreateExternalPurchaseRequest,
+  CreateInternalManufacturingRequest,
 } from "./product.type";
 
 export const getProducts = async (
@@ -34,6 +36,28 @@ export const updateProduct = async (
   data: UpdateProductRequest
 ): Promise<GetProductResponse> => {
   const response = await apiClient.patch(`${BASE_API_URL}/products/${id}`, data);
+  return response.data;
+};
+
+export const createExternalPurchase = async (
+  data: CreateExternalPurchaseRequest
+): Promise<GetProductResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/products/create/external-purchase`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response.data;
+};
+
+export const createInternalManufacturing = async (
+  data: CreateInternalManufacturingRequest
+): Promise<GetProductResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/products/create/internal-manufacturing`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
   return response.data;
 };
 

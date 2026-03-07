@@ -13,7 +13,6 @@ const CreateRawMaterial = () => {
       <div className="mx-6 mb-5">
         <BreadCrumb items={breadcrumbItems} />
       </div>
-
       <CreateRawMaterialForm />
     </div>
   );

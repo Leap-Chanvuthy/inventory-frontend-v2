@@ -65,6 +65,49 @@ export interface ProductQueryParams {
   sort?: string;
 }
 
+// External Purchase creation
+export interface CreateExternalPurchaseRequest {
+  product_name: string;
+  barcode?: string;
+  product_description?: string;
+  product_category_id: number;
+  uom_id: number;
+  supplier_id: number;
+  warehouse_id: number;
+  quantity: number;
+  purchase_unit_price_in_usd: number;
+  exchange_rate_from_usd_to_riel: number;
+  selling_unit_price_in_usd: number;
+  selling_exchange_rate_from_usd_to_riel: number;
+  movement_date?: string;
+  note?: string;
+  images?: File[];
+}
+
+// Internal Manufacturing creation
+export interface RawMaterialBOM {
+  raw_material_id: number;
+  quantity: number;
+}
+
+export interface CreateInternalManufacturingRequest {
+  product_name: string;
+  barcode?: string;
+  product_description?: string;
+  product_category_id: number;
+  uom_id: number;
+  supplier_id: number;
+  warehouse_id: number;
+  product_status: string;
+  quantity: number;
+  selling_unit_price_in_usd: number;
+  selling_exchange_rate_from_usd_to_riel: number;
+  movement_date?: string;
+  note?: string;
+  raw_materials: RawMaterialBOM[];
+  images?: File[];
+}
+
 export interface CreateProductRequest {
   product_name: string;
   product_description?: string;

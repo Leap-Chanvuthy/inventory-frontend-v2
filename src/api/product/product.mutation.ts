@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, updateProduct, deleteProduct } from "./product.api";
-import { CreateProductRequest, UpdateProductRequest } from "./product.type";
+import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing } from "./product.api";
+import { CreateProductRequest, UpdateProductRequest, CreateExternalPurchaseRequest, CreateInternalManufacturingRequest } from "./product.type";
 import { toast } from "sonner";
 
 export const useCreateProduct = () => {
@@ -30,6 +30,34 @@ export const useUpdateProduct = (id: number) => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to update product");
+    },
+  });
+};
+
+export const useCreateExternalPurchase = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateExternalPurchaseRequest) => createExternalPurchase(payload),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success(response.message || "Product created successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to create product");
+    },
+  });
+};
+
+export const useCreateInternalManufacturing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateInternalManufacturingRequest) => createInternalManufacturing(payload),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success(response.message || "Product created successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to create product");
     },
   });
 };
