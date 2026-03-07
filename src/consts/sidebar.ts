@@ -1,6 +1,5 @@
 import {
   Home,
-  Inbox,
   Calendar,
   Search,
   Settings,
