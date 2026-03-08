@@ -111,11 +111,54 @@ export const ViewUOM = ({ id }: ViewUOMProps) => {
 
                 <div>
                   <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                    <IconBadge label="type" variant="cyan" />
-                    UOM Type
+                    <IconBadge label="category" variant="cyan" />
+                    Category
                   </p>
-                  <p className="font-medium">{uom.uom_type || "-"}</p>
+                  <p className="font-medium">{uom.category?.name ?? "-"}</p>
                 </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="type" variant="primary" />
+                    Unit Type
+                  </p>
+                  <span>
+                    {uom.is_base_unit ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Base Unit
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Derived Unit
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="unit" variant="info" />
+                    Conversion Factor
+                  </p>
+                  <p className="font-medium font-mono">
+                    {uom.is_base_unit
+                      ? "1 (base)"
+                      : `× ${Number(uom.conversion_factor).toLocaleString()}`}
+                  </p>
+                </div>
+
+                {!uom.is_base_unit && uom.baseUom && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                      <IconBadge label="symbol" variant="success" />
+                      Base Unit
+                    </p>
+                    <p className="font-medium">
+                      {uom.baseUom.name}
+                      {uom.baseUom.symbol ? ` (${uom.baseUom.symbol})` : ""}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Created At and Updated At - Same Row */}

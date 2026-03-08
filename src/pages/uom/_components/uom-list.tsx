@@ -7,6 +7,11 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { COLUMNS, SORT_OPTIONS, UOMCard } from "../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import UnexpectedError from "@/components/reusable/partials/error";
+import { useUomCategories } from "@/api/uom/uom.query";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Tag } from "lucide-react";
 
 export default function UOMList() {
   const {
@@ -21,6 +26,11 @@ export default function UOMList() {
     apiParams,
   } = useTableQueryParams();
 
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
+
+  const { data: categoriesData } = useUomCategories({ per_page: 100 });
+  const categories = categoriesData?.data ?? [];
+
   const { data, isLoading, isFetching, isError } = useUOMs({
     ...apiParams,
     "filter[is_active]": filter
@@ -28,6 +38,7 @@ export default function UOMList() {
         ? true
         : false
       : undefined,
+    ...(selectedCategory ? { "filter[category_id]": selectedCategory } : {}),
   });
 
   const uoms = data?.data || [];
@@ -38,8 +49,45 @@ export default function UOMList() {
   }
 
   return (
-    <div className="w-full  bg-background">
+    <div className="w-full bg-background">
       <div className="mx-auto max-w-[1600px]">
+
+        {/* Category filter pills */}
+        {categories.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <Button
+              variant={selectedCategory === undefined ? "default" : "outline"}
+              size="sm"
+              className={selectedCategory === undefined ? "bg-[#5c52d6] text-white" : ""}
+              onClick={() => setSelectedCategory(undefined)}
+            >
+              All Categories
+            </Button>
+            {categories.map(cat => (
+              <Button
+                key={cat.id}
+                variant={selectedCategory === cat.id ? "default" : "outline"}
+                size="sm"
+                className={selectedCategory === cat.id ? "bg-[#5c52d6] text-white" : ""}
+                onClick={() =>
+                  setSelectedCategory(prev =>
+                    prev === cat.id ? undefined : cat.id
+                  )
+                }
+              >
+                {cat.name}
+              </Button>
+            ))}
+            <Link
+              to="/unit-of-measurement/categories"
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              <Tag className="h-3.5 w-3.5" />
+              Manage Categories
+            </Link>
+          </div>
+        )}
+
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search UOM..."
@@ -54,7 +102,7 @@ export default function UOMList() {
           isListOptionDisplayed={true}
         />
 
-        {/* Toggleable List with Card and Table View */}
+        {/* Toggleable List */}
         <ToggleableList<UOM>
           items={uoms}
           isLoading={isLoading}

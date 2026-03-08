@@ -53,6 +53,10 @@ import UOM from "./pages/uom/page";
 import CreateUOM from "./pages/uom/create/page";
 import ViewUOM from "./pages/uom/view/page";
 import EditUOM from "./pages/uom/edit/page";
+import UomCategoriesPage from "./pages/uom-categories/page";
+import CreateUomCategoryPage from "./pages/uom-categories/create/page";
+import EditUomCategoryPage from "./pages/uom-categories/edit/page";
+import ViewUomCategoryPage from "./pages/uom-categories/view/page";
 import RawMaterials from "./pages/raw-materials/page";
 import { RawMaterialDetail } from "./pages/raw-materials/view/page";
 import CreateRawMaterial from "./pages/raw-materials/create/page";
@@ -193,6 +197,24 @@ export default function App() {
                 <Route
                   path="/unit-of-measurement/edit/:id"
                   element={<EditUOM />}
+                />
+
+                {/* UOM Categories */}
+                <Route
+                  path="/unit-of-measurement/categories"
+                  element={<UomCategoriesPage />}
+                />
+                <Route
+                  path="/unit-of-measurement/categories/create"
+                  element={<CreateUomCategoryPage />}
+                />
+                <Route
+                  path="/unit-of-measurement/categories/edit/:id"
+                  element={<EditUomCategoryPage />}
+                />
+                <Route
+                  path="/unit-of-measurement/categories/view/:id"
+                  element={<ViewUomCategoryPage />}
                 />
 
                 {/* Raw Materials */}
