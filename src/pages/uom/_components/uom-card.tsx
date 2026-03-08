@@ -32,6 +32,8 @@ interface UomCardProps {
   uom: UOM;
   allCategoryUoms: UOM[];   // flat list, used to compute parent label
   onAddChild: (parent: UOM) => void;
+  /** Called when the user clicks the Edit button — opens edit modal in parent */
+  onEdit?: (uom: UOM) => void;
   /** When true, renders in archived/trash mode: restore button, no edit/delete */
   isTrash?: boolean;
 }
@@ -98,7 +100,7 @@ function RelationshipLine({ uom, allUoms }: { uom: UOM; allUoms: UOM[] }) {
 
 // ── Main card ─────────────────────────────────────────────────────────────────
 
-export function UomCard({ uom, allCategoryUoms, onAddChild, isTrash = false }: UomCardProps) {
+export function UomCard({ uom, allCategoryUoms, onAddChild, onEdit, isTrash = false }: UomCardProps) {
   const navigate = useNavigate();
   const deleteMutation = useDeleteUOM();
   const restoreMutation = useRestoreUOM();
@@ -180,7 +182,7 @@ export function UomCard({ uom, allCategoryUoms, onAddChild, isTrash = false }: U
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                        onClick={() => navigate(`/unit-of-measurement/edit/${uom.id}`)}
+                        onClick={() => onEdit?.(uom)}
                         aria-label="Edit"
                       >
                         <Pencil className="h-3.5 w-3.5" />

@@ -4,13 +4,12 @@ import {
   fetchCategories,
   fetchSuppliers,
   fetchWarehouses,
-  fetchUOMs,
+  fetchUomCategories,
 } from "../utils/fetch-select-options";
 import { useSingleSupplier } from "@/api/suppliers/supplier.query";
 import { useSingleWarehouse } from "@/api/warehouses/warehouses.query";
-import { useSingleUOM } from "@/api/uom/uom.query";
+import { useSingleUomCategory } from "@/api/uom/uom.query";
 import UnexpectedError from "@/components/reusable/partials/error";
-import type { UOM } from "@/api/uom/uom.types";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
 import {
@@ -20,7 +19,7 @@ import {
   SelectInput,
 } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.types";
 import { Text } from "@/components/ui/text/app-text";
@@ -28,8 +27,8 @@ import { SearchableSelect } from "@/components/reusable/partials/searchable-sele
 import { toNumberOrNull } from "../utils/check_num_null";
 import { SupplierCard } from "@/pages/supplier/utils/table-feature";
 import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
-import { UOMCard } from "@/pages/uom/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
+import { UomHierarchyPreview } from "./uom-hierarchy-preview";
 import { PRODCUTION_METHOD } from "../utils/const";
 
 export const CreateRawMaterialForm = () => {
@@ -45,7 +44,8 @@ export const CreateRawMaterialForm = () => {
     expiry_date: "",
     description: "",
     raw_material_category_id: "",
-    uom_id: "",
+    uom_category_id: "",
+    base_uom_id: "",
     supplier_id: "",
     warehouse_id: "",
     quantity: "",
@@ -70,14 +70,35 @@ export const CreateRawMaterialForm = () => {
   const { data: selectedWarehouseData } = useSingleWarehouse(
     Number(form.warehouse_id),
   );
-  const { data: selectedUOMData } = useSingleUOM(Number(form.uom_id));
+  // Fetch UOM category to get its base unit — auto-populate uom_id
+  const { data: selectedUomCategoryData } = useSingleUomCategory(
+    Number(form.uom_category_id),
+  );
+
+  // Auto-set base_uom_id to the category's base unit when category changes.
+  // Normalise array-vs-object shape for base_unit.
+  useEffect(() => {
+    const raw = selectedUomCategoryData?.data?.base_unit;
+    const baseUnit = Array.isArray(raw) ? raw[0] : raw;
+    if (baseUnit?.id) {
+      setForm(prev => ({ ...prev, base_uom_id: String(baseUnit.id) }));
+    }
+  }, [selectedUomCategoryData]);
 
   const selectedCategory = selectedCategoryData?.data ?? null;
   const selectedSupplier = selectedSupplierData?.data?.supplier ?? null;
   const selectedWarehouse = selectedWarehouseData ?? null;
-  const selectedUOM = (selectedUOMData?.data ??
-    selectedUOMData ??
-    null) as UOM | null;
+
+  // Build the selectedLabel for the UOM SearchableSelect trigger.
+  // Normalise array-vs-object shape for base_unit.
+  const uomCategoryData = selectedUomCategoryData?.data;
+  const rawBase = uomCategoryData?.base_unit;
+  const uomBaseUnit = Array.isArray(rawBase) ? rawBase[0] : rawBase;
+  const uomSelectedLabel = uomCategoryData
+    ? uomBaseUnit
+      ? `${uomCategoryData.name} | ${uomBaseUnit.name}${uomBaseUnit.symbol ? ` (${uomBaseUnit.symbol})` : ""} [Base Unit]`
+      : uomCategoryData.name
+    : undefined;
 
   if (dropdownError) {
     return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
@@ -121,7 +142,7 @@ export const CreateRawMaterialForm = () => {
       expiry_date: form.expiry_date,
       description: form.description || undefined,
       raw_material_category_id: Number(form.raw_material_category_id),
-      uom_id: Number(form.uom_id),
+      base_uom_id: Number(form.base_uom_id),
       supplier_id: Number(form.supplier_id),
       warehouse_id: Number(form.warehouse_id),
       unit_price_in_usd: toNumberOrNull(form.unit_price_in_usd),
@@ -205,18 +226,14 @@ export const CreateRawMaterialForm = () => {
                       required
                     />
                     <SearchableSelect
-                      id="uom_id"
+                      id="uom_category_id"
                       label="Unit of Measurement"
-                      placeholder="Select UOM"
-                      fetchFn={fetchUOMs}
-                      value={form.uom_id}
-                      onChange={handleSelectChange("uom_id")}
-                      error={fieldErrors?.uom_id?.[0]}
-                      selectedLabel={
-                        selectedUOM
-                          ? `${selectedUOM.name} (${selectedUOM.symbol})`
-                          : undefined
-                      }
+                      placeholder="Search category or base unit…"
+                      fetchFn={fetchUomCategories}
+                      value={form.uom_category_id}
+                      onChange={handleSelectChange("uom_category_id")}
+                      error={fieldErrors?.base_uom_id?.[0]}
+                      selectedLabel={uomSelectedLabel}
                       onFetchError={handleDropdownError}
                       required
                     />
@@ -370,20 +387,21 @@ export const CreateRawMaterialForm = () => {
                         </div>
                       )}
 
-                      {selectedUOM ? (
+                      {form.uom_category_id ? (
                         <div>
                           <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Unit of Measurement
+                            Unit of Measurement Hierarchy
                           </p>
-                          <UOMCard
-                            uom={selectedUOM}
-                            hideActions={true}
-                            interactive={true}
-                          />
+                          <div className="rounded-lg border bg-card p-3">
+                            <UomHierarchyPreview
+                              categoryId={Number(form.uom_category_id)}
+                              quantity={Number(form.quantity) > 0 ? Number(form.quantity) : undefined}
+                            />
+                          </div>
                         </div>
                       ) : (
                         <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a UOM to preview details.
+                          Select a unit of measurement to see its hierarchy.
                         </div>
                       )}
 

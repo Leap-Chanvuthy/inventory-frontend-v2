@@ -11,6 +11,7 @@ import { useUOMs, useTrashedUOMs } from "@/api/uom/uom.query";
 import { UOM } from "@/api/uom/uom.types";
 import { UomCard } from "./uom-card";
 import { CreateUomModal } from "./create-uom-modal";
+import { EditUomModal } from "./edit-uom-modal";
 import { Button } from "@/components/ui/button";
 import {
   BoxIcon,
@@ -20,6 +21,7 @@ import {
   Trash2,
   RotateCcw,
   ArchiveX,
+  CirclePlus,
 } from "lucide-react";
 
 interface UomHierarchyPanelProps {
@@ -60,10 +62,11 @@ interface TreeViewProps {
   allUoms: UOM[];
   depth?: number;
   onAddChild: (parent: UOM) => void;
+  onEdit?: (uom: UOM) => void;
   isTrash?: boolean;
 }
 
-function TreeView({ nodes, allUoms, depth = 0, onAddChild, isTrash }: TreeViewProps) {
+function TreeView({ nodes, allUoms, depth = 0, onAddChild, onEdit, isTrash }: TreeViewProps) {
   return (
     <div className="w-full">
       {nodes.map((node, idx) => (
@@ -79,6 +82,7 @@ function TreeView({ nodes, allUoms, depth = 0, onAddChild, isTrash }: TreeViewPr
             uom={node.uom}
             allCategoryUoms={allUoms}
             onAddChild={onAddChild}
+            onEdit={onEdit}
             isTrash={isTrash}
           />
 
@@ -93,6 +97,7 @@ function TreeView({ nodes, allUoms, depth = 0, onAddChild, isTrash }: TreeViewPr
                 allUoms={allUoms}
                 depth={depth + 1}
                 onAddChild={onAddChild}
+                onEdit={onEdit}
                 isTrash={isTrash}
               />
             </div>
@@ -163,9 +168,12 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
 
   const allUoms: UOM[] = showTrashedUoms ? trashedUoms : activeUoms;
 
-  // Modal state: which parent to pre-fill (undefined = base unit creation)
+  // Create modal state: which parent to pre-fill (undefined = base unit creation)
   const [defaultParent, setDefaultParent] = useState<UOM | undefined>(undefined);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Edit modal state
+  const [editTarget, setEditTarget] = useState<UOM | null>(null);
 
   function openModalForBase() {
     setDefaultParent(undefined);
@@ -185,7 +193,7 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
     <div className="flex flex-col h-full overflow-hidden">
       {/* Panel header */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b shrink-0 flex items-center justify-between gap-4">
-        <div className="min-w-0">
+        <div className="min-w-0 pb-[22px]">
           <h2 className="font-semibold text-lg truncate">{categoryName}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {unitCount === 0
@@ -216,7 +224,7 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
               onClick={openModalForBase}
               disabled={currentlyLoading}
             >
-              <Plus className="h-4 w-4" />
+              <CirclePlus className="h-4 w-4" />
               Add Unit
             </Button>
           )}
@@ -247,6 +255,7 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
                   isTrash
                 />
               ))}
+              {/* Note: onEdit intentionally omitted in trash view */}
             </div>
           )
         ) : unitCount === 0 ? (
@@ -257,18 +266,30 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
               nodes={tree}
               allUoms={allUoms}
               onAddChild={openModalForChild}
+              onEdit={setEditTarget}
             />
           </div>
         )}
       </div>
 
-      {/* Modal */}
+      {/* Create modal */}
       {modalOpen && (
         <CreateUomModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           categoryUoms={allUoms}
           defaultParent={defaultParent}
+          categoryId={categoryId}
+        />
+      )}
+
+      {/* Edit modal */}
+      {editTarget && (
+        <EditUomModal
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          uom={editTarget}
+          categoryUoms={activeUoms}
           categoryId={categoryId}
         />
       )}

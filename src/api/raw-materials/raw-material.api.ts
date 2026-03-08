@@ -50,7 +50,27 @@ export const updateRawMaterial = async (
   id: number,
   data: UpdateRawMaterialRequest
 ): Promise<CreateRawMaterialResponse> => {
-  const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}`, data);
+  const { images, ...fields } = data;
+  const hasImages = images && images.length > 0;
+
+  if (!hasImages) {
+    // No files — regular JSON PATCH
+    const response = await apiClient.patch(`${BASE_API_URL}/raw-materials/${id}`, fields);
+    return response.data;
+  }
+
+  // PHP cannot parse multipart/form-data on PATCH requests.
+  // Use POST + _method=PATCH (Laravel method spoofing) for file uploads.
+  const formData = new FormData();
+  formData.append('_method', 'PATCH');
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  }
+  images.forEach(img => formData.append('images[]', img));
+
+  const response = await apiClient.post(`${BASE_API_URL}/raw-materials/${id}`, formData);
   return response.data;
 };
 

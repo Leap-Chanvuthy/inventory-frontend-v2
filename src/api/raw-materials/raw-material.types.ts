@@ -51,7 +51,7 @@ export interface RawMaterial {
   expiry_date: string | null;
   description: string | null;
   raw_material_category_id: number;
-  uom_id: number;
+  base_uom_id: number;
   supplier_id: number;
   warehouse_id: number;
   created_at: string;
@@ -129,7 +129,7 @@ export interface CreateRawMaterialRequest {
   expiry_date: string;
   description?: string;
   raw_material_category_id: number;
-  uom_id: number;
+  base_uom_id: number;
   supplier_id: number;
   warehouse_id: number;
   production_method: string;
@@ -154,12 +154,14 @@ export interface CreateRawMaterialResponse {
 
 export interface UpdateRawMaterialRequest {
   material_name: string;
+  production_method?: string;
   barcode?: string;
+  images?: File[];
   minimum_stock_level: number;
   expiry_date: string;
   description?: string;
   raw_material_category_id: number;
-  uom_id: number;
+  base_uom_id: number;
   supplier_id: number;
   warehouse_id: number;
   quantity: number | null;
@@ -195,7 +197,7 @@ export interface RawMaterialValidationErrors {
     expiry_date?: string[];
     description?: string[];
     raw_material_category_id?: string[];
-    uom_id?: string[];
+    base_uom_id?: string[];
     supplier_id?: string[];
     warehouse_id?: string[];
     production_method?: string[];

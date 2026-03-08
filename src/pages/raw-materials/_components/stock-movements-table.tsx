@@ -63,7 +63,11 @@ export function StockMovementsTable({
           columns={RM_STOCK_MOVEMENT_COLUMNS(
             materialName,
             rawMaterialId,
-            uom?.symbol || uom?.name,
+            uom
+              ? uom.symbol
+                ? `${uom.name} (${uom.symbol})`
+                : uom.name
+              : undefined,
           )}
           data={movements}
         />
