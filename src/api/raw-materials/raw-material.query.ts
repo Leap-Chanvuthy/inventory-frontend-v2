@@ -1,12 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getRawMaterials, getRawMaterialById, getDeletedRawMaterials } from "./raw-material.api";
 import { RawMaterialQueryParams } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
 export const useRawMaterials = (params?: RawMaterialQueryParams) => {
+  const normalizedParams = params ? { ...params } : {};
   return useQuery({
-    queryKey: ["raw-materials", params],
+    queryKey: ["raw-materials", normalizedParams],
     queryFn: () => getRawMaterials(params),
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -21,8 +23,10 @@ export const useSingleRawMaterial = (id: number) => {
 
 // Get deleted (soft-deleted) raw materials
 export const useDeletedRawMaterials = (params?: RawMaterialQueryParams) => {
+  const normalizedParams = params ? { ...params } : {};
   return useQuery({
-    queryKey: ["raw-materials-deleted", params],
+    queryKey: ["raw-materials-deleted", normalizedParams],
     queryFn: () => getDeletedRawMaterials(params),
+    placeholderData: keepPreviousData,
   });
 };

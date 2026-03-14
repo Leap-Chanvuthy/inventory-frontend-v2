@@ -20,7 +20,14 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { Search, ArrowUpDown, Download, X, CirclePlus } from "lucide-react";
+import {
+  Search,
+  ArrowUpDown,
+  Download,
+  X,
+  CirclePlus,
+  Trash2,
+} from "lucide-react";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import ListOptionToggle from "./list-option-toggle";
 
@@ -39,7 +46,7 @@ export type FilterOption = {
 export type RequestPerPageOption = {
   value: number;
   label: string;
-}
+};
 
 interface TableToolbarProps {
   /* Search */
@@ -63,6 +70,7 @@ interface TableToolbarProps {
   onFilterChange?: (value: string) => void;
 
   /* Actions */
+  deletedPathname?: string;
   onExport?: () => void;
   createHref?: string;
   onCreate?: () => void;
@@ -90,6 +98,7 @@ export const TableToolbar = ({
   selectedFilter,
   onFilterChange,
 
+  deletedPathname,
   onExport,
   createHref,
   onCreate,
@@ -99,7 +108,9 @@ export const TableToolbar = ({
   const [searchValue, setSearchValue] = useState<string>(search || "");
   const [sortValues, setSortValues] = useState<string[]>(selectedSort || []);
   const [filterValue, setFilterValue] = useState<string>(selectedFilter ?? "");
-  const [perPageValue, setPerPageValue] = useState<number | undefined>(perPage || undefined);
+  const [perPageValue, setPerPageValue] = useState<number | undefined>(
+    perPage || undefined,
+  );
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -107,7 +118,8 @@ export const TableToolbar = ({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       // only plain "/" (no modifiers)
-      if (e.key.toLowerCase() !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key.toLowerCase() !== "/" || e.metaKey || e.ctrlKey || e.altKey)
+        return;
 
       // don't hijack typing in inputs/textareas/selects/contenteditable
       const el = document.activeElement as HTMLElement | null;
@@ -134,7 +146,7 @@ export const TableToolbar = ({
     debounce((value: string) => {
       onSearch(value);
     }, 500),
-    [onSearch]
+    [onSearch],
   );
 
   useEffect(() => {
@@ -144,7 +156,7 @@ export const TableToolbar = ({
   /* ---------- Sort Toggle ---------- */
   const toggleSort = (value: string) => {
     const updated = sortValues.includes(value)
-      ? sortValues.filter(v => v !== value)
+      ? sortValues.filter((v) => v !== value)
       : [...sortValues, value];
 
     setSortValues(updated);
@@ -155,7 +167,7 @@ export const TableToolbar = ({
     const perPage = Number(value);
     setPerPageValue(perPage);
     onPerPageChange?.(perPage);
-  }
+  };
 
   /* ---------- Filter Change ---------- */
   const handleFilterChange = (value: string) => {
@@ -174,17 +186,17 @@ export const TableToolbar = ({
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
+    <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
       {/* LEFT */}
-      <div className="flex flex-1 flex-col sm:flex-row gap-3">
+      <div className="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-start">
         {/* Search */}
-        <div className="relative w-full sm:max-w-xs">
+        <div className="relative w-full md:max-w-xs">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
 
           <Input
             ref={searchInputRef}
             value={search || searchValue}
-            onChange={e => setSearchValue(e.target.value)}
+            onChange={(e) => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
             className="pl-9 pr-12"
           />
@@ -206,7 +218,7 @@ export const TableToolbar = ({
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex w-full flex-wrap gap-2 md:w-auto">
           {/* Sort */}
           {sortOptions.length > 0 && (
             <NavigationMenu>
@@ -218,7 +230,7 @@ export const TableToolbar = ({
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="p-3 w-56">
                     <div className="space-y-2">
-                      {sortOptions.map(opt => (
+                      {sortOptions.map((opt) => (
                         <label
                           key={opt.value}
                           className="flex items-center gap-2 cursor-pointer"
@@ -227,7 +239,11 @@ export const TableToolbar = ({
                             checked={sortValues.includes(opt.value)}
                             onCheckedChange={() => toggleSort(opt.value)}
                           />
-                          <span className="text-sm">{opt.label == selectedSort[0] ? `${opt.label}` : opt.label}</span>
+                          <span className="text-sm">
+                            {opt.label == selectedSort[0]
+                              ? `${opt.label}`
+                              : opt.label}
+                          </span>
                         </label>
                       ))}
                     </div>
@@ -244,7 +260,7 @@ export const TableToolbar = ({
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
-                {filterOptions.map(opt => (
+                {filterOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label == selectedFilter ? `${opt.label}` : opt.label}
                   </SelectItem>
@@ -255,12 +271,15 @@ export const TableToolbar = ({
 
           {/* request per page */}
           {requestPerPageOptions.length > 0 && (
-            <Select value={perPageValue?.toString()} onValueChange={handlePerPageChange}>
+            <Select
+              value={perPageValue?.toString()}
+              onValueChange={handlePerPageChange}
+            >
               <SelectTrigger className="w-16 h-9">
                 <SelectValue placeholder="Per Page" />
               </SelectTrigger>
               <SelectContent>
-                {requestPerPageOptions.map(opt => (
+                {requestPerPageOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value.toString()}>
                     {opt.value == perPage ? `${opt.label}` : opt.label}
                   </SelectItem>
@@ -293,9 +312,16 @@ export const TableToolbar = ({
       </div>
 
       {/* RIGHT */}
-      <div className="flex items-center gap-2">
+      <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end xl:w-auto">
         {/* Extra Actions */}
         {extraActions}
+
+        {/* Deleted items page link */}
+        <Link to={deletedPathname || "#"}>
+          <div className="p-2 rounded-md bg-red-100">
+            <Trash2 className="w-3 h-3 text-red-500" />
+          </div>
+        </Link>
 
         {/* Create Button */}
         {createHref && (

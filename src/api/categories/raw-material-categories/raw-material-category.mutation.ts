@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createRawMaterialCategory,
   deleteRawMaterialCategory,
+  restoreRawMaterialCategory,
   updateRawMaterialCategory,
 } from "./raw-material-category.api";
 import { CreateCategoryRequest } from "@/api/categories/types/category.type";
@@ -26,17 +27,27 @@ export const useCreateRawMaterialCategory = () => {
   });
 };
 
-export const useUpdateRawMaterialCategory = (id: number) => {
+type UpdateCategoryPayload =
+  | CreateCategoryRequest
+  | { id: number; payload: CreateCategoryRequest };
+
+export const useUpdateRawMaterialCategory = (categoryId?: number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateCategoryRequest) =>
-      updateRawMaterialCategory(id, data),
+    mutationFn: (payload: UpdateCategoryPayload) => {
+      if ("id" in payload) {
+        return updateRawMaterialCategory(payload.id, payload.payload);
+      }
+
+      if (!categoryId) {
+        throw new Error("Category id is required for update");
+      }
+
+      return updateRawMaterialCategory(categoryId, payload);
+    },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
-      queryClient.invalidateQueries({
-        queryKey: ["raw-material-category", id],
-      });
       toast.success("Category updated successfully");
     },
 
@@ -61,6 +72,24 @@ export const useDeleteRawMaterialCategory = () => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to delete category",
+      );
+    },
+  });
+};
+
+export const useRestoreRawMaterialCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => restoreRawMaterialCategory(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["raw-material-categories"] });
+      toast.success("Category restored successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to restore category",
       );
     },
   });

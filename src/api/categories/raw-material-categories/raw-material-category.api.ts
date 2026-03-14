@@ -51,3 +51,12 @@ export const updateRawMaterialCategory = async (
 export const deleteRawMaterialCategory = async (id: string | number): Promise<void> => {
   await apiClient.delete(`${BASE_API_URL}/raw-material-categories/${id}`);
 };
+
+export const restoreRawMaterialCategory = async (
+  id: string | number
+): Promise<{ status: boolean; message: string; data: RawMaterialCategory }> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/raw-material-categories/${id}/restore`
+  );
+  return response.data;
+};

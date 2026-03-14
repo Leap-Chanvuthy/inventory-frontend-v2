@@ -4,6 +4,8 @@ export interface BaseCategory {
   category_name: string;
   label_color: string;
   description: string;
+  deleted_at?: string | null;
+  raw_materials_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -48,6 +50,7 @@ export interface CategoryQueryParams {
   page?: number;
   per_page?: number;
   "filter[search]"?: string;
+  "filter[is_deleted]"?: number | boolean;
   sort?: string;
 }
 

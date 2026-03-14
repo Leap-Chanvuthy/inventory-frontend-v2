@@ -7,31 +7,42 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import {
   COLUMNS,
-  FILTER_OPTIONS,
   SORT_OPTIONS,
   RawMaterialCard,
 } from "../utils/table-feature";
-import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useSearchParams } from "react-router-dom";
 import UnexpectedError from "@/components/reusable/partials/error";
+import { useEffect } from "react";
 
-export function RawMaterialList() {
+interface RawMaterialListProps {
+  embedded?: boolean;
+}
+
+export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
   const {
     setPage,
     setSearch,
     setSort,
     setPerPage,
-    setFilter,
     perPage,
     filter,
     search,
     apiParams,
   } = useTableQueryParams();
 
+  const [searchParams] = useSearchParams();
+  const selectedCategoryId = searchParams.get("category_id")
+    ? Number(searchParams.get("category_id"))
+    : undefined;
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategoryId, setPage]);
+
   const { data, isLoading, isError, isFetching } = useRawMaterials({
     ...apiParams,
-    "filter[raw_material_category_id]": filter ? Number(filter) : undefined,
+    "filter[raw_material_category_id]":
+      selectedCategoryId || (filter ? Number(filter) : undefined),
   });
 
   if (isError && !isFetching) {
@@ -39,16 +50,13 @@ export function RawMaterialList() {
   }
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-8 bg-background">
-      <div className="mx-auto max-w-[1600px]">
+    <div className={embedded ? "w-full" : "min-h-screen w-full p-4 sm:p-8 bg-background"}>
+      <div className={embedded ? "w-full" : "mx-auto max-w-[1600px]"}>
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search raw materials..."
           onSearch={setSearch}
           search={search}
-          filterOptions={FILTER_OPTIONS}
-          selectedFilter={filter}
-          onFilterChange={val => setFilter(val || undefined)}
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
@@ -56,14 +64,7 @@ export function RawMaterialList() {
           onPerPageChange={setPerPage}
           createHref="/raw-materials/create"
           isListOptionDisplayed={true}
-          extraActions={
-            <Button variant="outline" asChild>
-              <Link to="/raw-materials/deleted">
-                <Trash2 className="w-4 h-4 mr-1.5 text-red-500" />
-                Recently Deleted
-              </Link>
-            </Button>
-          }
+          deletedPathname="/raw-materials/deleted"
         />
 
         <ToggleableList<RawMaterial>
