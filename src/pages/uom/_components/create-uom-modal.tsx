@@ -23,14 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Eye, AlertCircle } from "lucide-react";
+import { Eye, AlertCircle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Inline field error message displayed beneath a form input. */
@@ -49,8 +42,6 @@ interface CreateUomModalProps {
   onClose: () => void;
   /** All UOMs already in this category — used to populate parent dropdown */
   categoryUoms: UOM[];
-  /** Pre-selected parent (when clicking "+ Add Child" on a card) */
-  defaultParent?: UOM;
   /** Category ID for the new UOM */
   categoryId: number;
 }
@@ -67,7 +58,6 @@ export function CreateUomModal({
   open,
   onClose,
   categoryUoms,
-  defaultParent,
   categoryId,
 }: CreateUomModalProps) {
   const mutation = useCreateUOM();
@@ -82,9 +72,6 @@ export function CreateUomModal({
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [isBase, setIsBase] = useState(categoryUoms.length === 0); // auto-base if category is empty
-  const [parentId, setParentId] = useState<string>(
-    defaultParent ? String(defaultParent.id) : ""
-  );
   const [qty, setQty] = useState(""); // "contains N parent units"
 
   // Reset on open
@@ -93,13 +80,11 @@ export function CreateUomModal({
       setName("");
       setSymbol("");
       setIsBase(categoryUoms.length === 0);
-      setParentId(defaultParent ? String(defaultParent.id) : "");
       setQty("");
     }
-  }, [open, defaultParent, categoryUoms.length]);
+  }, [open, categoryUoms.length]);
 
   // Derived computations
-  const selectedParent = categoryUoms.find(u => String(u.id) === parentId);
   const qtyNum = parseFloat(qty) || 0;
 
   /**
@@ -107,21 +92,18 @@ export function CreateUomModal({
    * If parent is the base unit:  conversion_factor = qty
    * Otherwise:                   conversion_factor = qty × parent.conversion_factor
    */
-  const computedFactor =
-    selectedParent && qtyNum > 0
-      ? qtyNum * Number(selectedParent.conversion_factor)
-      : 0;
+  const computedFactor = qtyNum > 0 ? qtyNum : 0;
 
   // Preview sentence: "1 Box = 20 Blisters = 200 Tablets"
   const previewLine =
-    name && selectedParent && qtyNum > 0
-      ? buildPreview(name, symbol, qtyNum, selectedParent, baseUnit)
+    name && baseUnit && qtyNum > 0
+      ? buildPreview(name, symbol, qtyNum, baseUnit)
       : null;
 
   // Validation
   const canSubmit =
     name.trim() &&
-    (isBase || (selectedParent && qtyNum > 0));
+    (isBase || (!!baseUnit && qtyNum > 0));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,7 +116,7 @@ export function CreateUomModal({
         is_active: true,
         category_id: categoryId,
         is_base_unit: isBase,
-        base_uom_id: isBase || !selectedParent ? null : selectedParent.id,
+        base_uom_id: isBase ? null : baseUnit?.id ?? null,
         conversion_factor: isBase ? 1 : computedFactor,
       },
       {
@@ -142,9 +124,6 @@ export function CreateUomModal({
       }
     );
   };
-
-  // Dropdown options: any unit in the category (not self, since we don't have an id yet)
-  const parentOptions = categoryUoms;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -215,7 +194,6 @@ export function CreateUomModal({
                 onCheckedChange={checked => {
                   setIsBase(checked);
                   if (checked) {
-                    setParentId("");
                     setQty("");
                   }
                 }}
@@ -226,12 +204,31 @@ export function CreateUomModal({
           {/* ── Natural-language relationship input ────────────────────── */}
           {!isBase && (
             <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>Base Unit</Label>
+                <div className="h-9 px-3 flex items-center gap-2 rounded-md border bg-muted/40 text-sm text-muted-foreground select-none">
+                  <span>
+                    {baseUnit
+                      ? `${baseUnit.name}${baseUnit.symbol ? ` (${baseUnit.symbol})` : ""}`
+                      : "No base unit found for this category"}
+                  </span>
+                  {baseUnit && (
+                    <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 text-[10px] font-semibold uppercase tracking-wide border border-emerald-300">
+                      Base Unit
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This UOM is automatically linked to the base unit of the category and cannot be changed.
+                </p>
+              </div>
+
               <Label>
                 Relationship{" "}
                 <span className="text-muted-foreground font-normal">(required)</span>
               </Label>
 
-              {/* Sentence: "1 [name] contains [qty] [parent]" */}
+              {/* Sentence: "1 [name] contains [qty] [base unit]" */}
               <div className="flex items-center gap-2 p-3 rounded-lg border bg-background">
                 <span className="text-sm text-muted-foreground whitespace-nowrap">1</span>
                 <span
@@ -255,39 +252,27 @@ export function CreateUomModal({
                   value={qty}
                   onChange={e => setQty(e.target.value)}
                 />
-                <Select
-                  value={parentId}
-                  onValueChange={setParentId}
+                <div
+                  className={cn(
+                    "flex-1 h-8 px-2 rounded-md border bg-muted/40 text-sm text-muted-foreground flex items-center",
+                    serverErrors.fields.base_uom_id && "border-destructive"
+                  )}
                 >
-                  <SelectTrigger
-                    className={cn(
-                      "flex-1 h-8 text-sm",
-                      serverErrors.fields.base_uom_id && "border-destructive"
-                    )}
-                  >
-                    <SelectValue placeholder="select parent unit…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {parentOptions.map(u => (
-                      <SelectItem key={u.id} value={String(u.id)}>
-                        <span>{u.name}</span>
-                        {u.symbol && (
-                          <span className="ml-1 text-muted-foreground">({u.symbol})</span>
-                        )}
-                        {!!u.is_base_unit && (
-                          <Badge className="ml-2 text-[10px] py-0 bg-green-100 text-green-800 hover:bg-green-100">
-                            base
-                          </Badge>
-                        )}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {baseUnit
+                    ? `${baseUnit.name}${baseUnit.symbol ? ` (${baseUnit.symbol})` : ""}`
+                    : "No base unit"}
+                </div>
               </div>
 
               {/* Relationship field errors */}
-              {(serverErrors.fields.conversion_factor || serverErrors.fields.base_uom_id) && (
+              {(serverErrors.fields.conversion_factor || serverErrors.fields.base_uom_id || !baseUnit) && (
                 <div className="space-y-1">
+                  {!baseUnit && (
+                    <p className="flex items-center gap-1 text-xs text-destructive mt-1">
+                      <AlertCircle className="h-3 w-3 shrink-0" />
+                      Base unit is required for this category before creating derived units.
+                    </p>
+                  )}
                   <FieldError error={serverErrors.fields.conversion_factor} />
                   <FieldError error={serverErrors.fields.base_uom_id} />
                 </div>
@@ -301,6 +286,18 @@ export function CreateUomModal({
                     <span className="text-xs font-medium text-[#5c52d6]">Preview</span>
                   </div>
                   <p className="text-sm font-medium text-foreground">{previewLine}</p>
+                </div>
+              )}
+
+              {baseUnit && (
+                <div className="rounded-lg border bg-muted/20 p-3">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Info className="h-3.5 w-3.5" />
+                    Conversion chain
+                  </p>
+                  <p className="text-sm mt-1">Base Unit: {baseUnit.name}{baseUnit.symbol ? ` (${baseUnit.symbol})` : ""}</p>
+                  <p className="text-xs text-muted-foreground">↓</p>
+                  <p className="text-sm">{name || "New unit"}</p>
                 </div>
               )}
             </div>
@@ -341,24 +338,12 @@ function buildPreview(
   name: string,
   symbol: string,
   qty: number,
-  parent: UOM,
-  baseUnit?: UOM
+  baseUnit: UOM
 ): string {
   const selfLabel = symbol ? `${name} (${symbol})` : name;
-  const parentLabel = parent.symbol ? `${parent.name} (${parent.symbol})` : parent.name;
+  const baseLabel = baseUnit.symbol ? `${baseUnit.name} (${baseUnit.symbol})` : baseUnit.name;
 
-  let str = `1 ${selfLabel} = ${qty.toLocaleString()} ${pluralise(parentLabel, qty)}`;
-
-  // If parent is NOT the base, also show chain to base
-  if (baseUnit && !parent.is_base_unit) {
-    const factorToBase = qty * Number(parent.conversion_factor);
-    const baseLabel = baseUnit.symbol
-      ? `${baseUnit.name} (${baseUnit.symbol})`
-      : baseUnit.name;
-    str += ` = ${factorToBase.toLocaleString()} ${pluralise(baseLabel, factorToBase)}`;
-  }
-
-  return str;
+  return `1 ${selfLabel} = ${qty.toLocaleString()} ${pluralise(baseLabel, qty)}`;
 }
 
 /** Very basic pluralisation for preview text */

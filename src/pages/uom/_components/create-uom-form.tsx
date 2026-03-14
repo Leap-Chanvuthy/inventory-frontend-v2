@@ -10,6 +10,7 @@ import { CreateUOMValidationErrors, UOM } from "@/api/uom/uom.types";
 import { Text } from "@/components/ui/text/app-text";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Info, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuickCreateUomModal } from "./quick-create-uom-modal";
@@ -61,6 +62,16 @@ export const CreateUOMForm = () => {
     value: String(u.id),
     label: `${u.name}${u.symbol ? ` (${u.symbol})` : ""}`,
   }));
+
+  // Base UOM is auto-linked from category and cannot be changed manually.
+  useEffect(() => {
+    if (form.is_base_unit || !form.category_id) return;
+
+    const autoBase = baseUnitOptions[0]?.value ?? "";
+    if (form.base_uom_id !== autoBase) {
+      setForm(prev => ({ ...prev, base_uom_id: autoBase }));
+    }
+  }, [baseUnitOptions, form.category_id, form.base_uom_id, form.is_base_unit]);
 
   // Get selected base UOM object for quick-create modal
   const selectedBaseUom = baseUnitsData?.data.find(
@@ -216,26 +227,28 @@ export const CreateUOMForm = () => {
             {/* Derived unit fields */}
             {!form.is_base_unit && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Base Unit selector + quick create */}
+                {/* Base Unit auto-linked display + quick create */}
                 <div>
                   <div className="flex items-end gap-2">
                     <div className="flex-1">
-                      <SearchableSelect
-                        id="base_uom_id"
-                        label="Base Unit"
-                        placeholder={
-                          form.category_id
-                            ? "Select base unit"
-                            : "Select a category first"
-                        }
-                        value={form.base_uom_id}
-                        options={baseUnitOptions}
-                        onChange={val =>
-                          setForm(prev => ({ ...prev, base_uom_id: val }))
-                        }
-                        error={fieldErrors?.base_uom_id?.[0]}
-                        required
-                      />
+                      <Label className="text-sm font-medium">Base Unit</Label>
+                      <div className="mt-1 h-9 px-3 flex items-center gap-2 rounded-md border bg-muted/40 text-sm text-muted-foreground select-none">
+                        <span>
+                          {selectedBaseUom
+                            ? `${selectedBaseUom.name}${selectedBaseUom.symbol ? ` (${selectedBaseUom.symbol})` : ""}`
+                            : form.category_id
+                              ? "No base unit found for selected category"
+                              : "Select a category first"}
+                        </span>
+                        {selectedBaseUom && (
+                          <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 text-[10px] font-semibold uppercase tracking-wide border border-emerald-300">
+                            Base Unit
+                          </Badge>
+                        )}
+                      </div>
+                      {fieldErrors?.base_uom_id?.[0] && (
+                        <p className="mt-1 text-xs text-destructive">{fieldErrors.base_uom_id[0]}</p>
+                      )}
                     </div>
                     {/* Quick-create button */}
                     {selectedBaseUom && (
@@ -252,7 +265,7 @@ export const CreateUOMForm = () => {
                     )}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Only base units of the selected category are shown.
+                    This UOM is automatically linked to the base unit of the category and cannot be changed.
                   </p>
                 </div>
 

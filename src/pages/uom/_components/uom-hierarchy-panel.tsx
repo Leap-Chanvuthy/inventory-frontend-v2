@@ -168,20 +168,17 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
 
   const allUoms: UOM[] = showTrashedUoms ? trashedUoms : activeUoms;
 
-  // Create modal state: which parent to pre-fill (undefined = base unit creation)
-  const [defaultParent, setDefaultParent] = useState<UOM | undefined>(undefined);
+  // Create modal state
   const [modalOpen, setModalOpen] = useState(false);
 
   // Edit modal state
   const [editTarget, setEditTarget] = useState<UOM | null>(null);
 
   function openModalForBase() {
-    setDefaultParent(undefined);
     setModalOpen(true);
   }
 
-  function openModalForChild(parent: UOM) {
-    setDefaultParent(parent);
+  function openModalForChild(_parent: UOM) {
     setModalOpen(true);
   }
 
@@ -278,7 +275,6 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           categoryUoms={allUoms}
-          defaultParent={defaultParent}
           categoryId={categoryId}
         />
       )}
