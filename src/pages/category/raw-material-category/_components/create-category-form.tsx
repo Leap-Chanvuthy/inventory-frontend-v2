@@ -8,7 +8,17 @@ import { CreateCategoryValidationErrors } from "@/api/categories/types/category.
 import { useNavigate } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
 
-export const CreateCategoryForm = () => {
+interface CreateCategoryFormProps {
+  embedded?: boolean;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export const CreateCategoryForm = ({
+  embedded = false,
+  onSuccess,
+  onCancel,
+}: CreateCategoryFormProps = {}) => {
   const categoryMutation = useCreateRawMaterialCategory();
   const error =
     categoryMutation.error as AxiosError<CreateCategoryValidationErrors> | null;
@@ -48,6 +58,11 @@ export const CreateCategoryForm = () => {
 
     categoryMutation.mutate(form, {
       onSuccess: () => {
+        if (onSuccess) {
+          onSuccess();
+          return;
+        }
+
         if (action === "save_and_close") {
           navigate("/categories?tab=raw-material-category");
         } else {
@@ -57,8 +72,20 @@ export const CreateCategoryForm = () => {
     });
   };
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
+    <div
+      className={
+        embedded
+          ? "animate-in slide-in-from-right-8 duration-300"
+          : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"
+      }
+    >
+      <div
+        className={
+          embedded
+            ? "rounded-2xl border max-w-full mx-auto"
+            : "rounded-2xl shadow-sm border max-w-full mx-auto"
+        }
+      >
         <div className="p-8">
           <Text.TitleMedium className="mb-2">
             Create Raw Material Category
@@ -116,7 +143,10 @@ export const CreateCategoryForm = () => {
               />
             </div>
 
-            <FormFooterActions isSubmitting={categoryMutation.isPending} />
+            <FormFooterActions
+              isSubmitting={categoryMutation.isPending}
+              onCancel={onCancel}
+            />
           </form>
         </div>
       </div>

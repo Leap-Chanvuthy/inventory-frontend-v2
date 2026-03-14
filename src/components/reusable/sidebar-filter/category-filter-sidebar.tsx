@@ -1,14 +1,33 @@
-import { useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Archive, Folder, Plus, Search } from "lucide-react";
 import { CategoryCreateUpdateDialog, CategoryDialogValues } from "./category-create-update-dialog";
 import { CategoryFilterList } from "./category-filter-list";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+type CategoryCreateMode = "modal" | "page";
+
+interface CategoryFormRenderContext<T> {
+  mode: "create" | "update";
+  category?: T;
+  values?: CategoryDialogValues;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
 
 export interface CategoryFilterSidebarProps<T> {
   categoryKey: string;
   categoryLabel?: string;
+  createMode?: CategoryCreateMode;
+  createHref?: string;
   categories: T[];
   isLoading: boolean;
   selectedCategory: number | null;
@@ -34,11 +53,15 @@ export interface CategoryFilterSidebarProps<T> {
   getCategoryDescription?: (category: T) => string;
   getCategoryColor?: (category: T) => string | undefined;
   getCategoryCount?: (category: T) => number;
+  renderCreateForm?: (context: CategoryFormRenderContext<T>) => ReactNode;
+  renderUpdateForm?: (context: CategoryFormRenderContext<T>) => ReactNode;
 }
 
 export function CategoryFilterSidebar<T extends Record<string, any>>({
   categoryKey,
   categoryLabel = "Categories",
+  createMode = "modal",
+  createHref,
   categories,
   isLoading,
   selectedCategory,
@@ -64,6 +87,8 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
   getCategoryDescription = (category: T) => category.description || "",
   getCategoryColor = (category: T) => category.label_color,
   getCategoryCount = (category: T) => category.items_count || category.units_count || category.raw_materials_count || 0,
+  renderCreateForm,
+  renderUpdateForm,
 }: CategoryFilterSidebarProps<T>) {
   const [createOpen, setCreateOpen] = useState(false);
   const [updateTarget, setUpdateTarget] = useState<T | null>(null);
@@ -117,10 +142,19 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
               )}
             </button>
 
-            <Button type="button" size="sm" className="h-8" onClick={() => setCreateOpen(true)}>
-              <Plus className="h-3.5 w-3.5 mr-1.5" />
-              Create
-            </Button>
+            {createMode === "page" && createHref ? (
+              <Button type="button" size="sm" className="h-8" asChild>
+                <Link to={createHref}>
+                  <Plus className="h-3.5 w-3.5 mr-1.5" />
+                  Create
+                </Link>
+              </Button>
+            ) : (
+              <Button type="button" size="sm" className="h-8" onClick={() => setCreateOpen(true)}>
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                Create
+              </Button>
+            )}
           </div>
         </div>
 
@@ -160,31 +194,68 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
         }
       />
 
-      <CategoryCreateUpdateDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        mode="create"
-        isSubmitting={isCreatingCategory}
-        onSubmit={async payload => {
-          await onCreateCategory(payload);
-          setCreateOpen(false);
-        }}
-      />
+      {renderCreateForm ? (
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogContent className="max-w-3xl p-0">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Create {categoryLabel}</DialogTitle>
+            </DialogHeader>
+            {renderCreateForm({
+              mode: "create",
+              onSuccess: () => setCreateOpen(false),
+              onCancel: () => setCreateOpen(false),
+            })}
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <CategoryCreateUpdateDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          mode="create"
+          isSubmitting={isCreatingCategory}
+          onSubmit={async payload => {
+            await onCreateCategory(payload);
+            setCreateOpen(false);
+          }}
+        />
+      )}
 
-      <CategoryCreateUpdateDialog
-        open={!!updateTarget}
-        onOpenChange={open => {
-          if (!open) setUpdateTarget(null);
-        }}
-        mode="update"
-        defaultValues={targetValues}
-        isSubmitting={isUpdatingCategory}
-        onSubmit={async payload => {
-          if (!updateTarget) return;
-          await onUpdateCategory(getCategoryId(updateTarget), payload);
-          setUpdateTarget(null);
-        }}
-      />
+      {renderUpdateForm && updateTarget ? (
+        <Dialog
+          open={!!updateTarget}
+          onOpenChange={open => {
+            if (!open) setUpdateTarget(null);
+          }}
+        >
+          <DialogContent className="max-w-3xl p-0">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Update {categoryLabel}</DialogTitle>
+            </DialogHeader>
+            {renderUpdateForm({
+              mode: "update",
+              category: updateTarget,
+              values: targetValues,
+              onSuccess: () => setUpdateTarget(null),
+              onCancel: () => setUpdateTarget(null),
+            })}
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <CategoryCreateUpdateDialog
+          open={!!updateTarget}
+          onOpenChange={open => {
+            if (!open) setUpdateTarget(null);
+          }}
+          mode="update"
+          defaultValues={targetValues}
+          isSubmitting={isUpdatingCategory}
+          onSubmit={async payload => {
+            if (!updateTarget) return;
+            await onUpdateCategory(getCategoryId(updateTarget), payload);
+            setUpdateTarget(null);
+          }}
+        />
+      )}
     </aside>
   );
 }

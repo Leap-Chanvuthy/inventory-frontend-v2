@@ -1,8 +1,9 @@
 import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Pencil, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DeleteModal from "@/components/reusable/partials/delete-modal";
 
 interface CategoryFilterItemProps {
   name: string;
@@ -88,18 +89,18 @@ function CategoryFilterItemComponent({
                   >
                     <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                   </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={e => {
-                      e.stopPropagation();
-                      onDelete?.();
-                    }}
-                  >
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
+                    <div
+                      className="h-6 w-6"
+                      onClick={e => e.stopPropagation()}
+                      onMouseDown={e => e.stopPropagation()}
+                    >
+                      <DeleteModal
+                        heading="Delete Category"
+                        subheading="Are you sure you want to delete this category? This action cannot be undone."
+                        tooltipText="Delete Category"
+                        onDelete={onDelete}
+                      />
+                    </div>
                 </>
               )}
             </div>

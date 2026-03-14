@@ -12,6 +12,8 @@ import {
 } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
 import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
 import { CategoryQueryParams, RawMaterialCategory } from "@/api/categories/types/category.type";
+import { CreateCategoryForm } from "@/pages/category/raw-material-category/_components/create-category-form";
+import { UpdateCategoryForm } from "@/pages/category/raw-material-category/_components/update-raw-material-category-form";
 
 export default function RawMaterials() {
   const {
@@ -67,7 +69,9 @@ export default function RawMaterials() {
           sidebar={
             <CategoryFilterSidebar
               categoryKey="raw_material_category_id"
-              categoryLabel="Raw Material Categories"
+              categoryLabel="RM Categories"
+              createMode="modal"
+              createHref="/categories/raw-material-categories/create"
               categories={categories}
               isLoading={categoriesLoading}
               selectedCategory={selectedCategory}
@@ -90,6 +94,28 @@ export default function RawMaterials() {
               getCategoryDescription={category => category.description}
               getCategoryColor={category => category.label_color}
               getCategoryCount={category => category.raw_materials_count || 0}
+              renderCreateForm={({ onSuccess, onCancel }) => (
+                <CreateCategoryForm
+                  embedded
+                  onSuccess={onSuccess}
+                  onCancel={onCancel}
+                />
+              )}
+              renderUpdateForm={({ category, values, onSuccess, onCancel }) =>
+                category ? (
+                  <UpdateCategoryForm
+                    categoryId={category.id}
+                    initialData={{
+                      category_name: values?.category_name || category.category_name,
+                      label_color: values?.label_color || category.label_color,
+                      description: values?.description || category.description,
+                    }}
+                    embedded
+                    onSuccess={onSuccess}
+                    onCancel={onCancel}
+                  />
+                ) : null
+              }
             />
           }
         >
