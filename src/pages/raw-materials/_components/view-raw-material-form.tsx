@@ -13,7 +13,7 @@ import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation"
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 import UnexpectedError from "@/components/reusable/partials/error";
-import { UomHierarchyDisplay } from "@/pages/uom/_components/uom-hierarchy-display";
+import { UomHierarchyPreview } from "./uom-hierarchy-preview";
 
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
@@ -226,15 +226,15 @@ export function ViewRawMaterialForm() {
       {raw_material.uom?.category_id && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Unit of Measurement Hierarchy</CardTitle>
+            <CardTitle>Unit of Measurement Preview</CardTitle>
             <p className="text-sm text-muted-foreground">
               All units in the{" "}
               <span className="font-medium">{raw_material.uom?.category?.name ?? "selected"}</span>{" "}
-              category. The highlighted unit is assigned to this raw material.
+              category. Switch between hierarchy and card mode. The highlighted unit is assigned to this raw material.
             </p>
           </CardHeader>
           <CardContent>
-            <UomHierarchyDisplay
+            <UomHierarchyPreview
               categoryId={raw_material.uom.category_id}
               highlightUomId={raw_material.base_uom_id}
             />

@@ -19,6 +19,7 @@ import {
   useCreateUomCategory,
   useDeleteUomCategory,
   useRestoreUomCategory,
+  useUpdateUomCategory,
 } from "@/api/uom/uom.mutation";
 import { UomCategory } from "@/api/uom/uom.types";
 import { parseApiError } from "@/api/uom/uom-error.utils";
@@ -42,6 +43,7 @@ import {
   Plus,
   Search,
   Trash2,
+  Pencil,
   RotateCcw,
   ChevronRight,
   AlertCircle,
@@ -145,11 +147,105 @@ function AddCategoryDialog({ open, onClose }: { open: boolean; onClose: () => vo
   );
 }
 
+// ── Edit-category mini-form dialog ───────────────────────────────────────────
+function EditCategoryDialog({
+  category,
+  onClose,
+}: {
+  category: UomCategory;
+  onClose: () => void;
+}) {
+  const mutation = useUpdateUomCategory(category.id);
+  const [name, setName] = useState(category.name ?? "");
+  const [description, setDescription] = useState(category.description ?? "");
+
+  useEffect(() => {
+    setName(category.name ?? "");
+    setDescription(category.description ?? "");
+  }, [category]);
+
+  const serverErrors = useMemo(
+    () =>
+      mutation.error
+        ? parseApiError(mutation.error)
+        : { fields: {} as Record<string, string> },
+    [mutation.error]
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    mutation.mutate(
+      { name: name.trim(), description: description.trim() || undefined },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
+  };
+
+  return (
+    <Dialog open={!!category} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Edit Category</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-cat-name">Category Name *</Label>
+            <Input
+              id="edit-cat-name"
+              placeholder="e.g., Weight, Volume, Packaging"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+              className={cn(
+                serverErrors.fields.name &&
+                  "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            <FieldError error={serverErrors.fields.name} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-cat-desc">Description</Label>
+            <Textarea
+              id="edit-cat-desc"
+              placeholder="Optional description…"
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={cn(
+                serverErrors.fields.description &&
+                  "border-destructive focus-visible:ring-destructive"
+              )}
+            />
+            <FieldError error={serverErrors.fields.description} />
+          </div>
+          <div className="flex gap-2 justify-end pt-1">
+            <Button type="button" variant="outline" size="sm" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={mutation.isPending || !name.trim()}
+            >
+              {mutation.isPending ? "Saving…" : "Update"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ── CategoryRow ───────────────────────────────────────────────────────────────
 function CategoryRow({
   cat,
   selectedId,
   onSelect,
+  onEdit,
   onDelete,
   onRestore,
   isTrashed,
@@ -157,6 +253,7 @@ function CategoryRow({
   cat: UomCategory;
   selectedId: number | null;
   onSelect: (id: number) => void;
+  onEdit: (cat: UomCategory) => void;
   onDelete: (cat: UomCategory) => void;
   onRestore: (cat: UomCategory) => void;
   isTrashed: boolean;
@@ -216,18 +313,33 @@ function CategoryRow({
               <RotateCcw className="h-3 w-3" />
             </button>
           ) : (
-            /* Archive button */
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(cat);
-              }}
-              className="opacity-0 group-hover:opacity-100 h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-              aria-label={`Archive ${cat.name}`}
-            >
-              <Trash2 className="h-3 w-3" />
-            </button>
+            <>
+              {/* Edit button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(cat);
+                }}
+                className="opacity-0 group-hover:opacity-100 h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-[#5c52d6] hover:bg-[#5c52d6]/10 transition-all"
+                aria-label={`Edit ${cat.name}`}
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+
+              {/* Archive button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(cat);
+                }}
+                className="opacity-0 group-hover:opacity-100 h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                aria-label={`Archive ${cat.name}`}
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </>
           )}
         </div>
       </button>
@@ -321,6 +433,7 @@ export function CategorySidebar({ selectedId, onSelect }: CategorySidebarProps) 
   const restoreMutation = useRestoreUomCategory();
 
   const [addOpen, setAddOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<UomCategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UomCategory | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<UomCategory | null>(null);
 
@@ -405,6 +518,7 @@ export function CategorySidebar({ selectedId, onSelect }: CategorySidebarProps) 
                 cat={cat}
                 selectedId={selectedId}
                 onSelect={onSelect}
+                onEdit={setEditTarget}
                 isTrashed={showTrashed}
                 onDelete={setDeleteTarget}
                 onRestore={(cat) => setRestoreTarget(cat)}
@@ -427,6 +541,13 @@ export function CategorySidebar({ selectedId, onSelect }: CategorySidebarProps) 
 
       {/* ── Dialogs ─────────────────────────────────────────────────────── */}
       <AddCategoryDialog open={addOpen} onClose={() => setAddOpen(false)} />
+
+      {editTarget && (
+        <EditCategoryDialog
+          category={editTarget}
+          onClose={() => setEditTarget(null)}
+        />
+      )}
 
       {/* Archive confirmation */}
       <Dialog

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Archive, Folder, Plus, Search } from "lucide-react";
+import { Archive, CirclePlus, Folder, Search } from "lucide-react";
 import { CategoryCreateUpdateDialog, CategoryDialogValues } from "./category-create-update-dialog";
 import { CategoryFilterList } from "./category-filter-list";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -145,13 +145,13 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
             {createMode === "page" && createHref ? (
               <Button type="button" size="sm" className="h-8" asChild>
                 <Link to={createHref}>
-                  <Plus className="h-3.5 w-3.5 mr-1.5" />
+                  <CirclePlus className="h-3.5 w-3.5 mr-1.5" />
                   Create
                 </Link>
               </Button>
             ) : (
               <Button type="button" size="sm" className="h-8" onClick={() => setCreateOpen(true)}>
-                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                <CirclePlus className="h-3.5 w-3.5 mr-1.5" />
                 Create
               </Button>
             )}

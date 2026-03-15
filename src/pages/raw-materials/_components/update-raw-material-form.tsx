@@ -505,7 +505,7 @@ export const UpdateRawMaterialForm = () => {
                       {form.uom_category_id ? (
                         <div>
                           <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Unit of Measurement Hierarchy
+                            Unit of Measurement Preview
                           </p>
                           <div className="rounded-lg border bg-card p-3">
                             <UomHierarchyPreview
@@ -516,7 +516,7 @@ export const UpdateRawMaterialForm = () => {
                         </div>
                       ) : (
                         <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a unit of measurement to see its hierarchy.
+                          Select a unit of measurement category to see hierarchy and card preview.
                         </div>
                       )}
 

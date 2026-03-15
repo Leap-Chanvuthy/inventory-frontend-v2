@@ -317,11 +317,13 @@ export const TableToolbar = ({
         {extraActions}
 
         {/* Deleted items page link */}
-        <Link to={deletedPathname || "#"}>
-          <div className="p-2 rounded-md bg-red-100">
-            <Trash2 className="w-3 h-3 text-red-500" />
-          </div>
-        </Link>
+        {deletedPathname && (
+          <Link to={deletedPathname || "#"}>
+            <div className="p-2 rounded-md bg-red-100">
+              <Trash2 className="w-3 h-3 text-red-500" />
+            </div>
+          </Link>
+        )}
 
         {/* Create Button */}
         {createHref && (

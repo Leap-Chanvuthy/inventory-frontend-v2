@@ -29,6 +29,8 @@ interface UomHierarchyPanelProps {
   categoryName: string;
 }
 
+type ViewMode = "hierarchy" | "card";
+
 // ── Tree helpers ──────────────────────────────────────────────────────────────
 
 interface TreeNode {
@@ -134,6 +136,67 @@ function EmptyState({ onCreateBase }: { onCreateBase: () => void }) {
   );
 }
 
+function formatFactor(value: unknown) {
+  const numeric = Number(value);
+  if (Number.isNaN(numeric)) return "-";
+  return numeric.toLocaleString();
+}
+
+function CardModeView({ uoms }: { uoms: UOM[] }) {
+  const baseUnit =
+    uoms.find(u => !!u.is_base_unit) ||
+    [...uoms].sort((a, b) => Number(a.conversion_factor) - Number(b.conversion_factor))[0];
+
+  if (!baseUnit) return null;
+
+  const baseFactor = Number(baseUnit.conversion_factor || 1) || 1;
+  const nonBaseUnits = uoms.filter(u => u.id !== baseUnit.id);
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          Base Unit (Smallest)
+        </p>
+        <p className="mt-1 text-lg font-semibold text-emerald-900">
+          {baseUnit.name}
+          {baseUnit.symbol ? ` (${baseUnit.symbol})` : ""}
+        </p>
+      </div>
+
+      {nonBaseUnits.length === 0 ? (
+        <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+          This category currently has only a base unit.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {nonBaseUnits.map(unit => {
+            const unitFactor = Number(unit.conversion_factor || 0);
+            const multiplier = baseFactor > 0 ? unitFactor / baseFactor : unitFactor;
+
+            return (
+              <div
+                key={unit.id}
+                className="rounded-xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
+              >
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Conversion
+                </p>
+                <p className="mt-3 text-xl font-semibold leading-tight">
+                  1 {unit.name}
+                </p>
+                <p className="mt-2 text-lg font-bold text-[#5c52d6] leading-tight">
+                  = {formatFactor(multiplier)} {baseUnit.name}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main panel ────────────────────────────────────────────────────────────────
 
 export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPanelProps) {
@@ -173,6 +236,7 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
 
   // Edit modal state
   const [editTarget, setEditTarget] = useState<UOM | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("hierarchy");
 
   function openModalForBase() {
     setModalOpen(true);
@@ -200,6 +264,29 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {!showTrashedUoms && (
+            <div className="hidden sm:flex items-center rounded-md border p-0.5">
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "hierarchy" ? "default" : "ghost"}
+                className={viewMode === "hierarchy" ? "h-7 px-2 bg-[#5c52d6] hover:bg-[#4c43c0]" : "h-7 px-2"}
+                onClick={() => setViewMode("hierarchy")}
+              >
+                Hierarchy
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={viewMode === "card" ? "default" : "ghost"}
+                className={viewMode === "card" ? "h-7 px-2 bg-[#5c52d6] hover:bg-[#4c43c0]" : "h-7 px-2"}
+                onClick={() => setViewMode("card")}
+              >
+                Card
+              </Button>
+            </div>
+          )}
+
           {/* Trash toggle */}
           <Button
             variant={showTrashedUoms ? "secondary" : "ghost"}
@@ -259,12 +346,39 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
           <EmptyState onCreateBase={openModalForBase} />
         ) : (
           <div className="p-4 sm:p-6 w-full">
-            <TreeView
-              nodes={tree}
-              allUoms={allUoms}
-              onAddChild={openModalForChild}
-              onEdit={setEditTarget}
-            />
+            {!showTrashedUoms && (
+              <div className="mb-4 flex items-center rounded-md border p-0.5 sm:hidden w-fit">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "hierarchy" ? "default" : "ghost"}
+                  className={viewMode === "hierarchy" ? "h-7 px-2 bg-[#5c52d6] hover:bg-[#4c43c0]" : "h-7 px-2"}
+                  onClick={() => setViewMode("hierarchy")}
+                >
+                  Hierarchy
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={viewMode === "card" ? "default" : "ghost"}
+                  className={viewMode === "card" ? "h-7 px-2 bg-[#5c52d6] hover:bg-[#4c43c0]" : "h-7 px-2"}
+                  onClick={() => setViewMode("card")}
+                >
+                  Card
+                </Button>
+              </div>
+            )}
+
+            {showTrashedUoms || viewMode === "hierarchy" ? (
+              <TreeView
+                nodes={tree}
+                allUoms={allUoms}
+                onAddChild={openModalForChild}
+                onEdit={setEditTarget}
+              />
+            ) : (
+              <CardModeView uoms={allUoms} />
+            )}
           </div>
         )}
       </div>
