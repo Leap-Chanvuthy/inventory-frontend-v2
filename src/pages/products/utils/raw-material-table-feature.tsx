@@ -1,6 +1,6 @@
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 import { Badge } from "@/components/ui/badge";
-import { PickerColumn } from "../../../components/ui/picker-dialog";
+import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 
 export const getRMStockStatus = (rm: RawMaterial) => {
   if (rm.minimum_stock_level === 0)
@@ -21,12 +21,14 @@ export const getRMStockStatus = (rm: RawMaterial) => {
   };
 };
 
-export const RM_COLUMNS: PickerColumn<RawMaterial>[] = [
+export const RM_COLUMNS: DataTableColumn<RawMaterial>[] = [
   {
+    key: "name",
     header: "Name",
     render: rm => <span className="font-medium">{rm.material_name}</span>,
   },
   {
+    key: "code",
     header: "Code",
     render: rm => (
       <span className="text-muted-foreground text-xs">
@@ -35,6 +37,7 @@ export const RM_COLUMNS: PickerColumn<RawMaterial>[] = [
     ),
   },
   {
+    key: "category",
     header: "Category",
     render: rm => (
       <Badge
@@ -51,6 +54,7 @@ export const RM_COLUMNS: PickerColumn<RawMaterial>[] = [
     ),
   },
   {
+    key: "status",
     header: "Status",
     render: rm => {
       const s = getRMStockStatus(rm);
@@ -64,11 +68,13 @@ export const RM_COLUMNS: PickerColumn<RawMaterial>[] = [
     },
   },
   {
+    key: "qty",
     header: "Qty",
     className: "text-right",
     render: rm => <span>{rm.minimum_stock_level}</span>,
   },
   {
+    key: "unit",
     header: "Unit",
     render: rm => (
       <span className="text-muted-foreground text-xs">{rm.uom_name}</span>
