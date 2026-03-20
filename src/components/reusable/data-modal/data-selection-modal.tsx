@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -102,6 +102,20 @@ export function DataSelectionModal<T>({
 
     const selectedRows = selectedItems.map(x => x.payload);
 
+    // Track previous sort selection to detect which value was newly checked
+    const prevSortRef = useRef<string[]>([]);
+
+    const handleSortChange = (values: string[]) => {
+        if (values.length === 0) {
+            prevSortRef.current = [];
+            onSortChange?.("");
+            return;
+        }
+        const newVal = values.find(v => !prevSortRef.current.includes(v));
+        prevSortRef.current = values;
+        if (newVal) onSortChange?.(newVal);
+    };
+
     return (
         <Dialog
             open={open}
@@ -126,7 +140,7 @@ export function DataSelectionModal<T>({
                         searchPlaceholder={searchPlaceholder}
                         onSearch={onSearch}
                         sortOptions={sortOptions}
-                        onSortChange={values => onSortChange && onSortChange(values[0])}
+                        onSortChange={handleSortChange}
                         filterOptions={filterOptions}
                         onFilterChange={val => onFilterChange && onFilterChange(val || undefined)}
                         createHref={createHref}

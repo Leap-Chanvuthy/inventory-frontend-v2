@@ -71,7 +71,7 @@ export interface CreateExternalPurchaseRequest {
   barcode?: string;
   product_description?: string;
   product_category_id: number;
-  uom_id: number;
+  base_uom_id: number;
   supplier_id: number;
   warehouse_id: number;
   quantity: number;
@@ -95,7 +95,7 @@ export interface CreateInternalManufacturingRequest {
   barcode?: string;
   product_description?: string;
   product_category_id: number;
-  uom_id: number;
+  base_uom_id: number;
   supplier_id: number;
   warehouse_id: number;
   product_status: string;
