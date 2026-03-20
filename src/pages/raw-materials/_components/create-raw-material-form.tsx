@@ -25,6 +25,7 @@ import { RawMaterialValidationErrors } from "@/api/raw-materials/raw-material.ty
 import { Text } from "@/components/ui/text/app-text";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { toNumberOrNull } from "../utils/check_num_null";
+import { validateUomCategoryConfiguration } from "../utils/uom-category-validation";
 import { SupplierCard } from "@/pages/supplier/utils/table-feature";
 import { WarehouseCard } from "@/pages/warehouses/utils/table-feature";
 import CategorySingleCard from "@/pages/category/_components/category-single-card";
@@ -58,7 +59,11 @@ export const CreateRawMaterialForm = () => {
 
   const [form, setForm] = useState(initialForm);
   const [dropdownError, setDropdownError] = useState(false);
+  const [uomValidationError, setUomValidationError] = useState<string>("");
   const handleDropdownError = useCallback(() => setDropdownError(true), []);
+
+  const INVALID_UOM_MESSAGE =
+    "This UOM category does not have a Base Unit or conversion units configured yet. Please configure the units before selecting this UOM.";
 
   // Fetch selected items for preview cards
   const { data: selectedCategoryData } = useSingleRawMaterialCategory(
@@ -75,15 +80,37 @@ export const CreateRawMaterialForm = () => {
     Number(form.uom_category_id),
   );
 
+  const uomValidation = validateUomCategoryConfiguration(
+    selectedUomCategoryData?.data,
+  );
+
   // Auto-set base_uom_id to the category's base unit when category changes.
   // Normalise array-vs-object shape for base_unit.
   useEffect(() => {
-    const raw = selectedUomCategoryData?.data?.base_unit;
-    const baseUnit = Array.isArray(raw) ? raw[0] : raw;
-    if (baseUnit?.id) {
-      setForm(prev => ({ ...prev, base_uom_id: String(baseUnit.id) }));
+    if (!form.uom_category_id) {
+      setUomValidationError("");
+      setForm(prev =>
+        prev.base_uom_id === "" ? prev : { ...prev, base_uom_id: "" },
+      );
+      return;
     }
-  }, [selectedUomCategoryData]);
+
+    if (uomValidation.isValid && uomValidation.baseUnitId) {
+      setUomValidationError("");
+      const nextBaseId = String(uomValidation.baseUnitId);
+      setForm(prev =>
+        prev.base_uom_id === nextBaseId
+          ? prev
+          : { ...prev, base_uom_id: nextBaseId },
+      );
+      return;
+    }
+
+    setUomValidationError(INVALID_UOM_MESSAGE);
+    setForm(prev =>
+      prev.base_uom_id === "" ? prev : { ...prev, base_uom_id: "" },
+    );
+  }, [INVALID_UOM_MESSAGE, form.uom_category_id, uomValidation.baseUnitId, uomValidation.isValid]);
 
   const selectedCategory = selectedCategoryData?.data ?? null;
   const selectedSupplier = selectedSupplierData?.data?.supplier ?? null;
@@ -117,7 +144,17 @@ export const CreateRawMaterialForm = () => {
   };
 
   const handleSelectChange = (field: string) => (value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm(prev => {
+      const next = { ...prev, [field]: value } as typeof prev;
+      if (field === "uom_category_id") {
+        next.base_uom_id = "";
+      }
+      return next;
+    });
+
+    if (field === "uom_category_id") {
+      setUomValidationError("");
+    }
   };
 
   const handleDateChange = (value: string) => {
@@ -154,6 +191,11 @@ export const CreateRawMaterialForm = () => {
       production_method: form.production_method,
       images: form.images.length > 0 ? form.images : undefined,
     };
+
+    if (!uomValidation.isValid || !payload.base_uom_id) {
+      setUomValidationError(INVALID_UOM_MESSAGE);
+      return;
+    }
 
     rawMaterialMutation.mutate(payload, {
       onSuccess: () => {
@@ -232,7 +274,7 @@ export const CreateRawMaterialForm = () => {
                       fetchFn={fetchUomCategories}
                       value={form.uom_category_id}
                       onChange={handleSelectChange("uom_category_id")}
-                      error={fieldErrors?.base_uom_id?.[0]}
+                      error={uomValidationError || fieldErrors?.base_uom_id?.[0]}
                       selectedLabel={uomSelectedLabel}
                       onFetchError={handleDropdownError}
                       required
