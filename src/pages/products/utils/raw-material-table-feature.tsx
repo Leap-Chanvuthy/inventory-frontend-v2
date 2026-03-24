@@ -1,81 +1,54 @@
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
-import { Badge } from "@/components/ui/badge";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
-
-export const getRMStockStatus = (rm: RawMaterial) => {
-  if (rm.minimum_stock_level === 0)
-    return {
-      label: "Out of Stock",
-      className: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
-    };
-  if (rm.minimum_stock_level < 50)
-    return {
-      label: "Low Stock",
-      className:
-        "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-    };
-  return {
-    label: "In Stock",
-    className:
-      "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
-  };
-};
+import { CategoryBadge, StockStatusBadge } from "@/pages/raw-materials/utils/raw-material-status";
 
 export const RM_COLUMNS: DataTableColumn<RawMaterial>[] = [
   {
     key: "name",
     header: "Name",
+    className: "py-6",
     render: rm => <span className="font-medium">{rm.material_name}</span>,
   },
   {
     key: "code",
     header: "Code",
+    className: "py-6",
     render: rm => (
-      <span className="text-muted-foreground text-xs">
-        {rm.material_sku_code}
-      </span>
+      <span className="text-muted-foreground text-xs">{rm.material_sku_code}</span>
     ),
   },
   {
     key: "category",
     header: "Category",
+    className: "whitespace-nowrap py-6",
     render: rm => (
-      <Badge
-        className="text-[11px] min-w-[150px] max-w-[150px] truncate inline-block text-center"
-        style={
-          rm.rm_category?.label_color
-            ? { backgroundColor: rm.rm_category.label_color, color: "#fff" }
-            : undefined
-        }
-        title={rm.raw_material_category_name}
-      >
-        {rm.raw_material_category_name}
-      </Badge>
+      <CategoryBadge
+        category={rm.raw_material_category_name}
+        color={rm.rm_category?.label_color}
+      />
     ),
   },
   {
     key: "status",
     header: "Status",
-    render: rm => {
-      const s = getRMStockStatus(rm);
-      return (
-        <span
-          className={`text-xs min-w-[90px] inline-flex items-center justify-center py-0.5 rounded-full font-medium ${s.className}`}
-        >
-          {s.label}
-        </span>
-      );
-    },
+    className: "whitespace-nowrap py-6",
+    render: rm => (
+      <StockStatusBadge
+        quantity={rm.minimum_stock_level}
+        minimumStock={50}
+      />
+    ),
   },
   {
     key: "qty",
     header: "Qty",
-    className: "text-right",
+    className: "text-right py-6",
     render: rm => <span>{rm.minimum_stock_level}</span>,
   },
   {
     key: "unit",
     header: "Unit",
+    className: "py-6",
     render: rm => (
       <span className="text-muted-foreground text-xs">{rm.uom_name}</span>
     ),

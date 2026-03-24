@@ -127,6 +127,8 @@ export function DataTable<T>({
                                 <TableRow
                                     key={idx}
                                     data-state={selected ? "selected" : undefined}
+                                    className={hasSelection ? "cursor-pointer" : undefined}
+                                    onClick={() => hasSelection && toggleRow(row)}
                                 >
                                     {hasSelection && (
                                         <TableCell>

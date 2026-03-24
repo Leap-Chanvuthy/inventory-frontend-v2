@@ -9,6 +9,8 @@ import {
   useCreateExternalPurchase,
   useCreateInternalManufacturing,
 } from "@/api/product/product.mutation";
+import { ProductValidationErrors } from "@/api/product/product.type";
+import { AxiosError } from "axios";
 
 import {
   fetchProductCategories,
@@ -78,6 +80,13 @@ export const CreateProductForm = () => {
   const internalMutation = useCreateInternalManufacturing();
 
   const [sourceType, setSourceType] = useState<SourceType>("internal");
+
+  const activeMutation =
+    sourceType === "external" ? externalMutation : internalMutation;
+  const fieldErrors = (
+    activeMutation.error as AxiosError<ProductValidationErrors> | null
+  )?.response?.data?.errors;
+
   const [base, setBase] = useState(initialBaseForm);
   const [external, setExternal] = useState(initialExternalForm);
   const [internal, setInternal] = useState(initialInternalForm);
@@ -248,6 +257,7 @@ export const CreateProductForm = () => {
                     placeholder="e.g., Bamboo Toothbrush"
                     value={base.product_name}
                     onChange={handleBaseChange}
+                    error={fieldErrors?.product_name?.[0]}
                     required
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -258,6 +268,7 @@ export const CreateProductForm = () => {
                       value={base.product_category_id}
                       onChange={handleBaseSelect("product_category_id")}
                       selectedLabel={selectedCategory?.category_name}
+                      error={fieldErrors?.product_category_id?.[0]}
                       required
                     />
                     <SearchableSelect
@@ -266,6 +277,7 @@ export const CreateProductForm = () => {
                       fetchFn={fetchUOMs}
                       value={base.base_uom_id}
                       onChange={handleBaseSelect("base_uom_id")}
+                      error={fieldErrors?.base_uom_id?.[0]}
                       required
                     />
                   </div>
@@ -277,6 +289,7 @@ export const CreateProductForm = () => {
                     placeholder="Enter description..."
                     value={base.product_description}
                     onChange={handleBaseChange}
+                    error={fieldErrors?.product_description?.[0]}
                   />
                 </div>
               </section>
@@ -298,7 +311,7 @@ export const CreateProductForm = () => {
                       onValueChange={v => setSourceType(v as SourceType)}
                       className="w-full md:w-auto"
                     >
-                      <TabsList className="grid grid-cols-2 w-full md:w-[320px] bg-white border">
+                      <TabsList className="grid grid-cols-2 w-full md:w-[320px] bg-white dark:bg-muted border dark:border-border">
                         <TabsTrigger value="internal" className="gap-2">
                           <Factory className="w-4 h-4" />
                           Internal
@@ -320,6 +333,7 @@ export const CreateProductForm = () => {
                         label="Quantity"
                         value={external.quantity}
                         onChange={handleSourceChange(setExternal)}
+                        error={fieldErrors?.quantity?.[0]}
                         isNumberOnly
                         required
                       />
@@ -328,6 +342,7 @@ export const CreateProductForm = () => {
                         label="Purchase Unit Price (USD)"
                         value={external.purchase_unit_price_in_usd}
                         onChange={handleSourceChange(setExternal)}
+                        error={fieldErrors?.purchase_unit_price_in_usd?.[0]}
                         required
                       />
                       <TextInput
@@ -335,6 +350,7 @@ export const CreateProductForm = () => {
                         label="Selling Unit Price (USD)"
                         value={external.selling_unit_price_in_usd}
                         onChange={handleSourceChange(setExternal)}
+                        error={fieldErrors?.selling_unit_price_in_usd?.[0]}
                         required
                       />
                       <TextInput
@@ -342,6 +358,7 @@ export const CreateProductForm = () => {
                         label="Purchase Exchange Rate (USD→KHR)"
                         value={external.exchange_rate_from_usd_to_riel}
                         onChange={handleSourceChange(setExternal)}
+                        error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
                         isNumberOnly
                       />
                     </div>
@@ -362,6 +379,7 @@ export const CreateProductForm = () => {
                           label="Quantity"
                           value={internal.quantity}
                           onChange={handleSourceChange(setInternal)}
+                          error={fieldErrors?.quantity?.[0]}
                           isNumberOnly
                           required
                         />
@@ -371,6 +389,7 @@ export const CreateProductForm = () => {
                           placeholder="e.g., 12.00"
                           value={internal.selling_unit_price_in_usd}
                           onChange={handleSourceChange(setInternal)}
+                          error={fieldErrors?.selling_unit_price_in_usd?.[0]}
                           required
                         />
                         <TextInput
@@ -381,6 +400,10 @@ export const CreateProductForm = () => {
                             internal.selling_exchange_rate_from_usd_to_riel
                           }
                           onChange={handleSourceChange(setInternal)}
+                          error={
+                            fieldErrors
+                              ?.selling_exchange_rate_from_usd_to_riel?.[0]
+                          }
                           isNumberOnly
                           required
                         />
@@ -404,11 +427,18 @@ export const CreateProductForm = () => {
                         </div>
 
                         {bomEntries.length === 0 ? (
-                          <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-2xl bg-slate-50/50">
-                            <Package className="w-8 h-8 text-slate-300 mb-2" />
-                            <p className="text-sm text-slate-400">
+                          <div
+                            className={`flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-2xl bg-slate-50/50 dark:bg-muted/20 ${fieldErrors?.raw_materials ? "border-red-400 dark:border-red-500" : "dark:border-muted-foreground/20"}`}
+                          >
+                            <Package className="w-8 h-8 text-slate-300 dark:text-muted-foreground mb-2" />
+                            <p className="text-sm text-slate-400 dark:text-muted-foreground">
                               No raw materials linked yet.
                             </p>
+                            {fieldErrors?.raw_materials && (
+                              <p className="text-xs text-red-500 mt-2">
+                                {fieldErrors.raw_materials[0]}
+                              </p>
+                            )}
                           </div>
                         ) : (
                           <div className="border rounded-xl bg-white overflow-hidden">
@@ -489,7 +519,7 @@ export const CreateProductForm = () => {
                 {/* Media Card */}
                 <section className="bg-white dark:bg-card rounded-2xl border shadow-sm p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <Text.TitleSmall>Product Media</Text.TitleSmall>
+                    <Text.TitleSmall>Product Image</Text.TitleSmall>
                   </div>
                   <MultiImageUpload
                     label=""
@@ -501,7 +531,7 @@ export const CreateProductForm = () => {
                 {/* Logistics Card */}
                 <section className="bg-white dark:bg-card rounded-2xl border shadow-sm p-6 space-y-6">
                   <div className="flex items-center gap-2">
-                    <Text.TitleSmall>Logistics</Text.TitleSmall>
+                    <Text.TitleSmall>Stock Movement</Text.TitleSmall>
                   </div>
                   <div className="space-y-4">
                     <SearchableSelect
@@ -510,6 +540,7 @@ export const CreateProductForm = () => {
                       fetchFn={fetchSuppliers}
                       value={base.supplier_id}
                       onChange={handleBaseSelect("supplier_id")}
+                      error={fieldErrors?.supplier_id?.[0]}
                       required
                     />
                     <SearchableSelect
@@ -518,6 +549,7 @@ export const CreateProductForm = () => {
                       fetchFn={fetchWarehouses}
                       value={base.warehouse_id}
                       onChange={handleBaseSelect("warehouse_id")}
+                      error={fieldErrors?.warehouse_id?.[0]}
                       required
                     />
                     <DatePickerInput
@@ -525,6 +557,7 @@ export const CreateProductForm = () => {
                       label="Movement Date"
                       value={base.movement_date}
                       onChange={v => setBase(p => ({ ...p, movement_date: v }))}
+                      error={fieldErrors?.movement_date?.[0]}
                     />
                   </div>
                 </section>
