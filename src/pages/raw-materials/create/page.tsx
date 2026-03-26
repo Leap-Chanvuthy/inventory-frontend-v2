@@ -5,7 +5,11 @@ const CreateRawMaterial = () => {
   const breadcrumbItems = [
     { name: "inventory", label: "Inventory", link: "/raw-materials" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
-    { name: "create", label: "Create a new Raw Material" },
+    {
+      name: "create",
+      label: "Create a new Raw Material",
+      className: "text-primary font-medium",
+    },
   ];
 
   return (

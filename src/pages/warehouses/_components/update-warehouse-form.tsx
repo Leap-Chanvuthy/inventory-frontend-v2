@@ -14,6 +14,8 @@ import MapPicker from "@/components/reusable/map-picker/map-picker";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface UpdateWarehouseValidationErrors {
   errors?: {
@@ -157,144 +159,114 @@ export const UpdateWarehouseForm = () => {
   if (!warehouse) return <DataCardEmpty emptyText="Warehouse not found." />;
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
           <Text.TitleMedium className="mb-2">Update Warehouse</Text.TitleMedium>
           <p className="text-sm text-muted-foreground mb-6">
             Update warehouse information and images.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <TextInput
-                id="warehouse_name"
-                label="Warehouse Name"
-                placeholder="Enter warehouse name"
-                value={form.warehouse_name}
-                error={
-                  fieldErrors?.warehouse_name
-                    ? fieldErrors.warehouse_name[0]
-                    : undefined
-                }
-                onChange={handleChange}
-                required={true}
-              />
-            </div>
-
-            {/* Row 2: Warehouse Address (Full Width Textarea) */}
-            <div>
-              <TextAreaInput
-                id="warehouse_address"
-                label="Warehouse Address"
-                placeholder="Enter warehouse address"
-                value={form.warehouse_address}
-                error={
-                  fieldErrors?.warehouse_address
-                    ? fieldErrors.warehouse_address[0]
-                    : undefined
-                }
-                onChange={handleTextAreaChange}
-                required={true}
-              />
-            </div>
-
-            {/* Row 3: Warehouse Manager, Manager Contact, Manager Email */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <TextInput
-                id="warehouse_manager"
-                label="Warehouse Manager"
-                placeholder="Enter manager name"
-                value={form.warehouse_manager}
-                error={
-                  fieldErrors?.warehouse_manager
-                    ? fieldErrors.warehouse_manager[0]
-                    : undefined
-                }
-                onChange={handleChange}
-              />
-              <TextInput
-                id="warehouse_manager_contact"
-                label="Manager Contact"
-                placeholder="Enter contact number"
-                value={form.warehouse_manager_contact}
-                error={
-                  fieldErrors?.warehouse_manager_contact
-                    ? fieldErrors.warehouse_manager_contact[0]
-                    : undefined
-                }
-                onChange={handleChange}
-                isNumberOnly={true}
-              />
-              <TextInput
-                id="warehouse_manager_email"
-                type="email"
-                label="Manager Email"
-                placeholder="Enter email address"
-                value={form.warehouse_manager_email}
-                error={
-                  fieldErrors?.warehouse_manager_email
-                    ? fieldErrors.warehouse_manager_email[0]
-                    : undefined
-                }
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Row 4: Description (Full Width Textarea) */}
-            <div>
-              <TextAreaInput
-                id="warehouse_description"
-                label="Description"
-                placeholder="Enter warehouse description"
-                value={form.warehouse_description}
-                error={
-                  fieldErrors?.warehouse_description
-                    ? fieldErrors.warehouse_description[0]
-                    : undefined
-                }
-                onChange={handleTextAreaChange}
-              />
-            </div>
-
-            {/* Warehouse Images & Map */}
-            <div className="flex flex-col lg:flex-row w-full gap-4">
-              <div className="w-full lg:w-1/2">
-                <MultiImageUpload
-                  label="Warehouse Images"
-                  defaultImages={existingImages.map(img => img.url)}
-                  defaultImageIds={existingImages.map(img => img.id)}
-                  onChange={handleImagesChange}
-                  onDeleteExisting={handleDeleteExistingImage}
-                  maxImages={3}
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Warehouse Information</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">Basic details and manager contact.</p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <TextInput
+                  id="warehouse_name"
+                  label="Warehouse Name"
+                  placeholder="Enter warehouse name"
+                  value={form.warehouse_name}
+                  error={fieldErrors?.warehouse_name?.[0]}
+                  onChange={handleChange}
+                  required={true}
                 />
-              </div>
 
-              <div className="w-full lg:w-1/2">
-                <MapPicker
-                  label="Warehouse Location"
-                  defaultPosition={
-                    form.latitude && form.longitude
-                      ? [parseFloat(form.latitude), parseFloat(form.longitude)]
-                      : undefined
-                  }
-                  onChange={(lat, lng) =>
-                    setForm(prev => ({
-                      ...prev,
-                      latitude: lat.toString(),
-                      longitude: lng.toString(),
-                    }))
-                  }
+                <TextAreaInput
+                  id="warehouse_address"
+                  label="Warehouse Address"
+                  placeholder="Enter warehouse address"
+                  value={form.warehouse_address}
+                  error={fieldErrors?.warehouse_address?.[0]}
+                  onChange={handleTextAreaChange}
+                  required={true}
                 />
-              </div>
-            </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <TextInput
+                    id="warehouse_manager"
+                    label="Warehouse Manager"
+                    placeholder="Enter manager name"
+                    value={form.warehouse_manager}
+                    error={fieldErrors?.warehouse_manager?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    id="warehouse_manager_contact"
+                    label="Manager Contact"
+                    placeholder="Enter contact number"
+                    value={form.warehouse_manager_contact}
+                    error={fieldErrors?.warehouse_manager_contact?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                  />
+                  <TextInput
+                    id="warehouse_manager_email"
+                    type="email"
+                    label="Manager Email"
+                    placeholder="Enter email address"
+                    value={form.warehouse_manager_email}
+                    error={fieldErrors?.warehouse_manager_email?.[0]}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <TextAreaInput
+                  id="warehouse_description"
+                  label="Description"
+                  placeholder="Enter warehouse description"
+                  value={form.warehouse_description}
+                  error={fieldErrors?.warehouse_description?.[0]}
+                  onChange={handleTextAreaChange}
+                />
+
+                <div className="flex flex-col lg:flex-row w-full gap-4 items-stretch">
+                  <div className="w-full lg:w-1/2 h-full">
+                    <MultiImageUpload
+                      label="Warehouse Images"
+                      defaultImages={existingImages.map(img => img.url)}
+                      defaultImageIds={existingImages.map(img => img.id)}
+                      onChange={handleImagesChange}
+                      onDeleteExisting={handleDeleteExistingImage}
+                      maxImages={3}
+                    />
+                  </div>
+                  <div className="w-full lg:w-1/2 h-full">
+                    <MapPicker
+                      label="Warehouse Location"
+                      defaultPosition={
+                        form.latitude && form.longitude
+                          ? [parseFloat(form.latitude), parseFloat(form.longitude)]
+                          : undefined
+                      }
+                      onChange={(lat, lng) =>
+                        setForm(prev => ({
+                          ...prev,
+                          latitude: lat.toString(),
+                          longitude: lng.toString(),
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             <FormFooterActions
               isSubmitting={isDeletingImages || warehouseMutation.isPending}
             />
           </form>
-        </div>
-      </div>
     </div>
   );
 };

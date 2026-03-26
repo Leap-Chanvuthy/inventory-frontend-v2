@@ -75,8 +75,15 @@ export function DataTable<T>({
 
     const toggleAll = () => {
         if (!rowSelection || !data || rowSelection.mode !== "multiple") return;
-
-        rowSelection.onChange(allSelected ? [] : data);
+        const { selected, onChange, getRowId } = rowSelection;
+        if (allSelected) {
+            // Remove only the visible items from the full selection
+            onChange(selected.filter(r => !data.some(d => getRowId(d) === getRowId(r))));
+        } else {
+            // Merge visible items into the existing selection (no duplicates)
+            const newItems = data.filter(d => !selected.some(r => getRowId(r) === getRowId(d)));
+            onChange([...selected, ...newItems]);
+        }
     };
 
     return (
@@ -131,7 +138,7 @@ export function DataTable<T>({
                                     onClick={() => hasSelection && toggleRow(row)}
                                 >
                                     {hasSelection && (
-                                        <TableCell>
+                                        <TableCell onClick={e => e.stopPropagation()}>
                                             <Checkbox
                                                 checked={!!selected}
                                                 onCheckedChange={() => toggleRow(row)}

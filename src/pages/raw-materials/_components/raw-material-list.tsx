@@ -5,11 +5,7 @@ import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
-import {
-  COLUMNS,
-  SORT_OPTIONS,
-  RawMaterialCard,
-} from "../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS, RawMaterialCard } from "../utils/table-feature";
 import { useSearchParams } from "react-router-dom";
 import UnexpectedError from "@/components/reusable/partials/error";
 import { useEffect } from "react";
@@ -50,7 +46,11 @@ export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
   }
 
   return (
-    <div className={embedded ? "w-full" : "min-h-screen w-full p-4 sm:p-8 bg-background"}>
+    <div
+      className={
+        embedded ? "w-full" : "min-h-screen w-full p-4 sm:p-8 bg-background"
+      }
+    >
       <div className={embedded ? "w-full" : "mx-auto max-w-[1600px]"}>
         {/* Toolbar */}
         <TableToolbar

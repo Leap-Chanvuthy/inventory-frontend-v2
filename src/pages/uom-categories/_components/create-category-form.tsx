@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UomCategoryValidationErrors } from "@/api/uom/uom.types";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export const CreateCategoryForm = () => {
   const mutation = useCreateUomCategory();
@@ -42,7 +44,6 @@ export const CreateCategoryForm = () => {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-      <div className="rounded-2xl shadow-sm border max-w-2xl p-8">
         <Text.TitleMedium className="mb-1">Category Details</Text.TitleMedium>
         <p className="text-sm text-muted-foreground mb-6">
           Categories group related units so conversions stay within the same
@@ -50,26 +51,34 @@ export const CreateCategoryForm = () => {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <TextInput
-            id="name"
-            label="Category Name"
-            placeholder="e.g., Weight"
-            value={form.name}
-            error={fieldErrors?.name?.[0]}
-            required
-            onChange={handleChange}
-          />
-          <TextAreaInput
-            id="description"
-            label="Description"
-            placeholder="Describe what units belong in this category..."
-            value={form.description}
-            error={fieldErrors?.description?.[0]}
-            onChange={handleChange}
-          />
+          <Card>
+            <CardHeader className="pb-4">
+              <Text.TitleSmall>Category Details</Text.TitleSmall>
+              <p className="text-xs text-muted-foreground">Categories group related units so conversions stay within the same domain.</p>
+            </CardHeader>
+            <Separator />
+            <CardContent className="pt-6 space-y-4">
+              <TextInput
+                id="name"
+                label="Category Name"
+                placeholder="e.g., Weight"
+                value={form.name}
+                error={fieldErrors?.name?.[0]}
+                required
+                onChange={handleChange}
+              />
+              <TextAreaInput
+                id="description"
+                label="Description"
+                placeholder="Describe what units belong in this category..."
+                value={form.description}
+                error={fieldErrors?.description?.[0]}
+                onChange={handleChange}
+              />
+            </CardContent>
+          </Card>
           <FormFooterActions isSubmitting={mutation.isPending} />
         </form>
-      </div>
     </div>
   );
 };

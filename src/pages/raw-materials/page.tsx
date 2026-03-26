@@ -11,7 +11,10 @@ import {
   useUpdateRawMaterialCategory,
 } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
 import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
-import { CategoryQueryParams, RawMaterialCategory } from "@/api/categories/types/category.type";
+import {
+  CategoryQueryParams,
+  RawMaterialCategory,
+} from "@/api/categories/types/category.type";
 import { CreateCategoryForm } from "@/pages/category/raw-material-category/_components/create-category-form";
 import { UpdateCategoryForm } from "@/pages/category/raw-material-category/_components/update-raw-material-category-form";
 
@@ -106,7 +109,8 @@ export default function RawMaterials() {
                   <UpdateCategoryForm
                     categoryId={category.id}
                     initialData={{
-                      category_name: values?.category_name || category.category_name,
+                      category_name:
+                        values?.category_name || category.category_name,
                       label_color: values?.label_color || category.label_color,
                       description: values?.description || category.description,
                     }}

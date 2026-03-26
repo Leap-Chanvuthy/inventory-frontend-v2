@@ -37,13 +37,12 @@ export default function WarehousesList({
     "filter[status]": filter,
   });
 
-  const warehouses = data?.data || [];
   const totalPages = data?.last_page || 1;
 
   /* callback to give warehouse data to map */
   useEffect(() => {
-    onWarehousesChange(warehouses);
-  }, [warehouses, onWarehousesChange]);
+    onWarehousesChange(data?.data || []);
+  }, [data, onWarehousesChange]);
 
   useEffect(() => {
     onLoadingChange(isLoading);

@@ -1,6 +1,6 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
 import { Text } from "@/components/ui/text/app-text";
-import { ProductList } from './_components/product-list'
+import { ProductList } from "./_components/product-list";
 
 const Product = () => {
   const breadcrumbItems = [
@@ -16,10 +16,9 @@ const Product = () => {
       </div>
 
       <Text.TitleLarge className="mx-6">Product Management</Text.TitleLarge>
-
       <ProductList />
     </div>
   );
-}
+};
 
-export default Product
+export default Product;

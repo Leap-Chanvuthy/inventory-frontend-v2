@@ -164,7 +164,9 @@ export const UpdateRawMaterialForm = () => {
       raw_material_category_id: rawMaterial.raw_material_category_id
         ? String(rawMaterial.raw_material_category_id)
         : "",
-      base_uom_id: rawMaterial.base_uom_id ? String(rawMaterial.base_uom_id) : "",
+      base_uom_id: rawMaterial.base_uom_id
+        ? String(rawMaterial.base_uom_id)
+        : "",
       uom_category_id: rawMaterial.uom?.category_id
         ? String(rawMaterial.uom.category_id)
         : "",
@@ -305,333 +307,330 @@ export const UpdateRawMaterialForm = () => {
   };
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-5">
-          <Text.TitleMedium className="mb-2">
-            Update Raw Material
-          </Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Update raw material info and its initial PURCHASE stock movement
-            (qty/unit price/exchange rate).
-          </p>
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+      <Text.TitleMedium className="mb-2">Update Raw Material</Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Update raw material info and its initial PURCHASE stock movement
+        (qty/unit price/exchange rate).
+      </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left: Form inputs */}
-              <div className="lg:col-span-7 space-y-6">
-                <div className="rounded-xl border bg-card p-5 space-y-5">
-                  <div>
-                    <Text.TitleSmall>Basic Information</Text.TitleSmall>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      General details and storage setup for this raw material.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextInput
-                      id="material_name"
-                      label="Material Name"
-                      placeholder="e.g., Steel Sheet"
-                      value={form.material_name}
-                      error={fieldErrors?.material_name?.[0]}
-                      onChange={handleChange}
-                      required
-                    />
-
-                    <SelectInput
-                      id="production_method"
-                      label="Production Method (Default FIFO)"
-                      placeholder="Select production method"
-                      error={fieldErrors?.production_method?.[0]}
-                      options={PRODCUTION_METHOD}
-                      value={form.production_method}
-                      onChange={handleSelectChange("production_method")}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextInput
-                      id="barcode"
-                      label="Barcode"
-                      placeholder="e.g., 123456789"
-                      value={form.barcode}
-                      error={fieldErrors?.barcode?.[0]}
-                      onChange={handleChange}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SearchableSelect
-                      id="raw_material_category_id"
-                      label="Category"
-                      placeholder="Select category"
-                      fetchFn={fetchCategories}
-                      value={form.raw_material_category_id}
-                      onChange={handleSelectChange("raw_material_category_id")}
-                      error={fieldErrors?.raw_material_category_id?.[0]}
-                      selectedLabel={selectedCategory?.category_name}
-                      onFetchError={handleDropdownError}
-                      required
-                    />
-                    <SearchableSelect
-                      id="uom_category_id"
-                      label="Unit of Measurement"
-                      placeholder="Search category or base unit…"
-                      fetchFn={fetchUomCategories}
-                      value={form.uom_category_id}
-                      onChange={handleSelectChange("uom_category_id")}
-                      error={uomValidationError || fieldErrors?.base_uom_id?.[0]}
-                      selectedLabel={uomSelectedLabel}
-                      onFetchError={handleDropdownError}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SearchableSelect
-                      id="supplier_id"
-                      label="Supplier"
-                      placeholder="Select supplier"
-                      fetchFn={fetchSuppliers}
-                      value={form.supplier_id}
-                      onChange={handleSelectChange("supplier_id")}
-                      error={fieldErrors?.supplier_id?.[0]}
-                      selectedLabel={selectedSupplier?.official_name}
-                      onFetchError={handleDropdownError}
-                      required
-                    />
-                    <SearchableSelect
-                      id="warehouse_id"
-                      label="Warehouse"
-                      placeholder="Select warehouse"
-                      fetchFn={fetchWarehouses}
-                      value={form.warehouse_id}
-                      onChange={handleSelectChange("warehouse_id")}
-                      error={fieldErrors?.warehouse_id?.[0]}
-                      selectedLabel={selectedWarehouse?.warehouse_name}
-                      onFetchError={handleDropdownError}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TextInput
-                      id="minimum_stock_level"
-                      label="Minimum Stock Level"
-                      placeholder="e.g., 10"
-                      value={form.minimum_stock_level}
-                      error={fieldErrors?.minimum_stock_level?.[0]}
-                      onChange={handleChange}
-                      isNumberOnly
-                      required
-                    />
-
-                    <DatePickerInput
-                      id="expiry_date"
-                      label="Expiry Date"
-                      placeholder="Pick a date"
-                      error={fieldErrors?.expiry_date?.[0]}
-                      value={form.expiry_date}
-                      onChange={handleDateChange}
-                      required
-                    />
-                  </div>
-
-                  <TextAreaInput
-                    id="description"
-                    label="Description"
-                    placeholder="Enter description..."
-                    value={form.description}
-                    error={fieldErrors?.description?.[0]}
-                    onChange={handleTextAreaChange}
-                  />
-                </div>
-
-                <div className="rounded-xl border bg-card p-5 space-y-5">
-                  <div>
-                    <Text.TitleSmall>Purchase Stock Movement</Text.TitleSmall>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Purchase movement type is locked to PURCHASE, but you can
-                      update quantity and pricing.
-                    </p>
-                  </div>
-
-                  <div className="mb-2">
-                    <DatePickerInput
-                      id="movement_date"
-                      label="Movement Date"
-                      placeholder="Pick a date"
-                      error={fieldErrors?.movement_date?.[0]}
-                      value={form.movement_date}
-                      onChange={handleMovementDateChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <TextInput
-                      id="quantity"
-                      label="Quantity"
-                      placeholder="e.g., 50"
-                      value={form.quantity}
-                      error={fieldErrors?.quantity?.[0]}
-                      onChange={handleChange}
-                      isNumberOnly
-                      required
-                    />
-                    <TextInput
-                      id="unit_price_in_usd"
-                      label="Unit Price (USD)"
-                      placeholder="e.g., 2.5"
-                      value={form.unit_price_in_usd}
-                      error={fieldErrors?.unit_price_in_usd?.[0]}
-                      onChange={handleChange}
-                      required
-                    />
-                    <TextInput
-                      id="exchange_rate_from_usd_to_riel"
-                      label="Exchange Rate (USD → Riel)"
-                      placeholder="e.g., 4100"
-                      value={form.exchange_rate_from_usd_to_riel}
-                      error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <TextAreaInput
-                    id="note"
-                    label="Note"
-                    placeholder="Optional note..."
-                    value={form.note}
-                    error={fieldErrors?.note?.[0]}
-                    onChange={handleTextAreaChange}
-                  />
-                </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Form inputs */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="rounded-xl border bg-card p-5 space-y-5">
+              <div>
+                <Text.TitleSmall>Basic Information</Text.TitleSmall>
+                <p className="text-sm text-muted-foreground mt-1">
+                  General details and storage setup for this raw material.
+                </p>
               </div>
 
-              {/* Right: Selected cards preview */}
-              <div className="flex flex-col gap-5 lg:col-span-5">
-                <div className="lg:sticky lg:top-6 space-y-6">
-                  <div className="rounded-xl border bg-card p-5 h-[30rem] overflow-y-scroll">
-                    <Text.TitleSmall className="mb-2">
-                      Selected Data Preview
-                    </Text.TitleSmall>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Review the full details of what you selected.
-                    </p>
-
-                    <div className="grid grid-cols-1 gap-4 my-5">
-                      {selectedCategory ? (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Category
-                          </p>
-                          <CategorySingleCard
-                            category={selectedCategory}
-                            viewRoute="/raw-material-categories/view"
-                            editRoute="/raw-material-categories/edit"
-                            hideActions={false}
-                            disableLink
-                            interactive={false}
-                            variant="compact"
-                          />
-                        </div>
-                      ) : (
-                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a category to preview details.
-                        </div>
-                      )}
-
-                      {form.uom_category_id ? (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Unit of Measurement Preview
-                          </p>
-                          <div className="rounded-lg border bg-card p-3">
-                            <UomHierarchyPreview
-                              categoryId={Number(form.uom_category_id)}
-                              quantity={Number(form.quantity) > 0 ? Number(form.quantity) : undefined}
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a unit of measurement category to see hierarchy and card preview.
-                        </div>
-                      )}
-
-                      {selectedSupplier ? (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Supplier
-                          </p>
-                          <SupplierCard
-                            supplier={selectedSupplier}
-                            hideActions={false}
-                            disableLink
-                            interactive={false}
-                          />
-                        </div>
-                      ) : (
-                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a supplier to preview details.
-                        </div>
-                      )}
-
-                      {selectedWarehouse ? (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Warehouse
-                          </p>
-                          <WarehouseCard
-                            warehouse={selectedWarehouse}
-                            hideActions={false}
-                            disableLink
-                            interactive={false}
-                          />
-                        </div>
-                      ) : (
-                        <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-                          Select a warehouse to preview details.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border bg-card p-6">
-                  <Text.TitleSmall className="mb-2">Upload New Images</Text.TitleSmall>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Add more images (max 4 total across existing + new).
-                  </p>
-                  <MultiImageUpload
-                    label="Raw Material Images"
-                    onChange={handleImagesChange}
-                    maxImages={4}
-                  />
-                </div>
-
-                <SelectableImageDelete
-                  title="Delete Raw Material Image"
-                  images={rawMaterialImage}
-                  onDelete={handleDeleteImages}
-                  isDeleting={deleteImagesMutation.isPending}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextInput
+                  id="material_name"
+                  label="Material Name"
+                  placeholder="e.g., Steel Sheet"
+                  value={form.material_name}
+                  error={fieldErrors?.material_name?.[0]}
+                  onChange={handleChange}
+                  required
                 />
+
+                <SelectInput
+                  id="production_method"
+                  label="Production Method (Default FIFO)"
+                  placeholder="Select production method"
+                  error={fieldErrors?.production_method?.[0]}
+                  options={PRODCUTION_METHOD}
+                  value={form.production_method}
+                  onChange={handleSelectChange("production_method")}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextInput
+                  id="barcode"
+                  label="Barcode"
+                  placeholder="e.g., 123456789"
+                  value={form.barcode}
+                  error={fieldErrors?.barcode?.[0]}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SearchableSelect
+                  id="raw_material_category_id"
+                  label="Category"
+                  placeholder="Select category"
+                  fetchFn={fetchCategories}
+                  value={form.raw_material_category_id}
+                  onChange={handleSelectChange("raw_material_category_id")}
+                  error={fieldErrors?.raw_material_category_id?.[0]}
+                  selectedLabel={selectedCategory?.category_name}
+                  onFetchError={handleDropdownError}
+                  required
+                />
+                <SearchableSelect
+                  id="uom_category_id"
+                  label="Unit of Measurement"
+                  placeholder="Search category or base unit…"
+                  fetchFn={fetchUomCategories}
+                  value={form.uom_category_id}
+                  onChange={handleSelectChange("uom_category_id")}
+                  error={fieldErrors?.base_uom_id?.[0]}
+                  selectedLabel={uomSelectedLabel}
+                  onFetchError={handleDropdownError}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SearchableSelect
+                  id="supplier_id"
+                  label="Supplier"
+                  placeholder="Select supplier"
+                  fetchFn={fetchSuppliers}
+                  value={form.supplier_id}
+                  onChange={handleSelectChange("supplier_id")}
+                  error={fieldErrors?.supplier_id?.[0]}
+                  selectedLabel={selectedSupplier?.official_name}
+                  onFetchError={handleDropdownError}
+                  required
+                />
+                <SearchableSelect
+                  id="warehouse_id"
+                  label="Warehouse"
+                  placeholder="Select warehouse"
+                  fetchFn={fetchWarehouses}
+                  value={form.warehouse_id}
+                  onChange={handleSelectChange("warehouse_id")}
+                  error={fieldErrors?.warehouse_id?.[0]}
+                  selectedLabel={selectedWarehouse?.warehouse_name}
+                  onFetchError={handleDropdownError}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextInput
+                  id="minimum_stock_level"
+                  label="Minimum Stock Level"
+                  placeholder="e.g., 10"
+                  value={form.minimum_stock_level}
+                  error={fieldErrors?.minimum_stock_level?.[0]}
+                  onChange={handleChange}
+                  isNumberOnly
+                  required
+                />
+
+                <DatePickerInput
+                  id="expiry_date"
+                  label="Expiry Date"
+                  placeholder="Pick a date"
+                  error={fieldErrors?.expiry_date?.[0]}
+                  value={form.expiry_date}
+                  onChange={handleDateChange}
+                  required
+                />
+              </div>
+
+              <TextAreaInput
+                id="description"
+                label="Description"
+                placeholder="Enter description..."
+                value={form.description}
+                error={fieldErrors?.description?.[0]}
+                onChange={handleTextAreaChange}
+              />
+            </div>
+
+            <div className="rounded-xl border bg-card p-5 space-y-5">
+              <div>
+                <Text.TitleSmall>Purchase Stock Movement</Text.TitleSmall>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Purchase movement type is locked to PURCHASE, but you can
+                  update quantity and pricing.
+                </p>
+              </div>
+
+              <div className="mb-2">
+                <DatePickerInput
+                  id="movement_date"
+                  label="Movement Date"
+                  placeholder="Pick a date"
+                  error={fieldErrors?.movement_date?.[0]}
+                  value={form.movement_date}
+                  onChange={handleMovementDateChange}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <TextInput
+                  id="quantity"
+                  label="Quantity"
+                  placeholder="e.g., 50"
+                  value={form.quantity}
+                  error={fieldErrors?.quantity?.[0]}
+                  onChange={handleChange}
+                  isNumberOnly
+                  required
+                />
+                <TextInput
+                  id="unit_price_in_usd"
+                  label="Unit Price (USD)"
+                  placeholder="e.g., 2.5"
+                  value={form.unit_price_in_usd}
+                  error={fieldErrors?.unit_price_in_usd?.[0]}
+                  onChange={handleChange}
+                  required
+                />
+                <TextInput
+                  id="exchange_rate_from_usd_to_riel"
+                  label="Exchange Rate (USD → Riel)"
+                  placeholder="e.g., 4100"
+                  value={form.exchange_rate_from_usd_to_riel}
+                  error={fieldErrors?.exchange_rate_from_usd_to_riel?.[0]}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <TextAreaInput
+                id="note"
+                label="Note"
+                placeholder="Optional note..."
+                value={form.note}
+                error={fieldErrors?.note?.[0]}
+                onChange={handleTextAreaChange}
+              />
+            </div>
+          </div>
+
+          {/* Right: Selected cards preview */}
+          <div className="flex flex-col gap-5 lg:col-span-5">
+            <div className="lg:sticky lg:top-6 space-y-6">
+              <div className="rounded-xl border bg-card p-5 h-[30rem] overflow-y-scroll">
+                <Text.TitleSmall className="mb-2">
+                  Selected Data Preview
+                </Text.TitleSmall>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Review the full details of what you selected.
+                </p>
+
+                <div className="grid grid-cols-1 gap-4 my-5">
+                  {selectedCategory ? (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        Category
+                      </p>
+                      <CategorySingleCard
+                        category={selectedCategory}
+                        viewRoute="/raw-material-categories/view"
+                        editRoute="/raw-material-categories/edit"
+                        hideActions={false}
+                        disableLink
+                        interactive={false}
+                        variant="compact"
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                      Select a category to preview details.
+                    </div>
+                  )}
+
+                  {form.uom_category_id ? (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        Unit of Measurement Preview
+                      </p>
+                      <div className="rounded-lg border bg-card p-3">
+                        <UomHierarchyPreview
+                          categoryId={Number(form.uom_category_id)}
+                          quantity={
+                            Number(form.quantity) > 0
+                              ? Number(form.quantity)
+                              : undefined
+                          }
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                      Select a unit of measurement category to see hierarchy and
+                      card preview.
+                    </div>
+                  )}
+
+                  {selectedSupplier ? (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        Supplier
+                      </p>
+                      <SupplierCard
+                        supplier={selectedSupplier}
+                        hideActions={false}
+                        disableLink
+                        interactive={false}
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                      Select a supplier to preview details.
+                    </div>
+                  )}
+
+                  {selectedWarehouse ? (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">
+                        Warehouse
+                      </p>
+                      <WarehouseCard
+                        warehouse={selectedWarehouse}
+                        hideActions={false}
+                        disableLink
+                        interactive={false}
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+                      Select a warehouse to preview details.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <FormFooterActions
-              isSubmitting={
-                updateMutation.isPending || deleteImagesMutation.isPending
-              }
-              saveAndCloseLabel="Save & Close"
-              saveLabel="Save"
+            <div className="rounded-xl border bg-card p-6">
+              <Text.TitleSmall className="mb-2">
+                Upload New Images
+              </Text.TitleSmall>
+              <p className="text-sm text-muted-foreground mb-4">
+                Add more images (max 4 total across existing + new).
+              </p>
+              <MultiImageUpload onChange={handleImagesChange} maxImages={4} />
+            </div>
+
+            <SelectableImageDelete
+              title="Delete Raw Material Image"
+              images={rawMaterialImage}
+              onDelete={handleDeleteImages}
+              isDeleting={deleteImagesMutation.isPending}
             />
-          </form>
+          </div>
         </div>
-      </div>
+
+        <FormFooterActions
+          isSubmitting={
+            updateMutation.isPending || deleteImagesMutation.isPending
+          }
+          saveAndCloseLabel="Save & Close"
+          saveLabel="Save"
+        />
+      </form>
     </div>
   );
 };

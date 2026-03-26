@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Download } from "lucide-react";
 import { Text } from "@/components/ui/text/app-text";
 
@@ -56,13 +51,12 @@ export const ImportInstructionsCard = ({
 }: ImportInstructionsCardProps) => {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Import Instructions</CardTitle>
-        <CardDescription>
-          Follow these guidelines to ensure successful import
-        </CardDescription>
+      <CardHeader className="pb-4">
+        <Text.TitleSmall>Import Instructions</Text.TitleSmall>
+        <p className="text-xs text-muted-foreground">Follow these guidelines to ensure successful import.</p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <Separator />
+      <CardContent className="pt-6 space-y-4">
         <div className="space-y-2">
           <Text.TitleSmall>File Requirements:</Text.TitleSmall>
           <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">

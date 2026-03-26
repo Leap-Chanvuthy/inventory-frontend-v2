@@ -6,13 +6,8 @@ import {
   ImportInstructionsCard,
   requiredFields,
 } from "@/pages/supplier/_components/import-instructions-card";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -61,59 +56,59 @@ export const ImportSupplierForm = () => {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
-          <Text.TitleMedium className="mb-2">Import Suppliers</Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Upload an Excel or CSV file to import multiple suppliers at once.
-            Requires ADMIN role.
-          </p>
+      <Text.TitleMedium className="mb-2">Import Suppliers</Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Upload an Excel or CSV file to import multiple suppliers at once.
+        Requires ADMIN role.
+      </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Instructions Card */}
-            <ImportInstructionsCard
-              requiredFields={requiredFields}
-              onDownloadTemplate={handleDownloadTemplate}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Instructions Card */}
+        <ImportInstructionsCard
+          requiredFields={requiredFields}
+          onDownloadTemplate={handleDownloadTemplate}
+        />
+
+        {/* File Upload Card */}
+        <Card>
+          <CardHeader className="pb-4">
+            <Text.TitleSmall>Upload File</Text.TitleSmall>
+            <p className="text-xs text-muted-foreground">
+              Select or drag and drop your Excel/CSV file.
+            </p>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-6">
+            <FileImport
+              file={file}
+              onFileChange={handleFileChange}
+              error={fileError || fieldErrors?.supplier_file?.[0]}
             />
 
-            {/* File Upload Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Upload File</CardTitle>
-                <CardDescription>
-                  Select or drag and drop your Excel/CSV file
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileImport
-                  file={file}
-                  onFileChange={handleFileChange}
-                  error={fileError || fieldErrors?.supplier_file?.[0]}
-                />
+            {fieldErrors && Object.keys(fieldErrors).length > 0 && (
+              <div className="mt-4">
+                <Alert variant="destructive">
+                  <AlertTitle>Import validation failed</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc ml-5">
+                      {Object.entries(fieldErrors).map(([k, v]) => (
+                        <li key={k}>
+                          <strong className="capitalize">
+                            {k.replace(/_/g, " ")}
+                          </strong>
+                          : {Array.isArray(v) ? v.join(", ") : v}
+                        </li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-                {fieldErrors && Object.keys(fieldErrors).length > 0 && (
-                  <div className="mt-4">
-                    <Alert variant="destructive">
-                      <AlertTitle>Import validation failed</AlertTitle>
-                      <AlertDescription>
-                        <ul className="list-disc ml-5">
-                          {Object.entries(fieldErrors).map(([k, v]) => (
-                            <li key={k}>
-                              <strong className="capitalize">{k.replace(/_/g, " ")}</strong>: {Array.isArray(v) ? v.join(', ') : v}
-                            </li>
-                          ))}
-                        </ul>
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <FormFooterActions isSubmitting={importMutation.isPending} />
-          </form>
-        </div>
-      </div>
+        <FormFooterActions isSubmitting={importMutation.isPending} />
+      </form>
     </div>
   );
 };

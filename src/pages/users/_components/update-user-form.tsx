@@ -13,6 +13,8 @@ import { Text } from "@/components/ui/text/app-text";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export const UpdateUserForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,10 +56,7 @@ export const UpdateUserForm = () => {
   };
 
   const handleFileChange = (file: File | null) => {
-    setForm(prev => ({
-      ...prev,
-      profile_picture: file,
-    }));
+    setForm(prev => ({ ...prev, profile_picture: file }));
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,7 +72,6 @@ export const UpdateUserForm = () => {
         if (action === "save_and_close") {
           navigate("/users");
         }
-        // save → stay, data auto-refreshed
       },
     });
   };
@@ -91,50 +89,68 @@ export const UpdateUserForm = () => {
   }
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
-          <Text.TitleMedium className="mb-6">Update User Info</Text.TitleMedium>
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+      <Text.TitleMedium className="mb-2">Update User Info</Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Manage user details and roles within the application.
+      </p>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Upload */}
-              <div className="lg:col-span-1">
-                <ImageUpload
-                  label="Profile Picture"
-                  defaultImage={user?.profile_picture ?? undefined}
-                  onChange={handleFileChange}
-                />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Form inputs */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="lg:sticky lg:top-6 space-y-6">
+              <Card>
+                <CardHeader className="pb-4">
+                  <Text.TitleSmall>Profile Picture</Text.TitleSmall>
+                  <p className="text-xs text-muted-foreground">Upload an optional profile image for the user.</p>
+                </CardHeader>
+                <Separator />
+                <CardContent className="pt-6">
+                  <ImageUpload
+                    defaultImage={user?.profile_picture ?? undefined}
+                    onChange={handleFileChange}
+                  />
+                </CardContent>
+              </Card>
 
-                <div className="my-5 flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border text-xs text-gray-500">
-                  <Info />
-                  After updating the user, an email will be sent to them to set
-                  up their password.
-                </div>
+              <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30 text-xs text-muted-foreground">
+                <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                <p>
+                  After updating the user, the changes will be reflected
+                  immediately.
+                </p>
               </div>
+            </div>
+          </div>
 
-              {/* Form */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="flex flex-col lg:flex-row gap-3">
+          {/* Right: Profile picture + notice */}
+
+          <div className="lg:col-span-7 space-y-6">
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Basic Information</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">Account credentials and contact details.</p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <TextInput
                     id="email"
                     type="email"
                     label="Email"
                     placeholder="Enter email address"
                     value={form.email}
-                    error={
-                      fieldErrors?.email ? fieldErrors.email[0] : undefined
-                    }
+                    error={fieldErrors?.email?.[0]}
                     onChange={handleChange}
                     required={true}
                   />
-
                   <SelectInput
                     id="role"
                     label="Role"
                     options={USER_ROLES}
                     value={form.role}
-                    error={fieldErrors?.role ? fieldErrors.role[0] : undefined}
+                    error={fieldErrors?.role?.[0]}
                     onChange={value =>
                       setForm(prev => ({ ...prev, role: value }))
                     }
@@ -142,28 +158,21 @@ export const UpdateUserForm = () => {
                   />
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-3">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <TextInput
                     id="name"
                     label="Name"
-                    error={fieldErrors?.name ? fieldErrors.name[0] : undefined}
+                    error={fieldErrors?.name?.[0]}
                     placeholder="Enter username"
                     value={form.name}
                     onChange={handleChange}
                     required={true}
                   />
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-3">
                   <TextInput
                     id="phone_number"
                     label="Phone Number"
                     onChange={handleChange}
-                    error={
-                      fieldErrors?.phone_number
-                        ? fieldErrors.phone_number[0]
-                        : undefined
-                    }
+                    error={fieldErrors?.phone_number?.[0]}
                     placeholder="Enter phone number"
                     value={form.phone_number}
                     required={true}
@@ -171,13 +180,13 @@ export const UpdateUserForm = () => {
                     maxLength={10}
                   />
                 </div>
-              </div>
-            </div>
-
-            <FormFooterActions isSubmitting={updateMutation.isPending} />
-          </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+
+        <FormFooterActions isSubmitting={updateMutation.isPending} />
+      </form>
     </div>
   );
 };

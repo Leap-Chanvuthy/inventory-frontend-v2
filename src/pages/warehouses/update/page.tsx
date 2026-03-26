@@ -14,19 +14,15 @@ const UpdateWarehouse = () => {
     {
       name: `${warehouse?.warehouse_name || ""}`,
       label: `${warehouse?.warehouse_name || ""}`,
+      className: "text-primary font-medium",
     },
   ];
 
-  if (!id) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Warehouse ID is missing</p>
-      </div>
-    );
-  }
   return (
-    <div className="mx-6 mb-5">
-      <BreadCrumb items={breadcrumbItems} />
+    <div>
+      <div className="mx-6 mb-5">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
       <UpdateWarehouseForm />
     </div>
   );

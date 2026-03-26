@@ -1,18 +1,22 @@
 import { useUpdateUomCategory } from "@/api/uom/uom.mutation";
+import { useSingleUomCategory } from "@/api/uom/uom.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { UomCategory, UomCategoryValidationErrors } from "@/api/uom/uom.types";
+import { useNavigate, useParams } from "react-router-dom";
+import { UomCategoryValidationErrors } from "@/api/uom/uom.types";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
 
-interface EditCategoryFormProps {
-  category: UomCategory;
-}
-
-export const EditCategoryForm = ({ category }: EditCategoryFormProps) => {
-  const mutation = useUpdateUomCategory(category.id);
+export const EditCategoryForm = () => {
+  const { id } = useParams<{ id: string }>();
+  const { data: categoryData, isLoading, isFetching, isError } = useSingleUomCategory(Number(id));
+  const category = categoryData?.data;
+  const mutation = useUpdateUomCategory(Number(id));
   const error = mutation.error as AxiosError<UomCategoryValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
@@ -27,6 +31,9 @@ export const EditCategoryForm = ({ category }: EditCategoryFormProps) => {
       });
     }
   }, [category]);
+
+  if (isLoading) return <DataCardLoading text="Loading category..." />;
+  if (isError && !isFetching) return <UnexpectedError kind="fetch" homeTo="/unit-of-measurement/categories" />;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -53,34 +60,41 @@ export const EditCategoryForm = ({ category }: EditCategoryFormProps) => {
   };
 
   return (
-    <div className="mx-6">
-      <div className="rounded-2xl shadow-sm border max-w-2xl p-8">
-        <Text.TitleMedium className="mb-1">Edit Category</Text.TitleMedium>
-        <p className="text-sm text-muted-foreground mb-6">
-          Update the name or description of this UOM category.
-        </p>
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+      <Text.TitleMedium className="mb-1">Edit Category</Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Update the name or description of this UOM category.
+      </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <TextInput
-            id="name"
-            label="Category Name"
-            placeholder="e.g., Weight"
-            value={form.name}
-            error={fieldErrors?.name?.[0]}
-            required
-            onChange={handleChange}
-          />
-          <TextAreaInput
-            id="description"
-            label="Description"
-            placeholder="Describe what units belong in this category..."
-            value={form.description}
-            error={fieldErrors?.description?.[0]}
-            onChange={handleChange}
-          />
-          <FormFooterActions isSubmitting={mutation.isPending} />
-        </form>
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader className="pb-4">
+            <Text.TitleSmall>Category Details</Text.TitleSmall>
+            <p className="text-xs text-muted-foreground">Update the name or description of this UOM category.</p>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-6 space-y-4">
+            <TextInput
+              id="name"
+              label="Category Name"
+              placeholder="e.g., Weight"
+              value={form.name}
+              error={fieldErrors?.name?.[0]}
+              required
+              onChange={handleChange}
+            />
+            <TextAreaInput
+              id="description"
+              label="Description"
+              placeholder="Describe what units belong in this category..."
+              value={form.description}
+              error={fieldErrors?.description?.[0]}
+              onChange={handleChange}
+            />
+          </CardContent>
+        </Card>
+        <FormFooterActions isSubmitting={mutation.isPending} />
+      </form>
     </div>
   );
 };

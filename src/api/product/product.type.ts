@@ -96,7 +96,7 @@ export interface CreateInternalManufacturingRequest {
   product_description?: string;
   product_category_id: number;
   base_uom_id: number;
-  supplier_id: number;
+  supplier_id?: number;
   warehouse_id: number;
   product_status: string;
   quantity: number;
@@ -120,8 +120,17 @@ export interface CreateProductRequest {
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 
+export interface InsufficientStockError {
+  raw_material_id: number;
+  material_name: string;
+  material_sku_code: string;
+  required_qty: number;
+  available_qty: number;
+  shortfall_qty: number;
+}
+
 export interface ProductValidationErrors {
   status: boolean;
   message: string;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[]> | InsufficientStockError[];
 }

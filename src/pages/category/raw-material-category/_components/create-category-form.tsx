@@ -7,6 +7,8 @@ import { useState } from "react";
 import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
 import { useNavigate } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface CreateCategoryFormProps {
   embedded?: boolean;
@@ -79,14 +81,6 @@ export const CreateCategoryForm = ({
           : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"
       }
     >
-      <div
-        className={
-          embedded
-            ? "rounded-2xl border max-w-full mx-auto"
-            : "rounded-2xl shadow-sm border max-w-full mx-auto"
-        }
-      >
-        <div className="p-8">
           <Text.TitleMedium className="mb-2">
             Create Raw Material Category
           </Text.TitleMedium>
@@ -95,61 +89,47 @@ export const CreateCategoryForm = ({
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Category Name */}
-            <div>
-              <TextInput
-                id="category_name"
-                label="Category Name"
-                placeholder="Enter category name"
-                value={form.category_name}
-                error={
-                  fieldErrors?.category_name
-                    ? fieldErrors.category_name[0]
-                    : undefined
-                }
-                required={true}
-                onChange={handleChange}
-              />
-            </div>
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Category Details</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">Name, description and label colour for this category.</p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <TextInput
+                  id="category_name"
+                  label="Category Name"
+                  placeholder="Enter category name"
+                  value={form.category_name}
+                  error={fieldErrors?.category_name?.[0]}
+                  required={true}
+                  onChange={handleChange}
+                />
 
-            {/* Description */}
-            <div>
-              <TextAreaInput
-                id="description"
-                label="Description"
-                placeholder="Enter category description"
-                value={form.description}
-                error={
-                  fieldErrors?.description
-                    ? fieldErrors.description[0]
-                    : undefined
-                }
-                onChange={handleTextAreaChange}
-              />
-            </div>
+                <TextAreaInput
+                  id="description"
+                  label="Description"
+                  placeholder="Enter category description"
+                  value={form.description}
+                  error={fieldErrors?.description?.[0]}
+                  onChange={handleTextAreaChange}
+                />
 
-            {/* Label Colour */}
-            <div>
-              <ColorPickerInput
-                id="label_color"
-                label="Label Colour"
-                value={form.label_color}
-                error={
-                  fieldErrors?.label_color
-                    ? fieldErrors.label_color[0]
-                    : undefined
-                }
-                onChange={handleColorChange}
-              />
-            </div>
+                <ColorPickerInput
+                  id="label_color"
+                  label="Label Colour"
+                  value={form.label_color}
+                  error={fieldErrors?.label_color?.[0]}
+                  onChange={handleColorChange}
+                />
+              </CardContent>
+            </Card>
 
             <FormFooterActions
               isSubmitting={categoryMutation.isPending}
               onCancel={onCancel}
             />
           </form>
-        </div>
-      </div>
     </div>
   );
 };

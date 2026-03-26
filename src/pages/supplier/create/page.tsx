@@ -7,7 +7,11 @@ function CreateSupplier() {
   const breadcrumbItems = [
     { name: "inventory", label: "Inventory", link: "/" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
-    { name: "create-supplier", label: "Create a new Supplier" },
+    {
+      name: "create-supplier",
+      label: "Create a new Supplier",
+      className: "text-primary font-medium",
+    },
   ];
 
   const tabs = [

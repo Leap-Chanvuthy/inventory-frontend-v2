@@ -14,6 +14,7 @@ type Crumb = {
     name: string
     label: string
     link?: string
+    className?: string
 }
 
 type BreadCrumbProps = {
@@ -32,9 +33,9 @@ export function BreadCrumb({ items }: BreadCrumbProps) {
                         <React.Fragment key={item.name ?? idx}>
                             <BreadcrumbItem>
                                 {isLast ? (
-                                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                                    <BreadcrumbPage className={item.className}>{item.label}</BreadcrumbPage>
                                 ) : (
-                                    <BreadcrumbLink asChild>
+                                    <BreadcrumbLink asChild className={item.className}>
                                         <Link to={item.link ?? "#"}>{item.label}</Link>
                                     </BreadcrumbLink>
                                 )}

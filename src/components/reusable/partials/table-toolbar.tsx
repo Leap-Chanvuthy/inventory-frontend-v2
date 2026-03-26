@@ -255,14 +255,15 @@ export const TableToolbar = ({
 
           {/* Filter */}
           {filterOptions.length > 0 && (
-            <Select value={filterValue} onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-28 h-9">
+            <Select value={filterValue || "__all__"} onValueChange={v => handleFilterChange(v === "__all__" ? "" : v)}>
+              <SelectTrigger className="w-32 h-9">
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="__all__">All</SelectItem>
                 {filterOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label == selectedFilter ? `${opt.label}` : opt.label}
+                    {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>

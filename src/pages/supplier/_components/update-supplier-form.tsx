@@ -6,13 +6,8 @@ import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { BankPaymentSection } from "./bank-payment-section";
 import {
   BankDetails,
@@ -199,265 +194,263 @@ export const UpdateSupplierForm = () => {
   }
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
-          <Text.TitleMedium className="mb-2">Update Supplier</Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Update supplier details and roles within the application.
-          </p>
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+      <Text.TitleMedium className="mb-2">Update Supplier</Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Update supplier details and roles within the application.
+      </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left: Form inputs */}
-              <div className="lg:col-span-7 space-y-6">
-                {/* Basic Information */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Basic Information</CardTitle>
-                    <CardDescription>Supplier's basic details</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        required={true}
-                        id="official_name"
-                        label="Official Name"
-                        placeholder="Enter official name"
-                        value={form.official_name}
-                        error={fieldErrors?.official_name?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        id="contact_person"
-                        label="Contact Person"
-                        placeholder="Enter contact person"
-                        value={form.contact_person}
-                        error={fieldErrors?.contact_person?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id="phone"
-                        label="Phone"
-                        type="tel"
-                        placeholder="Enter phone number"
-                        value={form.phone}
-                        error={fieldErrors?.phone?.[0]}
-                        onChange={handleChange}
-                        isNumberOnly={true}
-                        maxLength={10}
-                      />
-                      <TextInput
-                        id="email"
-                        label="Email"
-                        type="email"
-                        placeholder="Enter email address"
-                        value={form.email}
-                        error={fieldErrors?.email?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Business Information */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Business Information</CardTitle>
-                    <CardDescription>
-                      Legal and business details
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <TextInput
-                      id="legal_business_name"
-                      label="Legal Business Name"
-                      placeholder="Enter legal business name"
-                      value={form.legal_business_name}
-                      error={fieldErrors?.legal_business_name?.[0]}
-                      onChange={handleChange}
-                    />
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id="tax_identification_number"
-                        label="Tax Identification Number"
-                        type="text"
-                        placeholder="Enter TIN"
-                        value={form.tax_identification_number}
-                        error={fieldErrors?.tax_identification_number?.[0]}
-                        onChange={handleChange}
-                        isNumberOnly={true}
-                      />
-                      <TextInput
-                        id="business_registration_number"
-                        label="Business Registration Number"
-                        type="text"
-                        placeholder="Enter BRN"
-                        value={form.business_registration_number}
-                        error={fieldErrors?.business_registration_number?.[0]}
-                        onChange={handleChange}
-                        isNumberOnly={true}
-                      />
-                    </div>
-
-                    <TextAreaInput
-                      id="business_description"
-                      label="Business Description"
-                      placeholder="Enter business description"
-                      value={form.business_description}
-                      error={fieldErrors?.business_description?.[0]}
-                      onChange={handleTextAreaChange}
-                    />
-                  </CardContent>
-                </Card>
-
-                {/* Address Information */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Address Information</CardTitle>
-                    <CardDescription>
-                      Supplier's location details
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <TextInput
-                      required={true}
-                      id="address_line1"
-                      label="Address Line 1"
-                      placeholder="Enter address"
-                      value={form.address_line1}
-                      error={fieldErrors?.address_line1?.[0]}
-                      onChange={handleChange}
-                    />
-                    <TextInput
-                      id="address_line2"
-                      label="Address Line 2"
-                      placeholder="Enter address (optional)"
-                      value={form.address_line2}
-                      error={fieldErrors?.address_line2?.[0]}
-                      onChange={handleChange}
-                    />
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                      <TextInput
-                        required={true}
-                        id="village"
-                        label="Village"
-                        placeholder="Enter village"
-                        value={form.village}
-                        error={fieldErrors?.village?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        required={true}
-                        id="commune"
-                        label="Commune"
-                        placeholder="Enter commune"
-                        value={form.commune}
-                        error={fieldErrors?.commune?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        required={true}
-                        id="district"
-                        label="District"
-                        placeholder="Enter district"
-                        value={form.district}
-                        error={fieldErrors?.district?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                      <TextInput
-                        required={true}
-                        id="city"
-                        label="City"
-                        placeholder="Enter city"
-                        value={form.city}
-                        error={fieldErrors?.city?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        required={true}
-                        id="province"
-                        label="Province"
-                        placeholder="Enter province"
-                        value={form.province}
-                        error={fieldErrors?.province?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        id="postal_code"
-                        label="Postal Code"
-                        type="text"
-                        placeholder="Enter postal code"
-                        value={form.postal_code}
-                        error={fieldErrors?.postal_code?.[0]}
-                        onChange={handleChange}
-                        isNumberOnly={true}
-                      />
-                    </div>
-
-                    <MapPicker
-                      label="Supplier Location"
-                      defaultPosition={
-                        form.latitude && form.longitude
-                          ? [
-                              parseFloat(form.latitude),
-                              parseFloat(form.longitude),
-                            ]
-                          : undefined
-                      }
-                      onChange={(lat, lng) =>
-                        setForm(prev => ({
-                          ...prev,
-                          latitude: lat.toString(),
-                          longitude: lng.toString(),
-                        }))
-                      }
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Right: Image + bank details */}
-              <div className="lg:col-span-5 space-y-6">
-                <div className="lg:sticky lg:top-6 space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Supplier Image</CardTitle>
-                      <CardDescription>
-                        Upload an optional profile image for the supplier.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ImageUpload
-                        label="Supplier Image"
-                        onChange={handleImageChange}
-                        defaultImage={defaultImage || undefined}
-                      />
-                    </CardContent>
-                  </Card>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Form inputs */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Basic Information */}
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Basic Information</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">
+                  Supplier's basic details.
+                </p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <TextInput
+                    required={true}
+                    id="official_name"
+                    label="Official Name"
+                    placeholder="Enter official name"
+                    value={form.official_name}
+                    error={fieldErrors?.official_name?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    id="contact_person"
+                    label="Contact Person"
+                    placeholder="Enter contact person"
+                    value={form.contact_person}
+                    error={fieldErrors?.contact_person?.[0]}
+                    onChange={handleChange}
+                  />
                 </div>
 
-                {/* Bank Information */}
-                <BankPaymentSection
-                  banks={banks}
-                  setBanks={setBanks}
-                  fieldErrors={fieldErrors}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <TextInput
+                    id="phone"
+                    label="Phone"
+                    type="tel"
+                    placeholder="Enter phone number"
+                    value={form.phone}
+                    error={fieldErrors?.phone?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                    maxLength={10}
+                  />
+                  <TextInput
+                    id="email"
+                    label="Email"
+                    type="email"
+                    placeholder="Enter email address"
+                    value={form.email}
+                    error={fieldErrors?.email?.[0]}
+                    onChange={handleChange}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Business Information */}
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Business Information</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">
+                  Legal and business details.
+                </p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <TextInput
+                  id="legal_business_name"
+                  label="Legal Business Name"
+                  placeholder="Enter legal business name"
+                  value={form.legal_business_name}
+                  error={fieldErrors?.legal_business_name?.[0]}
+                  onChange={handleChange}
                 />
-              </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <TextInput
+                    id="tax_identification_number"
+                    label="Tax Identification Number"
+                    type="text"
+                    placeholder="Enter TIN"
+                    value={form.tax_identification_number}
+                    error={fieldErrors?.tax_identification_number?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                  />
+                  <TextInput
+                    id="business_registration_number"
+                    label="Business Registration Number"
+                    type="text"
+                    placeholder="Enter BRN"
+                    value={form.business_registration_number}
+                    error={fieldErrors?.business_registration_number?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                  />
+                </div>
+
+                <TextAreaInput
+                  id="business_description"
+                  label="Business Description"
+                  placeholder="Enter business description"
+                  value={form.business_description}
+                  error={fieldErrors?.business_description?.[0]}
+                  onChange={handleTextAreaChange}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Address Information */}
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Address Information</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">
+                  Supplier's location details.
+                </p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <TextInput
+                  required={true}
+                  id="address_line1"
+                  label="Address Line 1"
+                  placeholder="Enter address"
+                  value={form.address_line1}
+                  error={fieldErrors?.address_line1?.[0]}
+                  onChange={handleChange}
+                />
+                <TextInput
+                  id="address_line2"
+                  label="Address Line 2"
+                  placeholder="Enter address (optional)"
+                  value={form.address_line2}
+                  error={fieldErrors?.address_line2?.[0]}
+                  onChange={handleChange}
+                />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <TextInput
+                    required={true}
+                    id="village"
+                    label="Village"
+                    placeholder="Enter village"
+                    value={form.village}
+                    error={fieldErrors?.village?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    required={true}
+                    id="commune"
+                    label="Commune"
+                    placeholder="Enter commune"
+                    value={form.commune}
+                    error={fieldErrors?.commune?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    required={true}
+                    id="district"
+                    label="District"
+                    placeholder="Enter district"
+                    value={form.district}
+                    error={fieldErrors?.district?.[0]}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <TextInput
+                    required={true}
+                    id="city"
+                    label="City"
+                    placeholder="Enter city"
+                    value={form.city}
+                    error={fieldErrors?.city?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    required={true}
+                    id="province"
+                    label="Province"
+                    placeholder="Enter province"
+                    value={form.province}
+                    error={fieldErrors?.province?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    id="postal_code"
+                    label="Postal Code"
+                    type="text"
+                    placeholder="Enter postal code"
+                    value={form.postal_code}
+                    error={fieldErrors?.postal_code?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                  />
+                </div>
+
+                <MapPicker
+                  label="Supplier Location"
+                  defaultPosition={
+                    form.latitude && form.longitude
+                      ? [parseFloat(form.latitude), parseFloat(form.longitude)]
+                      : undefined
+                  }
+                  onChange={(lat, lng) =>
+                    setForm(prev => ({
+                      ...prev,
+                      latitude: lat.toString(),
+                      longitude: lng.toString(),
+                    }))
+                  }
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right: Image + bank details */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="lg:sticky lg:top-6 space-y-6">
+              <Card>
+                <CardHeader className="pb-4">
+                  <Text.TitleSmall>Supplier Image</Text.TitleSmall>
+                  <p className="text-xs text-muted-foreground">
+                    Upload an optional profile image for the supplier.
+                  </p>
+                </CardHeader>
+                <Separator />
+                <CardContent className="pt-6">
+                  <ImageUpload
+                    onChange={handleImageChange}
+                    defaultImage={defaultImage || undefined}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
-            <FormFooterActions isSubmitting={supplierMutation.isPending} />
-          </form>
+            {/* Bank Information */}
+            <BankPaymentSection
+              banks={banks}
+              setBanks={setBanks}
+              fieldErrors={fieldErrors}
+            />
+          </div>
         </div>
-      </div>
+
+        <FormFooterActions isSubmitting={supplierMutation.isPending} />
+      </form>
     </div>
   );
 };

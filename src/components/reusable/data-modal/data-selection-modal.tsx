@@ -42,6 +42,8 @@ type DataSelectionModalProps<T> = {
     data?: T[];
     columns: DataTableColumn<T>[];
     getRowId: (row: T) => string | number;
+    getRowLabel?: (row: T) => string;
+    defaultSelected?: T[];
 
     // ✅ pagination
     currentPage?: number;
@@ -81,6 +83,8 @@ export function DataSelectionModal<T>({
     filterOptions,
     onFilterChange,
     createHref,
+    defaultSelected,
+    getRowLabel,
 }: DataSelectionModalProps<T>) {
     const path = useLocation().pathname;
     const dispatch = useDispatch();
@@ -89,15 +93,23 @@ export function DataSelectionModal<T>({
         selectSelectedItems(state, scope)
     ) as { id: string; payload: T }[];
 
-    // clean up on unmount or path change
+    // Init scope and pre-populate selection when modal opens; clear on close/unmount
     useEffect(() => {
         if (open) {
             dispatch(initScope({ scope, mode }));
-        }
-        return () => {
+            if (defaultSelected?.length) {
+                dispatch(setSelection({
+                    scope,
+                    items: defaultSelected.map(row => ({
+                        id: String(getRowId(row)),
+                        payload: row,
+                    })),
+                }));
+            }
+        } else {
             dispatch(clearScope({ scope }));
-        };
-    }, [path]);
+        }
+    }, [open, path]);
 
 
     const selectedRows = selectedItems.map(x => x.payload);
@@ -119,9 +131,7 @@ export function DataSelectionModal<T>({
     return (
         <Dialog
             open={open}
-            onOpenChange={() => {
-                onclick: onClose();
-            }}
+            onOpenChange={onClose}
         >
             <DialogContent
                 className="max-w-7xl mx-w-[95vw] max-h-[90vh] overflow-y-auto"
@@ -182,6 +192,38 @@ export function DataSelectionModal<T>({
                     )}
                 </div>
 
+
+                {/* Selected summary */}
+                {selectedRows.length > 0 && (
+                    <div className="px-6 py-3 border-t bg-muted/30">
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">
+                            Selected ({selectedRows.length})
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {selectedRows.map(row => (
+                                <span
+                                    key={String(getRowId(row))}
+                                    className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1"
+                                >
+                                    {getRowLabel ? getRowLabel(row) : String(getRowId(row))}
+                                    <button
+                                        type="button"
+                                        className="hover:text-destructive"
+                                        onClick={() => {
+                                            const updated = selectedRows.filter(r => getRowId(r) !== getRowId(row));
+                                            dispatch(setSelection({
+                                                scope,
+                                                items: updated.map(r => ({ id: String(getRowId(r)), payload: r })),
+                                            }));
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="flex justify-end gap-2 border-t px-6 py-4">

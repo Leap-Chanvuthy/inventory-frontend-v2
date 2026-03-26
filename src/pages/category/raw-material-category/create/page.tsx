@@ -9,7 +9,11 @@ export const CreateCategories = () => {
       label: "Category",
       link: "/categories?tab=raw-material-category",
     },
-    { name: "create-category", label: "Create a new Raw Material Category" },
+    {
+      name: "create-category",
+      label: "Create a new Raw Material Category",
+      className: "text-primary font-medium",
+    },
   ];
 
   return (

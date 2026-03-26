@@ -8,6 +8,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSingleProductCategory } from "@/api/categories/product-categories/product-category.query";
 import { CreateCategoryValidationErrors } from "@/api/categories/types/category.type";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
@@ -87,9 +89,7 @@ export const UpdateCategoryForm = () => {
     return <DataCardEmpty emptyText="Category not found." />;
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
           <Text.TitleMedium className="mb-2">
             Update Product Category
           </Text.TitleMedium>
@@ -98,57 +98,41 @@ export const UpdateCategoryForm = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Category Name */}
-            <div>
-              <TextInput
-                id="category_name"
-                label="Category Name"
-                placeholder="Enter category name"
-                value={form.category_name}
-                error={
-                  fieldErrors?.category_name
-                    ? fieldErrors.category_name[0]
-                    : undefined
-                }
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <TextAreaInput
-                id="description"
-                label="Description"
-                placeholder="Enter category description"
-                value={form.description}
-                error={
-                  fieldErrors?.description
-                    ? fieldErrors.description[0]
-                    : undefined
-                }
-                onChange={handleTextAreaChange}
-              />
-            </div>
-
-            {/* Label Colour */}
-            <div>
-              <ColorPickerInput
-                id="label_color"
-                label="Label Colour"
-                value={form.label_color}
-                error={
-                  fieldErrors?.label_color
-                    ? fieldErrors.label_color[0]
-                    : undefined
-                }
-                onChange={handleColorChange}
-              />
-            </div>
+            <Card>
+              <CardHeader className="pb-4">
+                <Text.TitleSmall>Category Details</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground">Name, description and label colour for this category.</p>
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                <TextInput
+                  id="category_name"
+                  label="Category Name"
+                  placeholder="Enter category name"
+                  value={form.category_name}
+                  error={fieldErrors?.category_name?.[0]}
+                  onChange={handleChange}
+                />
+                <TextAreaInput
+                  id="description"
+                  label="Description"
+                  placeholder="Enter category description"
+                  value={form.description}
+                  error={fieldErrors?.description?.[0]}
+                  onChange={handleTextAreaChange}
+                />
+                <ColorPickerInput
+                  id="label_color"
+                  label="Label Colour"
+                  value={form.label_color}
+                  error={fieldErrors?.label_color?.[0]}
+                  onChange={handleColorChange}
+                />
+              </CardContent>
+            </Card>
 
             <FormFooterActions isSubmitting={categoryMutation.isPending} />
           </form>
-        </div>
-      </div>
     </div>
   );
 };

@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateCustomerCategoryValidationErrors } from "@/api/categories/types/category.type";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export const CreateCustomerCategoryForm = () => {
   const categoryMutation = useCreateCustomerCategory();
@@ -58,69 +60,52 @@ export const CreateCustomerCategoryForm = () => {
   };
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-      <div className="rounded-2xl shadow-sm border max-w-full mx-auto">
-        <div className="p-8">
-          <Text.TitleMedium className="mb-2">
-            Create Customer Category
-          </Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Create a new customer category with name, description and label
-            color.
-          </p>
+      <Text.TitleMedium className="mb-2">
+        Create Customer Category
+      </Text.TitleMedium>
+      <p className="text-sm text-muted-foreground mb-6">
+        Create a new customer category with name, description and label color.
+      </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Category Name */}
-            <div>
-              <TextInput
-                id="category_name"
-                label="Category Name"
-                placeholder="Enter category name"
-                value={form.category_name}
-                error={
-                  fieldErrors?.category_name
-                    ? fieldErrors.category_name[0]
-                    : undefined
-                }
-                required={true}
-                onChange={handleChange}
-              />
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader className="pb-4">
+            <Text.TitleSmall>Category Details</Text.TitleSmall>
+            <p className="text-xs text-muted-foreground">
+              Name, description and label colour for this category.
+            </p>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-6 space-y-4">
+            <TextInput
+              id="category_name"
+              label="Category Name"
+              placeholder="Enter category name"
+              value={form.category_name}
+              error={fieldErrors?.category_name?.[0]}
+              required={true}
+              onChange={handleChange}
+            />
+            <TextAreaInput
+              id="description"
+              label="Description"
+              placeholder="Enter category description"
+              value={form.description}
+              error={fieldErrors?.description?.[0]}
+              onChange={handleTextAreaChange}
+            />
+            <ColorPickerInput
+              id="label_color"
+              label="Label Colour"
+              value={form.label_color}
+              error={fieldErrors?.label_color?.[0]}
+              onChange={handleColorChange}
+            />
+          </CardContent>
+        </Card>
 
-            {/* Description */}
-            <div>
-              <TextAreaInput
-                id="description"
-                label="Description"
-                placeholder="Enter category description"
-                value={form.description}
-                error={
-                  fieldErrors?.description
-                    ? fieldErrors.description[0]
-                    : undefined
-                }
-                onChange={handleTextAreaChange}
-              />
-            </div>
-
-            {/* Label Colour */}
-            <div>
-              <ColorPickerInput
-                id="label_color"
-                label="Label Colour"
-                value={form.label_color}
-                error={
-                  fieldErrors?.label_color
-                    ? fieldErrors.label_color[0]
-                    : undefined
-                }
-                onChange={handleColorChange}
-              />
-            </div>
-
-            <FormFooterActions isSubmitting={categoryMutation.isPending} />
-          </form>
-        </div>
-      </div>
+        <FormFooterActions isSubmitting={categoryMutation.isPending} />
+      </form>
     </div>
   );
 };

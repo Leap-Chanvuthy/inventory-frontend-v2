@@ -12,12 +12,18 @@ const UpdateUser = () => {
     { name: "managements", label: "Managements", link: "" },
     { name: "users", label: "Users", link: "/users" },
     { name: "update-user", label: "Update User" },
-    { name: `${user?.email || ""}`, label: `${user?.email || "Update User"}` },
+    {
+      name: `${user?.email || ""}`,
+      label: `${user?.email || ""}`,
+      className: "text-primary font-medium",
+    },
   ];
 
   return (
-    <div className="mx-6 mb-5">
-      <BreadCrumb items={breadcrumbItems} />
+    <div>
+      <div className="mx-6 mb-5">
+        <BreadCrumb items={breadcrumbItems} />
+      </div>
       <UpdateUserForm />
     </div>
   );

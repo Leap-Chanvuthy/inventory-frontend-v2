@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateUOMValidationErrors, UOM } from "@/api/uom/uom.types";
 import { Text } from "@/components/ui/text/app-text";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -137,17 +139,17 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
   };
 
   return (
-    <div className="mx-6 space-y-5">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
       <form onSubmit={handleSubmit} className="space-y-5">
 
         {/* ── Section 1: General Information ────────────────────────────── */}
-        <div className="rounded-2xl shadow-sm border p-8">
-          <Text.TitleMedium className="mb-1">General Information</Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Basic identification details for this unit of measurement.
-          </p>
-
-          <div className="space-y-6">
+        <Card>
+          <CardHeader className="pb-4">
+            <Text.TitleSmall>General Information</Text.TitleSmall>
+            <p className="text-xs text-muted-foreground">Basic identification details for this unit of measurement.</p>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <TextInput
                 id="name"
@@ -213,17 +215,17 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
                 }
               />
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* ── Section 2: Conversion Configuration ────────────────────────── */}
-        <div className="rounded-2xl shadow-sm border p-8 bg-indigo-50/30 dark:bg-indigo-950/10">
-          <Text.TitleMedium className="mb-1">Conversion Configuration</Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Define how this unit relates to others in the same category.
-          </p>
-
-          <div className="space-y-6">
+        <Card>
+          <CardHeader className="pb-4">
+            <Text.TitleSmall>Conversion Configuration</Text.TitleSmall>
+            <p className="text-xs text-muted-foreground">Define how this unit relates to others in the same category.</p>
+          </CardHeader>
+          <Separator />
+          <CardContent className="pt-6 space-y-6">
             <div className="flex items-center justify-between py-3 px-4 rounded-lg border bg-background">
               <div>
                 <Label className="text-sm font-medium">Is Base Unit</Label>
@@ -309,8 +311,8 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         <FormFooterActions isSubmitting={uomMutation.isPending} />
       </form>

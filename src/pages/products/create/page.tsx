@@ -5,7 +5,11 @@ const CreateProduct = () => {
   const breadcrumbItems = [
     { name: "inventory", label: "Inventory", link: "/" },
     { name: "products", label: "Products", link: "/products" },
-    { name: "create", label: "Create a New Product" },
+    {
+      name: "create",
+      label: "Create a New Product",
+      className: "text-primary font-medium",
+    },
   ];
 
   return (
