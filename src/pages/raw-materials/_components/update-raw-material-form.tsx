@@ -148,7 +148,12 @@ export const UpdateRawMaterialForm = () => {
     setForm(prev =>
       prev.base_uom_id === "" ? prev : { ...prev, base_uom_id: "" },
     );
-  }, [INVALID_UOM_MESSAGE, form.uom_category_id, uomValidation.baseUnitId, uomValidation.isValid]);
+  }, [
+    INVALID_UOM_MESSAGE,
+    form.uom_category_id,
+    uomValidation.baseUnitId,
+    uomValidation.isValid,
+  ]);
 
   useEffect(() => {
     if (!rawMaterial) return;

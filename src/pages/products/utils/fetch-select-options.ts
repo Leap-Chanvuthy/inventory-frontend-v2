@@ -1,4 +1,5 @@
 import { getProductCategories } from "@/api/categories/product-categories/product-category.api";
+import { getRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-category.api";
 import { getSuppliers } from "@/api/suppliers/supplier.api";
 import { getWarehouses } from "@/api/warehouses/warehouses.api";
 import { getUOMs, getUomCategories } from "@/api/uom/uom.api";
@@ -66,6 +67,18 @@ export const fetchUomCategories = async (params: FetchParams): Promise<FetchResu
     }),
     current_page: res.current_page,
     last_page: res.last_page,
+  };
+};
+
+export const fetchRawMaterialCategories = async (params: FetchParams): Promise<FetchResult> => {
+  const res = await getRawMaterialCategories(params);
+  return {
+    data: res.data.data.map((cat) => ({
+      value: String(cat.id),
+      label: cat.category_name,
+    })),
+    current_page: res.data.current_page,
+    last_page: res.data.last_page,
   };
 };
 

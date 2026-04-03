@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import { useDeleteWarehouse } from "@/api/warehouses/warehouses.mutation";
 import { Text } from "@/components/ui/text/app-text";
+import { formatDate } from "@/utils/date-format";
 
 // Sort Options
 export const SORT_OPTIONS = [
@@ -44,12 +45,6 @@ function getWarehouseImageSrc(warehouse: Warehouse) {
   return first || "/warehouse-placeholder.png";
 }
 
-function formatDate(dateString?: string) {
-  if (!dateString) return "-";
-  const d = new Date(dateString);
-  if (Number.isNaN(d.getTime())) return "-";
-  return d.toLocaleDateString();
-}
 
 // Define table columns (kept for table view)
 export const COLUMNS : DataTableColumn<Warehouse>[] = [

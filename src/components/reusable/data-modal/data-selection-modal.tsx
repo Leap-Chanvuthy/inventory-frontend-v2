@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { FetchParams, FetchResult } from "@/components/reusable/partials/searchable-select";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -57,6 +58,7 @@ type DataSelectionModalProps<T> = {
     onSortChange?: (sort: string) => void;
     filterOptions?: { label: string; value: string }[];
     onFilterChange?: (filter: string | undefined) => void;
+    filterFetchFn?: (params: FetchParams) => Promise<FetchResult>;
     createHref?: string;
 };
 
@@ -82,6 +84,7 @@ export function DataSelectionModal<T>({
     onSortChange,
     filterOptions,
     onFilterChange,
+    filterFetchFn,
     createHref,
     defaultSelected,
     getRowLabel,
@@ -153,6 +156,7 @@ export function DataSelectionModal<T>({
                         onSortChange={handleSortChange}
                         filterOptions={filterOptions}
                         onFilterChange={val => onFilterChange && onFilterChange(val || undefined)}
+                        filterFetchFn={filterFetchFn}
                         createHref={createHref}
                     />
 
@@ -161,6 +165,7 @@ export function DataSelectionModal<T>({
                         columns={columns}
                         data={data}
                         isLoading={isLoading}
+                        loadingClassName="min-h-[320px]"
                         emptyText={emptyText}
                         rowSelection={{
                             mode,

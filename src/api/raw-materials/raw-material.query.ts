@@ -1,5 +1,9 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getRawMaterials, getRawMaterialById, getDeletedRawMaterials } from "./raw-material.api";
+import {
+  getRawMaterials,
+  getRawMaterialById,
+  getDeletedRawMaterials,
+} from "./raw-material.api";
 import { RawMaterialQueryParams } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
@@ -8,7 +12,6 @@ export const useRawMaterials = (params?: RawMaterialQueryParams) => {
   return useQuery({
     queryKey: ["raw-materials", normalizedParams],
     queryFn: () => getRawMaterials(params),
-    placeholderData: keepPreviousData,
   });
 };
 

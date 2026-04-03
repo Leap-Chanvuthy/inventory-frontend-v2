@@ -112,7 +112,12 @@ export const CreateRawMaterialForm = () => {
     setForm(prev =>
       prev.base_uom_id === "" ? prev : { ...prev, base_uom_id: "" },
     );
-  }, [INVALID_UOM_MESSAGE, form.uom_category_id, uomValidation.baseUnitId, uomValidation.isValid]);
+  }, [
+    INVALID_UOM_MESSAGE,
+    form.uom_category_id,
+    uomValidation.baseUnitId,
+    uomValidation.isValid,
+  ]);
 
   const selectedCategory = selectedCategoryData?.data ?? null;
   const selectedSupplier = selectedSupplierData?.data?.supplier ?? null;

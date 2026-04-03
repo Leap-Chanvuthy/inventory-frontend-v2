@@ -10,6 +10,7 @@ import UnauthicatedRoute from "./components/routes/unauthenticated-route";
 import Home from "./pages/home/page";
 import Product from "./pages/products/page";
 import CreateProduct from "./pages/products/create/page";
+import { ProductDetail } from "./pages/products/view/page";
 import Users from "./pages/users/page";
 import CreateUser from "./pages/users/create/page";
 import Setting from "./pages/settings/page";
@@ -89,6 +90,7 @@ export default function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/products" element={<Product />} />
               <Route path="/products/create" element={<CreateProduct />} />
+              <Route path="/products/view/:id" element={<ProductDetail />} />
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>

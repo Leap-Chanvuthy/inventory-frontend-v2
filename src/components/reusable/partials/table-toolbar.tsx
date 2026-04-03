@@ -5,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  SearchableSelect,
+  type FetchParams,
+  type FetchResult,
+} from "./searchable-select";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -68,6 +73,8 @@ interface TableToolbarProps {
   filterOptions?: FilterOption[];
   selectedFilter?: string;
   onFilterChange?: (value: string) => void;
+  filterFetchFn?: (params: FetchParams) => Promise<FetchResult>;
+  filterSelectedLabel?: string;
 
   /* Actions */
   deletedPathname?: string;
@@ -97,6 +104,8 @@ export const TableToolbar = ({
   filterOptions = [],
   selectedFilter,
   onFilterChange,
+  filterFetchFn,
+  filterSelectedLabel,
 
   deletedPathname,
   onExport,
@@ -142,21 +151,24 @@ export const TableToolbar = ({
   }, []);
 
   /* ---------- Debounced Search ---------- */
+  const onSearchRef = useRef(onSearch);
+  useEffect(() => { onSearchRef.current = onSearch; });
+
   const debouncedSearch = useCallback(
     debounce((value: string) => {
-      onSearch(value);
+      onSearchRef.current(value);
     }, 500),
-    [onSearch],
+    [],
   );
 
   useEffect(() => {
     debouncedSearch(searchValue);
-  }, [searchValue, debouncedSearch]);
+  }, [searchValue]);
 
   /* ---------- Sort Toggle ---------- */
   const toggleSort = (value: string) => {
     const updated = sortValues.includes(value)
-      ? sortValues.filter((v) => v !== value)
+      ? sortValues.filter(v => v !== value)
       : [...sortValues, value];
 
     setSortValues(updated);
@@ -196,7 +208,7 @@ export const TableToolbar = ({
           <Input
             ref={searchInputRef}
             value={search || searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={e => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
             className="pl-9 pr-12"
           />
@@ -230,7 +242,7 @@ export const TableToolbar = ({
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="p-3 w-56">
                     <div className="space-y-2">
-                      {sortOptions.map((opt) => (
+                      {sortOptions.map(opt => (
                         <label
                           key={opt.value}
                           className="flex items-center gap-2 cursor-pointer"
@@ -254,20 +266,37 @@ export const TableToolbar = ({
           )}
 
           {/* Filter */}
-          {filterOptions.length > 0 && (
-            <Select value={filterValue || "__all__"} onValueChange={v => handleFilterChange(v === "__all__" ? "" : v)}>
-              <SelectTrigger className="w-32 h-9">
-                <SelectValue placeholder="Filter by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">All</SelectItem>
-                {filterOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {filterFetchFn ? (
+            <SearchableSelect
+              id="toolbar-filter"
+              placeholder="Filter by category"
+              fetchFn={filterFetchFn}
+              value={filterValue}
+              selectedLabel={filterSelectedLabel}
+              onChange={v => handleFilterChange(v)}
+              className="w-48"
+            />
+          ) : (
+            filterOptions.length > 0 && (
+              <Select
+                value={filterValue || "__all__"}
+                onValueChange={v =>
+                  handleFilterChange(v === "__all__" ? "" : v)
+                }
+              >
+                <SelectTrigger className="w-32 h-9">
+                  <SelectValue placeholder="Filter by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All</SelectItem>
+                  {filterOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )
           )}
 
           {/* request per page */}
@@ -280,7 +309,7 @@ export const TableToolbar = ({
                 <SelectValue placeholder="Per Page" />
               </SelectTrigger>
               <SelectContent>
-                {requestPerPageOptions.map((opt) => (
+                {requestPerPageOptions.map(opt => (
                   <SelectItem key={opt.value} value={opt.value.toString()}>
                     {opt.value == perPage ? `${opt.label}` : opt.label}
                   </SelectItem>

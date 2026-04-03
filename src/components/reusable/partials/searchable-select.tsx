@@ -55,6 +55,7 @@ type SearchableSelectProps = {
   selectedLabel?: string;
   /** Called when a fetch fails — use to show a page-level error */
   onFetchError?: () => void;
+  className?: string;
 };
 
 export const SearchableSelect = ({
@@ -72,6 +73,7 @@ export const SearchableSelect = ({
   fetchPerPage = 10,
   selectedLabel: selectedLabelProp,
   onFetchError,
+  className,
 }: SearchableSelectProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -195,7 +197,7 @@ export const SearchableSelect = ({
   const isLoading = isApiMode && isFetching;
 
   return (
-    <div className="space-y-1.5 w-full">
+    <div className={cn("space-y-1.5 w-full", className)}>
       {label && (
         <Label
           htmlFor={id}

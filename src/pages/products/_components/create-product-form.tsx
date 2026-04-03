@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Package, ChevronRight } from "lucide-react";
+import { Trash2, Plus, Package } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
-import { useRawMaterialCategories } from "@/api/categories/raw-material-categories/raw-material-catergory.query";
 
 import {
   useCreateExternalPurchase,
@@ -20,6 +19,7 @@ import {
   fetchSuppliers,
   fetchWarehouses,
   fetchUomCategories,
+  fetchRawMaterials,
 } from "../utils/fetch-select-options";
 import { DataSelectionModal } from "@/components/reusable/data-modal/data-selection-modal";
 import { RM_COLUMNS } from "../utils/raw-material-table-feature";
@@ -131,19 +131,11 @@ export const CreateProductForm = () => {
 
   const [rmSearch, setRmSearch] = useState("");
   const [rmPage, setRmPage] = useState(1);
+  const rmLastPageRef = useRef(1);
   const [rmSort, setRmSort] = useState("-created_at");
   const [rmCategoryFilter, setRmCategoryFilter] = useState<string | undefined>(
     undefined,
   );
-
-  const { data: rmCategoriesData } = useRawMaterialCategories({
-    per_page: 100,
-  });
-  const rmFilterOptions =
-    rmCategoriesData?.data?.data?.map(c => ({
-      label: c.category_name,
-      value: String(c.id),
-    })) ?? [];
 
   const { data: rmData, isLoading: rmLoading } = useRawMaterials({
     page: rmPage,
@@ -804,13 +796,16 @@ export const CreateProductForm = () => {
           setRmSort(v || "-created_at");
           setRmPage(1);
         }}
-        filterOptions={rmFilterOptions}
+        filterFetchFn={fetchRawMaterials}
         onFilterChange={(f: string | undefined) => {
           setRmCategoryFilter(f);
           setRmPage(1);
         }}
-        currentPage={rmData?.current_page ?? 1}
-        lastPage={rmData?.last_page ?? 1}
+        currentPage={rmPage}
+        lastPage={(() => {
+          if (rmData?.last_page) rmLastPageRef.current = rmData.last_page;
+          return rmLastPageRef.current;
+        })()}
         onPageChange={setRmPage}
       />
     </div>

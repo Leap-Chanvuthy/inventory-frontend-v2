@@ -16,6 +16,7 @@ type DataTableProps<T> = {
     data?: T[];
     isLoading?: boolean;
     loadingText?: string;
+    loadingClassName?: string;
     emptyText?: string;
 
     /** Optional row selection */
@@ -28,6 +29,7 @@ export function DataTable<T>({
     data,
     isLoading = false,
     loadingText,
+    loadingClassName,
     emptyText = "No data found",
     rowSelection,
 }: DataTableProps<T>) {
@@ -117,7 +119,7 @@ export function DataTable<T>({
                                 colSpan={columns.length + (hasSelection ? 1 : 0)}
                                 className="p-0"
                             >
-                                <DataCardLoading text={loadingText} />
+                                <DataCardLoading text={loadingText} className={loadingClassName} />
                             </TableCell>
                         </TableRow>
                     ) : data?.length ? (
