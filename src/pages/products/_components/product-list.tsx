@@ -7,8 +7,14 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { COLUMNS, SORT_OPTIONS, ProductCard } from "../utils/table-feature";
 import UnexpectedError from "@/components/reusable/partials/error";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
-export function ProductList() {
+interface ProductListProps {
+  embedded?: boolean;
+}
+
+export function ProductList({ embedded = false }: ProductListProps) {
   const {
     setPage,
     setSearch,
@@ -21,9 +27,19 @@ export function ProductList() {
     apiParams,
   } = useTableQueryParams();
 
+  const [searchParams] = useSearchParams();
+  const selectedCategoryId = searchParams.get("category_id")
+    ? Number(searchParams.get("category_id"))
+    : undefined;
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategoryId, setPage]);
+
   const { data, isLoading, isError, isFetching } = useProducts({
     ...apiParams,
-    "filter[product_category_id]": filter ? Number(filter) : undefined,
+    "filter[product_category_id]":
+      selectedCategoryId || (filter ? Number(filter) : undefined),
   });
 
   if (isError && !isFetching) {
@@ -31,8 +47,8 @@ export function ProductList() {
   }
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-8 bg-background">
-      <div className="mx-auto max-w-[1600px]">
+    <div className={embedded ? "w-full" : "min-h-screen w-full p-4 sm:p-8 bg-background"}>
+      <div className={embedded ? "w-full" : "mx-auto max-w-[1600px]"}>
         <TableToolbar
           searchPlaceholder="Search products..."
           onSearch={setSearch}
