@@ -108,6 +108,7 @@ export interface ProductQueryParams {
   page?: number;
   per_page?: number;
   "filter[search]"?: string;
+  "filter[product_type]"?: string;
   "filter[product_category_id]"?: number;
   "filter[supplier_id]"?: number;
   "filter[warehouse_id]"?: number;

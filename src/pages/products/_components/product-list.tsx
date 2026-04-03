@@ -5,7 +5,7 @@ import { Product } from "@/api/product/product.type";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
-import { COLUMNS, SORT_OPTIONS, ProductCard } from "../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS, FILTER_OPTIONS, ProductCard } from "../utils/table-feature";
 import UnexpectedError from "@/components/reusable/partials/error";
 
 export function ProductList() {
@@ -21,10 +21,19 @@ export function ProductList() {
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError, isFetching } = useProducts({
-    ...apiParams,
-    "filter[product_category_id]": filter ? Number(filter) : undefined,
-  });
+
+  const baseParams = { ...apiParams } as Record<string, unknown>;
+  delete baseParams.filter;
+
+  const isNumericFilter = filter ? /^\d+$/.test(String(filter)) : false;
+
+  const apiCallParams = {
+    ...baseParams,
+    "filter[product_category_id]": isNumericFilter ? Number(filter) : undefined,
+    "filter[product_type]": !isNumericFilter && filter ? filter : undefined,
+  } as any;
+
+  const { data, isLoading, isError, isFetching } = useProducts(apiCallParams);
 
   if (isError && !isFetching) {
     return <UnexpectedError kind="fetch" hideHomeButton hideBackButton />;
@@ -39,6 +48,7 @@ export function ProductList() {
           search={search}
           selectedFilter={filter}
           onFilterChange={(val) => setFilter(val || undefined)}
+          filterOptions={FILTER_OPTIONS}
           sortOptions={SORT_OPTIONS}
           onSortChange={(values) => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}

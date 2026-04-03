@@ -548,6 +548,9 @@ export const CreateProductForm = () => {
                                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
                                   Required Qty
                                 </th>
+                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Available
+                                </th>
                                 <th className="w-12 px-4 py-3" />
                               </tr>
                             </thead>
@@ -593,20 +596,36 @@ export const CreateProductForm = () => {
                                       </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                      <TextInput
-                                        id={`qty_${entry.raw_material.id}`}
-                                        label=""
-                                        value={String(entry.quantity)}
-                                        onChange={e =>
-                                          updateBOMQty(
-                                            entry.raw_material.id,
-                                            e.target.value,
-                                          )
-                                        }
-                                        error={stockErr ? " " : undefined}
-                                        isNumberOnly
-                                      />
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex-1">
+                                          <TextInput
+                                            id={`qty_${entry.raw_material.id}`}
+                                            label=""
+                                            value={String(entry.quantity)}
+                                            onChange={e =>
+                                              updateBOMQty(
+                                                entry.raw_material.id,
+                                                e.target.value,
+                                              )
+                                            }
+                                            error={stockErr ? " " : undefined}
+                                            isNumberOnly
+                                          />
+                                        </div>
+                                        <div className="text-xs text-muted-foreground min-w-[56px] text-right">
+                                          {entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ""}
+                                        </div>
+                                      </div>
                                     </td>
+
+                                    <td className="px-4 py-3 text-right">
+                                      <div className="text-sm font-medium">
+                                        {((entry.raw_material as any).current_qty_in_stock != null)
+                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ''}`
+                                          : "-"}
+                                      </div>
+                                    </td>
+
                                     <td className="px-4 py-3">
                                       <Button
                                         type="button"

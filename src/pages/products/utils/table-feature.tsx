@@ -47,6 +47,16 @@ export const SORT_OPTIONS = [
   { value: "-product_name", label: "Name (Z-A)" },
 ];
 
+// filter by product type
+export const FILTER_OPTIONS = [
+{
+    value: 'external_purchased', label: 'External Purchased'
+},
+{
+    value: 'internal_produced', label: 'Internal Produced'
+}
+]
+
 // Table Columns
 export const COLUMNS: DataTableColumn<Product>[] = [
   {

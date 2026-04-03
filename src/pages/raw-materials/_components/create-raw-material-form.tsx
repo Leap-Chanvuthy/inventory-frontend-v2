@@ -61,7 +61,7 @@ export const CreateRawMaterialForm = () => {
 
   const [form, setForm] = useState(initialForm);
   const [dropdownError, setDropdownError] = useState(false);
-  const [uomValidationError, setUomValidationError] = useState<string>("");
+  const [, setUomValidationError] = useState<string>("");
   const handleDropdownError = useCallback(() => setDropdownError(true), []);
 
   const INVALID_UOM_MESSAGE =

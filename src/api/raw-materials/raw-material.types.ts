@@ -61,6 +61,7 @@ export interface RawMaterial {
   raw_material_category_name: string;
   official_name?: string; // Supplier official name
   warehouse_name?: string;
+  current_qty_in_stock?: number;
   uom_name?: string;
   // Nested relations
   rm_category?: RawMaterialCategory;

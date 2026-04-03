@@ -98,7 +98,7 @@ export const UpdateRawMaterialForm = () => {
   });
 
   const [dropdownError, setDropdownError] = useState(false);
-  const [uomValidationError, setUomValidationError] = useState<string>("");
+  const [, setUomValidationError] = useState<string>("");
   const handleDropdownError = useCallback(() => setDropdownError(true), []);
 
   const INVALID_UOM_MESSAGE =
