@@ -10,7 +10,17 @@ import { Text } from "@/components/ui/text/app-text";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-export const CreateCategoryForm = () => {
+interface CreateCategoryFormProps {
+  embedded?: boolean;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export const CreateCategoryForm = ({
+  embedded = false,
+  onSuccess,
+  onCancel,
+}: CreateCategoryFormProps = {}) => {
   const categoryMutation = useCreateProductCategory();
   const error =
     categoryMutation.error as AxiosError<CreateProductCategoryValidationErrors> | null;
@@ -50,6 +60,10 @@ export const CreateCategoryForm = () => {
 
     categoryMutation.mutate(form, {
       onSuccess: () => {
+        if (onSuccess) {
+          onSuccess();
+          return;
+        }
         if (action === "save_and_close") {
           navigate("/categories?tab=product-category");
         } else {
@@ -59,7 +73,7 @@ export const CreateCategoryForm = () => {
     });
   };
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+    <div className={embedded ? "animate-in slide-in-from-right-8 duration-300" : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"}>
       <Text.TitleMedium className="mb-2">
         Create Product Category
       </Text.TitleMedium>
@@ -102,7 +116,7 @@ export const CreateCategoryForm = () => {
           </CardContent>
         </Card>
 
-        <FormFooterActions isSubmitting={categoryMutation.isPending} />
+        <FormFooterActions isSubmitting={categoryMutation.isPending} onCancel={onCancel} />
       </form>
     </div>
   );

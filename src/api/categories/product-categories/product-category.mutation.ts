@@ -7,6 +7,10 @@ import {
 import { toast } from "sonner";
 import { CreateProductCategoryRequest } from "@/api/categories/types/category.type";
 
+type UpdateProductCategoryPayload =
+  | CreateProductCategoryRequest
+  | { id: number; payload: CreateProductCategoryRequest };
+
 export const useCreateProductCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -20,41 +24,40 @@ export const useCreateProductCategory = () => {
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to create category"
+        error?.response?.data?.message || "Failed to create category",
       );
     },
   });
 };
 
-export const useUpdateProductCategory = (id: number) => {
+export const useUpdateProductCategory = (categoryId?: number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateProductCategoryRequest) =>
-      updateProductCategory(id, data),
+    mutationFn: (data: UpdateProductCategoryPayload) => {
+      if ("id" in data) {
+        return updateProductCategory(data.id, data.payload);
+      }
+      if (!categoryId) throw new Error("Category id is required for update");
+      return updateProductCategory(categoryId, data);
+    },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-categories"] });
-      queryClient.invalidateQueries({
-        queryKey: ["product-category", id],
-      });
       toast.success("Category updated successfully");
     },
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to update category"
+        error?.response?.data?.message || "Failed to update category",
       );
     },
   });
 };
 
-
-
 export const useDeleteProductCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string | number) => 
-      deleteProductCategory(id),
+    mutationFn: (id: string | number) => deleteProductCategory(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-categories"] });
@@ -63,8 +66,8 @@ export const useDeleteProductCategory = () => {
 
     onError: (error: any) => {
       toast.error(
-        error?.response?.data?.message || "Failed to delete category"
+        error?.response?.data?.message || "Failed to delete category",
       );
     },
   });
-}
+};

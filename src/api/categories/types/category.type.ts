@@ -6,6 +6,7 @@ export interface BaseCategory {
   description: string;
   deleted_at?: string | null;
   raw_materials_count?: number;
+  products_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -81,6 +82,9 @@ export type CreateRawMaterialCategoryRequest = CreateCategoryRequest;
 export type CreateProductCategoryRequest = CreateCategoryRequest;
 export type CreateCustomerCategoryRequest = CreateCategoryRequest;
 
-export type CreateRawMaterialCategoryValidationErrors = CreateCategoryValidationErrors;
-export type CreateProductCategoryValidationErrors = CreateCategoryValidationErrors;
-export type CreateCustomerCategoryValidationErrors = CreateCategoryValidationErrors;
+export type CreateRawMaterialCategoryValidationErrors =
+  CreateCategoryValidationErrors;
+export type CreateProductCategoryValidationErrors =
+  CreateCategoryValidationErrors;
+export type CreateCustomerCategoryValidationErrors =
+  CreateCategoryValidationErrors;
