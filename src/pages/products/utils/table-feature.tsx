@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Package, Warehouse, User, Ruler, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDeleteProduct } from "@/api/product/product.mutation";
+import { RecoverProductAction } from "./deleted-table-feature";
 
 // Category Badge with consistent sizing and truncation
 const CategoryBadge = ({ product }: { product: Product }) => (
@@ -128,7 +129,7 @@ export const COLUMNS: DataTableColumn<Product>[] = [
 ];
 
 // Card Component for Grid View
-export function ProductCard({ product }: { product?: Product }) {
+export function ProductCard({ product, isDeleted = false }: { product?: Product; isDeleted?: boolean }) {
   if (!product) return null;
 
   return (
@@ -147,6 +148,7 @@ export function ProductCard({ product }: { product?: Product }) {
             </Text.Small>
           </div>
         </Link>
+        {isDeleted && <RecoverProductAction product={product} />}
       </CardHeader>
 
       <CardContent className="flex-1 space-y-2.5 sm:space-y-3">
@@ -183,9 +185,11 @@ export function ProductCard({ product }: { product?: Product }) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end pt-0 pb-4">
-        <ProductActions product={product} />
-      </CardFooter>
+      {!isDeleted && (
+        <CardFooter className="flex justify-end pt-0 pb-4">
+          <ProductActions product={product} />
+        </CardFooter>
+      )}
     </Card>
   );
 }

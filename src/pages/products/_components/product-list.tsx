@@ -71,6 +71,7 @@ export function ProductList({ embedded = false }: ProductListProps) {
           onPerPageChange={setPerPage}
           createHref="/products/create"
           isListOptionDisplayed={true}
+          deletedPathname="/products/deleted"
         />
 
         <ToggleableList<Product>

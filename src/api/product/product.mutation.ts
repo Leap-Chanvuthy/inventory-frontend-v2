@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing } from "./product.api";
+import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct } from "./product.api";
 import { CreateProductRequest, UpdateProductRequest, CreateExternalPurchaseRequest, CreateInternalManufacturingRequest } from "./product.type";
 import { toast } from "sonner";
 
@@ -58,6 +58,22 @@ export const useCreateInternalManufacturing = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to create product");
+    },
+  });
+};
+
+export const useRecoverProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => recoverProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["products-trashed"] });
+      toast.success("Product recovered successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to recover product");
     },
   });
 };

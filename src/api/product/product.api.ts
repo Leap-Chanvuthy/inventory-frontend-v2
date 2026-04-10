@@ -67,3 +67,17 @@ export const deleteProduct = async (
   const response = await apiClient.delete(`${BASE_API_URL}/products/${id}`);
   return response.data;
 };
+
+export const getTrashedProducts = async (
+  params?: ProductQueryParams
+): Promise<GetProductsResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/products/trashed`, { params });
+  return response.data;
+};
+
+export const recoverProduct = async (
+  id: number
+): Promise<{ status: boolean; message: string }> => {
+  const response = await apiClient.patch(`${BASE_API_URL}/products/${id}/restore`);
+  return response.data;
+};
