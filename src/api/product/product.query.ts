@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProducts, getProductById } from "./product.api";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getProducts, getProductById, getTrashedProducts } from "./product.api";
 import { ProductQueryParams } from "./product.type";
 
 export const useProducts = (params?: ProductQueryParams) => {
@@ -14,5 +14,13 @@ export const useSingleProduct = (id: number) => {
     queryKey: ["product", id],
     queryFn: () => getProductById(id),
     enabled: !!id,
+  });
+};
+
+export const useTrashedProducts = (params?: ProductQueryParams) => {
+  return useQuery({
+    queryKey: ["products-trashed", params],
+    queryFn: () => getTrashedProducts(params),
+    placeholderData: keepPreviousData,
   });
 };
