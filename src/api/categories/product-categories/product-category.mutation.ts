@@ -5,16 +5,16 @@ import {
   updateProductCategory,
 } from "./product-category.api";
 import { toast } from "sonner";
-import { CreateProductCategoryRequest } from "@/api/categories/types/category.type";
+import { CreateCategoryRequest } from "@/api/categories/types/category.type";
 
 type UpdateProductCategoryPayload =
-  | CreateProductCategoryRequest
-  | { id: number; payload: CreateProductCategoryRequest };
+  | CreateCategoryRequest
+  | { id: number; payload: CreateCategoryRequest };
 
 export const useCreateProductCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateProductCategoryRequest) =>
+    mutationFn: (data: CreateCategoryRequest) =>
       createProductCategory(data),
 
     onSuccess: () => {
