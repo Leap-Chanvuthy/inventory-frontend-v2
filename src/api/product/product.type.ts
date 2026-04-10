@@ -73,11 +73,33 @@ export interface Product {
   product_raw_materials?: ProductRawMaterial[];
 }
 
+export interface ProductPnL {
+  revenue_usd: number;
+  revenue_riel: number;
+  costs: {
+    purchase: { count: number; total_usd: number; total_riel: number };
+    reorder: { count: number; total_usd: number; total_riel: number };
+    scrap: { count: number; total_usd: number; total_riel: number };
+    sales: { count: number; revenue_usd: number; revenue_riel: number; cogs_usd: number; cogs_riel: number };
+  };
+  total_loss_usd: number;
+  total_loss_riel: number;
+  gross_profit_usd: number;
+  gross_profit_riel: number;
+  net_profit_usd: number;
+  net_profit_riel: number;
+  counts: {
+    total_movements: number;
+    by_type: Record<string, number>;
+  };
+}
+
 export interface GetProductDetailData {
   product: Product;
   current_qty_in_stock: number;
   product_stock_status: string;
   total_count_by_movement_type: Record<string, number>;
+  product_pnl: ProductPnL;
 }
 
 export interface PaginatedData<T> {

@@ -18,7 +18,7 @@ import { UomHierarchyPreview } from "./uom-hierarchy-preview";
 export function ViewRawMaterialForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSingleRawMaterial(Number(id));
+  const { data, isLoading, isError, isFetching } = useSingleRawMaterial(Number(id));
   const deleteMutation = useDeleteRawMaterial();
 
   const handleDelete = () => {
@@ -31,7 +31,8 @@ export function ViewRawMaterialForm() {
     return <DataCardLoading text="Loading raw material..." />;
   }
 
-  if (isError) return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
+  if (isError && !isFetching)
+    return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
   if (!data?.data) return <DataCardEmpty emptyText="Raw material not found." />;
 
   const { raw_material, current_qty_in_stock, total_count_by_movement_type } =

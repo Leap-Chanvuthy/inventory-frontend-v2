@@ -12,6 +12,7 @@ import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 import UnexpectedError from "@/components/reusable/partials/error";
 import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { IconStatCard } from "@/components/reusable/partials/icon-stat-card";
+import { ProductMovementChart } from "./product-movement-chart";
 import { formatDate } from "@/utils/date-format";
 import {
   Package,
@@ -19,10 +20,9 @@ import {
   Layers,
   DollarSign,
   TrendingUp,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  Hash,
 } from "lucide-react";
+import { ProductPnlCard } from "./product-pnl-card";
+import { ProductMovementHistory } from "./product-movement-history";
 
 function Field({
   label,
@@ -44,7 +44,7 @@ function Field({
 export function ViewProductForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useSingleProduct(Number(id));
+  const { data, isLoading, isError, isFetching } = useSingleProduct(Number(id));
   const deleteMutation = useDeleteProduct();
 
   const handleDelete = () => {
@@ -53,16 +53,23 @@ export function ViewProductForm() {
     });
   };
 
-  if (isLoading) return <DataCardLoading text="Loading product..." />;
-  if (isError) return <UnexpectedError kind="fetch" homeTo="/products" />;
-
   const detail = data?.data;
   const product = detail?.product;
+
+  if (isLoading) {
+    return <DataCardLoading text="Loading product..." />;
+  }
+
+  if (isError && !isFetching)
+    return <UnexpectedError kind="fetch" homeTo="/products" />;
+
   if (!product) return <DataCardEmpty emptyText="Product not found." />;
 
   const isInternal = product.product_type === "INTERNAL_PRODUCED";
   const movement = product.product_movements?.[0];
   const stockStatus = detail?.product_stock_status;
+  const pnl = detail?.product_pnl;
+  const totalCountByMovementType = detail?.total_count_by_movement_type;
 
   const stockStatusStyle =
     stockStatus === "IN_STOCK"
@@ -316,14 +323,16 @@ export function ViewProductForm() {
         </Card>
       </div>
 
-      {/* ── Warehouse & Supplier detail row ── */}
+      {/* ── Chart & PnL row ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ProductMovementChart data={totalCountByMovementType ?? {}} />
+        {pnl && <ProductPnlCard pnl={pnl} />}
+      </div>
 
-      {/* ── BOM & Movements row ── */}
-      <div
-        className={isInternal ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}
-      >
-        {/* Bill of Materials */}
-        {isInternal && (product.product_raw_materials?.length ?? 0) > 0 && (
+      {/* ── BOM & Movement History row ── */}
+      <div className={isInternal ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}>
+        {/* Bill of Materials (internal only) */}
+        {isInternal && (
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
@@ -339,151 +348,60 @@ export function ViewProductForm() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground w-10">
-                        #
-                      </th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
-                        Material Name
-                      </th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
-                        SKU Code
-                      </th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">
-                        Qty
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {product.product_raw_materials!.map((rm, idx) => (
-                      <tr
-                        key={rm.id}
-                        className="border-t hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="px-4 py-3 text-muted-foreground text-xs">
-                          {idx + 1}
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          {rm.raw_material?.material_name || "—"}
-                        </td>
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                          {rm.raw_material?.material_sku_code || "—"}
-                        </td>
-                        <td className="px-4 py-3 text-right font-semibold">
-                          {parseFloat(rm.quantity).toFixed(2)}
-                        </td>
+              {(product.product_raw_materials?.length ?? 0) > 0 ? (
+                <div className="overflow-x-auto rounded-lg border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground w-10">
+                          #
+                        </th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
+                          Material Name
+                        </th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
+                          SKU Code
+                        </th>
+                        <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">
+                          Qty
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {product.product_raw_materials!.map((rm, idx) => (
+                        <tr
+                          key={rm.id}
+                          className="border-t hover:bg-muted/30 transition-colors"
+                        >
+                          <td className="px-4 py-3 text-muted-foreground text-xs">
+                            {idx + 1}
+                          </td>
+                          <td className="px-4 py-3 font-medium">
+                            {rm.raw_material?.material_name || "—"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                            {rm.raw_material?.material_sku_code || "—"}
+                          </td>
+                          <td className="px-4 py-3 text-right font-semibold">
+                            {parseFloat(rm.quantity).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                  <Layers className="h-8 w-8" />
+                  <p className="text-sm">No materials added</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
 
         {/* Movement History */}
-        {(product.product_movements?.length ?? 0) > 0 && (
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-950">
-                  <Hash className="h-4 w-4 text-teal-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Movement History</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Stock in/out records
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      {[
-                        "Type",
-                        "Dir",
-                        "Qty",
-                        "Sell (USD)",
-                        "Status",
-                        "Date",
-                        "By",
-                      ].map(h => (
-                        <th
-                          key={h}
-                          className="text-left px-3 py-3 text-xs font-semibold text-muted-foreground whitespace-nowrap"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {product.product_movements!.map(mv => (
-                      <tr
-                        key={mv.id}
-                        className="border-t hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="px-3 py-3">
-                          <Badge
-                            variant="outline"
-                            className="text-xs whitespace-nowrap"
-                          >
-                            {mv.movement_type.replace(/_/g, " ")}
-                          </Badge>
-                        </td>
-                        <td className="px-3 py-3">
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-semibold ${mv.direction === "IN" ? "text-green-600" : "text-red-600"}`}
-                          >
-                            {mv.direction === "IN" ? (
-                              <ArrowDownToLine className="h-3.5 w-3.5" />
-                            ) : (
-                              <ArrowUpFromLine className="h-3.5 w-3.5" />
-                            )}
-                            {mv.direction}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3 font-semibold">
-                          {parseFloat(mv.quantity).toFixed(2)}
-                        </td>
-                        <td className="px-3 py-3">
-                          ${mv.selling_unit_price_in_usd.toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3">
-                          <Badge
-                            variant="outline"
-                            className={
-                              mv.product_status === "COMPLETED"
-                                ? "border-green-500 text-green-600 text-xs"
-                                : "text-xs"
-                            }
-                          >
-                            {mv.product_status}
-                          </Badge>
-                        </td>
-                        <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                          {new Date(mv.movement_date).toLocaleDateString(
-                            "en-US",
-                            { month: "short", day: "numeric", year: "numeric" },
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                          {mv.created_by?.name || "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <ProductMovementHistory movements={product.product_movements ?? []} />
       </div>
     </div>
   );
