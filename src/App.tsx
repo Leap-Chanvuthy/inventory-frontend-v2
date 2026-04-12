@@ -63,6 +63,8 @@ import { RawMaterialDetail } from "./pages/raw-materials/view/page";
 import CreateRawMaterial from "./pages/raw-materials/create/page";
 import UpdateRawMaterial from "./pages/raw-materials/update/page";
 import DeletedRawMaterials from "./pages/raw-materials/deleted/page";
+import AuditLog from "./pages/audit-logs/page";
+import ViewAuditLog from "./pages/audit-logs/view/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -98,6 +100,11 @@ export default function App() {
                 <Route path="/users" element={<Users />} />
                 <Route path="/users/create" element={<CreateUser />} />
                 <Route path="/users/update/:id" element={<UpdateUser />} />
+                
+                {/* Audit Logs */}
+                <Route path="/audit-logs" element={<AuditLog />} />
+                <Route path="/audit-logs/view/:id" element={<ViewAuditLog />} />
+
 
                 {/* Supplier */}
                 <Route path="/supplier" element={<Supplier />} />
@@ -112,7 +119,10 @@ export default function App() {
                   element={<UpdateSupplier />}
                 />
                 <Route path="/supplier/view/:id" element={<SupplierDetail />} />
-                <Route path="/supplier/deleted" element={<DeletedSuppliers />} />
+                <Route
+                  path="/supplier/deleted"
+                  element={<DeletedSuppliers />}
+                />
 
                 {/* Customer Routes */}
                 <Route path="/customer" element={<Customers />} />

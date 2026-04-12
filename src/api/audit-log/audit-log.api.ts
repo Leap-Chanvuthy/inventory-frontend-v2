@@ -1,8 +1,12 @@
 import { BASE_API_URL } from "@/consts/endpoints";
 import { apiClient } from "../client";
-import { GetAllAuditResponse, GetAuditByIdResponse } from "./audit-log.types";
+import {
+  GetAllAuditResponse,
+  GetAuditByIdResponse,
+  QueryAuditsParams,
+} from "./audit-log.types";
 
-export const getAllAudits = async (params?: { per_page?: number; page?: number }) => {
+export const getAllAudits = async (params?: QueryAuditsParams) => {
   const { data } = await apiClient.get<GetAllAuditResponse>(`${BASE_API_URL}/audit-logs`, { params });
   return data;
 };

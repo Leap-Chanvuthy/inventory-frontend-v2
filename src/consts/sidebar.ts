@@ -15,6 +15,7 @@ import {
   NotepadText,
   Tag,
   type LucideIcon,
+  Activity,
 } from "lucide-react";
 import { ROLES, Role } from "./role";
 
@@ -49,7 +50,14 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Users",
         url: "/users",
         icon: User,
-        roles: [ROLES.ADMIN], // ⛔ ADMIN ONLY
+        roles: [ROLES.ADMIN],
+        isQuickMenu: true,
+      },
+      {
+        title: "Audit Logs",
+        url: "/audit-logs",
+        icon: Activity,
+        roles: [ROLES.ADMIN],
         isQuickMenu: true,
       },
     ],

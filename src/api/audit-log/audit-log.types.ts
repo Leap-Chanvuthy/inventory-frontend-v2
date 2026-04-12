@@ -35,6 +35,8 @@ export interface AuditEntry {
   user?: AuditUser | null;
 }
 
+export type AuditLog = AuditEntry;
+
 export interface PaginationLink {
   url?: string | null;
   label: string;
@@ -68,6 +70,7 @@ export interface QueryAuditsParams {
   per_page?: number;
   "filter[search]"?: string;
   "filter[id]"?: number;
+  "filter[action]"?: string;
   "filter[event]"?: string;
   "filter[user_id]"?: number;
   "filter[auditable_type]"?: string;
