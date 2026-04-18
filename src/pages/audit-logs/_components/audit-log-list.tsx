@@ -51,11 +51,11 @@ export default function AuditLogList() {
           sortOptions={SORT_OPTIONS}
           onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
-          selectedFilter={filter || "__all__"}
+          selectedFilter={filter || ""}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           onPerPageChange={setPerPage}
           perPage={perPage}
-          onFilterChange={val => setFilter(val === "__all__" ? undefined : val || undefined)}
+          onFilterChange={val => setFilter(val === "" ? undefined : val || undefined)}
           isListOptionDisplayed={true}
         />
 

@@ -2,8 +2,6 @@ import { AuditLog } from "@/api/audit-log/audit-log.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
 import {
   Avatar,
@@ -14,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { formatDate } from "@/utils/date-format";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { Globe, ShieldCheck, User2 } from "lucide-react";
+import TableActions from "@/components/reusable/partials/table-actions";
 
 export const FILTER_OPTIONS = [
   { label: "Create", value: "CREATE" },
@@ -37,6 +36,18 @@ function parseTagDescription(tags?: string | null): string {
     return "";
   }
 }
+
+
+const AuditLogAction = ({ auditLog }: { auditLog: AuditLog }) => {
+
+  return (
+    <div className="flex items-center gap-2">
+      <TableActions
+          viewDetailPath={`/audit-logs/view/${auditLog.id}`}
+      />
+    </div>
+  );
+};
 
 function getAction(log: AuditLog): string {
   const event = (log.event || "").toUpperCase();
@@ -180,13 +191,7 @@ export const COLUMNS: DataTableColumn<AuditLog>[] = [
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
-    render: log => (
-      <div className="flex items-center gap-2">
-        <Link to={`/audit-logs/view/${log.id}`}>
-          <Button size="sm" variant="outline">View</Button>
-        </Link>
-      </div>
-    ),
+    render: log => <AuditLogAction auditLog={log} />,
   },
 ];
 
@@ -241,9 +246,7 @@ export function AuditLogCard({ log }: { log?: AuditLog }) {
           </div>
         </div>
         <div className="mt-4 flex justify-end">
-          <Link to={`/audit-logs/view/${log.id}`}>
-            <Button size="sm">View Details</Button>
-          </Link>
+          <AuditLogAction auditLog={log} />
         </div>
       </CardContent>
     </Card>
