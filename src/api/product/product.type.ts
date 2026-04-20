@@ -50,6 +50,7 @@ export interface Product {
   barcode: string | null;
   product_description: string | null;
   product_type: "INTERNAL_PRODUCED" | "EXTERNAL_PURCHASED" | string;
+  sale_method?: "FIFO" | "LIFO" | string;
   product_category_id: number;
   supplier_id: number | null;
   warehouse_id: number;
@@ -154,6 +155,7 @@ export interface CreateExternalPurchaseRequest {
   movement_date?: string;
   note?: string;
   images?: File[];
+  sale_method?: "FIFO" | "LIFO" | string;
 }
 
 // Internal Manufacturing creation
@@ -176,6 +178,7 @@ export interface CreateInternalManufacturingRequest {
   note?: string;
   raw_materials: RawMaterialBOM[];
   images?: File[];
+  sale_method?: "FIFO" | "LIFO" | string;
 }
 
 export interface CreateProductRequest {
@@ -186,6 +189,7 @@ export interface CreateProductRequest {
   uom_id: number;
   supplier_id: number;
   warehouse_id: number;
+  sale_method?: "FIFO" | "LIFO" | string;
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {}

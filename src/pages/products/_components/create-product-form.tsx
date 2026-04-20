@@ -53,6 +53,11 @@ const PRODUCT_STATUS_OPTIONS = [
   { value: "BLOCKED", label: "Blocked" },
 ];
 
+const SALE_METHOD_OPTIONS = [
+  { value: "FIFO", label: "FIFO (First In, First Out)" },
+  { value: "LIFO", label: "LIFO (Last In, First Out)" },
+];
+
 const initialBaseForm = {
   product_name: "",
   barcode: "",
@@ -62,6 +67,7 @@ const initialBaseForm = {
   base_uom_id: "",
   supplier_id: "",
   warehouse_id: "",
+  sale_method: "",
   movement_date: "",
   note: "",
   images: [] as File[],
@@ -206,6 +212,7 @@ export const CreateProductForm = () => {
       product_category_id: Number(base.product_category_id),
       base_uom_id: Number(base.base_uom_id),
       warehouse_id: Number(base.warehouse_id),
+      sale_method: base.sale_method || undefined,
       movement_date: base.movement_date || undefined,
       note: base.note || undefined,
       images: base.images.length > 0 ? base.images : undefined,
@@ -315,6 +322,19 @@ export const CreateProductForm = () => {
                     error={fieldErrors?.base_uom_id?.[0]}
                     required
                   />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <SelectInput
+                    id="sale_method"
+                    label="Sale Method (Default FIFO)"
+                    placeholder="Select sale method"
+                    options={SALE_METHOD_OPTIONS}
+                    value={base.sale_method}
+                    onChange={v => setBase(prev => ({ ...prev, sale_method: v }))}
+                    error={fieldErrors?.sale_method?.[0]}
+                  />
+                  <div />
                 </div>
                 <TextAreaInput
                   id="product_description"
