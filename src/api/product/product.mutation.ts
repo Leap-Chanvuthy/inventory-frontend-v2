@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct } from "./product.api";
+import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct, updateExternalPurchase, updateInternalManufacturing } from "./product.api";
 import { CreateProductRequest, UpdateProductRequest, CreateExternalPurchaseRequest, CreateInternalManufacturingRequest } from "./product.type";
 import { toast } from "sonner";
 
@@ -58,6 +58,36 @@ export const useCreateInternalManufacturing = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to create product");
+    },
+  });
+};
+
+export const useUpdateExternalPurchase = (id: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateExternalPurchaseRequest) => updateExternalPurchase(id, payload),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+      toast.success(response.message || "Product updated successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to update product");
+    },
+  });
+};
+
+export const useUpdateInternalManufacturing = (id: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateInternalManufacturingRequest) => updateInternalManufacturing(id, payload),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+      toast.success(response.message || "Product updated successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to update product");
     },
   });
 };

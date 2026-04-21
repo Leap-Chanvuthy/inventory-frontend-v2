@@ -81,3 +81,27 @@ export const recoverProduct = async (
   const response = await apiClient.patch(`${BASE_API_URL}/products/${id}/restore`);
   return response.data;
 };
+
+export const updateExternalPurchase = async (
+  id: number,
+  data: CreateExternalPurchaseRequest
+): Promise<GetProductResponse> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/products/${id}/update/external-purchase`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response.data;
+};
+
+export const updateInternalManufacturing = async (
+  id: number,
+  data: CreateInternalManufacturingRequest
+): Promise<GetProductResponse> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/products/${id}/update/internal-manufacturing`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response.data;
+};

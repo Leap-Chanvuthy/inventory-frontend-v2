@@ -12,6 +12,7 @@ import Product from "./pages/products/page";
 import CreateProduct from "./pages/products/create/page";
 import { ProductDetail } from "./pages/products/view/page";
 import DeletedProducts from "./pages/products/deleted/page";
+import UpdateProduct from "./pages/products/update/page";
 import Users from "./pages/users/page";
 import CreateUser from "./pages/users/create/page";
 import Setting from "./pages/settings/page";
@@ -95,6 +96,7 @@ export default function App() {
               <Route path="/products/create" element={<CreateProduct />} />
               <Route path="/products/view/:id" element={<ProductDetail />} />
               <Route path="/products/deleted" element={<DeletedProducts />} />
+              <Route path="/products/update/:id" element={<UpdateProduct />} />
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
