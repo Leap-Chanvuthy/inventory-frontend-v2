@@ -51,6 +51,11 @@ const PRODUCT_STATUS_OPTIONS = [
   { value: "BLOCKED", label: "Blocked" },
 ];
 
+const SALE_METHOD_OPTIONS = [
+  { value: "FIFO", label: "FIFO (First In, First Out)" },
+  { value: "LIFO", label: "LIFO (Last In, First Out)" },
+];
+
 function SectionHeader({
   title,
   description,
@@ -99,6 +104,7 @@ export const UpdateProductForm = () => {
     base_uom_id: "",
     supplier_id: "",
     warehouse_id: "",
+    sale_method: "",
     movement_date: "",
     note: "",
   });
@@ -137,6 +143,7 @@ export const UpdateProductForm = () => {
       base_uom_id: String(product.base_uom_id ?? ""),
       supplier_id: String(product.supplier_id ?? ""),
       warehouse_id: String(product.warehouse_id ?? ""),
+      sale_method: product.sale_method ?? "FIFO",
       movement_date: mv?.movement_date ? mv.movement_date.substring(0, 10) : "",
       note: mv?.note ?? "",
     });
@@ -241,6 +248,12 @@ export const UpdateProductForm = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+
+    const submitter = (e.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+
+    const action = submitter?.value;
+
     const commonBase = {
       product_name: base.product_name,
       barcode: base.barcode || undefined,
@@ -248,11 +261,12 @@ export const UpdateProductForm = () => {
       product_category_id: Number(base.product_category_id),
       base_uom_id: Number(base.base_uom_id),
       warehouse_id: Number(base.warehouse_id),
+      sale_method: base.sale_method || undefined,
       movement_date: base.movement_date || undefined,
       note: base.note || undefined,
     };
 
-    const onSuccess = () => navigate(`/products/view/${productId}`);
+    // const onSuccess = () => navigate(`/products/view/${productId}`);
 
     if (!isInternal) {
       externalMutation.mutate(
@@ -271,7 +285,11 @@ export const UpdateProductForm = () => {
             external.selling_exchange_rate_from_usd_to_riel,
           ),
         },
-        { onSuccess },
+        { onSuccess : () => {
+            if (action === "save_and_close") {
+            navigate("/products");
+        }
+        } },
       );
     } else {
       internalMutation.mutate(
@@ -288,7 +306,11 @@ export const UpdateProductForm = () => {
             quantity: e.quantity,
           })),
         },
-        { onSuccess },
+        { onSuccess : () => {
+          if (action === "save_and_close") {
+              navigate("/products");
+          }
+        }},
       );
     }
   };
@@ -370,6 +392,20 @@ export const UpdateProductForm = () => {
                   onChange={handleBaseChange}
                   error={fieldErrors?.product_description?.[0]}
                 />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <SelectInput
+                    id="sale_method"
+                    label="Sale Method (Default FIFO)"
+                    placeholder="Select sale method"
+                    options={SALE_METHOD_OPTIONS}
+                    value={base.sale_method}
+                    onChange={v =>
+                      setBase(prev => ({ ...prev, sale_method: v }))
+                    }
+                    error={fieldErrors?.sale_method?.[0]}
+                  />
+                  <div />
+                </div>
               </CardContent>
             </Card>
 

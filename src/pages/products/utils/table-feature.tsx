@@ -84,26 +84,26 @@ export const COLUMNS: DataTableColumn<Product>[] = [
     className: "whitespace-nowrap py-6",
     render: (product) => <CategoryBadge product={product} />,
   },
-  {
-    key: "supplier",
-    header: "Supplier",
-    className: "whitespace-nowrap py-6",
-    render: (product) => (
-      <span className="text-muted-foreground whitespace-nowrap">
-        {product.official_name || "—"}
-      </span>
-    ),
-  },
-  {
-    key: "warehouse",
-    header: "Warehouse",
-    className: "whitespace-nowrap py-6",
-    render: (product) => (
-      <span className="text-muted-foreground whitespace-nowrap">
-        {product.warehouse_name || "—"}
-      </span>
-    ),
-  },
+  // {
+  //   key: "supplier",
+  //   header: "Supplier",
+  //   className: "whitespace-nowrap py-6",
+  //   render: (product) => (
+  //     <span className="text-muted-foreground whitespace-nowrap">
+  //       {product.official_name || "—"}
+  //     </span>
+  //   ),
+  // },
+  // {
+  //   key: "warehouse",
+  //   header: "Warehouse",
+  //   className: "whitespace-nowrap py-6",
+  //   render: (product) => (
+  //     <span className="text-muted-foreground whitespace-nowrap">
+  //       {product.warehouse_name || "—"}
+  //     </span>
+  //   ),
+  // },
   {
     key: "uom",
     header: "Unit",
@@ -112,14 +112,14 @@ export const COLUMNS: DataTableColumn<Product>[] = [
       <span className="text-muted-foreground">{product.uom_name || "—"}</span>
     ),
   },
-  {
-    key: "barcode",
-    header: "Barcode",
-    className: "whitespace-nowrap py-6",
-    render: (product) => (
-      <span className="text-muted-foreground">{product.barcode || "—"}</span>
-    ),
-  },
+  // {
+  //   key: "barcode",
+  //   header: "Barcode",
+  //   className: "whitespace-nowrap py-6",
+  //   render: (product) => (
+  //     <span className="text-muted-foreground">{product.barcode || "—"}</span>
+  //   ),
+  // },
   {
     key: "actions",
     header: "Actions",

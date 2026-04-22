@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct, updateExternalPurchase, updateInternalManufacturing } from "./product.api";
 import { CreateProductRequest, UpdateProductRequest, CreateExternalPurchaseRequest, CreateInternalManufacturingRequest } from "./product.type";
 import { toast } from "sonner";
+import { showApiErrorToast } from "@/components/reusable/partials/api-error-response-toast";
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
@@ -13,7 +14,7 @@ export const useCreateProduct = () => {
       toast.success(response.message || "Product created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create product");
+      showApiErrorToast(error, "Failed to create product");
     },
   });
 };
@@ -29,7 +30,7 @@ export const useUpdateProduct = (id: number) => {
       toast.success(response.message || "Product updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update product");
+      showApiErrorToast(error, "Failed to update product");
     },
   });
 };
@@ -43,7 +44,7 @@ export const useCreateExternalPurchase = () => {
       toast.success(response.message || "Product created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create product");
+      showApiErrorToast(error, "Failed to create product");
     },
   });
 };
@@ -57,7 +58,7 @@ export const useCreateInternalManufacturing = () => {
       toast.success(response.message || "Product created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create product");
+      showApiErrorToast(error, "Failed to create product");
     },
   });
 };
@@ -72,7 +73,7 @@ export const useUpdateExternalPurchase = (id: number) => {
       toast.success(response.message || "Product updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update product");
+      showApiErrorToast(error, "Failed to update product");
     },
   });
 };
@@ -87,7 +88,7 @@ export const useUpdateInternalManufacturing = (id: number) => {
       toast.success(response.message || "Product updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update product");
+      showApiErrorToast(error, "Failed to update product");
     },
   });
 };
@@ -103,7 +104,7 @@ export const useRecoverProduct = () => {
       toast.success("Product recovered successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to recover product");
+      showApiErrorToast(error, "Failed to recover product");
     },
   });
 };
@@ -118,7 +119,7 @@ export const useDeleteProduct = () => {
       toast.success("Product deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to delete product");
+      showApiErrorToast(error, "Failed to delete product");
     },
   });
 };

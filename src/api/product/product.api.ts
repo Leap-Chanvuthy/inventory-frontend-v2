@@ -86,10 +86,10 @@ export const updateExternalPurchase = async (
   id: number,
   data: CreateExternalPurchaseRequest
 ): Promise<GetProductResponse> => {
-  const response = await apiClient.patch(
+  const response = await apiClient.post(
     `${BASE_API_URL}/products/${id}/update/external-purchase`,
     data,
-    { headers: { "Content-Type": "multipart/form-data" } }
+    { headers: { "Content-Type": "multipart/form-data" } , params: { _method: "PATCH" } }
   );
   return response.data;
 };
@@ -101,7 +101,7 @@ export const updateInternalManufacturing = async (
   const response = await apiClient.patch(
     `${BASE_API_URL}/products/${id}/update/internal-manufacturing`,
     data,
-    { headers: { "Content-Type": "multipart/form-data" } }
+    { headers: { "Content-Type": "multipart/form-data" } , params: { _method: "PATCH" } }
   );
   return response.data;
 };
