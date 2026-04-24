@@ -82,8 +82,8 @@ export const UpdateProductForm = () => {
 
   const product = data?.data?.product;
   const isInternal = product?.product_type === "INTERNAL_PRODUCED";
+  const isSold = data?.data?.is_sold ?? false;
   const activeMutation = isInternal ? internalMutation : externalMutation;
-
   const responseErrors = (
     activeMutation.error as AxiosError<ProductValidationErrors> | null
   )?.response?.data?.errors;
@@ -148,9 +148,11 @@ export const UpdateProductForm = () => {
       note: mv?.note ?? "",
     });
 
+    const currentQty = String(data?.data?.current_qty_in_stock ?? "");
+
     if (!isInternal && mv) {
       setExternal({
-        quantity: mv.quantity ?? "",
+        quantity: currentQty,
         purchase_unit_price_in_usd: String(mv.purchase_unit_price_in_usd ?? ""),
         exchange_rate_from_usd_to_riel: String(
           mv.exchange_rate_from_usd_to_riel ?? "4100",
@@ -165,7 +167,7 @@ export const UpdateProductForm = () => {
     if (isInternal && mv) {
       setInternal({
         product_status: mv.product_status ?? "COMPLETED",
-        quantity: mv.quantity ?? "",
+        quantity: currentQty,
         selling_unit_price_in_usd: String(mv.selling_unit_price_in_usd ?? ""),
         selling_exchange_rate_from_usd_to_riel: String(
           mv.selling_exchange_rate_from_usd_to_riel ?? "4100",
@@ -261,7 +263,7 @@ export const UpdateProductForm = () => {
       product_category_id: Number(base.product_category_id),
       base_uom_id: Number(base.base_uom_id),
       warehouse_id: Number(base.warehouse_id),
-      sale_method: base.sale_method || undefined,
+      sale_method: base.sale_method,
       movement_date: base.movement_date || undefined,
       note: base.note || undefined,
     };
@@ -385,6 +387,20 @@ export const UpdateProductForm = () => {
                     required
                   />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <SelectInput
+                    id="sale_method"
+                    label="Sale Method (Default FIFO)"
+                    placeholder="Select sale method"
+                    options={SALE_METHOD_OPTIONS}
+                    value={base.sale_method}
+                    onChange={v =>
+                      setBase(prev => ({ ...prev, sale_method: v }))
+                    }
+                    error={fieldErrors?.sale_method?.[0]}
+                  />
+                  <div />
+                </div>
                 <TextAreaInput
                   id="product_description"
                   label="Product Description"
@@ -448,15 +464,23 @@ export const UpdateProductForm = () => {
                         Purchase Details
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <TextInput
-                          id="quantity"
-                          label="Quantity"
-                          value={external.quantity}
-                          onChange={handleSourceChange(setExternal)}
-                          error={fieldErrors?.quantity?.[0]}
-                          isNumberOnly
-                          required
-                        />
+                        <div>
+                          <TextInput
+                            id="quantity"
+                            label="Quantity"
+                            value={external.quantity}
+                            onChange={handleSourceChange(setExternal)}
+                            error={fieldErrors?.quantity?.[0]}
+                            isNumberOnly
+                            required
+                            // disabled={isSold}
+                          />
+                          {isSold && (
+                            <p className="text-xs text-yellow-500 mt-1">
+                              Quantity cannot be changed after the product has been sold.
+                            </p>
+                          )}
+                        </div>
                         <TextInput
                           id="purchase_unit_price_in_usd"
                           label="Purchase Unit Price (USD)"
@@ -522,15 +546,23 @@ export const UpdateProductForm = () => {
                             setInternal(p => ({ ...p, product_status: v }))
                           }
                         />
-                        <TextInput
-                          id="quantity"
-                          label="Quantity"
-                          value={internal.quantity}
-                          onChange={handleSourceChange(setInternal)}
-                          error={fieldErrors?.quantity?.[0]}
-                          isNumberOnly
-                          required
-                        />
+                        <div>
+                          <TextInput
+                            id="quantity"
+                            label="Quantity"
+                            value={internal.quantity}
+                            onChange={handleSourceChange(setInternal)}
+                            error={fieldErrors?.quantity?.[0]}
+                            isNumberOnly
+                            required
+                            // disabled={isSold}
+                          />
+                          {isSold && (
+                            <p className="text-xs text-yellow-500 mt-1">
+                              Quantity cannot be changed after the product has been sold.
+                            </p>
+                          )}
+                        </div>
                         <TextInput
                           id="selling_unit_price_in_usd"
                           label="Selling Unit Price (USD)"

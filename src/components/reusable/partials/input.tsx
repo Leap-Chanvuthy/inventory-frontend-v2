@@ -28,6 +28,7 @@ type TextInputProps = {
   isNumberOnly?: boolean;
   maxLength?: number;
   allowPaste?: boolean;
+  disabled?: boolean;
 };
 
 type TextAreaInputProps = {
@@ -64,6 +65,7 @@ export const TextInput = ({
   isNumberOnly = false,
   maxLength,
   allowPaste = true,
+  disabled = false,
 }: TextInputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -71,8 +73,9 @@ export const TextInput = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isNumberOnly) {
-      // Filter out non-numeric characters
-      const numericValue = e.target.value.replace(/\D/g, "");
+      const numericValue = e.target.value
+        .replace(/[^\d.]/g, "")
+        .replace(/(\..*)\./g, "$1");
       e.target.value = numericValue;
     }
     onChange?.(e);
@@ -100,6 +103,7 @@ export const TextInput = ({
           value={value}
           onChange={handleChange}
           maxLength={maxLength}
+          disabled={disabled}
           onPaste={!allowPaste ? (e) => e.preventDefault() : undefined}
           className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""
             }`}

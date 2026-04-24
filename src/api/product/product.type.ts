@@ -96,6 +96,7 @@ export interface ProductPnL {
 }
 
 export interface GetProductDetailData {
+  is_sold: boolean;
   product: Product;
   current_qty_in_stock: number;
   product_stock_status: string;
@@ -139,6 +140,16 @@ export interface ProductQueryParams {
   sort?: string;
 }
 
+export interface ProductMovementQueryParams {
+  page?: number;
+  per_page?: number;
+  sort?: string;
+  "filter[movement_type]"?: string;
+  "filter[direction]"?: string;
+}
+
+export type GetProductMovementsResponse = PaginatedData<ProductMovement>;
+
 // External Purchase creation
 export interface CreateExternalPurchaseRequest {
   product_name: string;
@@ -154,8 +165,7 @@ export interface CreateExternalPurchaseRequest {
   selling_exchange_rate_from_usd_to_riel: number;
   movement_date?: string;
   note?: string;
-  images?: File[];
-  sale_method?: "FIFO" | "LIFO" | string;
+  sale_method: "FIFO" | "LIFO" | string;
 }
 
 // Internal Manufacturing creation
@@ -177,8 +187,27 @@ export interface CreateInternalManufacturingRequest {
   movement_date?: string;
   note?: string;
   raw_materials: RawMaterialBOM[];
-  images?: File[];
-  sale_method?: "FIFO" | "LIFO" | string;
+  sale_method: "FIFO" | "LIFO" | string;
+}
+
+export interface ReorderInternalManufacturingPayload {
+  movement_date: string;
+  product_status: string;
+  quantity: number;
+  selling_unit_price_in_usd: number;
+  selling_exchange_rate_from_usd_to_riel: number;
+  raw_materials: { raw_material_id: number; quantity: number }[];
+  note?: string;
+}
+
+export interface ReorderExternalPurchasePayload {
+  movement_date: string;
+  quantity: number;
+  purchase_unit_price_in_usd: number;
+  exchange_rate_from_usd_to_riel: number;
+  selling_unit_price_in_usd: number;
+  selling_exchange_rate_from_usd_to_riel: number;
+  note?: string;
 }
 
 export interface CreateProductRequest {
@@ -193,6 +222,68 @@ export interface CreateProductRequest {
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
+
+export interface CreateScrapMovementPayload {
+  movement_date: string;
+  quantity: number;
+  note?: string;
+}
+
+export interface UpdateScrapMovementPayload {
+  movement_date?: string;
+  quantity?: number;
+  note?: string;
+}
+
+export interface ScrapMovement {
+  id: number;
+  product_id: number;
+  product_type: string | null;
+  direction: "OUT";
+  movement_type: "SCRAP";
+  product_status: string;
+  quantity: number;
+  is_sold: boolean;
+  movement_date: string;
+  note: string | null;
+  created_by: number;
+  last_updated_by: number;
+  purchase_unit_price_in_usd: number;
+  purchase_total_price_in_usd: number;
+  exchange_rate_from_usd_to_riel: number;
+  exchange_rate_from_riel_to_usd: number;
+  purchase_unit_price_in_riel: number;
+  purchase_total_price_in_riel: number;
+  selling_unit_price_in_usd: number;
+  selling_unit_price_in_riel: number;
+  selling_exchange_rate_from_usd_to_riel: number;
+  selling_exchange_rate_from_riel_to_usd: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScrapMovementResponse {
+  status: boolean;
+  message: string;
+  data: {
+    product: Product;
+    movement: ScrapMovement;
+  };
+}
+
+export interface ScrapMovementMutationResponse {
+  status: boolean;
+  message: string;
+  data: ScrapMovement;
+}
+
+export interface GetMovementDetailResponse {
+  status: boolean;
+  message: string;
+  data: {
+    movement: ProductMovement;
+  };
+}
 
 export interface InsufficientStockError {
   raw_material_id: number;

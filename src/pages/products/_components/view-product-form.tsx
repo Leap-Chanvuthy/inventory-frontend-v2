@@ -10,9 +10,7 @@ import { Text } from "@/components/ui/text/app-text";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 import UnexpectedError from "@/components/reusable/partials/error";
-import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { IconStatCard } from "@/components/reusable/partials/icon-stat-card";
-import { ProductMovementChart } from "./product-movement-chart";
 import { formatDate } from "@/utils/date-format";
 import {
   Package,
@@ -22,7 +20,11 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { ProductPnlCard } from "./product-pnl-card";
-import { ProductMovementHistory } from "./product-movement-history";
+import { ProductMovementHistory } from "./movement/product-movement-history";
+import { ReorderDialog } from "./reorder-dialog";
+import { ScrapDialog } from "./scrap-dialog";
+import { ProductBomCard } from "./product-bom-card";
+import { ProductMovementChart } from "./movement/product-movement-chart";
 
 function Field({
   label,
@@ -105,6 +107,20 @@ export function ViewProductForm() {
           onDelete={handleDelete}
           deleteHeading="Delete Product"
           deleteSubheading={`Are you sure you want to delete "${product.product_name}"? This action cannot be undone.`}
+          customUI={
+            <div className="flex items-center gap-2">
+              <ReorderDialog
+                productId={product.id}
+                productName={product.product_name}
+                productType={product.product_type}
+                productRawMaterials={product.product_raw_materials}
+              />
+              <ScrapDialog
+                productId={product.id}
+                productName={product.product_name}
+              />
+            </div>
+          }
         />
       </div>
 
@@ -165,163 +181,139 @@ export function ViewProductForm() {
         />
       </div>
 
-      {/* ── Product Information & Images row ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950">
-                <Package className="h-4 w-4 text-blue-600" />
-              </div>
-              <CardTitle className="text-base">Product Information</CardTitle>
+      {/* ── Product Information ── */}
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950">
+              <Package className="h-4 w-4 text-blue-600" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-5">
-              <Field
-                label={
-                  <>
-                    <IconBadge label="name" variant="info" /> Product Name
-                  </>
-                }
-                value={product.product_name}
-              />
-              <Field
-                label={
-                  <>
-                    <IconBadge label="code" variant="primary" /> SKU Code
-                  </>
-                }
-                value={
-                  <span className="font-mono text-xs">
-                    {product.product_sku_code}
-                  </span>
-                }
-              />
-              <Field
-                label={
-                  <>
-                    <IconBadge label="barcode" variant="primary" /> Barcode
-                  </>
-                }
-                value={product.barcode || "—"}
-              />
-              <Field
-                label={
-                  <>
-                    <IconBadge label="category" variant="warning" /> Category
-                  </>
-                }
-                value={
-                  <Badge
-                    variant="outline"
-                    style={
-                      product.category?.label_color
-                        ? {
-                            backgroundColor: `${product.category.label_color}20`,
-                            borderColor: product.category.label_color,
-                            color: product.category.label_color,
-                          }
-                        : undefined
-                    }
-                  >
-                    {product.category?.category_name || "—"}
-                  </Badge>
-                }
-              />
-              <Field
-                label={
-                  <>
-                    <IconBadge label="unit" variant="info" /> Base Unit
-                  </>
-                }
-                value={
-                  product.base_uom
-                    ? `${product.base_uom.name} (${product.base_uom.symbol})`
-                    : "—"
-                }
-              />
-              <Field
-                label={
-                  <>
-                    <IconBadge label="warehouse" variant="indigo" /> Warehouse
-                  </>
-                }
-                value={product.warehouse?.warehouse_name || "—"}
-              />
-              {!isInternal && (
-                <Field
-                  label={
-                    <>
-                      <IconBadge label="supplier" /> Supplier
-                    </>
-                  }
-                  value={product.supplier?.official_name || "—"}
-                />
-              )}
-              {movement && (
-                <Field
-                  label={
-                    <>
-                      <IconBadge label="expiry_date" variant="orange" />{" "}
-                      Movement Date
-                    </>
-                  }
-                  value={formatDate(movement.movement_date)}
-                />
-              )}
-              <Field
-                label={
-                  <>
-                    <IconBadge label="created_date" /> Created At
-                  </>
-                }
-                value={formatDate(product.created_at)}
-              />
-            </div>
-
-            {product.product_description && (
-              <>
-                <Separator />
-                <Field
-                  label={
-                    <>
-                      <IconBadge label="description" variant="info" />{" "}
-                      Description
-                    </>
-                  }
-                  value={
-                    <p className="text-sm leading-relaxed text-foreground/80">
-                      {product.product_description}
-                    </p>
-                  }
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* ── Images ── */}
-        <Card>
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-pink-50 dark:bg-pink-950">
-                <Package className="h-4 w-4 text-pink-600" />
-              </div>
-              <CardTitle className="text-base">Product Images</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <HorizontalImageScroll
-              images={product.product_images || []}
-              imageWidth="380px"
-              imageHeight="240px"
-              gap="1rem"
-              emptyMessage="No images available"
+            <CardTitle className="text-base">Product Information</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-5">
+            <Field
+              label={
+                <>
+                  <IconBadge label="name" variant="info" /> Product Name
+                </>
+              }
+              value={product.product_name}
             />
-          </CardContent>
-        </Card>
-      </div>
+            <Field
+              label={
+                <>
+                  <IconBadge label="code" variant="primary" /> SKU Code
+                </>
+              }
+              value={
+                <span className="font-mono text-xs">
+                  {product.product_sku_code}
+                </span>
+              }
+            />
+            <Field
+              label={
+                <>
+                  <IconBadge label="barcode" variant="primary" /> Barcode
+                </>
+              }
+              value={product.barcode || "—"}
+            />
+            <Field
+              label={
+                <>
+                  <IconBadge label="category" variant="warning" /> Category
+                </>
+              }
+              value={
+                <Badge
+                  variant="outline"
+                  style={
+                    product.category?.label_color
+                      ? {
+                          backgroundColor: `${product.category.label_color}20`,
+                          borderColor: product.category.label_color,
+                          color: product.category.label_color,
+                        }
+                      : undefined
+                  }
+                >
+                  {product.category?.category_name || "—"}
+                </Badge>
+              }
+            />
+            <Field
+              label={
+                <>
+                  <IconBadge label="unit" variant="info" /> Base Unit
+                </>
+              }
+              value={
+                product.base_uom
+                  ? `${product.base_uom.name} (${product.base_uom.symbol})`
+                  : "—"
+              }
+            />
+            <Field
+              label={
+                <>
+                  <IconBadge label="warehouse" variant="indigo" /> Warehouse
+                </>
+              }
+              value={product.warehouse?.warehouse_name || "—"}
+            />
+            {!isInternal && (
+              <Field
+                label={
+                  <>
+                    <IconBadge label="supplier" /> Supplier
+                  </>
+                }
+                value={product.supplier?.official_name || "—"}
+              />
+            )}
+            {movement && (
+              <Field
+                label={
+                  <>
+                    <IconBadge label="expiry_date" variant="orange" /> Movement
+                    Date
+                  </>
+                }
+                value={formatDate(movement.movement_date)}
+              />
+            )}
+            <Field
+              label={
+                <>
+                  <IconBadge label="created_date" /> Created At
+                </>
+              }
+              value={formatDate(product.created_at)}
+            />
+          </div>
+
+          {product.product_description && (
+            <>
+              <Separator />
+              <Field
+                label={
+                  <>
+                    <IconBadge label="description" variant="info" /> Description
+                  </>
+                }
+                value={
+                  <p className="text-sm leading-relaxed text-foreground/80">
+                    {product.product_description}
+                  </p>
+                }
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* ── Chart & PnL row ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -330,78 +322,19 @@ export function ViewProductForm() {
       </div>
 
       {/* ── BOM & Movement History row ── */}
-      <div className={isInternal ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}>
+      <div
+        className={isInternal ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}
+      >
         {/* Bill of Materials (internal only) */}
         {isInternal && (
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-orange-50 dark:bg-orange-950">
-                  <Layers className="h-4 w-4 text-orange-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Bill of Materials</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Raw materials used to produce this product
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {(product.product_raw_materials?.length ?? 0) > 0 ? (
-                <div className="overflow-x-auto rounded-lg border">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/50">
-                      <tr>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground w-10">
-                          #
-                        </th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
-                          Material Name
-                        </th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">
-                          SKU Code
-                        </th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">
-                          Qty
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {product.product_raw_materials!.map((rm, idx) => (
-                        <tr
-                          key={rm.id}
-                          className="border-t hover:bg-muted/30 transition-colors"
-                        >
-                          <td className="px-4 py-3 text-muted-foreground text-xs">
-                            {idx + 1}
-                          </td>
-                          <td className="px-4 py-3 font-medium">
-                            {rm.raw_material?.material_name || "—"}
-                          </td>
-                          <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                            {rm.raw_material?.material_sku_code || "—"}
-                          </td>
-                          <td className="px-4 py-3 text-right font-semibold">
-                            {parseFloat(rm.quantity).toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
-                  <Layers className="h-8 w-8" />
-                  <p className="text-sm">No materials added</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <ProductBomCard rawMaterials={product.product_raw_materials} />
         )}
 
         {/* Movement History */}
-        <ProductMovementHistory movements={product.product_movements ?? []} />
+        <ProductMovementHistory
+          productId={product.id}
+          productType={product.product_type}
+        />
       </div>
     </div>
   );
