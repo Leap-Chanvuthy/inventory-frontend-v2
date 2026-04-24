@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Trash2, Plus, Package, Layers, ShoppingCart } from "lucide-react";
+import { Package, Layers, ShoppingCart } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 import {
@@ -33,7 +33,6 @@ import {
 } from "@/components/reusable/partials/input";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { Text } from "@/components/ui/text/app-text";
-import { Button } from "@/components/ui/button";
 
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -82,8 +81,8 @@ export const UpdateProductForm = () => {
 
   const product = data?.data?.product;
   const isInternal = product?.product_type === "INTERNAL_PRODUCED";
+  const isSold = data?.data?.is_sold ?? false;
   const activeMutation = isInternal ? internalMutation : externalMutation;
-
   const responseErrors = (
     activeMutation.error as AxiosError<ProductValidationErrors> | null
   )?.response?.data?.errors;
@@ -132,7 +131,9 @@ export const UpdateProductForm = () => {
   useEffect(() => {
     if (!product || initialized) return;
 
-    const mv = product.product_movements?.[0];
+    const mv = product.product_movements?.find(
+      m => m.movement_type === "INTERNAL_PRODUCED" || m.movement_type === "EXTERNAL_PURCHASED"
+    );
 
     setBase({
       product_name: product.product_name ?? "",
@@ -150,7 +151,7 @@ export const UpdateProductForm = () => {
 
     if (!isInternal && mv) {
       setExternal({
-        quantity: mv.quantity ?? "",
+        quantity: String(mv.quantity ?? ""),
         purchase_unit_price_in_usd: String(mv.purchase_unit_price_in_usd ?? ""),
         exchange_rate_from_usd_to_riel: String(
           mv.exchange_rate_from_usd_to_riel ?? "4100",
@@ -165,7 +166,7 @@ export const UpdateProductForm = () => {
     if (isInternal && mv) {
       setInternal({
         product_status: mv.product_status ?? "COMPLETED",
-        quantity: mv.quantity ?? "",
+        quantity: String(mv.quantity ?? ""),
         selling_unit_price_in_usd: String(mv.selling_unit_price_in_usd ?? ""),
         selling_exchange_rate_from_usd_to_riel: String(
           mv.selling_exchange_rate_from_usd_to_riel ?? "4100",
@@ -238,12 +239,7 @@ export const UpdateProductForm = () => {
   const handleBaseSelect = (field: string) => (value: string) =>
     setBase(prev => ({ ...prev, [field]: value }));
 
-  const updateBOMQty = (id: number, val: string) =>
-    setBomEntries(prev =>
-      prev.map(e =>
-        e.raw_material.id === id ? { ...e, quantity: Number(val) || 0 } : e,
-      ),
-    );
+
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -261,7 +257,7 @@ export const UpdateProductForm = () => {
       product_category_id: Number(base.product_category_id),
       base_uom_id: Number(base.base_uom_id),
       warehouse_id: Number(base.warehouse_id),
-      sale_method: base.sale_method || undefined,
+      sale_method: base.sale_method,
       movement_date: base.movement_date || undefined,
       note: base.note || undefined,
     };
@@ -385,6 +381,20 @@ export const UpdateProductForm = () => {
                     required
                   />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <SelectInput
+                    id="sale_method"
+                    label="Sale Method (Default FIFO)"
+                    placeholder="Select sale method"
+                    options={SALE_METHOD_OPTIONS}
+                    value={base.sale_method}
+                    onChange={v =>
+                      setBase(prev => ({ ...prev, sale_method: v }))
+                    }
+                    error={fieldErrors?.sale_method?.[0]}
+                  />
+                  <div />
+                </div>
                 <TextAreaInput
                   id="product_description"
                   label="Product Description"
@@ -448,15 +458,23 @@ export const UpdateProductForm = () => {
                         Purchase Details
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <TextInput
-                          id="quantity"
-                          label="Quantity"
-                          value={external.quantity}
-                          onChange={handleSourceChange(setExternal)}
-                          error={fieldErrors?.quantity?.[0]}
-                          isNumberOnly
-                          required
-                        />
+                        <div>
+                          <TextInput
+                            id="quantity"
+                            label="Quantity"
+                            value={external.quantity}
+                            onChange={handleSourceChange(setExternal)}
+                            error={fieldErrors?.quantity?.[0]}
+                            isNumberOnly
+                            required
+                            disabled={isSold}
+                          />
+                          {isSold && (
+                            <p className="text-xs text-yellow-500 mt-1">
+                              Quantity cannot be changed after the product has been sold.
+                            </p>
+                          )}
+                        </div>
                         <TextInput
                           id="purchase_unit_price_in_usd"
                           label="Purchase Unit Price (USD)"
@@ -522,15 +540,23 @@ export const UpdateProductForm = () => {
                             setInternal(p => ({ ...p, product_status: v }))
                           }
                         />
-                        <TextInput
-                          id="quantity"
-                          label="Quantity"
-                          value={internal.quantity}
-                          onChange={handleSourceChange(setInternal)}
-                          error={fieldErrors?.quantity?.[0]}
-                          isNumberOnly
-                          required
-                        />
+                        <div>
+                          <TextInput
+                            id="quantity"
+                            label="Quantity"
+                            value={internal.quantity}
+                            onChange={handleSourceChange(setInternal)}
+                            error={fieldErrors?.quantity?.[0]}
+                            isNumberOnly
+                            required
+                            disabled={isSold}
+                          />
+                          {isSold && (
+                            <p className="text-xs text-yellow-500 mt-1">
+                              Quantity cannot be changed after the product has been sold.
+                            </p>
+                          )}
+                        </div>
                         <TextInput
                           id="selling_unit_price_in_usd"
                           label="Selling Unit Price (USD)"
@@ -570,16 +596,6 @@ export const UpdateProductForm = () => {
                             </p>
                           )}
                         </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-8 gap-1.5 border-dashed hover:border-primary hover:text-primary"
-                          onClick={() => setPickerOpen(true)}
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          Add Material
-                        </Button>
                       </div>
 
                       {bomEntries.length === 0 ? (
@@ -605,7 +621,6 @@ export const UpdateProductForm = () => {
                                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
                                   Available
                                 </th>
-                                <th className="w-12 px-4 py-3" />
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -651,26 +666,14 @@ export const UpdateProductForm = () => {
                                     </td>
                                     <td className="px-4 py-3">
                                       <div className="flex items-center gap-2">
-                                        <div className="flex-1">
-                                          <TextInput
-                                            id={`qty_${entry.raw_material.id}`}
-                                            label=""
-                                            value={String(entry.quantity)}
-                                            onChange={e =>
-                                              updateBOMQty(
-                                                entry.raw_material.id,
-                                                e.target.value,
-                                              )
-                                            }
-                                            error={stockErr ? " " : undefined}
-                                            isNumberOnly
-                                          />
-                                        </div>
-                                        <div className="text-xs text-muted-foreground min-w-[56px] text-right">
+                                        <span className="text-sm font-medium">
+                                          {entry.quantity}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
                                           {entry.raw_material.uom?.symbol ||
                                             entry.raw_material.uom_name ||
                                             ""}
-                                        </div>
+                                        </span>
                                       </div>
                                     </td>
                                     <td className="px-4 py-3 text-right">
@@ -680,25 +683,6 @@ export const UpdateProductForm = () => {
                                           ? `${Number((entry.raw_material as any).current_qty_in_stock)} ${entry.raw_material.uom?.symbol || ""}`
                                           : "—"}
                                       </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-                                        onClick={() =>
-                                          setBomEntries(p =>
-                                            p.filter(
-                                              e =>
-                                                e.raw_material.id !==
-                                                entry.raw_material.id,
-                                            ),
-                                          )
-                                        }
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </Button>
                                     </td>
                                   </tr>
                                 );

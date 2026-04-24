@@ -44,7 +44,7 @@ export function ProductList({ embedded = false }: ProductListProps) {
 
   const apiCallParams = {
     ...baseParams,
-    "filter[product_category_id]": isNumericFilter ? Number(filter) : undefined,
+    "filter[product_category_id]": selectedCategoryId || (isNumericFilter ? Number(filter) : undefined),
     "filter[product_type]": !isNumericFilter && filter ? filter : undefined,
   } as any;
 

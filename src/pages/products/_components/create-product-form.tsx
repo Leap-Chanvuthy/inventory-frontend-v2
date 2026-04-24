@@ -27,7 +27,6 @@ import { useSingleProductCategory } from "@/api/categories/product-categories/pr
 import { useSingleUomCategory } from "@/api/uom/uom.query";
 
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
 import {
   TextInput,
   TextAreaInput,
@@ -70,7 +69,6 @@ const initialBaseForm = {
   sale_method: "",
   movement_date: "",
   note: "",
-  images: [] as File[],
 };
 
 const initialExternalForm = {
@@ -212,10 +210,9 @@ export const CreateProductForm = () => {
       product_category_id: Number(base.product_category_id),
       base_uom_id: Number(base.base_uom_id),
       warehouse_id: Number(base.warehouse_id),
-      sale_method: base.sale_method || undefined,
+      sale_method: base.sale_method,
       movement_date: base.movement_date || undefined,
       note: base.note || undefined,
-      images: base.images.length > 0 ? base.images : undefined,
     };
 
     const onSuccess = () => {
@@ -279,9 +276,8 @@ export const CreateProductForm = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* ── LEFT COLUMN ───────────────────────────── */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* General Information */}
+          {/* ── General Information (full width) ── */}
+          <div className="lg:col-span-12">
             <Card>
               <CardHeader className="pb-4">
                 <SectionHeader
@@ -300,7 +296,7 @@ export const CreateProductForm = () => {
                   error={fieldErrors?.product_name?.[0]}
                   required
                 />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <SearchableSelect
                     id="product_category_id"
                     label="Category"
@@ -322,19 +318,17 @@ export const CreateProductForm = () => {
                     error={fieldErrors?.base_uom_id?.[0]}
                     required
                   />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <SelectInput
                     id="sale_method"
-                    label="Sale Method (Default FIFO)"
+                    label="Sale Method"
                     placeholder="Select sale method"
                     options={SALE_METHOD_OPTIONS}
                     value={base.sale_method}
-                    onChange={v => setBase(prev => ({ ...prev, sale_method: v }))}
+                    onChange={v =>
+                      setBase(prev => ({ ...prev, sale_method: v }))
+                    }
                     error={fieldErrors?.sale_method?.[0]}
                   />
-                  <div />
                 </div>
                 <TextAreaInput
                   id="product_description"
@@ -346,7 +340,10 @@ export const CreateProductForm = () => {
                 />
               </CardContent>
             </Card>
+          </div>
 
+          {/* ── LEFT COLUMN ───────────────────────────── */}
+          <div className="lg:col-span-8 space-y-6">
             {/* Inventory Sourcing */}
             <Card className="overflow-hidden">
               <CardHeader className="pb-4">
@@ -390,17 +387,17 @@ export const CreateProductForm = () => {
                       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Purchase Details
                       </p>
+                      <TextInput
+                        id="quantity"
+                        label="Quantity"
+                        placeholder="e.g., 10"
+                        value={external.quantity}
+                        onChange={handleSourceChange(setExternal)}
+                        error={fieldErrors?.quantity?.[0]}
+                        isNumberOnly
+                        required
+                      />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <TextInput
-                          id="quantity"
-                          label="Quantity"
-                          placeholder="e.g., 10"
-                          value={external.quantity}
-                          onChange={handleSourceChange(setExternal)}
-                          error={fieldErrors?.quantity?.[0]}
-                          isNumberOnly
-                          required
-                        />
                         <TextInput
                           id="purchase_unit_price_in_usd"
                           label="Purchase Unit Price (USD)"
@@ -633,15 +630,18 @@ export const CreateProductForm = () => {
                                           />
                                         </div>
                                         <div className="text-xs text-muted-foreground min-w-[56px] text-right">
-                                          {entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ""}
+                                          {entry.raw_material.uom?.symbol ||
+                                            entry.raw_material.uom_name ||
+                                            ""}
                                         </div>
                                       </div>
                                     </td>
 
                                     <td className="px-4 py-3 text-right">
                                       <div className="text-sm font-medium">
-                                        {((entry.raw_material as any).current_qty_in_stock != null)
-                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ''}`
+                                        {(entry.raw_material as any)
+                                          .current_qty_in_stock != null
+                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ""}`
                                           : "-"}
                                       </div>
                                     </td>
@@ -682,24 +682,6 @@ export const CreateProductForm = () => {
           {/* ── RIGHT COLUMN ──────────────────────────── */}
           <div className="lg:col-span-4 space-y-6">
             <div className="sticky top-6 space-y-6">
-              {/* Product Image */}
-              <Card>
-                <CardHeader className="pb-4">
-                  <SectionHeader
-                    title="Product Image"
-                    description="Up to 4 images supported"
-                  />
-                </CardHeader>
-                <Separator />
-                <CardContent className="pt-5">
-                  <MultiImageUpload
-                    label=""
-                    onChange={files => setBase(p => ({ ...p, images: files }))}
-                    maxImages={4}
-                  />
-                </CardContent>
-              </Card>
-
               {/* Stock Movement */}
               <Card>
                 <CardHeader className="pb-4">

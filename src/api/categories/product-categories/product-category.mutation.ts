@@ -14,8 +14,7 @@ type UpdateProductCategoryPayload =
 export const useCreateProductCategory = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateCategoryRequest) =>
-      createProductCategory(data),
+    mutationFn: (data: CreateCategoryRequest) => createProductCategory(data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-categories"] });
