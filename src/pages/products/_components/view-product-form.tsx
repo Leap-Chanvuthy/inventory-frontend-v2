@@ -87,7 +87,14 @@ export function ViewProductForm() {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <Text.Medium bold>{product.product_name}</Text.Medium>
-            <Badge variant={isInternal ? "default" : "secondary"}>
+            <Badge
+              variant="outline"
+              className={
+                isInternal
+                  ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-400"
+                  : "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400"
+              }
+            >
               {isInternal ? "Internal Produced" : "External Purchased"}
             </Badge>
             {stockStatus && (
