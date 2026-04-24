@@ -16,6 +16,7 @@ type TableQueryConfig = {
 
 export function useTableQueryParams(config?: TableQueryConfig) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchParamsString = searchParams.toString();
 
   const pageParam = config?.pageParam || "page";
   const perPageParam = config?.perPageParam || "per_page";
@@ -43,20 +44,45 @@ export function useTableQueryParams(config?: TableQueryConfig) {
     searchParams.get(filterParam) || config?.defaultFilter
   );
 
-  //  Sync state → URL (preserves 'tab' and other params)f
+  // Sync URL -> state (supports back/forward navigation)
   useEffect(() => {
-    const newParams = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParamsString);
+    const nextPage = Number(params.get(pageParam)) || config?.defaultPage || 1;
+    const nextPerPage =
+      Number(params.get(perPageParam)) || config?.defaultPerPage || 10;
+    const nextSearch = params.get(searchParam) || config?.defaultSearch || "";
+    const nextSort = params.get(sortParam) || config?.defaultSort;
+    const nextFilter = params.get(filterParam) || config?.defaultFilter;
 
-    const tabParam = searchParams.get("tab");
+    setPage(prev => (prev === nextPage ? prev : nextPage));
+    setPerPage(prev => (prev === nextPerPage ? prev : nextPerPage));
+    setSearch(prev => (prev === nextSearch ? prev : nextSearch));
+    setSort(prev => (prev === nextSort ? prev : nextSort));
+    setFilter(prev => (prev === nextFilter ? prev : nextFilter));
+  }, [
+    searchParamsString,
+    pageParam,
+    perPageParam,
+    searchParam,
+    sortParam,
+    filterParam,
+    config?.defaultPage,
+    config?.defaultPerPage,
+    config?.defaultSearch,
+    config?.defaultSort,
+    config?.defaultFilter,
+  ]);
 
-    // Add This because when the user like search and then they delete the text in the box so we want to clear the url as well
+  // Sync state -> URL while preserving unrelated params
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParamsString);
+
     newParams.delete(searchParam);
     newParams.delete(pageParam);
     newParams.delete(perPageParam);
     newParams.delete(sortParam);
     newParams.delete(filterParam);
 
-    // Add new table params (only if not default values)
     if (search) newParams.set(searchParam, search);
     if (page > 1) newParams.set(pageParam, String(page));
     if (perPage && perPage !== (config?.defaultPerPage || 10))
@@ -64,23 +90,23 @@ export function useTableQueryParams(config?: TableQueryConfig) {
     if (sort) newParams.set(sortParam, sort);
     if (filter) newParams.set(filterParam, filter);
 
-    //  Restore 'tab' parameter if it existed
-    if (tabParam) newParams.set("tab", tabParam);
-
-    setSearchParams(newParams, { replace: true });
+    const nextParamsString = newParams.toString();
+    if (nextParamsString !== searchParamsString) {
+      setSearchParams(newParams, { replace: true });
+    }
   }, [
     search,
     page,
     perPage,
     sort,
     filter,
-    searchParams,
     setSearchParams,
     searchParam,
     pageParam,
     perPageParam,
     sortParam,
     filterParam,
+    searchParamsString,
     config?.defaultPerPage,
   ]);
 

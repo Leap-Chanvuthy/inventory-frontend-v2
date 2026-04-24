@@ -67,6 +67,7 @@ import UpdateRawMaterial from "./pages/raw-materials/update/page";
 import DeletedRawMaterials from "./pages/raw-materials/deleted/page";
 import AuditLog from "./pages/audit-logs/page";
 import ViewAuditLog from "./pages/audit-logs/view/page";
+import SaleOrdersPage from "./pages/sale-orders/page";
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -93,6 +94,7 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/products" element={<Product />} />
+              <Route path="/sale-orders" element={<SaleOrdersPage />} />
               <Route path="/products/create" element={<CreateProduct />} />
               <Route path="/products/view/:id" element={<ProductDetail />} />
               <Route path="/products/deleted" element={<DeletedProducts />} />
