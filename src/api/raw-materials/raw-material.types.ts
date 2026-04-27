@@ -62,6 +62,8 @@ export interface RawMaterial {
   official_name?: string; // Supplier official name
   warehouse_name?: string;
   current_qty_in_stock?: number;
+  stock_availability?: number;
+  stock_availability_status?: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
   uom_name?: string;
   // Nested relations
   rm_category?: RawMaterialCategory;
