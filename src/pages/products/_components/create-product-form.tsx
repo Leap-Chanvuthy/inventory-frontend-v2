@@ -41,7 +41,11 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type BOMEntry = { raw_material: RawMaterial; quantity: number };
+type BOMEntry = {
+  raw_material: RawMaterial;
+  quantity_per_unit: number;
+  scrap_percentage: number;
+};
 type SourceType = "external" | "internal";
 
 const PRODUCT_STATUS_OPTIONS = [
@@ -132,6 +136,7 @@ export const CreateProductForm = () => {
   const [internal, setInternal] = useState(initialInternalForm);
   const [bomEntries, setBomEntries] = useState<BOMEntry[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const productionQuantity = Number(internal.quantity) || 0;
 
   const [rmSearch, setRmSearch] = useState("");
   const [rmPage, setRmPage] = useState(1);
@@ -194,7 +199,22 @@ export const CreateProductForm = () => {
   const updateBOMQty = (id: number, val: string) => {
     setBomEntries(prev =>
       prev.map(e =>
-        e.raw_material.id === id ? { ...e, quantity: Number(val) || 0 } : e,
+        e.raw_material.id === id
+          ? { ...e, quantity_per_unit: Number(val) || 0 }
+          : e,
+      ),
+    );
+  };
+
+  const updateBOMScrap = (id: number, val: string) => {
+    setBomEntries(prev =>
+      prev.map(e =>
+        e.raw_material.id === id
+          ? {
+              ...e,
+              scrap_percentage: Math.max(0, Math.min(100, Number(val) || 0)),
+            }
+          : e,
       ),
     );
   };
@@ -257,7 +277,8 @@ export const CreateProductForm = () => {
           ),
           raw_materials: bomEntries.map(e => ({
             raw_material_id: e.raw_material.id,
-            quantity: e.quantity,
+            quantity_per_unit: e.quantity_per_unit,
+            scrap_percentage: e.scrap_percentage,
           })),
         },
         { onSuccess },
@@ -466,9 +487,9 @@ export const CreateProductForm = () => {
                         />
                         <TextInput
                           id="quantity"
-                          label="Quantity"
+                          label="Production Quantity"
                           value={internal.quantity}
-                          placeholder="e.g., 10"
+                          placeholder="How many finished units to produce"
                           onChange={handleSourceChange(setInternal)}
                           error={fieldErrors?.quantity?.[0]}
                           isNumberOnly
@@ -507,7 +528,10 @@ export const CreateProductForm = () => {
                         <div className="flex items-center gap-2">
                           <div>
                             <p className="text-sm font-semibold">
-                              Bill of Materials
+                              Bill of Materials (Per Unit)
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              Define raw material quantity for 1 unit. Totals are scaled by Production Quantity.
                             </p>
                             {bomEntries.length > 0 && (
                               <p className="text-xs text-muted-foreground">
@@ -525,7 +549,7 @@ export const CreateProductForm = () => {
                           onClick={() => setPickerOpen(true)}
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          Add Material
+                          Add Raw Material
                         </Button>
                       </div>
 
@@ -562,10 +586,22 @@ export const CreateProductForm = () => {
                                 <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                   Material
                                 </th>
-                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
-                                  Required Qty
+                                <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
+                                  Qty / Unit
                                 </th>
-                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                <th className="text-left px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-32">
+                                  Scrap %
+                                </th>
+                                <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Required
+                                </th>
+                                <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Scrap Qty
+                                </th>
+                                <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Total Use
+                                </th>
+                                <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
                                   Available
                                 </th>
                                 <th className="w-12 px-4 py-3" />
@@ -577,6 +613,20 @@ export const CreateProductForm = () => {
                                   e =>
                                     e.raw_material_id === entry.raw_material.id,
                                 );
+                                const unitLabel =
+                                  entry.raw_material.uom?.symbol ||
+                                  entry.raw_material.uom_name ||
+                                  "";
+                                const qtyPerUnit =
+                                  Number(entry.quantity_per_unit) || 0;
+                                const scrapPercentage =
+                                  Number(entry.scrap_percentage) || 0;
+                                const requiredQty =
+                                  qtyPerUnit * productionQuantity;
+                                const scrapQty =
+                                  (requiredQty * scrapPercentage) / 100;
+                                const totalUse = requiredQty + scrapQty;
+
                                 return (
                                   <tr
                                     key={entry.raw_material.id}
@@ -598,10 +648,7 @@ export const CreateProductForm = () => {
                                             {entry.raw_material.material_name}
                                           </p>
                                           <p className="text-xs text-muted-foreground">
-                                            {
-                                              entry.raw_material
-                                                .material_sku_code
-                                            }
+                                            {entry.raw_material.material_sku_code}
                                           </p>
                                           {stockErr && (
                                             <p className="text-xs text-destructive mt-0.5 font-medium">
@@ -612,36 +659,53 @@ export const CreateProductForm = () => {
                                         </div>
                                       </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex-1">
-                                          <TextInput
-                                            id={`qty_${entry.raw_material.id}`}
-                                            label=""
-                                            value={String(entry.quantity)}
-                                            onChange={e =>
-                                              updateBOMQty(
-                                                entry.raw_material.id,
-                                                e.target.value,
-                                              )
-                                            }
-                                            error={stockErr ? " " : undefined}
-                                            isNumberOnly
-                                          />
-                                        </div>
-                                        <div className="text-xs text-muted-foreground min-w-[56px] text-right">
-                                          {entry.raw_material.uom?.symbol ||
-                                            entry.raw_material.uom_name ||
-                                            ""}
-                                        </div>
-                                      </div>
+
+                                    <td className="px-3 py-3">
+                                      <TextInput
+                                        id={`qty_${entry.raw_material.id}`}
+                                        label=""
+                                        value={String(entry.quantity_per_unit)}
+                                        onChange={e =>
+                                          updateBOMQty(
+                                            entry.raw_material.id,
+                                            e.target.value,
+                                          )
+                                        }
+                                        error={stockErr ? " " : undefined}
+                                        isNumberOnly
+                                      />
                                     </td>
 
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-3 py-3">
+                                      <TextInput
+                                        id={`scrap_${entry.raw_material.id}`}
+                                        label=""
+                                        value={String(entry.scrap_percentage)}
+                                        onChange={e =>
+                                          updateBOMScrap(
+                                            entry.raw_material.id,
+                                            e.target.value,
+                                          )
+                                        }
+                                        isNumberOnly
+                                      />
+                                    </td>
+
+                                    <td className="px-3 py-3 text-right text-xs font-medium">
+                                      {requiredQty.toFixed(2)} {unitLabel}
+                                    </td>
+                                    <td className="px-3 py-3 text-right text-xs font-medium">
+                                      {scrapQty.toFixed(2)} {unitLabel}
+                                    </td>
+                                    <td className="px-3 py-3 text-right text-sm font-semibold">
+                                      {totalUse.toFixed(2)} {unitLabel}
+                                    </td>
+
+                                    <td className="px-3 py-3 text-right">
                                       <div className="text-sm font-medium">
                                         {(entry.raw_material as any)
                                           .current_qty_in_stock != null
-                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${entry.raw_material.uom?.symbol || entry.raw_material.uom_name || ""}`
+                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${unitLabel}`
                                           : "-"}
                                       </div>
                                     </td>
@@ -755,6 +819,16 @@ export const CreateProductForm = () => {
                     {sourceType === "internal" && bomEntries.length > 0 && (
                       <div className="flex justify-between gap-2">
                         <span className="text-muted-foreground shrink-0">
+                          Production qty
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {productionQuantity || 0}
+                        </span>
+                      </div>
+                    )}
+                    {sourceType === "internal" && bomEntries.length > 0 && (
+                      <div className="flex justify-between gap-2">
+                        <span className="text-muted-foreground shrink-0">
                           BOM items
                         </span>
                         <span className="font-medium text-foreground">
@@ -790,7 +864,13 @@ export const CreateProductForm = () => {
           setBomEntries(prev =>
             selected.map(rm => {
               const existing = prev.find(e => e.raw_material.id === rm.id);
-              return existing ?? { raw_material: rm, quantity: 1 };
+              return (
+                existing ?? {
+                  raw_material: rm,
+                  quantity_per_unit: 1,
+                  scrap_percentage: 0,
+                }
+              );
             }),
           );
         }}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Package, Layers, ShoppingCart } from "lucide-react";
+import { Package, Layers, ShoppingCart, Plus, Trash2 } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 import {
@@ -33,6 +33,8 @@ import {
 } from "@/components/reusable/partials/input";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { Text } from "@/components/ui/text/app-text";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -40,7 +42,20 @@ import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import { formatDate } from "@/utils/date-format";
 
-type BOMEntry = { raw_material: RawMaterial; quantity: number };
+type BOMEntry = {
+  raw_material: RawMaterial;
+  quantity_per_unit: number;
+  scrap_percentage: number;
+};
+
+const getRawMaterialUomLabel = (rawMaterial: RawMaterial): string => {
+  return (
+    rawMaterial.uom?.symbol ||
+    rawMaterial.uom_name ||
+    rawMaterial.uom?.name ||
+    ""
+  );
+};
 
 const PRODUCT_STATUS_OPTIONS = [
   { value: "DRAFT", label: "Draft" },
@@ -82,6 +97,11 @@ export const UpdateProductForm = () => {
   const product = data?.data?.product;
   const isInternal = product?.product_type === "INTERNAL_PRODUCED";
   const isSold = data?.data?.is_sold ?? false;
+  const canEditBom = isInternal && (data?.data?.allow_bom_update ?? !isSold);
+  const initialProductCategoryId = String(product?.product_category_id ?? "");
+  const initialSupplierId = String(product?.supplier_id ?? "");
+  const initialWarehouseId = String(product?.warehouse_id ?? "");
+  const initialUomCategoryId = String(product?.base_uom?.category_id ?? "");
   const activeMutation = isInternal ? internalMutation : externalMutation;
   const responseErrors = (
     activeMutation.error as AxiosError<ProductValidationErrors> | null
@@ -126,6 +146,7 @@ export const UpdateProductForm = () => {
   const [bomEntries, setBomEntries] = useState<BOMEntry[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const productionQuantity = Number(internal.quantity) || 0;
 
   // Pre-fill form when data loads
   useEffect(() => {
@@ -179,7 +200,10 @@ export const UpdateProductForm = () => {
             .filter(rm => rm.raw_material)
             .map(rm => ({
               raw_material: rm.raw_material as unknown as RawMaterial,
-              quantity: parseFloat(rm.quantity),
+              quantity_per_unit: Number(
+                rm.quantity_per_unit ?? rm.quantity ?? 0,
+              ),
+              scrap_percentage: Number(rm.scrap_percentage ?? 0),
             })),
         );
       }
@@ -198,6 +222,14 @@ export const UpdateProductForm = () => {
     Number(base.uom_category_id),
   );
 
+  useEffect(() => {
+    const raw = selectedUomCategoryData?.data?.base_unit;
+    const baseUnit = Array.isArray(raw) ? raw[0] : raw;
+    if (baseUnit?.id) {
+      setBase(prev => ({ ...prev, base_uom_id: String(baseUnit.id) }));
+    }
+  }, [selectedUomCategoryData]);
+
   const uomCatData = selectedUomCategoryData?.data;
   const rawBase = uomCatData?.base_unit;
   const uomBaseUnit = Array.isArray(rawBase) ? rawBase[0] : rawBase;
@@ -205,7 +237,7 @@ export const UpdateProductForm = () => {
     ? uomBaseUnit
       ? `${uomCatData.name} | ${uomBaseUnit.name}${uomBaseUnit.symbol ? ` (${uomBaseUnit.symbol})` : ""} [Base Unit]`
       : uomCatData.name
-    : product?.base_uom?.category
+    : base.uom_category_id === initialUomCategoryId && product?.base_uom?.category
       ? `${product.base_uom.category.name} | ${product.base_uom.name} (${product.base_uom.symbol}) [Base Unit]`
       : undefined;
 
@@ -238,6 +270,29 @@ export const UpdateProductForm = () => {
 
   const handleBaseSelect = (field: string) => (value: string) =>
     setBase(prev => ({ ...prev, [field]: value }));
+
+  const updateBOMQty = (id: number, val: string) => {
+    setBomEntries(prev =>
+      prev.map(entry =>
+        entry.raw_material.id === id
+          ? { ...entry, quantity_per_unit: Number(val) || 0 }
+          : entry,
+      ),
+    );
+  };
+
+  const updateBOMScrap = (id: number, val: string) => {
+    setBomEntries(prev =>
+      prev.map(entry =>
+        entry.raw_material.id === id
+          ? {
+              ...entry,
+              scrap_percentage: Math.max(0, Math.min(100, Number(val) || 0)),
+            }
+          : entry,
+      ),
+    );
+  };
 
 
 
@@ -299,7 +354,8 @@ export const UpdateProductForm = () => {
           ),
           raw_materials: bomEntries.map(e => ({
             raw_material_id: e.raw_material.id,
-            quantity: e.quantity,
+            quantity_per_unit: e.quantity_per_unit,
+            scrap_percentage: e.scrap_percentage,
           })),
         },
         { onSuccess : () => {
@@ -364,7 +420,9 @@ export const UpdateProductForm = () => {
                     onChange={handleBaseSelect("product_category_id")}
                     selectedLabel={
                       selectedCategory?.category_name ??
-                      product.category?.category_name
+                      (base.product_category_id === initialProductCategoryId
+                        ? product.category?.category_name
+                        : undefined)
                     }
                     error={fieldErrors?.product_category_id?.[0]}
                     required
@@ -402,20 +460,6 @@ export const UpdateProductForm = () => {
                   onChange={handleBaseChange}
                   error={fieldErrors?.product_description?.[0]}
                 />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <SelectInput
-                    id="sale_method"
-                    label="Sale Method (Default FIFO)"
-                    placeholder="Select sale method"
-                    options={SALE_METHOD_OPTIONS}
-                    value={base.sale_method}
-                    onChange={v =>
-                      setBase(prev => ({ ...prev, sale_method: v }))
-                    }
-                    error={fieldErrors?.sale_method?.[0]}
-                  />
-                  <div />
-                </div>
               </CardContent>
             </Card>
 
@@ -543,7 +587,7 @@ export const UpdateProductForm = () => {
                         <div>
                           <TextInput
                             id="quantity"
-                            label="Quantity"
+                            label="Production Quantity"
                             value={internal.quantity}
                             onChange={handleSourceChange(setInternal)}
                             error={fieldErrors?.quantity?.[0]}
@@ -587,8 +631,16 @@ export const UpdateProductForm = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-semibold">
-                            Bill of Materials
+                            Bill of Materials (Per Unit)
                           </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Per-unit BOM with live totals from Production Quantity.
+                          </p>
+                          {!canEditBom && (
+                            <p className="text-xs text-amber-700 mt-1">
+                              BOM is locked because this product has already been sold.
+                            </p>
+                          )}
                           {bomEntries.length > 0 && (
                             <p className="text-xs text-muted-foreground">
                               {bomEntries.length} material
@@ -596,31 +648,81 @@ export const UpdateProductForm = () => {
                             </p>
                           )}
                         </div>
+                        <div className="flex items-center gap-2">
+                          {!canEditBom && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-2 py-0 border-amber-300 text-amber-700 bg-amber-50"
+                            >
+                              Locked
+                            </Badge>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1.5 border-dashed hover:border-primary hover:text-primary"
+                            onClick={() => setPickerOpen(true)}
+                            disabled={!canEditBom}
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Raw Material
+                          </Button>
+                        </div>
                       </div>
 
                       {bomEntries.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed border-border bg-muted/20">
+                        <div
+                          className={`flex flex-col items-center justify-center gap-2 py-10 rounded-xl border-2 border-dashed ${
+                            fieldErrors?.raw_materials
+                              ? "border-destructive/50 bg-destructive/5"
+                              : "border-border bg-muted/20"
+                          }`}
+                        >
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                             <Package className="w-5 h-5 text-muted-foreground" />
                           </div>
                           <p className="text-sm font-medium text-muted-foreground">
                             No materials linked yet
                           </p>
+                          <p className="text-xs text-muted-foreground/80">
+                            {canEditBom
+                              ? "Use + Add Raw Material to build the BOM."
+                              : "BOM cannot be changed after sales have started."}
+                          </p>
+                          {fieldErrors?.raw_materials && (
+                            <Badge variant="destructive" className="text-xs">
+                              {fieldErrors.raw_materials[0]}
+                            </Badge>
+                          )}
                         </div>
                       ) : (
                         <div className="rounded-xl border overflow-hidden">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b bg-muted/50">
-                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                <th className="whitespace-nowrap text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                   Material
                                 </th>
-                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
-                                  Required Qty
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-32">
+                                  Qty / Unit
                                 </th>
-                                <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-28">
+                                  Scrap %
+                                </th>
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Required
+                                </th>
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Scrap Qty
+                                </th>
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
+                                  Total Use
+                                </th>
+                                <th className="whitespace-nowrap text-right px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
                                   Available
                                 </th>
+                                {canEditBom && <th className="w-12 px-4 py-3" />}
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -629,6 +731,18 @@ export const UpdateProductForm = () => {
                                   e =>
                                     e.raw_material_id === entry.raw_material.id,
                                 );
+                                const unitLabel = getRawMaterialUomLabel(
+                                  entry.raw_material,
+                                );
+                                const qtyPerUnit =
+                                  Number(entry.quantity_per_unit) || 0;
+                                const scrapPercentage =
+                                  Number(entry.scrap_percentage) || 0;
+                                const requiredQty =
+                                  qtyPerUnit * productionQuantity;
+                                const scrapQty =
+                                  (requiredQty * scrapPercentage) / 100;
+                                const totalUse = requiredQty + scrapQty;
                                 return (
                                   <tr
                                     key={entry.raw_material.id}
@@ -655,6 +769,11 @@ export const UpdateProductForm = () => {
                                                 .material_sku_code
                                             }
                                           </p>
+                                          {unitLabel && (
+                                            <p className="text-xs text-muted-foreground">
+                                              UOM: {unitLabel}
+                                            </p>
+                                          )}
                                           {stockErr && (
                                             <p className="text-xs text-destructive mt-0.5 font-medium">
                                               Need {stockErr.required_qty}, only{" "}
@@ -664,26 +783,83 @@ export const UpdateProductForm = () => {
                                         </div>
                                       </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium">
-                                          {entry.quantity}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                          {entry.raw_material.uom?.symbol ||
-                                            entry.raw_material.uom_name ||
-                                            ""}
-                                        </span>
-                                      </div>
+                                    <td className="px-3 py-3 text-right text-sm font-medium">
+                                      {canEditBom ? (
+                                        <TextInput
+                                          id={`qty_${entry.raw_material.id}`}
+                                          label=""
+                                          value={String(entry.quantity_per_unit)}
+                                          onChange={e =>
+                                            updateBOMQty(
+                                              entry.raw_material.id,
+                                              e.target.value,
+                                            )
+                                          }
+                                          error={stockErr ? " " : undefined}
+                                          isNumberOnly
+                                        />
+                                      ) : (
+                                        <>
+                                          {qtyPerUnit.toFixed(2)} {unitLabel}
+                                        </>
+                                      )}
                                     </td>
-                                    <td className="px-4 py-3 text-right">
+                                    <td className="px-3 py-3 text-right text-sm">
+                                      {canEditBom ? (
+                                        <TextInput
+                                          id={`scrap_${entry.raw_material.id}`}
+                                          label=""
+                                          value={String(entry.scrap_percentage)}
+                                          onChange={e =>
+                                            updateBOMScrap(
+                                              entry.raw_material.id,
+                                              e.target.value,
+                                            )
+                                          }
+                                          isNumberOnly
+                                        />
+                                      ) : (
+                                        `${scrapPercentage.toFixed(2)}%`
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-3 text-right text-sm font-medium">
+                                      {requiredQty.toFixed(2)} {unitLabel}
+                                    </td>
+                                    <td className="px-3 py-3 text-right text-sm font-medium">
+                                      {scrapQty.toFixed(2)} {unitLabel}
+                                    </td>
+                                    <td className="px-3 py-3 text-right text-sm font-semibold">
+                                      {totalUse.toFixed(2)} {unitLabel}
+                                    </td>
+                                    <td className="px-3 py-3 text-right">
                                       <div className="text-sm font-medium">
                                         {(entry.raw_material as any)
                                           .current_qty_in_stock != null
-                                          ? `${Number((entry.raw_material as any).current_qty_in_stock)} ${entry.raw_material.uom?.symbol || ""}`
-                                          : "—"}
+                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${unitLabel}`
+                                          : "-"}
                                       </div>
                                     </td>
+                                    {canEditBom && (
+                                      <td className="px-3 py-3 text-right">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                          onClick={() =>
+                                            setBomEntries(prev =>
+                                              prev.filter(
+                                                item =>
+                                                  item.raw_material.id !==
+                                                  entry.raw_material.id,
+                                              ),
+                                            )
+                                          }
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </Button>
+                                      </td>
+                                    )}
                                   </tr>
                                 );
                               })}
@@ -717,7 +893,11 @@ export const UpdateProductForm = () => {
                       fetchFn={fetchSuppliers}
                       value={base.supplier_id}
                       onChange={handleBaseSelect("supplier_id")}
-                      selectedLabel={product.supplier?.official_name}
+                      selectedLabel={
+                        base.supplier_id === initialSupplierId
+                          ? product.supplier?.official_name
+                          : undefined
+                      }
                       error={fieldErrors?.supplier_id?.[0]}
                       required
                     />
@@ -728,7 +908,11 @@ export const UpdateProductForm = () => {
                     fetchFn={fetchWarehouses}
                     value={base.warehouse_id}
                     onChange={handleBaseSelect("warehouse_id")}
-                    selectedLabel={product.warehouse?.warehouse_name}
+                    selectedLabel={
+                      base.warehouse_id === initialWarehouseId
+                        ? product.warehouse?.warehouse_name
+                        : undefined
+                    }
                     error={fieldErrors?.warehouse_id?.[0]}
                     required
                   />
@@ -762,17 +946,24 @@ export const UpdateProductForm = () => {
       </form>
 
       <DataSelectionModal<RawMaterial>
-        open={pickerOpen}
+        open={pickerOpen && canEditBom}
         onClose={() => {
           setPickerOpen(false);
           setRmSearch("");
           setRmPage(1);
         }}
         onConfirm={(selected: RawMaterial[]) => {
+          if (!canEditBom) return;
           setBomEntries(prev =>
             selected.map(rm => {
               const existing = prev.find(e => e.raw_material.id === rm.id);
-              return existing ?? { raw_material: rm, quantity: 1 };
+              return (
+                existing ?? {
+                  raw_material: rm,
+                  quantity_per_unit: 1,
+                  scrap_percentage: 0,
+                }
+              );
             }),
           );
         }}

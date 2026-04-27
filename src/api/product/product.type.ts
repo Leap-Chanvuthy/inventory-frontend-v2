@@ -32,7 +32,10 @@ export interface ProductRawMaterial {
   id: number;
   product_id: number;
   raw_material_id: number;
-  quantity: string;
+  quantity_per_unit: string | number;
+  scrap_percentage?: string | number;
+  // Legacy fallback from older API responses.
+  quantity?: string | number;
   created_at: string;
   updated_at: string;
   raw_material?: {
@@ -40,6 +43,8 @@ export interface ProductRawMaterial {
     material_name: string;
     material_sku_code: string;
     base_uom_id: number;
+    uom_name?: string;
+    uom?: UOM;
   };
 }
 
@@ -97,6 +102,7 @@ export interface ProductPnL {
 
 export interface GetProductDetailData {
   is_sold: boolean;
+  allow_bom_update?: boolean;
   product: Product;
   current_qty_in_stock: number;
   product_stock_status: string;
@@ -171,7 +177,8 @@ export interface CreateExternalPurchaseRequest {
 // Internal Manufacturing creation
 export interface RawMaterialBOM {
   raw_material_id: number;
-  quantity: number;
+  quantity_per_unit: number;
+  scrap_percentage?: number;
 }
 
 export interface CreateInternalManufacturingRequest {
@@ -196,7 +203,15 @@ export interface ReorderInternalManufacturingPayload {
   quantity: number;
   selling_unit_price_in_usd: number;
   selling_exchange_rate_from_usd_to_riel: number;
-  raw_materials: { raw_material_id: number; quantity: number }[];
+  raw_materials?: {
+    raw_material_id: number;
+    quantity_per_unit: number;
+    scrap_percentage?: number;
+  }[];
+  bom_override?: {
+    raw_material_id: number;
+    scrap_percentage: number;
+  }[];
   note?: string;
 }
 
@@ -282,6 +297,19 @@ export interface GetMovementDetailResponse {
   message: string;
   data: {
     movement: ProductMovement;
+    product_reorder?: {
+      bom_items?: Array<{
+        raw_material_id: number;
+        quantity_per_unit?: number;
+        quantity?: number;
+        scrap_percentage?: number;
+        raw_material?: {
+          material_name?: string;
+          uom_name?: string;
+          uom?: { name?: string; symbol?: string };
+        };
+      }>;
+    };
   };
 }
 

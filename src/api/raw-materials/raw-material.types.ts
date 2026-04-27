@@ -14,6 +14,9 @@ export interface RawMaterialStockMovement {
   movement_type:
     | "PURCHASE"
     | "PRODUCTION_SCRAP"
+    | "SCRAP"
+    | "MANUFACTURING"
+    | "PRODUCTION_RECEIPT"
     | "ADJUSTMENT_IN"
     | "ADJUSTMENT_OUT"
     | "RE_ORDER";

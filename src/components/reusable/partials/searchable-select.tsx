@@ -164,11 +164,12 @@ export const SearchableSelect = ({
     setCurrentPage(nextPage);
   }, [open, search, value, options, itemsPerPage, isApiMode]);
 
-  // Get selected option label
+  // Get selected option label.
+  // Prefer labels from currently selected value over initial fallback labels.
   const displayLabel =
-    selectedLabelProp ||
     options.find(opt => opt.value === value)?.label ||
-    fetchedData?.data.find(opt => opt.value === value)?.label;
+    fetchedData?.data.find(opt => opt.value === value)?.label ||
+    selectedLabelProp;
 
   // Reset page when search changes (static mode)
   const handleSearchChange = useCallback(

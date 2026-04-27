@@ -38,7 +38,10 @@ export function ProductBomCard({ rawMaterials = [] }: ProductBomCardProps) {
                     SKU Code
                   </th>
                   <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">
-                    Qty
+                    Qty / Unit
+                  </th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">
+                    Scrap %
                   </th>
                 </tr>
               </thead>
@@ -58,7 +61,12 @@ export function ProductBomCard({ rawMaterials = [] }: ProductBomCardProps) {
                       {rm.raw_material?.material_sku_code || "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold">
-                      {parseFloat(rm.quantity).toFixed(2)}
+                      {Number(rm.quantity_per_unit ?? rm.quantity ?? 0).toFixed(
+                        2,
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold">
+                      {Number(rm.scrap_percentage ?? 0).toFixed(2)}%
                     </td>
                   </tr>
                 ))}
