@@ -245,7 +245,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     className: "whitespace-nowrap py-6",
     render: (rawMaterial) => (
       <span>
-        {rawMaterial.minimum_stock_level}{" "}
+        {rawMaterial.stock_availability}{" "}
         {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
       </span>
     ),

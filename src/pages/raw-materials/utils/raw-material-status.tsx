@@ -37,7 +37,7 @@ export const StockStatusBadge = ({
       className:
         "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
     };
-  } else if (quantity <= minimumStock) {
+  } else if (quantity <= minimumStock || quantity === minimumStock) {
     status = {
       label: "Low Stock",
       className:

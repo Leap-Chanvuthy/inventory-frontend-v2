@@ -34,7 +34,7 @@ export const RM_COLUMNS: DataTableColumn<RawMaterial>[] = [
     className: "whitespace-nowrap py-6",
     render: rm => (
       <StockStatusBadge
-        quantity={rm.minimum_stock_level}
+        quantity={rm.stock_availability || 0}
         minimumStock={50}
       />
     ),
@@ -43,7 +43,7 @@ export const RM_COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "qty",
     header: "Qty",
     className: "text-right py-6",
-    render: rm => <span>{rm.minimum_stock_level}</span>,
+    render: rm => <span>{rm.stock_availability}</span>,
   },
   {
     key: "unit",
