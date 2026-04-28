@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Package } from "lucide-react";
+import { Trash2, Package, PlusCircle } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 
@@ -548,7 +548,7 @@ export const CreateProductForm = () => {
                           className="h-8 gap-1.5 border-dashed hover:border-primary hover:text-primary"
                           onClick={() => setPickerOpen(true)}
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <PlusCircle className="w-3.5 h-3.5" />
                           Add Raw Material
                         </Button>
                       </div>

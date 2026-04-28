@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Package, Layers, ShoppingCart, Plus, Trash2 } from "lucide-react";
+import { Package, Layers, ShoppingCart, Trash2, PlusCircle } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 import {
@@ -665,7 +665,7 @@ export const UpdateProductForm = () => {
                             onClick={() => setPickerOpen(true)}
                             disabled={!canEditBom}
                           >
-                            <Plus className="w-3.5 h-3.5" />
+                            <PlusCircle className="w-3.5 h-3.5" />
                             Add Raw Material
                           </Button>
                         </div>
