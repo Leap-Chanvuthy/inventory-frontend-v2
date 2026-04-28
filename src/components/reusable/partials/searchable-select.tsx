@@ -23,6 +23,9 @@ import {
 export type SelectOption = {
   value: string;
   label: string;
+  description?: string;
+  avatarUrl?: string | null;
+  searchText?: string;
 };
 
 export type FetchParams = {
@@ -123,7 +126,11 @@ export const SearchableSelect = ({
     : (() => {
         const filtered = search.trim()
           ? options.filter(opt =>
-              opt.label.toLowerCase().includes(search.toLowerCase()),
+              [opt.label, opt.description, opt.searchText]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(search.toLowerCase()),
             )
           : options;
         const start = (currentPage - 1) * itemsPerPage;
@@ -135,7 +142,11 @@ export const SearchableSelect = ({
     : Math.ceil(
         (search.trim()
           ? options.filter(opt =>
-              opt.label.toLowerCase().includes(search.toLowerCase()),
+              [opt.label, opt.description, opt.searchText]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(search.toLowerCase()),
             )
           : options
         ).length / itemsPerPage,
@@ -145,7 +156,11 @@ export const SearchableSelect = ({
     ? undefined
     : (search.trim()
         ? options.filter(opt =>
-            opt.label.toLowerCase().includes(search.toLowerCase()),
+            [opt.label, opt.description, opt.searchText]
+              .filter(Boolean)
+              .join(" ")
+              .toLowerCase()
+              .includes(search.toLowerCase()),
           )
         : options
       ).length;
@@ -285,7 +300,21 @@ export const SearchableSelect = ({
                     value === option.value && "bg-accent",
                   )}
                 >
-                  <span className="truncate">{option.label}</span>
+                  <div className="min-w-0 flex items-center gap-2">
+                    {option.avatarUrl ? (
+                      <img
+                        src={option.avatarUrl}
+                        alt={option.label}
+                        className="h-7 w-7 rounded-full object-cover border border-border"
+                      />
+                    ) : null}
+                    <div className="min-w-0">
+                      <div className="truncate text-sm">{option.label}</div>
+                      {option.description ? (
+                        <div className="truncate text-xs text-muted-foreground">{option.description}</div>
+                      ) : null}
+                    </div>
+                  </div>
                   {value === option.value && (
                     <Check className="h-4 w-4 flex-shrink-0" />
                   )}

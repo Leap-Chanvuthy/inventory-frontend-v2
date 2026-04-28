@@ -4,7 +4,7 @@ interface StatsCardProps {
   label: string;
   value: string | number;
   icon: LucideIcon;
-  tone: "green" | "red" | "purple" | "blue";
+  tone: "green" | "red" | "purple" | "blue" | "gray" | "yellow" | "orange";
   subValue?: string;
 }
 
@@ -13,6 +13,9 @@ const TONE_STYLES: Record<StatsCardProps["tone"], string> = {
   red: "border-red-500/20 bg-red-500/5 text-red-600",
   purple: "border-purple-500/20 bg-purple-500/5 text-purple-600",
   blue: "border-blue-500/20 bg-blue-500/5 text-blue-600",
+  gray: "border-slate-500/20 bg-slate-500/5 text-slate-600",
+  yellow: "border-amber-500/20 bg-amber-500/5 text-amber-600",
+  orange: "border-orange-500/20 bg-orange-500/5 text-orange-600",
 };
 
 export function StatsCard({ label, value, icon: Icon, tone, subValue }: StatsCardProps) {

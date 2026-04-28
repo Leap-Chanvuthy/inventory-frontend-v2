@@ -9,11 +9,15 @@ interface PriceSummaryProps {
 
 export function PriceSummary({ order, customers }: PriceSummaryProps) {
   const totals = calculateOrderTotals(order, customers);
+  const totalRiel = order.grandTotalInRiel > 0 ? order.grandTotalInRiel : convertUsdToRiel(totals.total);
 
-  const rows = [
+  const rows: Array<{ key: string; value: number; isDiscount: boolean; isMuted?: boolean }> = [
     { key: "Subtotal", value: totals.subtotal, isDiscount: false },
     { key: "Discount", value: totals.discountVal, isDiscount: true },
     { key: `Tax (${order.tax}%)`, value: totals.taxVal, isDiscount: false },
+    { key: "Paid", value: Number(order.paidAmountInUsd ?? 0), isDiscount: false },
+    { key: "Refunded", value: Number(order.totalRefundedAmountInUsd ?? 0), isDiscount: true },
+    { key: "Remaining", value: Number(order.remainingBalanceInUsd ?? 0), isDiscount: false, isMuted: true },
   ];
 
   return (
@@ -22,7 +26,7 @@ export function PriceSummary({ order, customers }: PriceSummaryProps) {
         {rows.map(row => (
           <div key={row.key} className="flex items-center justify-between">
             <span className="text-xs uppercase tracking-wide text-muted-foreground">{row.key}</span>
-            <span className={`text-sm font-medium ${row.isDiscount ? "text-red-500" : "text-foreground"}`}>
+            <span className={`text-sm font-medium ${row.isDiscount ? "text-red-500" : row.isMuted ? "text-amber-600" : "text-foreground"}`}>
               {row.isDiscount ? "-" : ""}
               {formatCurrency(row.value)}
             </span>
@@ -39,7 +43,7 @@ export function PriceSummary({ order, customers }: PriceSummaryProps) {
           <div className="text-right">
             <div className="text-2xl font-semibold text-foreground">{formatCurrency(totals.total)}</div>
             <div className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-              {formatCurrency(convertUsdToRiel(totals.total), "KHR")}
+              {formatCurrency(totalRiel, "KHR")}
             </div>
           </div>
         </div>

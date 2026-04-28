@@ -11,6 +11,7 @@ export interface CustomerCategory {
   category_name: string;
   label_color: string;
   description: string;
+  discount_percentage?: number;
   created_at: string;
   updated_at: string;
 }

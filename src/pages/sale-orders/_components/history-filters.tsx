@@ -1,5 +1,12 @@
 import { CalendarDays, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { DateRange, TopTab } from "../types";
 import { SearchInput } from "./search-input";
 
@@ -7,7 +14,9 @@ interface HistoryFiltersProps {
   mode: TopTab;
   searchTerm: string;
   dateRange: DateRange;
+  sort: string;
   onSearchChange: (value: string) => void;
+  onSortChange: (value: string) => void;
   onOpenDateFilter: () => void;
   onClearDateFilter: () => void;
   onDownloadReport: () => void;
@@ -25,7 +34,9 @@ export function HistoryFilters({
   mode,
   searchTerm,
   dateRange,
+  sort,
   onSearchChange,
+  onSortChange,
   onOpenDateFilter,
   onClearDateFilter,
   onDownloadReport,
@@ -38,9 +49,24 @@ export function HistoryFilters({
         <SearchInput
           value={searchTerm}
           onChange={onSearchChange}
-          placeholder={isHistory ? "Search order ID or customer..." : "Search active orders..."}
+          placeholder={isHistory ? "Search order ID, customer, or phone..." : "Search order ID, customer, or phone..."}
         />
       </div>
+
+      <Select value={sort} onValueChange={onSortChange}>
+        <SelectTrigger className="h-9 w-[180px] border-border bg-background text-xs text-muted-foreground">
+          <SelectValue placeholder="Sort" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="-created_at">Newest Created</SelectItem>
+          <SelectItem value="created_at">Oldest Created</SelectItem>
+          <SelectItem value="-updated_at">Recently Updated</SelectItem>
+          <SelectItem value="order_no">Order ID (A-Z)</SelectItem>
+          <SelectItem value="customer_name">Customer (A-Z)</SelectItem>
+          <SelectItem value="-grand_total_amount_in_usd">Total (High-Low)</SelectItem>
+          <SelectItem value="grand_total_amount_in_usd">Total (Low-High)</SelectItem>
+        </SelectContent>
+      </Select>
 
       {isHistory && (
         <>

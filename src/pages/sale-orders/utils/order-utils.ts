@@ -13,11 +13,31 @@ export function calculateOrderTotals(
 ): OrderTotals {
   if (!data) return { subtotal: 0, discountVal: 0, taxVal: 0, total: 0 };
 
+  // When order is loaded from backend, prefer computed financial totals to avoid drift.
+  if (
+    "subtotalInUsd" in data &&
+    typeof data.subtotalInUsd === "number" &&
+    "discountAmountInUsd" in data &&
+    typeof data.discountAmountInUsd === "number" &&
+    "taxAmountInUsd" in data &&
+    typeof data.taxAmountInUsd === "number" &&
+    "grandTotalInUsd" in data &&
+    typeof data.grandTotalInUsd === "number"
+  ) {
+    return {
+      subtotal: data.subtotalInUsd,
+      discountVal: data.discountAmountInUsd,
+      taxVal: data.taxAmountInUsd,
+      total: data.grandTotalInUsd,
+    };
+  }
+
   const subtotal = data.items.reduce((acc, item) => acc + item.qty * item.priceAtSale, 0);
   const customer = customers.find(c => c.id === data.customerId);
+  const manualDiscountPercentage = Math.max(0, Number(data.discount || 0));
   const discountVal = data.useCategoryDiscount
     ? (subtotal * (customer?.discount || 0)) / 100
-    : Number(data.discount || 0);
+    : (subtotal * manualDiscountPercentage) / 100;
   const taxVal = ((subtotal - discountVal) * Number(data.tax || 0)) / 100;
   const total = subtotal - discountVal + taxVal;
 

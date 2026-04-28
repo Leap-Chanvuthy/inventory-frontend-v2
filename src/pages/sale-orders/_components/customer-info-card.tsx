@@ -1,5 +1,6 @@
 import { CircleAlert, User } from "lucide-react";
 import type { Customer, Order } from "../types";
+import { formatDate } from "@/utils/date-format";
 
 interface CustomerInfoCardProps {
   order: Order;
@@ -23,13 +24,19 @@ export function CustomerInfoCard({ order, customer }: CustomerInfoCardProps) {
         <div className="grid grid-cols-2 gap-3 border-t border-border pt-3">
           <div>
             <p className="text-[10px] font-medium uppercase text-muted-foreground">Contact</p>
-            <p className="text-sm text-foreground">{customer?.phone ?? "-"}</p>
+            <p className="text-sm text-foreground">{order.customerPhone ?? customer?.phone ?? "-"}</p>
           </div>
           <div>
             <p className="text-[10px] font-medium uppercase text-muted-foreground">Tier</p>
             <span className="mt-1 inline-block rounded-md border border-green-500/20 bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600">
               {customer?.category ?? "-"}
             </span>
+          </div>
+          <div className="col-span-2">
+            <p className="text-[10px] font-medium uppercase text-muted-foreground">Return Valid Until</p>
+            <p className="text-sm text-foreground">
+              {formatDate(order.returnValidUntil) ?? "-"}
+            </p>
           </div>
         </div>
       </div>

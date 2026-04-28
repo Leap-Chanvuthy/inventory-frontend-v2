@@ -1,5 +1,4 @@
 import { Package } from "lucide-react";
-import { PRODUCTS } from "../constants";
 import type { Order } from "../types";
 import { formatCurrency } from "../utils/order-utils";
 
@@ -27,17 +26,21 @@ export function ProductTable({ order }: ProductTableProps) {
         </thead>
         <tbody className="divide-y divide-border text-sm">
           {order.items.map((item, index) => {
-            const product = PRODUCTS.find(productItem => productItem.id === item.productId);
             return (
               <tr key={`${item.productId}-${index}`} className="transition-colors hover:bg-muted/30">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-foreground">{product?.name ?? item.productId}</div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">SKU: {item.productId}</div>
+                  <div className="font-medium text-foreground">{item.productName ?? item.productId}</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    SKU: {item.productSku || item.productId}
+                    {item.productCategory ? ` · ${item.productCategory}` : ""}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-center font-medium text-foreground">{item.qty}</td>
-                <td className="px-4 py-3 text-right text-muted-foreground">{formatCurrency(item.priceAtSale)}</td>
+                <td className="px-4 py-3 text-right text-muted-foreground">
+                  {item.priceAtSale > 0 ? formatCurrency(item.priceAtSale) : "Auto"}
+                </td>
                 <td className="px-4 py-3 text-right font-semibold text-foreground">
-                  {formatCurrency(item.qty * item.priceAtSale)}
+                  {item.priceAtSale > 0 ? formatCurrency(item.qty * item.priceAtSale) : "Auto"}
                 </td>
               </tr>
             );

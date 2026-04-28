@@ -68,6 +68,10 @@ export interface Product {
   official_name?: string;
   warehouse_name?: string;
   uom_name?: string;
+  latest_selling_unit_price_in_usd?: number;
+  latest_selling_unit_price_in_riel?: number;
+  latest_selling_exchange_rate_from_usd_to_riel?: number;
+  latest_selling_exchange_rate_from_riel_to_usd?: number;
   // Nested relations
   category?: ProductCategory;
   supplier?: Supplier | null;

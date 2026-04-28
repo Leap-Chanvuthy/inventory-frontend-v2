@@ -1,14 +1,7 @@
-import { ArrowLeft, Calendar, DollarSign, Save, User, X } from "lucide-react";
+import { ArrowLeft, Calendar, Percent, Save, User, X } from "lucide-react";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Customer, OrderFormState, OrderTotals, Product } from "../types";
 import { convertUsdToRiel, formatCurrency } from "../utils/order-utils";
@@ -21,13 +14,11 @@ interface OrderFormProps {
   activeCustomer: Customer | null;
   formTotals: OrderTotals;
   formProductSelect: string;
-  formQtySelect: number;
   onCancel: () => void;
   onSetField: <K extends keyof OrderFormState>(field: K, value: OrderFormState[K]) => void;
   onSetProductSelect: (value: string) => void;
-  onSetQtySelect: (value: number) => void;
-  onAddItem: () => void;
   onRemoveItem: (productId: string) => void;
+  onUpdateItemQty: (productId: string, qty: number) => void;
   onSaveDraft: () => void;
   onSaveAndProcess: () => void;
 }
@@ -39,13 +30,11 @@ export function OrderForm({
   activeCustomer,
   formTotals,
   formProductSelect,
-  formQtySelect,
   onCancel,
   onSetField,
   onSetProductSelect,
-  onSetQtySelect,
-  onAddItem,
   onRemoveItem,
+  onUpdateItemQty,
   onSaveDraft,
   onSaveAndProcess,
 }: OrderFormProps) {
@@ -79,21 +68,19 @@ export function OrderForm({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-medium text-muted-foreground">Customer Selection</label>
-                <Select
+                <SearchableSelect
+                  id="sale-order-customer-select"
                   value={formState.customerId}
-                  onValueChange={value => onSetField("customerId", value)}
-                >
-                  <SelectTrigger className="h-8">
-                    <SelectValue placeholder="Select customer" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {customer.phone} ({customer.category})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={value => onSetField("customerId", value)}
+                  options={customers.map(customer => ({
+                    value: customer.id,
+                    label: customer.name,
+                    description: `${customer.phone || customer.email || "-"} · ${customer.category}`,
+                    avatarUrl: customer.avatar || undefined,
+                    searchText: `${customer.name} ${customer.phone || ""} ${customer.email || ""}`,
+                  }))}
+                  placeholder="Search customer by name / phone / email"
+                />
               </div>
 
               <div className="space-y-1.5">
@@ -101,16 +88,24 @@ export function OrderForm({
                 <div className="relative">
                   <Calendar className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    disabled
-                    value={new Date().toLocaleDateString("en-US", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    type="date"
+                    value={formState.orderDate}
+                    onChange={event => onSetField("orderDate", event.target.value)}
                     className="h-8 pl-8"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium text-muted-foreground">Return Window (days)</label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={3650}
+                  value={formState.returnWindowDays}
+                  onChange={event => onSetField("returnWindowDays", Number(event.target.value) || 30)}
+                  className="h-8"
+                />
               </div>
 
               <div className="col-span-2 space-y-1.5">
@@ -130,42 +125,32 @@ export function OrderForm({
               Order Items
             </h4>
 
-            <div className="flex gap-3 items-end bg-muted/40 p-3 rounded-md border border-border">
+            <div className="bg-muted/40 p-3 rounded-md border border-border">
               <SearchableSelect
                 id="sale-order-product-select"
-                label="Select Product"
+                label="Select Product (single click adds instantly)"
                 className="flex-1"
                 value={formProductSelect}
                 onChange={onSetProductSelect}
                 options={products.map(product => ({
                   value: product.id,
-                  label: `${product.name} - ${formatCurrency(product.price)}`,
+                  label: product.name,
+                  description: `${product.sku || "-"} · ${product.category || "Uncategorized"}`,
+                  searchText: `${product.name} ${product.sku || ""} ${product.category || ""}`,
                 }))}
-                placeholder="Search and select product"
+                placeholder="Search by product name or SKU"
               />
-
-              <div className="w-28 space-y-1.5">
-                <label className="text-[11px] font-medium text-muted-foreground">Quantity</label>
-                <Input
-                  type="number"
-                  min={1}
-                  className="h-8 text-center"
-                  value={formQtySelect}
-                  onChange={event => onSetQtySelect(Number(event.target.value) || 1)}
-                />
-              </div>
-
-              <Button
-                type="button"
-                size="sm"
-                onClick={onAddItem}
-                className="h-8"
-              >
-                Add Item
-              </Button>
             </div>
 
-            <FormItemTable items={formState.items} products={products} onRemoveItem={onRemoveItem} />
+            <FormItemTable
+              items={formState.items}
+              products={products}
+              onRemoveItem={onRemoveItem}
+              onUpdateQty={onUpdateItemQty}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Unit price is derived automatically from product movement history when saving the order. Product click adds quantity = 1 instantly.
+            </p>
           </section>
 
           <section className="bg-card p-4 rounded-lg border border-border space-y-4">
@@ -206,13 +191,14 @@ export function OrderForm({
                   />
                   <div className="flex-1">
                     <label htmlFor="man-discount" className="text-sm font-medium text-foreground block cursor-pointer mb-2">
-                      Manual Discount Amount ($)
+                      Manual Discount (%)
                     </label>
                     <div className="relative">
-                      <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <Percent className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                       <Input
                         type="number"
                         min={0}
+                        max={100}
                         step="0.01"
                         disabled={formState.useCategoryDiscount}
                         value={formState.discount}
@@ -226,6 +212,18 @@ export function OrderForm({
 
               <div className="w-1/2 bg-muted rounded-lg p-4 border border-border flex flex-col justify-between">
                 <div className="space-y-2.5">
+                  <div className="flex items-center justify-between text-sm gap-3">
+                    <span className="text-muted-foreground">Tax (%)</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step="0.01"
+                      className="h-8 w-24 text-right bg-card"
+                      value={formState.tax}
+                      onChange={event => onSetField("tax", Number(event.target.value) || 0)}
+                    />
+                  </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium text-foreground">{formatCurrency(formTotals.subtotal)}</span>

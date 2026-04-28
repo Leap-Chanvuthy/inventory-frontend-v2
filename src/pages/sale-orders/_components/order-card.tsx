@@ -17,7 +17,13 @@ const STATUS_STRIP: Record<OrderStatus, string> = {
   ON_HOLD: "bg-amber-500",
   COMPLETED: "bg-green-500",
   CANCELLED: "bg-red-500",
-  REFUNDED: "bg-purple-500",
+  REFUNDED: "bg-orange-500",
+};
+
+const PAYMENT_BADGE_STYLE: Record<NonNullable<Order["paymentStatus"]>, string> = {
+  PAID: "border-green-500/20 bg-green-500/10 text-green-700",
+  UNPAID: "border-red-500/20 bg-red-500/10 text-red-700",
+  DEBT: "border-amber-500/20 bg-amber-500/10 text-amber-700",
 };
 
 function getCustomerInitial(customerName: string) {
@@ -27,7 +33,9 @@ function getCustomerInitial(customerName: string) {
 export function OrderCard({ order, customer, isActive, onClick, customers }: OrderCardProps) {
   const { total } = calculateOrderTotals(order, customers);
   const itemCount = order.items.reduce((sum, item) => sum + item.qty, 0);
-  const customerName = customer?.name ?? order.customerId;
+  const customerName = order.customerName ?? customer?.name ?? order.customerId;
+  const customerPhone = order.customerPhone ?? customer?.phone;
+  const totalRiel = order.grandTotalInRiel > 0 ? order.grandTotalInRiel : convertUsdToRiel(total);
 
   return (
     <button
@@ -50,15 +58,32 @@ export function OrderCard({ order, customer, isActive, onClick, customers }: Ord
           <div className="min-w-0">
             <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{order.id}</p>
             <p className="truncate text-sm font-semibold text-foreground">{customerName}</p>
+            {customerPhone && (
+              <p className="truncate text-[10px] text-muted-foreground">{customerPhone}</p>
+            )}
           </div>
         </div>
 
-        <OrderStatusBadge status={order.status} />
+        <div className="flex flex-col items-end gap-1">
+          <OrderStatusBadge status={order.status} />
+          {order.paymentStatus && (
+            <span
+              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${PAYMENT_BADGE_STYLE[order.paymentStatus]}`}
+            >
+              {order.paymentStatus}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-2 flex items-end justify-between gap-3 pl-1">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">{itemCount} items</p>
+          {Number(order.totalRefundedAmountInUsd ?? 0) > 0 && (
+            <p className="text-[10px] text-orange-700">
+              Refunded ${Number(order.totalRefundedAmountInUsd ?? 0).toFixed(2)}
+            </p>
+          )}
           <p className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
             <Clock className="h-3 w-3" />
             {new Date(order.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })}
@@ -70,7 +95,7 @@ export function OrderCard({ order, customer, isActive, onClick, customers }: Ord
         <div className="text-right">
           <p className="text-sm font-semibold text-foreground">{formatCurrency(total)}</p>
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            {formatCurrency(convertUsdToRiel(total), "KHR")}
+            {formatCurrency(totalRiel, "KHR")}
           </p>
         </div>
       </div>
