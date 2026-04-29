@@ -1,9 +1,12 @@
 import { BASE_API_URL } from "@/consts/endpoints";
 import { apiClient } from "@/api/client";
 import {
+  AddSaleOrderPaymentPayload,
   CreateSaleOrderPayload,
   RefundSaleOrderPayload,
   SaleOrderRefundListResponse,
+  SaleOrderRefundRecordListResponse,
+  SaleOrderRefundRecordQueryParams,
   SaleOrderListResponse,
   SaleOrderQueryParams,
   SaleOrderStatisticsResponse,
@@ -34,6 +37,13 @@ export const getSaleOrderRefunds = async (
   return response.data;
 };
 
+export const getSaleOrderRefundRecords = async (
+  params?: SaleOrderRefundRecordQueryParams,
+): Promise<SaleOrderRefundRecordListResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/sale-orders/refund-records`, { params });
+  return response.data;
+};
+
 export const createSaleOrder = async (
   payload: CreateSaleOrderPayload,
 ): Promise<SaleOrderSingleResponse> => {
@@ -54,6 +64,14 @@ export const updateSaleOrderStatus = async (
   payload: UpdateSaleOrderStatusPayload,
 ): Promise<SaleOrderSingleResponse> => {
   const response = await apiClient.patch(`${BASE_API_URL}/sale-orders/${id}/status`, payload);
+  return response.data;
+};
+
+export const addSaleOrderPayment = async (
+  id: number,
+  payload: AddSaleOrderPaymentPayload,
+): Promise<SaleOrderSingleResponse> => {
+  const response = await apiClient.post(`${BASE_API_URL}/sale-orders/${id}/payments`, payload);
   return response.data;
 };
 
@@ -82,10 +100,32 @@ export const getSaleOrderStockAvailability = async (
 };
 
 export const getSaleOrderStatistics = async (
-  params?: { date_from?: string; date_to?: string },
+  params?: {
+    date_from?: string;
+    date_to?: string;
+    group_by?: "day" | "week" | "month" | "year";
+    customer_id?: number;
+    status?: string;
+  },
 ): Promise<SaleOrderStatisticsResponse> => {
   const response = await apiClient.get(`${BASE_API_URL}/sale-orders/statistics`, {
     params,
   });
   return response.data;
+};
+
+export const downloadSaleOrderStatisticsReport = async (
+  params?: {
+    date_from?: string;
+    date_to?: string;
+    group_by?: "day" | "week" | "month" | "year";
+    customer_id?: number;
+    status?: string;
+  },
+): Promise<Blob> => {
+  const response = await apiClient.get(`${BASE_API_URL}/sale-orders/statistics/report`, {
+    params,
+    responseType: "blob",
+  });
+  return response.data as Blob;
 };

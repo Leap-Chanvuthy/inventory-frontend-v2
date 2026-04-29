@@ -7,6 +7,7 @@ export interface Category {
   category_name: string;
   label_color: string;
   description: string;
+  discount_percentage?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -60,6 +61,16 @@ const BASE_COLUMNS: DataTableColumn<Category>[] = [
     className: "whitespace-nowrap py-6 max-w-md",
     render: category => (
       <span className="line-clamp-2">{category.description}</span>
+    ),
+  },
+  {
+    key: "discount_percentage",
+    header: "Discount",
+    className: "whitespace-nowrap py-6",
+    render: category => (
+      <span className="text-sm font-medium">
+        {Number(category.discount_percentage ?? 0)}%
+      </span>
     ),
   },
   {

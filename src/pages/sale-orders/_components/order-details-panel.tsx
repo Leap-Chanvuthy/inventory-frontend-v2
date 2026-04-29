@@ -31,12 +31,18 @@ interface OrderDetailsPanelProps {
   customer?: Customer;
   customers: Customer[];
   onEdit: (order: Order) => void;
-  onUpdateStatus: (orderId: string, status: OrderStatus) => void;
+  onUpdateStatus: (orderId: number, status: OrderStatus) => void;
   onUpdatePayment: (
-    orderId: string,
-    payload: { payment_status: PaymentStatus; paid_amount_in_usd?: number; paid_amount_in_riel?: number },
+    orderId: number,
+    payload: {
+      payment_status: PaymentStatus;
+      payment_percentage?: number;
+      installment_note?: string;
+    },
   ) => Promise<void>;
   onOpenRefund: (order: Order) => void;
+  onViewRefundRecords?: () => void;
+  onViewRefundDetail?: (refundId: number) => void;
 }
 
 export function OrderDetailsPanel({
@@ -47,26 +53,47 @@ export function OrderDetailsPanel({
   onUpdateStatus,
   onUpdatePayment,
   onOpenRefund,
+  onViewRefundRecords,
+  onViewRefundDetail,
 }: OrderDetailsPanelProps) {
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("UNPAID");
-  const [paidUsd, setPaidUsd] = useState("0");
-  const [paidRiel, setPaidRiel] = useState("0");
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("INSTALLMENT");
+  const [paymentPercentage, setPaymentPercentage] = useState("0");
+  const [installmentNote, setInstallmentNote] = useState("");
 
   useEffect(() => {
-    setPaymentStatus((order.paymentStatus as PaymentStatus) || "UNPAID");
-    setPaidUsd(String(Number(order.paidAmountInUsd ?? 0)));
-    setPaidRiel(String(Number(order.paidAmountInRiel ?? 0)));
+    setPaymentStatus((order.paymentStatus as PaymentStatus) || "INSTALLMENT");
+    setInstallmentNote("");
   }, [order]);
 
-  const canEditPayment = ["PROCESSING", "ON_HOLD", "COMPLETED"].includes(order.status);
+  useEffect(() => {
+    const remainingPercentage = Math.max(0, 100 - Number(order.paidPercentage ?? 0));
+    setPaymentPercentage(
+      paymentStatus === "PAID"
+        ? String(remainingPercentage > 0 ? remainingPercentage : 0)
+        : String(remainingPercentage > 0 ? Math.min(remainingPercentage, 10) : 0),
+    );
+  }, [order, paymentStatus]);
+
+  const canChangePaymentType = order.status === "DRAFT";
+  const canRecordPayment = !["CANCELLED", "REFUNDED"].includes(order.status);
+  const currentPaidPercentage = Number(order.paidPercentage ?? 0);
+  const remainingPercentage = Math.max(0, 100 - currentPaidPercentage);
 
   const handleSavePayment = async () => {
-    await onUpdatePayment(order.id, {
+    const nextPaymentPercentage = Number(paymentPercentage || 0);
+    if (nextPaymentPercentage <= 0) {
+      return;
+    }
+
+    await onUpdatePayment(order.dbId, {
       payment_status: paymentStatus,
-      paid_amount_in_usd: Number(paidUsd || 0),
-      paid_amount_in_riel: Number(paidRiel || 0),
+      payment_percentage: nextPaymentPercentage,
+      installment_note: installmentNote || undefined,
     });
   };
+
+  const installmentPreviewUsd = (Number(order.grandTotalInUsd || 0) * Number(paymentPercentage || 0)) / 100;
+  const installmentPreviewRiel = (Number(order.grandTotalInRiel || 0) * Number(paymentPercentage || 0)) / 100;
 
   return (
     <div className="flex h-full flex-1 flex-col animate-in slide-in-from-right-4 duration-300">
@@ -107,54 +134,100 @@ export function OrderDetailsPanel({
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Payment Status</p>
-              <Select value={paymentStatus} onValueChange={value => setPaymentStatus(value as PaymentStatus)} disabled={!canEditPayment}>
+              <Select value={paymentStatus} onValueChange={value => setPaymentStatus(value as PaymentStatus)} disabled={!canChangePaymentType}>
                 <SelectTrigger className="h-8">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="PAID">Paid</SelectItem>
-                  <SelectItem value="UNPAID">Unpaid</SelectItem>
+                  <SelectItem value="INSTALLMENT">Installment</SelectItem>
                   <SelectItem value="DEBT">Debt</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Paid (USD)</p>
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={paidUsd}
-                disabled={!canEditPayment}
-                className="h-8"
-                onChange={event => setPaidUsd(event.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Paid (KHR)</p>
-              <Input
-                type="number"
-                min="0"
-                step="1"
-                value={paidRiel}
-                disabled={!canEditPayment}
-                className="h-8"
-                onChange={event => setPaidRiel(event.target.value)}
-              />
+            <div className="space-y-1 md:col-span-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">New Payment Percentage (%)</p>
+              <div className="space-y-2 rounded-md border border-border/70 bg-muted/25 px-2.5 py-2">
+                <Input
+                  type="number"
+                  min={0.01}
+                  max={remainingPercentage}
+                  step="0.01"
+                  value={paymentPercentage}
+                  disabled={!canRecordPayment || remainingPercentage <= 0}
+                  className="h-8"
+                  onChange={event => setPaymentPercentage(event.target.value)}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Enter payment percentage. The system will calculate USD and KHR automatically.
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  New Amount: USD {installmentPreviewUsd.toFixed(2)} · KHR {Math.round(installmentPreviewRiel).toLocaleString()}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Total Paid: {currentPaidPercentage.toFixed(2)}% · Remaining: {remainingPercentage.toFixed(2)}%
+                </p>
+              </div>
             </div>
           </div>
-          {canEditPayment && (
+
+          <div className="mt-3 space-y-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Installment Note</p>
+            <Input
+              value={installmentNote}
+              onChange={event => setInstallmentNote(event.target.value)}
+              disabled={!canRecordPayment || remainingPercentage <= 0}
+              className="h-8"
+              placeholder="Optional note for this installment"
+            />
+          </div>
+
+          {canRecordPayment && (
             <div className="mt-3 flex justify-end">
-              <Button size="sm" className="h-8 text-xs" onClick={handleSavePayment}>
-                Save Payment
+              <Button size="sm" className="h-8 text-xs" onClick={handleSavePayment} disabled={remainingPercentage <= 0}>
+                Record Payment
               </Button>
+            </div>
+          )}
+
+          {Array.isArray(order.installments) && order.installments.length > 0 && (
+            <div className="mt-3 rounded-md border border-border/70 bg-muted/20 p-2.5">
+              <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
+                <span>Installment History</span>
+                <span>
+                  Paid {Number(order.paidPercentage ?? 0).toFixed(2)}% · Remaining {Math.max(0, 100 - Number(order.paidPercentage ?? 0)).toFixed(2)}%
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {order.installments.map(installment => (
+                  <div key={installment.id} className="flex items-center justify-between rounded-md bg-card/70 px-2 py-1.5 text-xs">
+                    <span className="text-foreground">
+                      {installment.percentage.toFixed(2)}% ({installment.cumulativePercentage.toFixed(2)}% total)
+                    </span>
+                    <span className="text-muted-foreground">
+                      ${installment.amountUsd.toFixed(2)} · {formatDate(installment.paidAt)}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </section>
         <ProductTable order={order} />
         {Array.isArray(order.refunds) && order.refunds.length > 0 && (
           <section className="space-y-3 rounded-lg border border-border bg-card p-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Refund History</h3>
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Refund History</h3>
+              {onViewRefundRecords && (
+                <button
+                  type="button"
+                  onClick={onViewRefundRecords}
+                  className="text-[11px] font-medium text-amber-700 hover:underline"
+                >
+                  View refund records
+                </button>
+              )}
+            </div>
             {order.refunds.map(refund => (
               <article key={refund.id} className="rounded-md border border-border bg-muted/30 p-3">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -172,6 +245,9 @@ export function OrderDetailsPanel({
                 <p className="text-xs text-muted-foreground">
                   Type: {refund.refundType.replace(/_/g, " ")} • Reason: {refund.reason}
                 </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Refunded items: {refund.items.length}
+                </p>
                 <div className="mt-2 space-y-1">
                   {refund.items.map(item => (
                     <div key={item.id} className="flex items-center justify-between text-xs">
@@ -188,6 +264,19 @@ export function OrderDetailsPanel({
                     </div>
                   ))}
                 </div>
+                {onViewRefundDetail && (
+                  <div className="mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-[11px]"
+                      onClick={() => onViewRefundDetail(refund.id)}
+                    >
+                      View Refund Detail
+                    </Button>
+                  </div>
+                )}
               </article>
             ))}
           </section>
@@ -199,7 +288,7 @@ export function OrderDetailsPanel({
         {order.status === "DRAFT" && (
           <>
             <button
-              onClick={() => onUpdateStatus(order.id, "CANCELLED")}
+              onClick={() => onUpdateStatus(order.dbId, "CANCELLED")}
               className="rounded-md px-3 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
             >
               Cancel Order
@@ -211,7 +300,7 @@ export function OrderDetailsPanel({
               Edit Order
             </button>
             <button
-              onClick={() => onUpdateStatus(order.id, "PROCESSING")}
+              onClick={() => onUpdateStatus(order.dbId, "PROCESSING")}
               className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Process Order <ChevronRight className="h-3.5 w-3.5" />
@@ -222,20 +311,20 @@ export function OrderDetailsPanel({
         {order.status === "PROCESSING" && (
           <>
             <button
-              onClick={() => onUpdateStatus(order.id, "CANCELLED")}
+              onClick={() => onUpdateStatus(order.dbId, "CANCELLED")}
               className="rounded-md px-3 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
             >
               Cancel Order
             </button>
             <button
-              onClick={() => onUpdateStatus(order.id, "ON_HOLD")}
+              onClick={() => onUpdateStatus(order.dbId, "ON_HOLD")}
               className="flex items-center gap-2 rounded-md bg-amber-500/90 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-amber-500"
             >
               <PauseCircle className="h-3.5 w-3.5" />
               Move to On Hold
             </button>
             <button
-              onClick={() => onUpdateStatus(order.id, "COMPLETED")}
+              onClick={() => onUpdateStatus(order.dbId, "COMPLETED")}
               className="flex items-center gap-2 rounded-md bg-green-600/90 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-green-600"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
@@ -247,13 +336,13 @@ export function OrderDetailsPanel({
         {order.status === "ON_HOLD" && (
           <>
             <button
-              onClick={() => onUpdateStatus(order.id, "CANCELLED")}
+              onClick={() => onUpdateStatus(order.dbId, "CANCELLED")}
               className="rounded-md px-3 py-2 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
             >
               Cancel Order
             </button>
             <button
-              onClick={() => onUpdateStatus(order.id, "COMPLETED")}
+              onClick={() => onUpdateStatus(order.dbId, "COMPLETED")}
               className="flex items-center gap-2 rounded-md bg-green-600/90 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-green-600"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />

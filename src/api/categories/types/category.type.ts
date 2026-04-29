@@ -4,6 +4,7 @@ export interface BaseCategory {
   category_name: string;
   label_color: string;
   description: string;
+  discount_percentage?: number | null;
   deleted_at?: string | null;
   raw_materials_count?: number;
   products_count?: number;
@@ -81,7 +82,9 @@ export type CustomerCategoryQueryParams = CategoryQueryParams;
 
 export type CreateRawMaterialCategoryRequest = CreateCategoryRequest;
 export type CreateProductCategoryRequest = CreateCategoryRequest;
-export type CreateCustomerCategoryRequest = CreateCategoryRequest;
+export type CreateCustomerCategoryRequest = CreateCategoryRequest & {
+  discount_percentage?: number;
+};
 
 export type CreateRawMaterialCategoryValidationErrors =
   CreateCategoryValidationErrors;

@@ -16,7 +16,7 @@ export function useRefundHandler() {
 
   const openRefundModal = (order: Order) => {
     setRefundData({
-      orderId: order.id,
+      orderId: order.dbId,
       refundType: "CASH_REFUND",
       refundMethod: "CASH",
       reasonType: "PRODUCT_ISSUE",

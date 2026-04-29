@@ -1,4 +1,5 @@
 import { Package } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Order } from "../types";
 import { formatCurrency } from "../utils/order-utils";
 
@@ -29,7 +30,9 @@ export function ProductTable({ order }: ProductTableProps) {
             return (
               <tr key={`${item.productId}-${index}`} className="transition-colors hover:bg-muted/30">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-foreground">{item.productName ?? item.productId}</div>
+                  <Link to={`/products/view/${item.productDbId}`} className="font-medium text-primary hover:underline">
+                    {item.productName ?? item.productId}
+                  </Link>
                   <div className="mt-0.5 text-xs text-muted-foreground">
                     SKU: {item.productSku || item.productId}
                     {item.productCategory ? ` · ${item.productCategory}` : ""}

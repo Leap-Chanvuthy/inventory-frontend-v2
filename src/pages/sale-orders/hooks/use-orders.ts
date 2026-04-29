@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import {
+  useAddSaleOrderPayment,
   useCreateSaleOrder,
   useRefundSaleOrder,
   useUpdateSaleOrder,
@@ -8,6 +9,7 @@ import {
 import { useSaleOrders } from "@/api/sale-orders/sale-order.query";
 import type {
   PaymentStatus,
+  SaleOrderInstallmentRecord,
   SaleOrderItemRecord,
   SaleOrderQueryParams,
   SaleOrderRecord,
@@ -31,6 +33,19 @@ function normalizeOrderItems(items: SaleOrderItemRecord[] | undefined): Order["i
     returnedQty: Number(item.returned_quantity ?? 0),
     refundQty: Number(item.refund_quantity ?? 0),
     exchangeRateUsdToRiel: Number(item.exchange_rate_from_usd_to_riel ?? 0),
+  }));
+}
+
+function normalizeInstallments(items: SaleOrderInstallmentRecord[] | undefined): NonNullable<Order["installments"]> {
+  if (!Array.isArray(items)) return [];
+  return items.map(item => ({
+    id: Number(item.id),
+    percentage: Number(item.percentage ?? 0),
+    cumulativePercentage: Number(item.cumulative_percentage ?? 0),
+    amountUsd: Number(item.amount_usd ?? 0),
+    amountRiel: Number(item.amount_riel ?? 0),
+    paidAt: item.paid_at,
+    note: item.note ?? null,
   }));
 }
 
@@ -70,14 +85,22 @@ function normalizeRefunds(refunds: SaleOrderRefundRecord[] | undefined): NonNull
   }));
 }
 
-function mapSaleOrderRecord(record: SaleOrderRecord): Order {
+export function mapSaleOrderRecord(record: SaleOrderRecord): Order {
   const orderItems = normalizeOrderItems(record.order_items ?? record.orderItems ?? []);
   const refunds = normalizeRefunds(record.refunds);
+  const installments = normalizeInstallments(record.installments);
   const customerDiscount = Number(
     record.customer?.customer_category?.discount_percentage ??
       record.customer?.customerCategory?.discount_percentage ??
       0,
   );
+
+  const normalizedPaymentStatus: Order["paymentStatus"] =
+    record.payment_status === "PAID"
+      ? "PAID"
+      : record.payment_status === "DEBT"
+        ? "DEBT"
+        : "INSTALLMENT";
 
   return {
     id: record.order_no,
@@ -86,7 +109,7 @@ function mapSaleOrderRecord(record: SaleOrderRecord): Order {
     customerName: record.customer_name ?? record.customer?.fullname ?? undefined,
     customerPhone: record.customer_phone ?? record.customer?.phone_number ?? undefined,
     status: record.order_status as OrderStatus,
-    paymentStatus: record.payment_status,
+    paymentStatus: normalizedPaymentStatus,
     discount: Number(record.discount_percentage ?? 0),
     discountPercentage: Number(record.discount_percentage ?? 0),
     tax: Number(record.tax_percentage ?? 0),
@@ -106,10 +129,12 @@ function mapSaleOrderRecord(record: SaleOrderRecord): Order {
     returnValidUntil: record.return_valid_until ?? undefined,
     paidAmountInUsd: Number(record.paid_amount_in_usd ?? 0),
     paidAmountInRiel: Number(record.paid_amount_in_riel ?? 0),
+    paidPercentage: Number(record.paid_percentage ?? 0),
     totalRefundedAmountInUsd: Number(record.total_refunded_amount_in_usd ?? 0),
     totalRefundedAmountInRiel: Number(record.total_refunded_amount_in_riel ?? 0),
     remainingBalanceInUsd: Number(record.remaining_balance_in_usd ?? 0),
     remainingBalanceInRiel: Number(record.remaining_balance_in_riel ?? 0),
+    installments,
     refunds,
     latestRefund: refunds[0] ?? null,
   };
@@ -144,6 +169,7 @@ export function useOrders(params?: SaleOrderQueryParams) {
   const updateMutation = useUpdateSaleOrder();
   const updateStatusMutation = useUpdateSaleOrderStatus();
   const refundMutation = useRefundSaleOrder();
+  const addPaymentMutation = useAddSaleOrderPayment();
 
   const orders: Order[] = useMemo(
     () => (ordersQuery.data?.data?.data ?? []).map(mapSaleOrderRecord),
@@ -153,6 +179,26 @@ export function useOrders(params?: SaleOrderQueryParams) {
   const orderMap = useMemo(() => {
     return new Map(orders.map(order => [order.id, order]));
   }, [orders]);
+
+  const orderMapByDbId = useMemo(() => {
+    return new Map(orders.map(order => [order.dbId, order]));
+  }, [orders]);
+
+  const resolveOrderByIdentifier = (identifier: string | number) => {
+    if (typeof identifier === "number") {
+      return orderMapByDbId.get(identifier) ?? null;
+    }
+
+    const byOrderNo = orderMap.get(identifier);
+    if (byOrderNo) return byOrderNo;
+
+    const numeric = Number(identifier);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return orderMapByDbId.get(numeric) ?? null;
+    }
+
+    return null;
+  };
 
   const saveOrder = async (formState: OrderFormState, shouldProcess = false) => {
     const payload = buildOrderPayload(formState);
@@ -177,8 +223,8 @@ export function useOrders(params?: SaleOrderQueryParams) {
     }
   };
 
-  const updateStatus = async (id: string, status: OrderStatus) => {
-    const order = orderMap.get(id);
+  const updateStatus = async (id: string | number, status: OrderStatus) => {
+    const order = resolveOrderByIdentifier(id);
     if (!order) return;
     if (status === "REFUNDED") return;
 
@@ -189,25 +235,35 @@ export function useOrders(params?: SaleOrderQueryParams) {
   };
 
   const updatePayment = async (
-    id: string,
+    id: string | number,
     payload: {
       payment_status: PaymentStatus;
-      paid_amount_in_usd?: number;
-      paid_amount_in_riel?: number;
+      payment_percentage?: number;
+      paid_at?: string;
+      installment_note?: string;
     },
   ) => {
-    const order = orderMap.get(id);
+    const order = resolveOrderByIdentifier(id);
     if (!order) return;
 
-    await updateMutation.mutateAsync({
+    if (typeof payload.payment_percentage !== "number") {
+      return;
+    }
+
+    await addPaymentMutation.mutateAsync({
       id: order.dbId,
-      payload,
+      payload: {
+        payment_status: payload.payment_status,
+        payment_percentage: payload.payment_percentage,
+        paid_at: payload.paid_at,
+        note: payload.installment_note,
+      },
     });
   };
 
   const markRefunded = async (refundData: RefundData) => {
     if (!refundData.orderId) return null;
-    const order = orderMap.get(refundData.orderId);
+    const order = orderMapByDbId.get(refundData.orderId);
     if (!order) return null;
 
     const selectedItems = refundData.items.filter(
@@ -244,6 +300,7 @@ export function useOrders(params?: SaleOrderQueryParams) {
   return {
     orders,
     orderMap,
+    orderMapByDbId,
     pagination: ordersQuery.data?.data
       ? {
           currentPage: Number(ordersQuery.data.data.current_page ?? 1),

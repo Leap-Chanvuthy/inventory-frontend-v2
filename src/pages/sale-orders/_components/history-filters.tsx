@@ -1,4 +1,4 @@
-import { CalendarDays, Download, X } from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatDate } from "@/utils/date-format";
 import type { DateRange, TopTab } from "../types";
 import { SearchInput } from "./search-input";
 
@@ -19,7 +20,6 @@ interface HistoryFiltersProps {
   onSortChange: (value: string) => void;
   onOpenDateFilter: () => void;
   onClearDateFilter: () => void;
-  onDownloadReport: () => void;
 }
 
 function getDateRangeLabel(dateRange: DateRange) {
@@ -27,7 +27,7 @@ function getDateRangeLabel(dateRange: DateRange) {
     return "Date Range";
   }
 
-  return `${new Date(dateRange.start).toLocaleDateString()} - ${new Date(dateRange.end).toLocaleDateString()}`;
+  return `${formatDate(dateRange.start)} - ${formatDate(dateRange.end)}`;
 }
 
 export function HistoryFilters({
@@ -39,7 +39,6 @@ export function HistoryFilters({
   onSortChange,
   onOpenDateFilter,
   onClearDateFilter,
-  onDownloadReport,
 }: HistoryFiltersProps) {
   const isHistory = mode === "HISTORY";
 
@@ -91,11 +90,6 @@ export function HistoryFilters({
               <X className="h-3.5 w-3.5" />
             </Button>
           )}
-
-          <Button type="button" size="sm" variant="secondary" onClick={onDownloadReport} className="h-9 px-3">
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            Download
-          </Button>
         </>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { CircleAlert, User } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Customer, Order } from "../types";
 import { formatDate } from "@/utils/date-format";
 
@@ -17,7 +18,13 @@ export function CustomerInfoCard({ order, customer }: CustomerInfoCardProps) {
           </div>
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Customer</p>
-            <p className="text-sm font-semibold text-foreground">{customer?.name ?? order.customerId}</p>
+            {order.customerId ? (
+              <Link to={`/customer/view/${order.customerId}`} className="text-sm font-semibold text-primary hover:underline">
+                {customer?.name ?? order.customerId}
+              </Link>
+            ) : (
+              <p className="text-sm font-semibold text-foreground">{customer?.name ?? order.customerId}</p>
+            )}
           </div>
         </div>
 

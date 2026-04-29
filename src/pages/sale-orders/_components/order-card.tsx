@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 import type { Customer, Order, OrderStatus } from "../types";
-import { calculateOrderTotals, convertUsdToRiel, formatCurrency } from "../utils/order-utils";
+import { calculateOrderTotals, convertUsdToRiel, formatCurrency, formatDate } from "../utils/order-utils";
 import { OrderStatusBadge } from "./order-status-badge";
 
 interface OrderCardProps {
@@ -22,7 +22,7 @@ const STATUS_STRIP: Record<OrderStatus, string> = {
 
 const PAYMENT_BADGE_STYLE: Record<NonNullable<Order["paymentStatus"]>, string> = {
   PAID: "border-green-500/20 bg-green-500/10 text-green-700",
-  UNPAID: "border-red-500/20 bg-red-500/10 text-red-700",
+  INSTALLMENT: "border-amber-500/30 bg-amber-500/15 text-amber-700",
   DEBT: "border-amber-500/20 bg-amber-500/10 text-amber-700",
 };
 
@@ -33,6 +33,11 @@ function getCustomerInitial(customerName: string) {
 export function OrderCard({ order, customer, isActive, onClick, customers }: OrderCardProps) {
   const { total } = calculateOrderTotals(order, customers);
   const itemCount = order.items.reduce((sum, item) => sum + item.qty, 0);
+  const refundedItemCount = order.items.filter(item => Number(item.refundQty ?? 0) > 0).length;
+  const isFullyRefundedByQty =
+    order.items.length > 0 &&
+    order.items.every(item => Number(item.refundQty ?? 0) + 0.0001 >= Number(item.qty ?? 0));
+  const hasRefunds = Number(order.totalRefundedAmountInUsd ?? 0) > 0 || refundedItemCount > 0;
   const customerName = order.customerName ?? customer?.name ?? order.customerId;
   const customerPhone = order.customerPhone ?? customer?.phone;
   const totalRiel = order.grandTotalInRiel > 0 ? order.grandTotalInRiel : convertUsdToRiel(total);
@@ -79,16 +84,17 @@ export function OrderCard({ order, customer, isActive, onClick, customers }: Ord
       <div className="mt-2 flex items-end justify-between gap-3 pl-1">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">{itemCount} items</p>
-          {Number(order.totalRefundedAmountInUsd ?? 0) > 0 && (
-            <p className="text-[10px] text-orange-700">
-              Refunded ${Number(order.totalRefundedAmountInUsd ?? 0).toFixed(2)}
-            </p>
+          {hasRefunds && (
+            <div className="space-y-1">
+              <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+                {isFullyRefundedByQty ? "Refunded" : "Partially Refunded"}
+              </span>
+              <p className="text-[10px] text-amber-700">{refundedItemCount} items refunded</p>
+            </div>
           )}
           <p className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
             <Clock className="h-3 w-3" />
-            {new Date(order.createdAt).toLocaleDateString([], { month: "short", day: "numeric" })}
-            {" · "}
-            {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            {formatDate(order.createdAt, true)}
           </p>
         </div>
 

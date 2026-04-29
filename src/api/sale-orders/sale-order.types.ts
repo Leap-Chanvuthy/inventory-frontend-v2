@@ -6,7 +6,7 @@ export type SaleOrderStatus =
   | "CANCELLED"
   | "REFUNDED";
 
-export type PaymentStatus = "PAID" | "UNPAID" | "DEBT";
+export type PaymentStatus = "PAID" | "INSTALLMENT" | "DEBT";
 
 export interface SaleOrderCustomerCategory {
   id?: number;
@@ -46,6 +46,33 @@ export interface SaleOrderItemRecord {
   product?: SaleOrderProduct;
 }
 
+export interface SaleOrderInstallmentRecord {
+  id: number;
+  sale_order_id: number;
+  percentage: number;
+  cumulative_percentage: number;
+  amount_usd: number;
+  amount_riel: number;
+  paid_at: string;
+  note?: string | null;
+  created_by?: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaleOrderStatusHistoryRecord {
+  id: number;
+  sale_order_id: number;
+  from_status?: string | null;
+  to_status: string;
+  note?: string | null;
+  changed_at: string;
+  changed_by?: number | null;
+  metadata?: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface SaleOrderRecord {
   id: number;
   order_no: string;
@@ -69,6 +96,7 @@ export interface SaleOrderRecord {
   discount_amount: number;
   paid_amount_in_usd?: number;
   paid_amount_in_riel?: number;
+  paid_percentage?: number;
   total_refunded_amount_in_usd?: number;
   total_refunded_amount_in_riel?: number;
   remaining_balance_in_usd?: number;
@@ -77,10 +105,13 @@ export interface SaleOrderRecord {
   updated_at: string;
   order_items_count?: number;
   refunds_count?: number;
+  installments_count?: number;
   order_items?: SaleOrderItemRecord[];
   orderItems?: SaleOrderItemRecord[];
   customer?: SaleOrderCustomer | null;
   refunds?: SaleOrderRefundRecord[];
+  installments?: SaleOrderInstallmentRecord[];
+  status_histories?: SaleOrderStatusHistoryRecord[];
 }
 
 export interface SaleOrderPaginatedData {
@@ -132,8 +163,9 @@ export interface CreateSaleOrderPayload {
   order_date: string;
   return_window_days?: number;
   payment_status?: PaymentStatus;
-  paid_amount_in_usd?: number;
-  paid_amount_in_riel?: number;
+  payment_percentage?: number;
+  paid_at?: string;
+  installment_note?: string;
   note?: string;
   tax_percentage?: number;
   discount_type?: "AUTO" | "MANUAL";
@@ -148,8 +180,9 @@ export interface UpdateSaleOrderPayload {
   order_date?: string;
   return_window_days?: number;
   payment_status?: PaymentStatus;
-  paid_amount_in_usd?: number;
-  paid_amount_in_riel?: number;
+  payment_percentage?: number;
+  paid_at?: string;
+  installment_note?: string;
   note?: string;
   tax_percentage?: number;
   discount_type?: "AUTO" | "MANUAL";
@@ -162,8 +195,13 @@ export interface UpdateSaleOrderPayload {
 export interface UpdateSaleOrderStatusPayload {
   order_status: Exclude<SaleOrderStatus, "REFUNDED">;
   payment_status?: PaymentStatus;
-  paid_amount_in_usd?: number;
-  paid_amount_in_riel?: number;
+}
+
+export interface AddSaleOrderPaymentPayload {
+  payment_status: PaymentStatus;
+  payment_percentage: number;
+  paid_at?: string;
+  note?: string;
 }
 
 export interface RefundSaleOrderLinePayload {
@@ -229,6 +267,8 @@ export interface SaleOrderRefundRecord {
   created_at: string;
   updated_at: string;
   items?: SaleOrderRefundItemRecord[];
+  sale_order?: SaleOrderRecord;
+  saleOrder?: SaleOrderRecord;
 }
 
 export interface SaleOrderRefundListResponse {
@@ -237,6 +277,27 @@ export interface SaleOrderRefundListResponse {
   data: {
     sale_order_id: number;
     refunds: SaleOrderRefundRecord[];
+  };
+}
+
+export interface SaleOrderRefundRecordQueryParams {
+  page?: number;
+  per_page?: number;
+  search?: string;
+  date_from?: string;
+  date_to?: string;
+  refund_type?: string;
+}
+
+export interface SaleOrderRefundRecordListResponse {
+  status: boolean;
+  message: string;
+  data: {
+    current_page: number;
+    data: SaleOrderRefundRecord[];
+    last_page: number;
+    per_page: number;
+    total: number;
   };
 }
 
@@ -254,14 +315,56 @@ export interface SaleOrderValidationErrors {
   errors?: Record<string, string[]> | Array<Record<string, unknown>>;
 }
 
+export interface SaleOrderTrendPoint {
+  period: string;
+  total_sales_usd: number;
+  total_sales_riel: number;
+}
+
 export interface SaleOrderStatistics {
+  total_orders: number;
   total_draft: number;
   total_processing: number;
   total_on_hold: number;
   total_completed: number;
+  total_cancelled: number;
+  total_refunded_records: number;
   total_refunded: number;
+  total_refunded_usd: number;
+  total_refunded_riel: number;
+  total_discount_amount: number;
+  gross_sales_usd: number;
+  gross_sales_riel: number;
+  total_sales_usd: number;
+  total_sales_riel: number;
+  net_revenue_usd: number;
+  net_revenue_riel: number;
+  average_order_value_usd: number;
+  average_order_value_riel: number;
   total_earning_usd: number;
   total_earning_riel: number;
+  group_by: "day" | "week" | "month" | "year";
+  top_customers: Array<{
+    customer_id: number | null;
+    customer_name: string;
+    orders_count: number;
+    total_sales_usd: number;
+    total_sales_riel: number;
+  }>;
+  top_products: Array<{
+    product_id: number;
+    product_name: string;
+    quantity_sold: number;
+    total_sales_usd: number;
+    total_sales_riel: number;
+  }>;
+  filters?: {
+    date_from?: string | null;
+    date_to?: string | null;
+    customer_id?: number | null;
+    status?: string[];
+  };
+  sales_trend: SaleOrderTrendPoint[];
 }
 
 export interface SaleOrderStatisticsResponse {

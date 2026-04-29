@@ -16,7 +16,12 @@ import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
 interface UpdateCustomerCategoryFormProps {
   categoryId?: number;
-  initialData?: { category_name: string; label_color: string; description: string };
+  initialData?: {
+    category_name: string;
+    label_color: string;
+    description: string;
+    discount_percentage?: string;
+  };
   embedded?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -48,17 +53,24 @@ export const UpdateCustomerCategoryForm = ({
     category_name: "",
     label_color: "#6366F1",
     description: "",
+    discount_percentage: "0",
   });
 
   //  data is fetched
   useEffect(() => {
     if (initialData) {
-      setForm(initialData);
+      setForm({
+        category_name: initialData.category_name,
+        label_color: initialData.label_color,
+        description: initialData.description,
+        discount_percentage: initialData.discount_percentage ?? "0",
+      });
     } else if (categoryData?.data) {
       setForm({
         category_name: categoryData.data.category_name,
         label_color: categoryData.data.label_color,
         description: categoryData.data.description,
+        discount_percentage: String(categoryData.data.discount_percentage ?? 0),
       });
     }
   }, [categoryData, initialData]);
@@ -87,7 +99,12 @@ export const UpdateCustomerCategoryForm = ({
 
     const action = submitter?.value;
 
-    categoryMutation.mutate(form, {
+    categoryMutation.mutate(
+      {
+        ...form,
+        discount_percentage: Number(form.discount_percentage),
+      },
+      {
       onSuccess: () => {
         if (onSuccess) {
           onSuccess();
@@ -154,6 +171,17 @@ export const UpdateCustomerCategoryForm = ({
               value={form.description}
               error={fieldErrors?.description?.[0]}
               onChange={handleTextAreaChange}
+            />
+            <TextInput
+              id="discount_percentage"
+              type="number"
+              label="Discount Percentage (%)"
+              placeholder="Enter discount percentage"
+              value={form.discount_percentage}
+              error={fieldErrors?.discount_percentage?.[0]}
+              required={true}
+              onChange={handleChange}
+              isNumberOnly={true}
             />
             <ColorPickerInput
               id="label_color"

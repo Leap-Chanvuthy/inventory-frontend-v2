@@ -1,12 +1,13 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
+  getSaleOrderRefundRecords,
   getSaleOrderById,
   getSaleOrderRefunds,
   getSaleOrderStatistics,
   getSaleOrderStockAvailability,
   getSaleOrders,
 } from "./sale-order.api";
-import { SaleOrderQueryParams } from "./sale-order.types";
+import { SaleOrderQueryParams, SaleOrderRefundRecordQueryParams } from "./sale-order.types";
 
 export const useSaleOrders = (params?: SaleOrderQueryParams) => {
   return useQuery({
@@ -32,6 +33,15 @@ export const useSaleOrderRefunds = (id: number) => {
   });
 };
 
+export const useSaleOrderRefundRecords = (params?: SaleOrderRefundRecordQueryParams) => {
+  return useQuery({
+    queryKey: ["sale-order-refund-records", params],
+    queryFn: () => getSaleOrderRefundRecords(params),
+    placeholderData: keepPreviousData,
+    enabled: Boolean(params),
+  });
+};
+
 export const useSaleOrderStockAvailability = (productId: number) => {
   return useQuery({
     queryKey: ["sale-order-stock-availability", productId],
@@ -40,7 +50,13 @@ export const useSaleOrderStockAvailability = (productId: number) => {
   });
 };
 
-export const useSaleOrderStatistics = (params?: { date_from?: string; date_to?: string }) => {
+export const useSaleOrderStatistics = (params?: {
+  date_from?: string;
+  date_to?: string;
+  group_by?: "day" | "week" | "month" | "year";
+  customer_id?: number;
+  status?: string;
+}) => {
   return useQuery({
     queryKey: ["sale-order-statistics", params],
     queryFn: () => getSaleOrderStatistics(params),

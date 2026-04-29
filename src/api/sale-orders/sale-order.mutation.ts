@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
+  addSaleOrderPayment,
   createSaleOrder,
   deleteSaleOrder,
   refundSaleOrder,
@@ -8,6 +9,7 @@ import {
   updateSaleOrderStatus,
 } from "./sale-order.api";
 import {
+  AddSaleOrderPaymentPayload,
   CreateSaleOrderPayload,
   RefundSaleOrderPayload,
   UpdateSaleOrderPayload,
@@ -74,6 +76,22 @@ export const useRefundSaleOrder = () => {
     },
     onError: (error: unknown) => {
       showApiErrorToast(error, "Failed to process refund");
+    },
+  });
+};
+
+export const useAddSaleOrderPayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: AddSaleOrderPaymentPayload }) =>
+      addSaleOrderPayment(id, payload),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["sale-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["sale-order"] });
+      toast.success(response.message || "Installment recorded successfully");
+    },
+    onError: (error: unknown) => {
+      showApiErrorToast(error, "Failed to record installment");
     },
   });
 };

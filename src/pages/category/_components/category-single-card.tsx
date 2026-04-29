@@ -8,6 +8,7 @@ interface Category {
   category_name: string;
   label_color: string;
   description: string;
+  discount_percentage?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -69,6 +70,9 @@ const SingleCard = ({
           >
             {category.description}
           </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Discount: {Number(category.discount_percentage ?? 0)}%
+          </p>
         </div>
       ) : (
         <Link to={`${viewRoute}/${category.id}`} className="block cursor-pointer">
@@ -95,6 +99,9 @@ const SingleCard = ({
             }
           >
             {category.description}
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Discount: {Number(category.discount_percentage ?? 0)}%
           </p>
         </Link>
       )}

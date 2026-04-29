@@ -5,11 +5,11 @@ import { OrderCard } from "./order-card";
 interface OrderListProps {
   orders: Order[];
   customers: Customer[];
-  selectedOrderId: string | null;
-  onSelectOrder: (orderId: string) => void;
+  selectedOrderDbId: number | null;
+  onSelectOrder: (order: Order) => void;
 }
 
-export function OrderList({ orders, customers, selectedOrderId, onSelectOrder }: OrderListProps) {
+export function OrderList({ orders, customers, selectedOrderDbId, onSelectOrder }: OrderListProps) {
   return (
     <div className="h-full overflow-y-auto bg-muted/20 px-2 py-2">
       <div className="space-y-1.5">
@@ -18,8 +18,8 @@ export function OrderList({ orders, customers, selectedOrderId, onSelectOrder }:
             key={order.id}
             order={order}
             customer={customers.find(customer => customer.id === order.customerId)}
-            isActive={selectedOrderId === order.id}
-            onClick={() => onSelectOrder(order.id)}
+            isActive={selectedOrderDbId === order.dbId}
+            onClick={() => onSelectOrder(order)}
             customers={customers}
           />
         ))}

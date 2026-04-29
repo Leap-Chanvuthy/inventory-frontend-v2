@@ -6,6 +6,7 @@ import type {
   OrderTotals,
 } from "../types";
 import { RIEL_RATE } from "../constants";
+import { formatDate as formatAppDate } from "@/utils/date-format";
 
 export function calculateOrderTotals(
   data: Pick<Order, "customerId" | "discount" | "tax" | "useCategoryDiscount" | "items"> | OrderFormState | null,
@@ -53,20 +54,7 @@ export function formatCurrency(value: number, currency: "USD" | "KHR" = "USD"): 
 }
 
 export function formatDate(date: string | Date, withTime = false): string {
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return "-";
-
-  if (!withTime) {
-    return d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" });
-  }
-
-  return d.toLocaleString([], {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatAppDate(date, withTime ? "dd MMM yyyy, hh:mm a" : "dd MMM yyyy");
 }
 
 export function filterOrdersByDate(orders: Order[], dateRange: DateRange): Order[] {

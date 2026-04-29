@@ -6,7 +6,10 @@ import { ACTIVE_SUB_TABS, HISTORY_SUB_TABS } from "../constants";
 import type { DateRange, OrderStatus, TopTab } from "../types";
 
 function parseTopTab(value: string | null): TopTab {
-  return value?.toLowerCase() === "history" ? "HISTORY" : "ACTIVE";
+  const normalized = (value || "").toLowerCase();
+  if (normalized === "history") return "HISTORY";
+  if (normalized === "statistic" || normalized === "statistics") return "STATISTIC";
+  return "ACTIVE";
 }
 
 function parseSubTab(value: string | null): OrderStatus | undefined {
@@ -35,19 +38,19 @@ export function useOrderFilters() {
   });
 
   const activeTopTab = useMemo(
-    () => parseTopTab(searchParams.get("tab")),
+    () => parseTopTab(searchParams.get("sale_order_tab") || searchParams.get("tab")),
     [searchParams],
   );
 
   const activeSubTabs = activeTopTab === "ACTIVE" ? ACTIVE_SUB_TABS : HISTORY_SUB_TABS;
   const defaultSubTab = activeTopTab === "ACTIVE" ? "DRAFT" : "COMPLETED";
-  const rawSubTab = parseSubTab(searchParams.get("subtab"));
+  const rawSubTab = parseSubTab(searchParams.get("sale_order_subtab") || searchParams.get("subtab"));
   const activeSubTab = (rawSubTab && activeSubTabs.includes(rawSubTab) ? rawSubTab : defaultSubTab) as OrderStatus;
 
   const dateRange = useMemo<DateRange>(
     () => ({
-      start: searchParams.get("startDate") || "",
-      end: searchParams.get("endDate") || "",
+      start: searchParams.get("date_from") || searchParams.get("startDate") || "",
+      end: searchParams.get("date_to") || searchParams.get("endDate") || "",
     }),
     [searchParams],
   );
@@ -73,12 +76,26 @@ export function useOrderFilters() {
   );
 
   const handleTabChange = (topTab: TopTab, subTab?: OrderStatus) => {
+    setPage(1);
+
+    if (topTab === "STATISTIC") {
+      updateQueryParams({
+        sale_order_tab: "statistic",
+        sale_order_subtab: undefined,
+        sale_order_id: undefined,
+        sale_order_refund_id: undefined,
+        page: "1",
+      });
+      return;
+    }
+
     const nextDefaultSubTab: OrderStatus = topTab === "ACTIVE" ? "DRAFT" : "COMPLETED";
     const nextSubTab = subTab ?? nextDefaultSubTab;
-    setPage(1);
     updateQueryParams({
-      tab: topTab.toLowerCase(),
-      subtab: nextSubTab.toLowerCase(),
+      sale_order_tab: topTab.toLowerCase(),
+      sale_order_subtab: nextSubTab.toLowerCase(),
+      sale_order_id: undefined,
+      sale_order_refund_id: undefined,
       page: "1",
     });
   };
@@ -86,8 +103,8 @@ export function useOrderFilters() {
   const setDateRange = (nextDateRange: DateRange) => {
     setPage(1);
     updateQueryParams({
-      startDate: nextDateRange.start || undefined,
-      endDate: nextDateRange.end || undefined,
+      date_from: nextDateRange.start || undefined,
+      date_to: nextDateRange.end || undefined,
       page: "1",
     });
   };
@@ -108,7 +125,7 @@ export function useOrderFilters() {
       per_page: perPage,
       sort: sort || "-created_at",
       "filter[search]": search || undefined,
-      "filter[order_status]": activeSubTab,
+      "filter[order_status]": activeTopTab === "STATISTIC" ? undefined : activeSubTab,
     };
 
     if (dateRange.start) {
@@ -120,7 +137,7 @@ export function useOrderFilters() {
     }
 
     return params;
-  }, [activeSubTab, dateRange.end, dateRange.start, page, perPage, search, sort]);
+  }, [activeSubTab, activeTopTab, dateRange.end, dateRange.start, page, perPage, search, sort]);
 
   return {
     activeTopTab,
@@ -137,6 +154,7 @@ export function useOrderFilters() {
     setDateRange,
     setSortValue,
     handleTabChange,
+    updateQueryParams,
     queryParams,
   };
 }

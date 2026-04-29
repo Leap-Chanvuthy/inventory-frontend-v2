@@ -131,6 +131,13 @@ export const ViewCustomerCategoryForm = ({
                 <div>
                   <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
                     <IconBadge label="description" variant="info" />
+                    Discount Percentage
+                  </p>
+                  <p className="font-medium mb-4">
+                    {Number(category.discount_percentage ?? 0)}%
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
+                    <IconBadge label="description" variant="info" />
                     Description
                   </p>
                   <p className="font-medium whitespace-pre-wrap">

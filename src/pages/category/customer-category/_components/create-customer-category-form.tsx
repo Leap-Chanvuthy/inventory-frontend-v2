@@ -30,6 +30,7 @@ export const CreateCustomerCategoryForm = ({
     category_name: "",
     label_color: "#6366F1",
     description: "",
+    discount_percentage: "0",
   };
 
   const [form, setForm] = useState(initialForm);
@@ -58,7 +59,12 @@ export const CreateCustomerCategoryForm = ({
 
     const action = submitter?.value;
 
-    categoryMutation.mutate(form, {
+    categoryMutation.mutate(
+      {
+        ...form,
+        discount_percentage: Number(form.discount_percentage),
+      },
+      {
       onSuccess: () => {
         if (onSuccess) {
           onSuccess();
@@ -113,6 +119,17 @@ export const CreateCustomerCategoryForm = ({
               value={form.description}
               error={fieldErrors?.description?.[0]}
               onChange={handleTextAreaChange}
+            />
+            <TextInput
+              id="discount_percentage"
+              type="number"
+              label="Discount Percentage (%)"
+              placeholder="Enter discount percentage"
+              value={form.discount_percentage}
+              error={fieldErrors?.discount_percentage?.[0]}
+              required={true}
+              onChange={handleChange}
+              isNumberOnly={true}
             />
             <ColorPickerInput
               id="label_color"
