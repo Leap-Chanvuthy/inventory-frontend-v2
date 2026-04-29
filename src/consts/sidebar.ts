@@ -2,9 +2,9 @@ import {
   Home,
   Calendar,
   Search,
-  Settings,
+  // Settings,
   User,
-  Boxes,
+  // Boxes,
   Warehouse,
   HelpCircle,
   Truck,
@@ -100,13 +100,14 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
         isQuickMenu: true,
       },
-      {
-        title: "Categories",
-        url: "/categories",
-        icon: Boxes,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
-        isQuickMenu: true,
-      },
+      // {
+      //   title: "Categories",
+      //   url: "/categories",
+      //   icon: Boxes,
+      //   roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+      //   isQuickMenu: false,
+      //   isLocked: true,
+      // },
       {
         title: "Unit of Measurement",
         url: "/unit-of-measurement",
@@ -151,13 +152,14 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
   {
     label: "Settings",
     items: [
-      {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
-        roles: [ROLES.ADMIN],
-        isLocked: true,
-      },
+      // {
+      //   title: "Settings",
+      //   url: "/settings",
+      //   icon: Settings,
+      //   roles: [ROLES.ADMIN],
+      //   isLocked: true,
+      //   isQuickMenu: false,
+      // },
       {
         title: "Company",
         url: "/company",

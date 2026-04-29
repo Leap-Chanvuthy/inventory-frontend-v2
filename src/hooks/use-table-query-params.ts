@@ -75,23 +75,47 @@ export function useTableQueryParams(config?: TableQueryConfig) {
 
   // Sync state -> URL while preserving unrelated params
   useEffect(() => {
+    const currentParams = new URLSearchParams(searchParamsString);
     const newParams = new URLSearchParams(searchParamsString);
 
-    newParams.delete(searchParam);
-    newParams.delete(pageParam);
-    newParams.delete(perPageParam);
-    newParams.delete(sortParam);
-    newParams.delete(filterParam);
+    const setOrDelete = (key: string, value?: string) => {
+      if (!value) {
+        if (newParams.has(key)) newParams.delete(key);
+        return;
+      }
 
-    if (search) newParams.set(searchParam, search);
-    if (page > 1) newParams.set(pageParam, String(page));
-    if (perPage && perPage !== (config?.defaultPerPage || 10))
-      newParams.set(perPageParam, String(perPage));
-    if (sort) newParams.set(sortParam, sort);
-    if (filter) newParams.set(filterParam, filter);
+      if (newParams.get(key) !== value) {
+        newParams.set(key, value);
+      }
+    };
 
-    const nextParamsString = newParams.toString();
-    if (nextParamsString !== searchParamsString) {
+    setOrDelete(searchParam, search || undefined);
+    setOrDelete(pageParam, page > 1 ? String(page) : undefined);
+    setOrDelete(
+      perPageParam,
+      perPage && perPage !== (config?.defaultPerPage || 10)
+        ? String(perPage)
+        : undefined,
+    );
+    setOrDelete(sortParam, sort || undefined);
+    setOrDelete(filterParam, filter || undefined);
+
+    const normalizeEntries = (params: URLSearchParams) =>
+      Array.from(params.entries()).sort(([aKey, aVal], [bKey, bVal]) =>
+        aKey === bKey ? aVal.localeCompare(bVal) : aKey.localeCompare(bKey),
+      );
+
+    const currentEntries = normalizeEntries(currentParams);
+    const nextEntries = normalizeEntries(newParams);
+
+    const entriesChanged =
+      currentEntries.length !== nextEntries.length ||
+      currentEntries.some(
+        ([key, val], index) =>
+          key !== nextEntries[index][0] || val !== nextEntries[index][1],
+      );
+
+    if (entriesChanged) {
       setSearchParams(newParams, { replace: true });
     }
   }, [

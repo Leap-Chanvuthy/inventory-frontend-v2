@@ -14,9 +14,23 @@ import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 
-export const UpdateCustomerCategoryForm = () => {
+interface UpdateCustomerCategoryFormProps {
+  categoryId?: number;
+  initialData?: { category_name: string; label_color: string; description: string };
+  embedded?: boolean;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+export const UpdateCustomerCategoryForm = ({
+  categoryId: categoryIdProp,
+  initialData,
+  embedded = false,
+  onSuccess,
+  onCancel,
+}: UpdateCustomerCategoryFormProps) => {
   const { id } = useParams<{ id: string }>();
-  const categoryId = Number(id);
+  const categoryId = categoryIdProp ?? Number(id);
   const navigate = useNavigate();
   const {
     data: categoryData,
@@ -38,14 +52,16 @@ export const UpdateCustomerCategoryForm = () => {
 
   //  data is fetched
   useEffect(() => {
-    if (categoryData?.data) {
+    if (initialData) {
+      setForm(initialData);
+    } else if (categoryData?.data) {
       setForm({
         category_name: categoryData.data.category_name,
         label_color: categoryData.data.label_color,
         description: categoryData.data.description,
       });
     }
-  }, [categoryData]);
+  }, [categoryData, initialData]);
 
   /* ---------- Handlers ---------- */
 
@@ -73,6 +89,10 @@ export const UpdateCustomerCategoryForm = () => {
 
     categoryMutation.mutate(form, {
       onSuccess: () => {
+        if (onSuccess) {
+          onSuccess();
+          return;
+        }
         if (action === "save_and_close") {
           navigate("/categories?tab=customer-category");
         }
@@ -81,19 +101,27 @@ export const UpdateCustomerCategoryForm = () => {
     });
   };
 
-  if (isLoading) return <DataCardLoading text="Loading category data..." />;
-  if (isError && !isFetching)
-    return (
-      <UnexpectedError
-        kind="fetch"
-        homeTo="/categories?tab=customer-category"
-      />
-    );
-  if (!categoryData?.data)
-    return <DataCardEmpty emptyText="Category not found." />;
+  if (!embedded) {
+    if (isLoading) return <DataCardLoading text="Loading category data..." />;
+    if (isError && !isFetching)
+      return (
+        <UnexpectedError
+          kind="fetch"
+          homeTo="/categories?tab=customer-category"
+        />
+      );
+    if (!categoryData?.data)
+      return <DataCardEmpty emptyText="Category not found." />;
+  }
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+    <div
+      className={
+        embedded
+          ? "animate-in slide-in-from-right-8 duration-300"
+          : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"
+      }
+    >
       <Text.TitleMedium className="mb-2">
         Update Customer Category
       </Text.TitleMedium>
@@ -137,7 +165,10 @@ export const UpdateCustomerCategoryForm = () => {
           </CardContent>
         </Card>
 
-        <FormFooterActions isSubmitting={categoryMutation.isPending} />
+        <FormFooterActions
+          isSubmitting={categoryMutation.isPending}
+          onCancel={onCancel}
+        />
       </form>
     </div>
   );

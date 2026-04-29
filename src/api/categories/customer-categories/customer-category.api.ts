@@ -17,6 +17,16 @@ export const getCustomerCategories = async (
   return response.data;
 };
 
+
+export const getTrashedCustomerCategories = async (params?: CustomerCategoryQueryParams): Promise<CustomerCategoryResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/customer-categories/trashed`, {
+    params,
+  });
+  return response.data;
+}
+
+
+
 export const createCustomerCategory = async (
   data: CreateCustomerCategoryRequest
 ): Promise<{ status: boolean; message: string; data: CustomerCategory }> => {
@@ -51,3 +61,8 @@ export const updateCustomerCategory = async (
 export const deleteCustomerCategory = async (id: string | number): Promise<void> => {
   await apiClient.delete(`${BASE_API_URL}/customer-categories/${id}`);
 };
+
+
+export const restoreCustomerCategory = async (id: string | number): Promise<void> => {
+  await apiClient.patch(`${BASE_API_URL}/customer-categories/${id}/restore`);
+}

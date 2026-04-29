@@ -12,8 +12,14 @@ import {
   CustomerCard,
 } from "../utils/table-feature";
 import UnexpectedError from "@/components/reusable/partials/error";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
-export function CustomerList() {
+interface CustomerListProps {
+  embedded?: boolean;
+}
+
+export function CustomerList({ embedded = false }: CustomerListProps) {
   const {
     setPage,
     setSearch,
@@ -26,9 +32,21 @@ export function CustomerList() {
     apiParams,
   } = useTableQueryParams();
 
+  const [searchParams] = useSearchParams();
+  const selectedCategoryId = searchParams.get("category_id")
+    ? Number(searchParams.get("category_id"))
+    : undefined;
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategoryId, setPage]);
+
   const { data, isLoading, isFetching, isError } = useCustomers({
     ...apiParams,
     "filter[customer_status]": filter,
+    "filter[customer_category_id]": selectedCategoryId
+      ? String(selectedCategoryId)
+      : undefined,
   });
 
   if (isError && !isFetching) {
@@ -36,8 +54,12 @@ export function CustomerList() {
   }
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-8 bg-background">
-      <div className="mx-auto max-w-[1600px]">
+    <div
+      className={
+        embedded ? "w-full" : "min-h-screen w-full p-4 sm:p-8 bg-background"
+      }
+    >
+      <div className={embedded ? "w-full" : "mx-auto max-w-[1600px]"}>
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search customer..."

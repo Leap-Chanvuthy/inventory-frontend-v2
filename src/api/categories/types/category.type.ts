@@ -7,6 +7,7 @@ export interface BaseCategory {
   deleted_at?: string | null;
   raw_materials_count?: number;
   products_count?: number;
+  customers_count?: number;
   created_at: string;
   updated_at: string;
 }

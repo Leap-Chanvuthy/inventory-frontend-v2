@@ -100,7 +100,7 @@ export interface CustomerQueryParams {
   "filter[id]"?: number;
   "filter[search]"?: string;
   "filter[customer_status]"?: string;
-  "filter[customer_category]"?: string;
+  "filter[customer_category_id]"?: string;
   sort?: string;
 }
 
