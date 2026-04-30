@@ -1,4 +1,16 @@
-import { ArrowLeft, CalendarDays, Download, LineChart as LineChartIcon, TrendingUp, X } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  CheckCircle2,
+  Download,
+  FileText,
+  LineChart as LineChartIcon,
+  PauseCircle,
+  RefreshCw,
+  TrendingUp,
+  X,
+  XCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -20,6 +32,8 @@ import {
   YAxis,
 } from "recharts";
 import { formatDate } from "@/utils/date-format";
+import { StatsCard } from "./stats-card";
+import { Text } from "@/components/ui/text/app-text";
 
 interface StatisticsPanelProps {
   stats?: SaleOrderStatistics;
@@ -183,31 +197,66 @@ export function StatisticsPanel({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-        <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Gross Sales</p>
-          <p className="mt-0.5 font-semibold text-foreground">{money(Number(safe.gross_sales_usd ?? 0))}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Net Revenue</p>
-          <p className="mt-0.5 font-semibold text-emerald-700">{money(Number(safe.net_revenue_usd ?? 0))}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total Refunded</p>
-          <p className="mt-0.5 font-semibold text-amber-700">{money(Number(safe.total_refunded_usd ?? 0))}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Avg Order Value</p>
-          <p className="mt-0.5 font-semibold text-blue-700">{money(Number(safe.average_order_value_usd ?? 0))}</p>
+      <div>
+      <Text.Small className="mb-2 text-primary">
+          Sales Summary
+        </Text.Small>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Gross Sales</p>
+            <p className="mt-0.5 font-semibold text-foreground">{money(Number(safe.gross_sales_usd ?? 0))}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Net Revenue</p>
+            <p className="mt-0.5 font-semibold text-emerald-700">{money(Number(safe.net_revenue_usd ?? 0))}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total Refunded</p>
+            <p className="mt-0.5 font-semibold text-amber-700">{money(Number(safe.total_refunded_usd ?? 0))}</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-2.5 text-xs">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Avg Order Value</p>
+            <p className="mt-0.5 font-semibold text-blue-700">{money(Number(safe.average_order_value_usd ?? 0))}</p>
+          </div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-5">
-        <div className="rounded-md border border-border bg-card p-2 text-xs">Draft: {Number(safe.total_draft ?? 0)}</div>
-        <div className="rounded-md border border-border bg-card p-2 text-xs">Processing: {Number(safe.total_processing ?? 0)}</div>
-        <div className="rounded-md border border-border bg-card p-2 text-xs">On Hold: {Number(safe.total_on_hold ?? 0)}</div>
-        <div className="rounded-md border border-border bg-card p-2 text-xs">Completed: {Number(safe.total_completed ?? 0)}</div>
-        <div className="rounded-md border border-border bg-card p-2 text-xs">Cancelled: {Number(safe.total_cancelled ?? 0)}</div>
+      <div>
+        <Text.Small className="mb-2 mt-4 text-primary">
+          Order Status Breakdown
+        </Text.Small>
+        <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-5">
+          <StatsCard
+            label="Draft"
+            value={Number(safe.total_draft ?? 0)}
+            icon={FileText}
+            tone="gray"
+          />
+          <StatsCard
+            label="Processing"
+            value={Number(safe.total_processing ?? 0)}
+            icon={RefreshCw}
+            tone="blue"
+          />
+          <StatsCard
+            label="On Hold"
+            value={Number(safe.total_on_hold ?? 0)}
+            icon={PauseCircle}
+            tone="yellow"
+          />
+          <StatsCard
+            label="Completed"
+            value={Number(safe.total_completed ?? 0)}
+            icon={CheckCircle2}
+            tone="green"
+          />
+          <StatsCard
+            label="Cancelled"
+            value={Number(safe.total_cancelled ?? 0)}
+            icon={XCircle}
+            tone="red"
+          />
+        </div>
       </div>
 
       <div className="mt-3 rounded-lg border border-border bg-card p-3">
