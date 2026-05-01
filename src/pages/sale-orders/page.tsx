@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
 import { toast } from "sonner";
-import { downloadSaleOrderStatisticsReport } from "@/api/sale-orders/sale-order.api";
+import { downloadSaleOrderReport, downloadSaleOrderStatisticsReport } from "@/api/sale-orders/sale-order.api";
 import type { PaymentStatus } from "@/api/sale-orders/sale-order.types";
 import { useSaleOrderRefundRecords, useSaleOrderStatistics, useSingleSaleOrder } from "@/api/sale-orders/sale-order.query";
 import { useCustomers } from "@/api/customers/customer.query";
@@ -27,6 +27,7 @@ import { useOrderForm } from "./hooks/use-order-form";
 import { mapSaleOrderRecord, useOrders } from "./hooks/use-orders";
 import { useRefundHandler } from "./hooks/use-refund-handler";
 import type { Order, OrderStatus, RefundRecordListItem, TopTab } from "./types";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 
 type ViewMode = "empty" | "view" | "form";
 
@@ -109,7 +110,7 @@ export default function SaleOrdersPage() {
   const isRefundedTab = activeTopTab === "HISTORY" && activeSubTab === "REFUNDED";
   const isStatisticTab = activeTopTab === "STATISTIC";
 
-  const { orders, orderMapByDbId, pagination, saveOrder, updateStatus, updatePayment, markRefunded, isFetching } =
+  const { orders, orderMapByDbId, pagination, saveOrder, updateStatus, updatePayment, updateLatestInstallment, markRefunded, isLoading: isOrdersLoading, isFetching } =
     useOrders(queryParams);
 
   const fallbackOrderQuery = useSingleSaleOrder(
@@ -168,6 +169,7 @@ export default function SaleOrdersPage() {
     customer_id: statsCustomerId,
     status: statsStatus,
   });
+  const statisticsData = statisticsQuery.data?.data;
 
   const {
     formState,
@@ -217,6 +219,15 @@ export default function SaleOrdersPage() {
     if (!selectedOrderDbId) return null;
     return orderMapByDbId.get(selectedOrderDbId) ?? fallbackOrder ?? null;
   }, [fallbackOrder, orderMapByDbId, selectedOrderDbId]);
+
+  const hasRefundListData = refundRecords.length > 0;
+  const isRefundListLoading = isRefundedTab && refundRecordsQuery.isLoading && !hasRefundListData;
+  const isDetailLoading =
+    viewMode === "view" &&
+    (
+      (Boolean(selectedOrderDbId) && (isOrdersLoading || fallbackOrderQuery.isLoading) && !currentViewOrder) ||
+      (Boolean(selectedRefundId) && isRefundListLoading && !selectedRefundRecord)
+    );
 
   useEffect(() => {
     if (viewMode === "form") return;
@@ -357,6 +368,21 @@ export default function SaleOrdersPage() {
     }
   };
 
+  const handleUpdateLatestInstallment = async (
+    orderId: number,
+    payload: {
+      payment_percentage: number;
+      note?: string;
+      paid_at?: string;
+    },
+  ) => {
+    try {
+      await updateLatestInstallment(orderId, payload);
+    } catch {
+      // Error toast handled by mutation hooks.
+    }
+  };
+
   const handleSelectOrder = (order: Order) => {
     setWorkspaceParams({
       sale_order_id: String(order.dbId),
@@ -431,8 +457,31 @@ export default function SaleOrdersPage() {
     }
   };
 
+  const handleDownloadInvoice = async (order: Order) => {
+    try {
+      const blob = await downloadSaleOrderReport(order.dbId);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const isQuote = order.status === "DRAFT";
+      const baseName = isQuote ? "quote" : "invoice";
+      link.download = `${baseName}-${order.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(`${isQuote ? "Quote" : "Invoice"} download started`);
+    } catch {
+      toast.error("Failed to download invoice");
+    }
+  };
+
   const detailContent =
-    isRefundedTab && viewMode === "view" ? (
+    isDetailLoading ? (
+      <div className="flex flex-1 items-center justify-center bg-muted/25 p-4">
+        <DataCardLoading text="Loading sale order data..." className="min-h-[260px]" />
+      </div>
+    ) : isRefundedTab && viewMode === "view" ? (
       <RefundRecordDetailsPanel record={selectedRefundRecord} onOpenOrder={handleOpenOrderFromRefund} />
     ) : viewMode === "view" && currentViewOrder ? (
       <OrderDetailsPanel
@@ -442,6 +491,8 @@ export default function SaleOrdersPage() {
         onEdit={handleOpenUpdateForm}
         onUpdateStatus={handleUpdateStatus}
         onUpdatePayment={handleUpdatePayment}
+        onUpdateLatestInstallment={handleUpdateLatestInstallment}
+        onDownloadInvoice={handleDownloadInvoice}
         onOpenRefund={handleOpenRefundModal}
         onViewRefundDetail={refundId => {
           updateQueryParams({
@@ -524,7 +575,8 @@ export default function SaleOrdersPage() {
           </div>
           <div className="min-h-0 flex-1 overflow-hidden">
             <StatisticsPanel
-              stats={statisticsQuery.data?.data}
+              stats={statisticsData}
+              isLoading={statisticsQuery.isLoading && !statisticsData}
               groupBy={statsGroupBy}
               customerId={statsCustomerId}
               status={statsStatus}
@@ -585,6 +637,7 @@ export default function SaleOrdersPage() {
               selectedRefundId={selectedRefundId}
               onSelectRefund={handleSelectRefundRecord}
               onOpenOrder={handleOpenOrderFromRefund}
+              isLoading={isRefundListLoading}
             />
           ) : (
             <OrderList
@@ -592,6 +645,7 @@ export default function SaleOrdersPage() {
               customers={customers}
               selectedOrderDbId={selectedOrderDbId}
               onSelectOrder={handleSelectOrder}
+              isLoading={isOrdersLoading && orders.length === 0}
             />
           )
         }

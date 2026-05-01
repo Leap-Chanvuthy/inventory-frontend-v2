@@ -5,6 +5,7 @@ import {
   createSaleOrder,
   deleteSaleOrder,
   refundSaleOrder,
+  updateSaleOrderLatestInstallment,
   updateSaleOrder,
   updateSaleOrderStatus,
 } from "./sale-order.api";
@@ -12,6 +13,7 @@ import {
   AddSaleOrderPaymentPayload,
   CreateSaleOrderPayload,
   RefundSaleOrderPayload,
+  UpdateLatestInstallmentPayload,
   UpdateSaleOrderPayload,
   UpdateSaleOrderStatusPayload,
 } from "./sale-order.types";
@@ -92,6 +94,22 @@ export const useAddSaleOrderPayment = () => {
     },
     onError: (error: unknown) => {
       showApiErrorToast(error, "Failed to record installment");
+    },
+  });
+};
+
+export const useUpdateLatestSaleOrderInstallment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateLatestInstallmentPayload }) =>
+      updateSaleOrderLatestInstallment(id, payload),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["sale-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["sale-order"] });
+      toast.success(response.message || "Latest installment updated successfully");
+    },
+    onError: (error: unknown) => {
+      showApiErrorToast(error, "Failed to update latest installment");
     },
   });
 };

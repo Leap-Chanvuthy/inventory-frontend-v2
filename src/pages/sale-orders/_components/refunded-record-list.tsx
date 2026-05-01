@@ -2,12 +2,14 @@ import { Receipt, Undo2 } from "lucide-react";
 import { formatDate } from "@/utils/date-format";
 import type { RefundRecordListItem } from "../types";
 import { EmptyState } from "./empty-state";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 
 interface RefundedRecordListProps {
   records: RefundRecordListItem[];
   selectedRefundId: number | null;
   onSelectRefund: (record: RefundRecordListItem) => void;
   onOpenOrder: (record: RefundRecordListItem) => void;
+  isLoading?: boolean;
 }
 
 export function RefundedRecordList({
@@ -15,7 +17,16 @@ export function RefundedRecordList({
   selectedRefundId,
   onSelectRefund,
   onOpenOrder,
+  isLoading = false,
 }: RefundedRecordListProps) {
+  if (isLoading) {
+    return (
+      <div className="h-full overflow-y-auto bg-muted/25 px-2 py-2">
+        <DataCardLoading text="Loading refund records..." className="min-h-[260px]" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-full overflow-y-auto bg-muted/25 px-2 py-2">
       <div className="space-y-1.5">

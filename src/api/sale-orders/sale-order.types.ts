@@ -204,6 +204,12 @@ export interface AddSaleOrderPaymentPayload {
   note?: string;
 }
 
+export interface UpdateLatestInstallmentPayload {
+  payment_percentage: number;
+  paid_at?: string;
+  note?: string;
+}
+
 export interface RefundSaleOrderLinePayload {
   sale_order_item_id?: number;
   product_id?: number;

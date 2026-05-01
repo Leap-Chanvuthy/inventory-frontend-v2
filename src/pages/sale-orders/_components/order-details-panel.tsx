@@ -2,6 +2,7 @@ import {
   AlertCircle,
   CheckCircle2,
   ChevronRight,
+  Edit3,
   FileText,
   MoreVertical,
   PauseCircle,
@@ -11,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -31,6 +33,7 @@ interface OrderDetailsPanelProps {
   customer?: Customer;
   customers: Customer[];
   onEdit: (order: Order) => void;
+  onDownloadInvoice: (order: Order) => Promise<void> | void;
   onUpdateStatus: (orderId: number, status: OrderStatus) => void;
   onUpdatePayment: (
     orderId: number,
@@ -38,6 +41,14 @@ interface OrderDetailsPanelProps {
       payment_status: PaymentStatus;
       payment_percentage?: number;
       installment_note?: string;
+    },
+  ) => Promise<void>;
+  onUpdateLatestInstallment: (
+    orderId: number,
+    payload: {
+      payment_percentage: number;
+      note?: string;
+      paid_at?: string;
     },
   ) => Promise<void>;
   onOpenRefund: (order: Order) => void;
@@ -50,8 +61,10 @@ export function OrderDetailsPanel({
   customer,
   customers,
   onEdit,
+  onDownloadInvoice,
   onUpdateStatus,
   onUpdatePayment,
+  onUpdateLatestInstallment,
   onOpenRefund,
   onViewRefundRecords,
   onViewRefundDetail,
@@ -59,6 +72,9 @@ export function OrderDetailsPanel({
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("INSTALLMENT");
   const [paymentPercentage, setPaymentPercentage] = useState("0");
   const [installmentNote, setInstallmentNote] = useState("");
+  const [latestInstallmentPercentage, setLatestInstallmentPercentage] = useState("0");
+  const [latestInstallmentNote, setLatestInstallmentNote] = useState("");
+  const [isEditingLatestInstallment, setIsEditingLatestInstallment] = useState(false);
 
   useEffect(() => {
     setPaymentStatus((order.paymentStatus as PaymentStatus) || "INSTALLMENT");
@@ -74,13 +90,36 @@ export function OrderDetailsPanel({
     );
   }, [order, paymentStatus]);
 
+  const installments = Array.isArray(order.installments) ? order.installments : [];
+  const latestInstallment = installments.length > 0 ? installments[installments.length - 1] : null;
+
+  useEffect(() => {
+    if (!latestInstallment) {
+      setLatestInstallmentPercentage("0");
+      setLatestInstallmentNote("");
+      return;
+    }
+
+    setLatestInstallmentPercentage(String(Number(latestInstallment.percentage ?? 0)));
+    setLatestInstallmentNote(latestInstallment.note || "");
+  }, [latestInstallment?.id, latestInstallment?.percentage, latestInstallment?.note]);
+
   const canChangePaymentType = order.status === "DRAFT";
   const canRecordPayment = !["CANCELLED", "REFUNDED"].includes(order.status);
   const currentPaidPercentage = Number(order.paidPercentage ?? 0);
   const remainingPercentage = Math.max(0, 100 - currentPaidPercentage);
+  const isFullyPaid = remainingPercentage <= 0;
+  const canEditLatestInstallment =
+    canRecordPayment &&
+    !!latestInstallment &&
+    !isFullyPaid &&
+    Number(latestInstallment?.cumulativePercentage ?? 0) < 100;
 
   const handleSavePayment = async () => {
-    const nextPaymentPercentage = Number(paymentPercentage || 0);
+    const nextPaymentPercentage =
+      paymentStatus === "PAID"
+        ? remainingPercentage
+        : Number(paymentPercentage || 0);
     if (nextPaymentPercentage <= 0) {
       return;
     }
@@ -90,6 +129,19 @@ export function OrderDetailsPanel({
       payment_percentage: nextPaymentPercentage,
       installment_note: installmentNote || undefined,
     });
+  };
+
+  const handleUpdateLatestInstallment = async () => {
+    if (!latestInstallment || !canEditLatestInstallment) return;
+
+    const nextPercentage = Number(latestInstallmentPercentage || 0);
+    if (nextPercentage <= 0) return;
+
+    await onUpdateLatestInstallment(order.dbId, {
+      payment_percentage: nextPercentage,
+      note: latestInstallmentNote || undefined,
+    });
+    setIsEditingLatestInstallment(false);
   };
 
   const installmentPreviewUsd = (Number(order.grandTotalInUsd || 0) * Number(paymentPercentage || 0)) / 100;
@@ -111,7 +163,12 @@ export function OrderDetailsPanel({
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" className="h-8 w-8 text-blue-600">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 text-blue-600"
+            onClick={() => onDownloadInvoice(order)}
+          >
             <Printer className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground">
@@ -134,7 +191,11 @@ export function OrderDetailsPanel({
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Payment Status</p>
-              <Select value={paymentStatus} onValueChange={value => setPaymentStatus(value as PaymentStatus)} disabled={!canChangePaymentType}>
+              <Select
+                value={paymentStatus}
+                onValueChange={value => setPaymentStatus(value as PaymentStatus)}
+                disabled={!canChangePaymentType || isFullyPaid}
+              >
                 <SelectTrigger className="h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -148,16 +209,22 @@ export function OrderDetailsPanel({
             <div className="space-y-1 md:col-span-2">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">New Payment Percentage (%)</p>
               <div className="space-y-2 rounded-md border border-border/70 bg-muted/25 px-2.5 py-2">
-                <Input
-                  type="number"
-                  min={0.01}
-                  max={remainingPercentage}
-                  step="0.01"
-                  value={paymentPercentage}
-                  disabled={!canRecordPayment || remainingPercentage <= 0}
-                  className="h-8"
-                  onChange={event => setPaymentPercentage(event.target.value)}
-                />
+                {paymentStatus === "PAID" ? (
+                  <div className="rounded-md border border-green-500/25 bg-green-500/10 px-2.5 py-2 text-[11px] text-green-700">
+                    PAID selected. Remaining {remainingPercentage.toFixed(2)}% will be settled automatically.
+                  </div>
+                ) : (
+                  <Input
+                    type="number"
+                    min={0.01}
+                    max={remainingPercentage}
+                    step="0.01"
+                    value={paymentPercentage}
+                    disabled={!canRecordPayment || remainingPercentage <= 0}
+                    className="h-8"
+                    onChange={event => setPaymentPercentage(event.target.value)}
+                  />
+                )}
                 <p className="text-[10px] text-muted-foreground">
                   Enter payment percentage. The system will calculate USD and KHR automatically.
                 </p>
@@ -199,16 +266,96 @@ export function OrderDetailsPanel({
                 </span>
               </div>
               <div className="space-y-1.5">
-                {order.installments.map(installment => (
-                  <div key={installment.id} className="flex items-center justify-between rounded-md bg-card/70 px-2 py-1.5 text-xs">
-                    <span className="text-foreground">
-                      {installment.percentage.toFixed(2)}% ({installment.cumulativePercentage.toFixed(2)}% total)
-                    </span>
-                    <span className="text-muted-foreground">
-                      ${installment.amountUsd.toFixed(2)} · {formatDate(installment.paidAt)}
-                    </span>
-                  </div>
-                ))}
+                {installments.map(installment => {
+                  const isLatest = latestInstallment?.id === installment.id;
+                  return (
+                    <div key={installment.id} className="rounded-md bg-card/70 px-2 py-1.5 text-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-foreground">
+                          {installment.percentage.toFixed(2)}% ({installment.cumulativePercentage.toFixed(2)}% total)
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">
+                            ${installment.amountUsd.toFixed(2)} · {formatDate(installment.paidAt)}
+                          </span>
+                          {isLatest && canEditLatestInstallment && !isEditingLatestInstallment && (
+                            <TooltipProvider delayDuration={150}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                    onClick={() => setIsEditingLatestInstallment(true)}
+                                  >
+                                    <Edit3 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p>Edit latest installment</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
+                      </div>
+                      {isLatest && (
+                        <div className="mt-2 rounded border border-border/70 bg-muted/30 p-2">
+                          {canEditLatestInstallment ? (
+                            <>
+                              {isEditingLatestInstallment ? (
+                                <>
+                                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                    Edit Latest Installment
+                                  </p>
+                                  <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                                    <Input
+                                      type="number"
+                                      min={0.01}
+                                      max={100}
+                                      step="0.01"
+                                      value={latestInstallmentPercentage}
+                                      className="h-7"
+                                      onChange={event => setLatestInstallmentPercentage(event.target.value)}
+                                    />
+                                    <Input
+                                      value={latestInstallmentNote}
+                                      className="h-7 md:col-span-2"
+                                      onChange={event => setLatestInstallmentNote(event.target.value)}
+                                      placeholder="Optional note"
+                                    />
+                                  </div>
+                                  <div className="mt-2 flex justify-end gap-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 text-[11px]"
+                                      onClick={() => setIsEditingLatestInstallment(false)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button size="sm" className="h-7 text-[11px]" onClick={handleUpdateLatestInstallment}>
+                                      Update Latest Installment
+                                    </Button>
+                                  </div>
+                                </>
+                              ) : (
+                                <p className="text-[10px] text-muted-foreground">
+                                  Click the edit icon on this row to modify the latest installment.
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-[10px] text-muted-foreground">
+                              Latest installment cannot be edited once payment reaches 100%.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -4,6 +4,7 @@ import {
   AddSaleOrderPaymentPayload,
   CreateSaleOrderPayload,
   RefundSaleOrderPayload,
+  UpdateLatestInstallmentPayload,
   SaleOrderRefundListResponse,
   SaleOrderRefundRecordListResponse,
   SaleOrderRefundRecordQueryParams,
@@ -75,6 +76,17 @@ export const addSaleOrderPayment = async (
   return response.data;
 };
 
+export const updateSaleOrderLatestInstallment = async (
+  id: number,
+  payload: UpdateLatestInstallmentPayload,
+): Promise<SaleOrderSingleResponse> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/sale-orders/${id}/installments/latest`,
+    payload,
+  );
+  return response.data;
+};
+
 export const refundSaleOrder = async (
   id: number,
   payload: RefundSaleOrderPayload,
@@ -125,6 +137,13 @@ export const downloadSaleOrderStatisticsReport = async (
 ): Promise<Blob> => {
   const response = await apiClient.get(`${BASE_API_URL}/sale-orders/statistics/report`, {
     params,
+    responseType: "blob",
+  });
+  return response.data as Blob;
+};
+
+export const downloadSaleOrderReport = async (id: number): Promise<Blob> => {
+  const response = await apiClient.get(`${BASE_API_URL}/sale-orders/${id}/report`, {
     responseType: "blob",
   });
   return response.data as Blob;

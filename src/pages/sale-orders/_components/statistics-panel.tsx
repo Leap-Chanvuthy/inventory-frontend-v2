@@ -34,6 +34,7 @@ import {
 import { formatDate } from "@/utils/date-format";
 import { StatsCard } from "./stats-card";
 import { Text } from "@/components/ui/text/app-text";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 
 interface StatisticsPanelProps {
   stats?: SaleOrderStatistics;
@@ -52,6 +53,7 @@ interface StatisticsPanelProps {
   onViewCustomer: (customerId: number) => void;
   onViewProduct: (productId: number) => void;
   isDownloading?: boolean;
+  isLoading?: boolean;
 }
 
 function money(value: number) {
@@ -85,7 +87,16 @@ export function StatisticsPanel({
   onViewCustomer,
   onViewProduct,
   isDownloading,
+  isLoading = false,
 }: StatisticsPanelProps) {
+  if (isLoading) {
+    return (
+      <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-muted/20 p-4">
+        <DataCardLoading text="Loading sale order statistics..." className="min-h-[320px]" />
+      </div>
+    );
+  }
+
   const safe = stats || {
     total_orders: 0,
     total_draft: 0,

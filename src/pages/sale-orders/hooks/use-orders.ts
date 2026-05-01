@@ -4,6 +4,7 @@ import {
   useCreateSaleOrder,
   useRefundSaleOrder,
   useUpdateSaleOrder,
+  useUpdateLatestSaleOrderInstallment,
   useUpdateSaleOrderStatus,
 } from "@/api/sale-orders/sale-order.mutation";
 import { useSaleOrders } from "@/api/sale-orders/sale-order.query";
@@ -170,6 +171,7 @@ export function useOrders(params?: SaleOrderQueryParams) {
   const updateStatusMutation = useUpdateSaleOrderStatus();
   const refundMutation = useRefundSaleOrder();
   const addPaymentMutation = useAddSaleOrderPayment();
+  const updateLatestInstallmentMutation = useUpdateLatestSaleOrderInstallment();
 
   const orders: Order[] = useMemo(
     () => (ordersQuery.data?.data?.data ?? []).map(mapSaleOrderRecord),
@@ -261,6 +263,27 @@ export function useOrders(params?: SaleOrderQueryParams) {
     });
   };
 
+  const updateLatestInstallment = async (
+    id: string | number,
+    payload: {
+      payment_percentage: number;
+      paid_at?: string;
+      note?: string;
+    },
+  ) => {
+    const order = resolveOrderByIdentifier(id);
+    if (!order) return;
+
+    await updateLatestInstallmentMutation.mutateAsync({
+      id: order.dbId,
+      payload: {
+        payment_percentage: payload.payment_percentage,
+        paid_at: payload.paid_at,
+        note: payload.note,
+      },
+    });
+  };
+
   const markRefunded = async (refundData: RefundData) => {
     if (!refundData.orderId) return null;
     const order = orderMapByDbId.get(refundData.orderId);
@@ -319,6 +342,7 @@ export function useOrders(params?: SaleOrderQueryParams) {
     saveOrder,
     updateStatus,
     updatePayment,
+    updateLatestInstallment,
     markRefunded,
   };
 }
