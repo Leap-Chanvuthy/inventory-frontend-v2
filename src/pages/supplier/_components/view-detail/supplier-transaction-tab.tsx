@@ -14,13 +14,20 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { History } from "lucide-react";
-import { TRANSACTION_COLUMNS, TRANSACTION_SORT_OPTIONS } from "../../utils/table-feature";
+import {
+  TRANSACTION_COLUMNS,
+  TRANSACTION_SORT_OPTIONS,
+} from "../../utils/table-feature";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+import UnexpectedError from "@/components/reusable/partials/error";
 
 interface SupplierTransactionTabProps {
   supplierId: number;
 }
 
-export function SupplierTransactionTab({ supplierId }: SupplierTransactionTabProps) {
+export function SupplierTransactionTab({
+  supplierId,
+}: SupplierTransactionTabProps) {
   const {
     setPage,
     setSearch,
@@ -31,18 +38,23 @@ export function SupplierTransactionTab({ supplierId }: SupplierTransactionTabPro
     apiParams,
   } = useTableQueryParams();
 
-  const { data, isLoading, isError } = useSupplierTransactions(supplierId, {
-    ...apiParams,
-    "filter[search]": search || "",
-  });
+  const { data, isLoading, isFetching, isError } = useSupplierTransactions(
+    supplierId,
+    {
+      ...apiParams,
+      "filter[search]": search || "",
+    },
+  );
 
   const transactions = data?.data?.data ?? [];
   const total = data?.data?.total ?? 0;
   const currentPage = data?.data?.current_page ?? 1;
   const lastPage = data?.data?.last_page ?? 1;
 
-  if (isError) {
-    return <p className="text-center text-red-500">Failed to load transactions</p>;
+  if (isError && !isFetching) {
+    return (
+      <p className="text-center text-red-500">Failed to load transactions</p>
+    );
   }
 
   return (
@@ -61,9 +73,11 @@ export function SupplierTransactionTab({ supplierId }: SupplierTransactionTabPro
                 Purchase and re-order stock movements for this supplier
               </CardDescription>
             </div>
-            <Badge variant="secondary" className="font-mono">
-              {total.toLocaleString()} Entries
-            </Badge>
+            {!(isLoading || isFetching) && (
+              <Badge variant="secondary" className="font-mono">
+                {total.toLocaleString()} Entries
+              </Badge>
+            )}
           </div>
         </CardHeader>
 
@@ -83,18 +97,21 @@ export function SupplierTransactionTab({ supplierId }: SupplierTransactionTabPro
             columns={TRANSACTION_COLUMNS}
             data={transactions}
             isLoading={isLoading}
+            loadingClassName="min-h-[200px]"
             emptyText="No transactions found for this supplier."
           />
 
-          <div className="flex justify-center mt-6">
-            <div className="flex items-center gap-1 border border-border rounded-lg p-1">
-              <GlobalPagination
-                currentPage={currentPage}
-                lastPage={lastPage}
-                onPageChange={setPage}
-              />
+          {!isLoading && lastPage > 1 && (
+            <div className="flex justify-center mt-6">
+              <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+                <GlobalPagination
+                  currentPage={currentPage}
+                  lastPage={lastPage}
+                  onPageChange={setPage}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

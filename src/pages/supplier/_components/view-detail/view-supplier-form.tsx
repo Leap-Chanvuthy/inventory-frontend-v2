@@ -8,12 +8,21 @@ import { SupplierDetailCard } from "./supplier-detail-card";
 import { SupplierSpendChart } from "./supplier-spend-chart";
 import { SupplierFinancialsCard } from "./supplier-financials-card";
 import { SupplierSupplyTrendCard } from "./supplier-supply-trend-card";
-import { SupplierInfoGrid } from "./supplier-info-grid";
 import { trendIcon } from "../../utils/trend-icon";
 import { Text } from "@/components/ui/text/app-text";
 import { IconBadge } from "@/components/ui/icons-badge";
 import { Separator } from "@/components/ui/separator";
-import { Package, DollarSign, ShoppingCart, RefreshCw } from "lucide-react";
+import {
+  Package,
+  DollarSign,
+  ShoppingCart,
+  RefreshCw,
+  Phone,
+  Mail,
+  User2,
+  MapPin,
+  Building2,
+} from "lucide-react";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
@@ -48,38 +57,99 @@ export function ViewSupplierForm() {
   const statistics = data.data.statistics;
   const supplyTrend = statistics.supply_trend;
 
+  const cityProvince = [supplier.city, supplier.province]
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
-      {/* 1. Profile Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-muted/30 p-6 rounded-2xl border">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-              <IconBadge label="supplier" size={24} />
+      {/* 1. Profile Hero */}
+      <div className="relative rounded-2xl border bg-gradient-to-br from-primary/5 via-muted/20 to-background overflow-hidden">
+        <div className="p-6 flex flex-col md:flex-row md:items-start gap-5">
+          {/* Avatar */}
+          <div className="shrink-0">
+            <div className="h-20 w-20 md:h-[88px] md:w-[88px] rounded-2xl border-2 border-background shadow-md overflow-hidden bg-primary/10 flex items-center justify-center">
+              {supplier.image ? (
+                <img
+                  src={supplier.image}
+                  alt={supplier.official_name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <IconBadge label="supplier" size={36} />
+              )}
             </div>
+          </div>
+
+          {/* Identity block */}
+          <div className="flex-1 min-w-0 space-y-2.5">
             <div>
-              <Text.TitleLarge className="leading-none">
+              <Text.TitleLarge className="leading-tight truncate">
                 {supplier.official_name}
               </Text.TitleLarge>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-muted-foreground font-mono">
+              {supplier.legal_business_name &&
+                supplier.legal_business_name !== supplier.official_name && (
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Building2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <Text.Small color="muted" className="truncate">
+                      {supplier.legal_business_name}
+                    </Text.Small>
+                  </div>
+                )}
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <span className="text-xs text-muted-foreground font-mono bg-muted/60 border px-2 py-0.5 rounded-md">
                   {supplier.supplier_code}
                 </span>
-                <Separator orientation="vertical" className="h-3" />
                 <SupplierCategoryBadge category={supplier.supplier_category} />
               </div>
             </div>
-          </div>
-        </div>
 
-        <HeaderActionButtons
-          editPath={`/supplier/update/${supplier.id}`}
-          showEdit={true}
-          showDelete={true}
-          onDelete={handleDelete}
-          deleteHeading="Delete Supplier"
-          deleteSubheading={`Are you sure you want to delete "${supplier.official_name}"? This action cannot be undone.`}
-        />
+            <Separator className="w-full opacity-50" />
+
+            {/* Quick contact row */}
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+              {supplier.contact_person && (
+                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <User2 className="w-3.5 h-3.5 shrink-0" />
+                  {supplier.contact_person}
+                </span>
+              )}
+              {supplier.phone && (
+                <a
+                  href={`tel:${supplier.phone}`}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 shrink-0" />
+                  {supplier.phone}
+                </a>
+              )}
+              {supplier.email && (
+                <a
+                  href={`mailto:${supplier.email}`}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 shrink-0" />
+                  {supplier.email}
+                </a>
+              )}
+              {cityProvince && (
+                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" />
+                  {cityProvince}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <HeaderActionButtons
+            editPath={`/supplier/update/${supplier.id}`}
+            showEdit={true}
+            showDelete={true}
+            onDelete={handleDelete}
+            deleteHeading="Delete Supplier"
+            deleteSubheading={`Are you sure you want to delete "${supplier.official_name}"? This action cannot be undone.`}
+          />
+        </div>
       </div>
 
       {/* 2. Statistics Row */}
@@ -99,7 +169,7 @@ export function ViewSupplierForm() {
         <SupplierDetailCard
           icon={<DollarSign className="w-4 h-4 text-green-500" />}
           iconBg="bg-green-500/10"
-          label="Total Earnings"
+          label="Total Spend"
           value={
             <div className="space-y-0.5">
               <div className="flex items-baseline gap-1">
@@ -166,20 +236,16 @@ export function ViewSupplierForm() {
       {/* 3. Analytics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         <SupplierSpendChart topRawMaterials={statistics.top_raw_materials} />
-
         <div className="flex flex-col h-full">
           <SupplierFinancialsCard financials={statistics.financials} />
         </div>
       </div>
 
-      {/* 4. Supply Trend Chart */}
+      {/* 4. Supply Trend */}
       <SupplierSupplyTrendCard supplyTrend={supplyTrend} />
 
-      {/* 6. Content Grid */}
-      <SupplierInfoGrid supplier={supplier} />
-
-      {/* 7. Bottom Tabs Section */}
-      <div className="pt-4">
+      {/* 5. Tabs */}
+      <div className="pt-2">
         <ViewSupplierTap supplier={supplier} />
       </div>
     </div>

@@ -578,7 +578,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     header: "Notes",
     className: "whitespace-nowrap py-6",
     render: (movement) => (
-      <Text.Small color="muted" fontStyle="italic" maxLines={1}>
+      <Text.Small color="muted" maxLines={1}>
         {movement.note || "No notes"}
       </Text.Small>
     ),

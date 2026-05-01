@@ -5,6 +5,15 @@ export enum CustomerStatus {
   PROSPECTIVE = "PROSPECTIVE",
 }
 
+// Customer Financial
+export interface CustomerFinancial {
+  id: number;
+  customer_id: number;
+  payment_terms: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Customer Category Information
 export interface CustomerCategory {
   id: number;
@@ -32,6 +41,8 @@ export interface Customer {
   customer_category_name: string;
   customer_category: CustomerCategory;
   customer_note: string | null;
+  customer_financial: CustomerFinancial | null;
+  deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }

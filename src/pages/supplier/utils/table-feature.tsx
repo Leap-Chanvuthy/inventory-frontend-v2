@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Supplier, SupplierTransactionItem } from "@/api/suppliers/supplier.types";
+import {
+  Supplier,
+  SupplierTransactionItem,
+} from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { SupplierCategoryBadge } from "./supplier-status";
 import TableActions from "@/components/reusable/partials/table-actions";
@@ -11,15 +14,14 @@ import {
 } from "@/components/ui/card";
 import { Banknote, Mail, MapPin, Phone, ScanQrCode } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useDeleteSupplier, useRecoverSupplier } from "@/api/suppliers/supplier.mutation";
+import {
+  useDeleteSupplier,
+  useRecoverSupplier,
+} from "@/api/suppliers/supplier.mutation";
 import { Text } from "@/components/ui/text/app-text";
 import { formatDate } from "@/utils/date-format";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  RotateCcw,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowDownLeft, ArrowUpRight, RotateCcw } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -108,7 +110,6 @@ export const RecoverSupplierAction = ({ supplier }: { supplier: Supplier }) => {
     </Dialog>
   );
 };
-
 
 export const FILTER_OPTIONS = [
   { value: " ", label: "All" },
@@ -227,7 +228,7 @@ export function SupplierCard({
       .join(" "),
   ]
     .filter(Boolean)
-    .join("\n");
+    .join(", ");
 
   return (
     <Card
@@ -332,7 +333,7 @@ export function SupplierCard({
 
         <div className="flex items-start gap-2">
           <MapPin className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
-          <Text.Small color="muted" maxLines={2}>
+          <Text.Small color="muted" maxLines={1} overflow="ellipsis">
             {addressText || "-"}
           </Text.Small>
         </div>
@@ -347,9 +348,6 @@ export function SupplierCard({
   );
 }
 
-
-
-
 /// Table feature for supplier transactions
 export const TRANSACTION_SORT_OPTIONS = [
   { value: "-movement_date", label: "Newest First" },
@@ -363,12 +361,19 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "raw_material_id",
     header: "Material",
     className: "whitespace-nowrap py-4",
-    render: (item) => (
+    render: item => (
       <div className="flex flex-col gap-0.5">
-        <Text.Small fontWeight="semibold" color="default" className="whitespace-nowrap">
+        <Text.Small
+          fontWeight="semibold"
+          color="default"
+          className="whitespace-nowrap"
+        >
           {item.raw_material?.material_name ?? "—"}
         </Text.Small>
-        <Text.Small color="muted" className="text-xs font-mono whitespace-nowrap">
+        <Text.Small
+          color="muted"
+          className="text-xs whitespace-nowrap"
+        >
           {item.raw_material?.material_sku_code ?? "—"}
         </Text.Small>
       </div>
@@ -378,8 +383,12 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "movement_date",
     header: "Movement Date",
     className: "whitespace-nowrap py-4",
-    render: (item) => (
-      <Text.Small color="muted" fontWeight="medium" className="whitespace-nowrap">
+    render: item => (
+      <Text.Small
+        color="muted"
+        fontWeight="medium"
+        className="whitespace-nowrap"
+      >
         {formatDate(item.movement_date)}
       </Text.Small>
     ),
@@ -388,17 +397,17 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "movement_type",
     header: "Type",
     className: "whitespace-nowrap py-4",
-    render: (item) => (
-      <Badge variant="secondary" className="whitespace-nowrap font-mono text-xs">
+    render: item => (
+      <Text.Small color="muted" className="whitespace-nowrap">
         {item.movement_type.replace(/_/g, " ")}
-      </Badge>
+      </Text.Small>
     ),
   },
   {
     key: "direction",
     header: "Direction",
     className: "whitespace-nowrap py-4",
-    render: (item) => {
+    render: item => {
       const isIn = item.direction === "IN";
       return (
         <div
@@ -411,7 +420,11 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
           ) : (
             <ArrowUpRight className="h-3.5 w-3.5" />
           )}
-          <Text.Small fontWeight="bold" letterSpacing="wide" className="uppercase">
+          <Text.Small
+            fontWeight="bold"
+            letterSpacing="wide"
+            className="uppercase"
+          >
             {item.direction}
           </Text.Small>
         </div>
@@ -422,13 +435,16 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "quantity",
     header: "Quantity",
     className: "whitespace-nowrap py-4 text-right",
-    render: (item) => {
+    render: item => {
       const isIn = item.direction === "IN";
-      const uomLabel = item.raw_material?.uom?.symbol ?? item.raw_material?.uom?.name ?? "";
+      const uomLabel =
+        item.raw_material?.uom?.symbol ?? item.raw_material?.uom?.name ?? "";
       return (
         <Text.Small color="default" fontWeight="medium">
           {isIn ? "+" : "-"}
-          {item.quantity.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          {item.quantity.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+          })}
           {uomLabel ? ` ${uomLabel}` : ""}
         </Text.Small>
       );
@@ -438,7 +454,7 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "unit_price_in_usd",
     header: "Unit Price",
     className: "whitespace-nowrap py-4 text-right",
-    render: (item) => (
+    render: item => (
       <Text.Small color="muted">
         ${item.unit_price_in_usd.toFixed(2)}
       </Text.Small>
@@ -448,7 +464,7 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "total_value_in_usd",
     header: "Total Value",
     className: "whitespace-nowrap py-4 text-right",
-    render: (item) => (
+    render: item => (
       <Text.Small color="default" fontWeight="semibold">
         $
         {item.total_value_in_usd.toLocaleString(undefined, {
@@ -461,8 +477,8 @@ export const TRANSACTION_COLUMNS: DataTableColumn<SupplierTransactionItem>[] = [
     key: "note",
     header: "Notes",
     className: "whitespace-nowrap py-4",
-    render: (item) => (
-      <Text.Small color="muted" fontStyle="italic" maxLines={1}>
+    render: item => (
+      <Text.Small color="muted" maxLines={1}>
         {item.note || "No notes"}
       </Text.Small>
     ),

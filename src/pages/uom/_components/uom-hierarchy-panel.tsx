@@ -13,11 +13,11 @@ import { UomCard } from "./uom-card";
 import { CreateUomModal } from "./create-uom-modal";
 import { EditUomModal } from "./edit-uom-modal";
 import { Button } from "@/components/ui/button";
+import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import {
   BoxIcon,
   ArrowDownIcon,
   Plus,
-  Loader2,
   Trash2,
   RotateCcw,
   ArchiveX,
@@ -318,10 +318,7 @@ export function UomHierarchyPanel({ categoryId, categoryName }: UomHierarchyPane
       {/* Body */}
       <div className="flex-1 overflow-y-auto">
         {currentlyLoading ? (
-          <div className="flex items-center justify-center h-48 gap-2 text-muted-foreground">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            <span className="text-sm">Loading units…</span>
-          </div>
+          <DataCardLoading text="Loading units…" className="h-48" />
         ) : showTrashedUoms ? (
           unitCount === 0 ? (
             <div className="flex flex-col items-center gap-2 py-16 px-6 text-center">

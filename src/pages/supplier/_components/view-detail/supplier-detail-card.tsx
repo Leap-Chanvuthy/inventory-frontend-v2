@@ -18,13 +18,19 @@ export function SupplierDetailCard({
 }: SupplierDetailCardProps) {
   return (
     <Card className="shadow-sm">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>{icon}</div>
-        <div className="min-w-0 flex-1">
-          <Text.Small>{label}</Text.Small>
-          <div className="leading-tight">{value}</div>
-          {subLabel && <Text.Small>{subLabel}</Text.Small>}
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>{icon}</div>
+          <Text.Small color="muted" className="text-xs font-medium leading-tight">
+            {label}
+          </Text.Small>
         </div>
+        <div className="leading-tight">{value}</div>
+        {subLabel && (
+          <Text.Small color="muted" className="text-xs leading-snug">
+            {subLabel}
+          </Text.Small>
+        )}
       </CardContent>
     </Card>
   );

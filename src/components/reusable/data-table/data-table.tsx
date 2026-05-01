@@ -29,7 +29,7 @@ export function DataTable<T>({
     data,
     isLoading = false,
     loadingText,
-    loadingClassName,
+    loadingClassName = "min-h-[200px]",
     emptyText = "No data found",
     rowSelection,
 }: DataTableProps<T>) {

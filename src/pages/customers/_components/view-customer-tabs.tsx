@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, MapPin, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FileText, MapPin, Globe } from "lucide-react";
 import { Customer } from "@/api/customers/customer.types";
 import ReusableTabs from "@/components/reusable/partials/tabs";
 import { Text } from "@/components/ui/text/app-text";
@@ -11,194 +12,122 @@ interface ViewCustomerTabsProps {
 export function ViewCustomerTabs({ customer }: ViewCustomerTabsProps) {
   const tabs = [
     {
-      label: "General Info",
-      value: "general",
+      label: "Notes",
+      value: "notes",
       content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <FileText className="h-5 w-5 inline mr-2" />
-              Customer Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">
+        <div className="py-6 animate-in fade-in duration-300">
+          <Card className="shadow-sm">
+            <CardHeader className="bg-muted/30">
+              <CardTitle className="text-base flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-md">
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
                 Customer Note
-              </p>
-              <p className="font-medium whitespace-pre-wrap">
-                {customer.customer_note || "No notes available"}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Created At</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <p className="font-medium">
-                    {new Date(customer.created_at).toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Last Updated
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-5">
+              {customer.customer_note ? (
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {customer.customer_note}
                 </p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <p className="font-medium">
-                    {new Date(customer.updated_at).toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+                  <div className="p-3 bg-muted rounded-full">
+                    <FileText className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <Text.Small color="muted">No notes for this customer.</Text.Small>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       ),
     },
     {
       label: "Location",
       value: "location",
       content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <MapPin className="h-5 w-5 inline mr-2" />
-              Address Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">
-                  Customer Address
-                </p>
-                <p className="font-medium">
-                  {customer.customer_address || "-"}
-                </p>
-              </div>
-
-              {/* {customer.google_map_link && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Google Map Location</p>
-                  <a
-                    href={customer.google_map_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-blue-600 hover:underline flex items-center gap-2"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    Open in Google Maps
-                  </a>
-                </div>
-              )} */}
-
-              {/* {customer.google_map_link && (
-                <div className="mt-4">
-                  <iframe
-                    src={customer.google_map_link.replace(
-                      "/maps/",
-                      "/maps/embed?pb=",
-                    )}
-                    width="100%"
-                    height="400"
-                    style={{ border: 0 }}
-                    allowFullScreen={true}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="rounded-lg"
-                  ></iframe>
-                </div>
-              )} */}
-            </div>
-          </CardContent>
-        </Card>
-      ),
-    },
-    {
-      label: "Contact Info",
-      value: "contact",
-      content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <Text.TitleSmall>Contact Details</Text.TitleSmall>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Email Address
-                  </p>
-                  <a
-                    href={`mailto:${customer.email_address}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {customer.email_address || "-"}
-                  </a>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Phone Number
-                  </p>
-                  <a
-                    href={`tel:${customer.phone_number}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {customer.phone_number || "-"}
-                  </a>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Social Media
-                  </p>
-                  {customer.social_media ? (
-                    <a
-                      href={customer.social_media}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-blue-600 hover:underline"
+        <div className="py-6 animate-in fade-in duration-300">
+          <Card className="shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              <div className="grid grid-cols-1 md:grid-cols-2">
+                {/* Address details */}
+                <div className="p-8 space-y-6">
+                  <div className="flex items-center gap-2 text-primary">
+                    <MapPin className="w-4 h-4" />
+                    <Text.Small
+                      fontWeight="bold"
+                      color="primary"
+                      className="text-xs uppercase tracking-widest"
                     >
-                      {customer.social_media}
-                    </a>
-                  ) : (
-                    <p className="font-medium">-</p>
-                  )}
+                      Primary Address
+                    </Text.Small>
+                  </div>
+                  <p className="text-sm font-medium leading-relaxed">
+                    {customer.customer_address || "No address provided."}
+                  </p>
+                </div>
+
+                {/* Map panel */}
+                <div
+                  className="relative m-4 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-10 text-center space-y-4 min-h-[220px]"
+                  style={{
+                    backgroundImage: "url('/assets/google_map.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/50 rounded-2xl" />
+                  <div className="relative z-10 flex flex-col items-center space-y-4">
+                    <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+                      <Globe className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <Text.Small
+                        fontWeight="semibold"
+                        className="text-white text-xs"
+                      >
+                        Open in Maps
+                      </Text.Small>
+                      <Text.Small className="text-white/70 text-xs mt-1 max-w-[180px]">
+                        View this location in Google Maps for directions.
+                      </Text.Small>
+                    </div>
+                    {customer.google_map_link ? (
+                      <Button
+                        size="sm"
+                        asChild
+                        className="bg-white text-black hover:bg-white/90"
+                      >
+                        <a
+                          href={customer.google_map_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Open Google Maps
+                        </a>
+                      </Button>
+                    ) : (
+                      <Text.Small className="text-white/50 text-xs">
+                        No map link available
+                      </Text.Small>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="mt-6">
+    <div className="pt-2">
       <ReusableTabs
         name="customer-details"
         tabs={tabs}
-        defaultValue="general"
+        defaultValue="notes"
       />
     </div>
   );
