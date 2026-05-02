@@ -8,7 +8,7 @@ import {
   Warehouse,
   HelpCircle,
   Truck,
-  PackageSearch,
+  PackageSearch, 
   PencilRuler,
   Users,
   CircleDollarSign,
