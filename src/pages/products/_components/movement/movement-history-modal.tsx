@@ -19,7 +19,6 @@ import {
   ArrowUpFromLine,
   Pencil,
   Eye,
-  Search,
 } from "lucide-react";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import DeleteModal from "@/components/reusable/partials/delete-modal";
@@ -111,27 +110,24 @@ export function MovementHistoryModal({
 
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-[160px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Select
-                value={movementType}
-                onValueChange={v => {
-                  setMovementType(v === "all" ? "" : v);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="pl-9">
-                  <SelectValue placeholder="All Types" />
-                </SelectTrigger>
-                <SelectContent>
-                  {MOVEMENT_TYPE_OPTIONS.map(o => (
-                    <SelectItem key={o.value || "all"} value={o.value || "all"}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={movementType}
+              onValueChange={v => {
+                setMovementType(v === "all" ? "" : v);
+                setPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                {MOVEMENT_TYPE_OPTIONS.map(o => (
+                  <SelectItem key={o.value || "all"} value={o.value || "all"}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Select
               value={direction}
