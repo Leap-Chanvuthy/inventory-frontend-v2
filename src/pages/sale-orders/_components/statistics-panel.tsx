@@ -310,10 +310,15 @@ export function StatisticsPanel({
         </div>
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        <div className="rounded-lg border border-border bg-card p-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 10 Buying Customers</p>
-          <div className="h-[320px]">
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card/95 p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Top 10 Buying Customers
+            </p>
+            <span className="text-[10px] text-muted-foreground">USD sales</span>
+          </div>
+          <div className="h-[380px]">
             {topCustomersChart.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topCustomersChart} layout="vertical" margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
@@ -347,9 +352,14 @@ export function StatisticsPanel({
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Top 10 Selling Products</p>
-          <div className="h-[320px]">
+        <div className="rounded-xl border border-border bg-card/95 p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Top 10 Selling Products
+            </p>
+            <span className="text-[10px] text-muted-foreground">Units sold</span>
+          </div>
+          <div className="h-[380px]">
             {topProductsChart.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topProductsChart} layout="vertical" margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
