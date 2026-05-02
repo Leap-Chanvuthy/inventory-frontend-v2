@@ -1,7 +1,7 @@
 import {
   Home,
-  Calendar,
-  Search,
+  // Calendar,
+  // Search,
   // Settings,
   User,
   // Boxes,
@@ -35,17 +35,9 @@ export interface SidebarGroup {
 
 export const SIDEBAR_CONFIG: SidebarGroup[] = [
   {
-    label: "Application",
+    label: "Application & Management",
     items: [
       { title: "Dashboard", url: "/", icon: Home },
-      // { title: "Products", url: "/products", icon: Inbox },
-      { title: "Calendar", url: "/calendar", icon: Calendar },
-      { title: "Search", url: "/search", icon: Search },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
       {
         title: "Users",
         url: "/users",
@@ -60,8 +52,28 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         roles: [ROLES.ADMIN],
         isQuickMenu: true,
       },
+
     ],
   },
+  // {
+  //   label: "Management",
+  //   items: [
+  //     {
+  //       title: "Users",
+  //       url: "/users",
+  //       icon: User,
+  //       roles: [ROLES.ADMIN],
+  //       isQuickMenu: true,
+  //     },
+  //     {
+  //       title: "Audit Logs",
+  //       url: "/audit-logs",
+  //       icon: Activity,
+  //       roles: [ROLES.ADMIN],
+  //       isQuickMenu: true,
+  //     },
+  //   ],
+  // },
   {
     label: "Inventory",
     items: [

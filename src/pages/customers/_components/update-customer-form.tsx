@@ -11,13 +11,8 @@ import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   CreateCustomerFormPayload,
   ValidationErrors,
@@ -151,6 +146,19 @@ export const UpdateCustomerForm = () => {
       label: category.category_name,
     })) || [];
 
+  const SectionHeader = ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => (
+    <div className="flex-1 min-w-0">
+      <Text.TitleSmall>{title}</Text.TitleSmall>
+      <p className="text-xs text-muted-foreground">{description}</p>
+    </div>
+  );
+
   if (isLoading) {
     return <DataCardLoading text="Loading customer details data..." />;
   }
@@ -164,113 +172,105 @@ export const UpdateCustomerForm = () => {
 
   return (
     <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
-          <Text.TitleMedium className="mb-2">Update Customer</Text.TitleMedium>
-          <p className="text-sm text-muted-foreground mb-6">
-            Update customer details and information within the application.
-          </p>
+      <div className="mb-6 space-y-1">
+        <Text.TitleMedium>Update Customer</Text.TitleMedium>
+        <p className="text-sm text-muted-foreground">
+          Update customer details and information within the application.
+        </p>
+      </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Customer's basic details</CardDescription>
+              <CardHeader className="pb-4">
+                <SectionHeader
+                  title="Basic Information"
+                  description="Customer identity and classification"
+                />
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* Upload Section */}
-                  <div className="lg:col-span-1">
-                    <ImageUpload
-                      label="Customer Image"
-                      onChange={handleImageChange}
-                      defaultImage={defaultImage || undefined}
-                    />
-                  </div>
+              <Separator />
+              <CardContent className="pt-6 space-y-5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <TextInput
+                    id="customer_code"
+                    label="Customer Code"
+                    placeholder="Auto-generated"
+                    value={form.customer_code}
+                    error={fieldErrors?.customer_code?.[0]}
+                    onChange={handleChange}
+                  />
+                  <TextInput
+                    required={true}
+                    id="fullname"
+                    label="Full Name"
+                    placeholder="Enter full name"
+                    value={form.fullname}
+                    error={fieldErrors?.fullname?.[0]}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                  {/* Form Fields */}
-                  <div className="lg:col-span-2 space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        id="customer_code"
-                        label="Customer Code"
-                        placeholder="Auto-generated"
-                        value={form.customer_code}
-                        error={fieldErrors?.customer_code?.[0]}
-                        onChange={handleChange}
-                      />
-                      <TextInput
-                        required={true}
-                        id="fullname"
-                        label="Full Name"
-                        placeholder="Enter full name"
-                        value={form.fullname}
-                        error={fieldErrors?.fullname?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <TextInput
+                    required={true}
+                    id="phone_number"
+                    label="Phone Number"
+                    type="tel"
+                    placeholder="Enter phone number"
+                    value={form.phone_number}
+                    error={fieldErrors?.phone_number?.[0]}
+                    onChange={handleChange}
+                    isNumberOnly={true}
+                    maxLength={10}
+                  />
+                  <TextInput
+                    id="email_address"
+                    label="Email Address"
+                    type="email"
+                    placeholder="Enter email address"
+                    value={form.email_address}
+                    error={fieldErrors?.email_address?.[0]}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <TextInput
-                        required={true}
-                        id="phone_number"
-                        label="Phone Number"
-                        type="tel"
-                        placeholder="Enter phone number"
-                        value={form.phone_number}
-                        error={fieldErrors?.phone_number?.[0]}
-                        onChange={handleChange}
-                        isNumberOnly={true}
-                        maxLength={10}
-                      />
-                      <TextInput
-                        id="email_address"
-                        label="Email Address"
-                        type="email"
-                        placeholder="Enter email address"
-                        value={form.email_address}
-                        error={fieldErrors?.email_address?.[0]}
-                        onChange={handleChange}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <SelectInput
-                        required={true}
-                        id="customer_status"
-                        label="Customer Status"
-                        placeholder="Select status"
-                        options={statusOptions}
-                        value={form.customer_status}
-                        error={fieldErrors?.customer_status?.[0]}
-                        onChange={handleSelectChange("customer_status")}
-                      />
-                      <SelectInput
-                        required={true}
-                        id="customer_category_id"
-                        label="Customer Category"
-                        placeholder={
-                          categoriesLoading ? "Loading..." : "Select category"
-                        }
-                        options={categoryOptions}
-                        value={form.customer_category_id}
-                        error={fieldErrors?.customer_category_id?.[0]}
-                        onChange={handleSelectChange("customer_category_id")}
-                      />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <SelectInput
+                    required={true}
+                    id="customer_status"
+                    label="Customer Status"
+                    placeholder="Select status"
+                    options={statusOptions}
+                    value={form.customer_status}
+                    error={fieldErrors?.customer_status?.[0]}
+                    onChange={handleSelectChange("customer_status")}
+                  />
+                  <SelectInput
+                    required={true}
+                    id="customer_category_id"
+                    label="Customer Category"
+                    placeholder={
+                      categoriesLoading ? "Loading..." : "Select category"
+                    }
+                    options={categoryOptions}
+                    value={form.customer_category_id}
+                    error={fieldErrors?.customer_category_id?.[0]}
+                    onChange={handleSelectChange("customer_category_id")}
+                  />
                 </div>
               </CardContent>
             </Card>
 
-            {/* Contact & Location Information */}
             <Card>
-              <CardHeader>
-                <CardTitle>Contact & Location Information</CardTitle>
-                <CardDescription>
-                  Additional contact and location details
-                </CardDescription>
+              <CardHeader className="pb-4">
+                <SectionHeader
+                  title="Contact & Location"
+                  description="Ways to reach this customer and visit their location"
+                />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
                 <TextInput
                   id="social_media"
                   label="Social Media"
@@ -309,9 +309,32 @@ export const UpdateCustomerForm = () => {
                 />
               </CardContent>
             </Card>
+          </div>
 
-            <FormFooterActions isSubmitting={customerMutation.isPending} />
-          </form>
+          <div className="lg:col-span-4 space-y-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-4">
+                <SectionHeader
+                  title="Customer Image"
+                  description="Upload a profile image for easy recognition"
+                />
+              </CardHeader>
+              <Separator />
+              <CardContent className="pt-6">
+                <ImageUpload
+                  label="Customer Image"
+                  onChange={handleImageChange}
+                  defaultImage={defaultImage || undefined}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <FormFooterActions isSubmitting={customerMutation.isPending} />
+        </div>
+      </form>
     </div>
   );
 };

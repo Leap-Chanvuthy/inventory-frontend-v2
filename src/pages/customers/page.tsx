@@ -108,6 +108,9 @@ export function Customers() {
                               values?.category_name || category.category_name,
                             label_color: values?.label_color || category.label_color,
                             description: values?.description || category.description,
+                            discount_percentage: String(
+                              category.discount_percentage ?? 0,
+                            ),
                           }}
                           embedded
                           onSuccess={onSuccess}

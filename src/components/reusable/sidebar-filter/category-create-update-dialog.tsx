@@ -17,6 +17,7 @@ export type CategoryDialogValues = {
   category_name: string;
   description: string;
   label_color: string;
+  discount_percentage?: number;
 };
 
 interface CategoryCreateUpdateDialogProps {

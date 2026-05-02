@@ -12,7 +12,7 @@ import {
   StatTile,
   ContactRow,
 } from "../utils/customer-detail-utils";
-import { IconBadge } from "@/components/ui/icons-badge";
+// import { IconBadge } from "@/components/ui/icons-badge";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import UnexpectedError from "@/components/reusable/partials/error";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";

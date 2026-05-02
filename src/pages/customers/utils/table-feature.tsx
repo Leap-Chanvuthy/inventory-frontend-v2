@@ -74,6 +74,22 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
       <span className="font-medium whitespace-nowrap">{customer.fullname}</span>
     ),
   },
+    {
+    key: "customer_category_name",
+    header: "Category",
+    className: "whitespace-nowrap py-6",
+    render: customer => (
+      <CustomerCategoryBadge categoryName={customer.customer_category_name} />
+    ),
+  },
+    {
+    key: "discount_applicable",
+    header: "Discount",
+    className: "whitespace-nowrap py-6",
+    render: customer => (
+      <span className="font-bold text-green-500">{customer?.customer_category?.discount_percentage ?? 0}%</span>
+    ),
+  },
   {
     key: "email_address",
     header: "Email",
@@ -85,14 +101,6 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
     header: "Phone",
     className: "whitespace-nowrap py-6",
     render: customer => <span>{customer.phone_number}</span>,
-  },
-  {
-    key: "customer_category_name",
-    header: "Category",
-    className: "whitespace-nowrap py-6",
-    render: customer => (
-      <CustomerCategoryBadge categoryName={customer.customer_category_name} />
-    ),
   },
   {
     key: "customer_status",

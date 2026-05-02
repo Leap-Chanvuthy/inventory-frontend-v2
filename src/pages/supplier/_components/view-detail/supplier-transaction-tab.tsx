@@ -18,8 +18,8 @@ import {
   TRANSACTION_COLUMNS,
   TRANSACTION_SORT_OPTIONS,
 } from "../../utils/table-feature";
-import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
-import UnexpectedError from "@/components/reusable/partials/error";
+// import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
+// import UnexpectedError from "@/components/reusable/partials/error";
 
 interface SupplierTransactionTabProps {
   supplierId: number;
