@@ -53,6 +53,7 @@ export interface CategoryFilterSidebarProps<T> {
   getCategoryDescription?: (category: T) => string;
   getCategoryColor?: (category: T) => string | undefined;
   getCategoryCount?: (category: T) => number;
+  getCategoryViewHref?: (category: T) => string | undefined;
   renderCreateForm?: (context: CategoryFormRenderContext<T>) => ReactNode;
   renderUpdateForm?: (context: CategoryFormRenderContext<T>) => ReactNode;
 }
@@ -87,6 +88,7 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
   getCategoryDescription = (category: T) => category.description || "",
   getCategoryColor = (category: T) => category.label_color,
   getCategoryCount = (category: T) => category.items_count || category.units_count || category.raw_materials_count || 0,
+  getCategoryViewHref,
   renderCreateForm,
   renderUpdateForm,
 }: CategoryFilterSidebarProps<T>) {
@@ -184,6 +186,7 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
         getCategoryLabel={getCategoryLabel}
         getCategoryCount={getCategoryCount}
         getCategoryColor={getCategoryColor}
+        getCategoryViewHref={getCategoryViewHref}
         onCategoryChange={onCategoryChange}
         onEditCategory={setUpdateTarget}
         onDeleteCategory={category => onDeleteCategory(getCategoryId(category))}

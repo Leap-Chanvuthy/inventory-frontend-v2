@@ -1,9 +1,10 @@
 import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil, RotateCcw } from "lucide-react";
+import { Eye, Pencil, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DeleteModal from "@/components/reusable/partials/delete-modal";
+import { Link } from "react-router-dom";
 
 interface CategoryFilterItemProps {
   name: string;
@@ -16,6 +17,7 @@ interface CategoryFilterItemProps {
   onDelete?: () => void;
   onRestore?: () => void;
   showActions?: boolean;
+  viewHref?: string;
 }
 
 function CategoryFilterItemComponent({
@@ -29,6 +31,7 @@ function CategoryFilterItemComponent({
   onDelete,
   onRestore,
   showActions = true,
+  viewHref,
 }: CategoryFilterItemProps) {
   return (
     <li>
@@ -62,6 +65,23 @@ function CategoryFilterItemComponent({
 
           {showActions && (
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              {viewHref && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  asChild
+                >
+                  <Link
+                    to={viewHref}
+                    onClick={e => e.stopPropagation()}
+                    aria-label={`View ${name}`}
+                  >
+                    <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Link>
+                </Button>
+              )}
               {isDeletedView ? (
               <Button
                 type="button"

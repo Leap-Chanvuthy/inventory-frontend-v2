@@ -20,6 +20,7 @@ interface CategoryFilterListProps<T> {
   getCategoryLabel: (category: T) => string;
   getCategoryCount: (category: T) => number;
   getCategoryColor?: (category: T) => string | undefined;
+  getCategoryViewHref?: (category: T) => string | undefined;
 }
 
 export function CategoryFilterList<T>({
@@ -41,6 +42,7 @@ export function CategoryFilterList<T>({
   getCategoryLabel,
   getCategoryCount,
   getCategoryColor,
+  getCategoryViewHref,
 }: CategoryFilterListProps<T>) {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
@@ -79,6 +81,7 @@ export function CategoryFilterList<T>({
                   onEdit={() => onEditCategory(category)}
                   onDelete={() => onDeleteCategory(category)}
                   onRestore={() => onRestoreCategory?.(category)}
+                  viewHref={getCategoryViewHref?.(category)}
                 />
               );
             })}

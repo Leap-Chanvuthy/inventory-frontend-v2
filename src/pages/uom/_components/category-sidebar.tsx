@@ -39,17 +39,19 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Layers,
-  Plus,
-  Search,
-  Trash2,
-  Pencil,
-  RotateCcw,
-  ChevronRight,
   AlertCircle,
   ArchiveX,
+  ChevronRight,
+  Eye,
+  Layers,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -298,6 +300,15 @@ function CategoryRow({
           >
             {cat.units_count ?? 0}
           </span>
+
+          <Link
+            to={`/unit-of-measurement/categories/view/${cat.id}`}
+            onClick={e => e.stopPropagation()}
+            className="opacity-0 group-hover:opacity-100 h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:bg-blue-600/10 transition-all"
+            aria-label={`View ${cat.name}`}
+          >
+            <Eye className="h-3 w-3" />
+          </Link>
 
           {isTrashed ? (
             /* Restore button */

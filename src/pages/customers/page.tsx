@@ -92,6 +92,9 @@ export function Customers() {
                     getCategoryDescription={category => category.description}
                     getCategoryColor={category => category.label_color}
                     getCategoryCount={category => category.customers_count || 0}
+                    getCategoryViewHref={category =>
+                      `/categories/customer-categories/view/${category.id}`
+                    }
                     renderCreateForm={({ onSuccess, onCancel }) => (
                       <CreateCustomerCategoryForm
                         embedded

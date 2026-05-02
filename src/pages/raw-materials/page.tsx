@@ -97,6 +97,9 @@ export default function RawMaterials() {
               getCategoryDescription={category => category.description}
               getCategoryColor={category => category.label_color}
               getCategoryCount={category => category.raw_materials_count || 0}
+              getCategoryViewHref={category =>
+                `/categories/raw-material-categories/view/${category.id}`
+              }
               renderCreateForm={({ onSuccess, onCancel }) => (
                 <CreateCategoryForm
                   embedded

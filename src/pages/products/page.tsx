@@ -92,6 +92,9 @@ const Product = () => {
               getCategoryDescription={category => category.description}
               getCategoryColor={category => category.label_color}
               getCategoryCount={category => category.products_count || 0}
+              getCategoryViewHref={category =>
+                `/categories/product-categories/view/${category.id}`
+              }
               renderCreateForm={({ onSuccess, onCancel }) => (
                 <CreateCategoryForm
                   embedded
