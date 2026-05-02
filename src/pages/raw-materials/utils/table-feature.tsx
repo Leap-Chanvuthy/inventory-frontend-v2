@@ -146,8 +146,8 @@ export const RecoverAction = ({
 
       <DialogContent
         className="sm:max-w-lg"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={e => e.preventDefault()}
+        onEscapeKeyDown={e => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>Recover This Raw Material</DialogTitle>
@@ -190,7 +190,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "material_name",
     header: "Name",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <span className="font-medium whitespace-nowrap">
         {rawMaterial.material_name}
       </span>
@@ -200,7 +200,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "material_sku_code",
     header: "Code",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <span className="text-muted-foreground whitespace-nowrap">
         {rawMaterial.material_sku_code}
       </span>
@@ -210,7 +210,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "category",
     header: "Category",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <CategoryBadge
         category={rawMaterial.raw_material_category_name}
         color={rawMaterial.rm_category?.label_color}
@@ -221,7 +221,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "status",
     header: "Status",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <StockStatusBadge
         quantity={rawMaterial.minimum_stock_level}
         minimumStock={50} // You might want to make this configurable
@@ -232,7 +232,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "production_method",
     header: "Production Method",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <div>
         {rawMaterial.production_method == "FIFO" && "FIFO (First In First Out)"}
         {rawMaterial.production_method == "LIFO" && "LIFO (Last In First Out)"}
@@ -243,7 +243,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "quantity",
     header: "Quantity",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <span>
         {rawMaterial.stock_availability}{" "}
         {rawMaterial.uom?.symbol || rawMaterial.uom_name || ""}
@@ -254,7 +254,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "uom",
     header: "Unit of Measure",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => (
+    render: rawMaterial => (
       <span className="text-muted-foreground">{rawMaterial.uom_name}</span>
     ),
   },
@@ -262,7 +262,7 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
-    render: (rawMaterial) => <RawMaterialActions rawMaterial={rawMaterial} />,
+    render: rawMaterial => <RawMaterialActions rawMaterial={rawMaterial} />,
   },
 ];
 
@@ -350,6 +350,13 @@ export function RawMaterialCard({
   );
 }
 
+export const RM_STOCK_MOVEMENT_SORT_OPTIONS = [
+  { value: "-movement_date", label: "Newest First" },
+  { value: "movement_date", label: "Oldest First" },
+  { value: "-quantity", label: "Highest Quantity" },
+  { value: "quantity", label: "Lowest Quantity" },
+];
+
 // Raw Material Stock Movement Table Columns (for DataTable-style usage)
 // Note: UOM is a property of the Raw Material, so we pass it in.
 export const RM_STOCK_MOVEMENT_COLUMNS = (
@@ -361,7 +368,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "movement_date",
     header: "Movement Date",
     className: "whitespace-nowrap py-6",
-    render: (movement) => (
+    render: movement => (
       <Text.Small
         color="muted"
         fontWeight="medium"
@@ -375,7 +382,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "movement_type",
     header: "Movement Type",
     className: "whitespace-nowrap py-6",
-    render: (movement) => {
+    render: movement => {
       const IS_IN_USED = isInUsed(movement.in_used as unknown);
       const IS_RE_ORDER_PURCHASED =
         movement.movement_type === "RE_ORDER" ||
@@ -415,7 +422,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "direction",
     header: "Direction",
     className: "whitespace-nowrap py-6",
-    render: (movement) => {
+    render: movement => {
       const isStockIn = movement.direction === "IN";
 
       return (
@@ -440,33 +447,33 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       );
     },
   },
-    {
+  {
     key: "expiry_date",
     header: "Expiry Date",
     className: "whitespace-nowrap py-6",
-      render: (movement) => {
-        const expiryStatus = getExpiryDayStatus(movement.expiry_date);
+    render: movement => {
+      const expiryStatus = getExpiryDayStatus(movement.expiry_date);
 
-        return (
-          <div
-            className={
-              expiryStatus.tone === "negative"
-                ? "ctext-red-600 dark:text-red-400"
-                : expiryStatus.tone === "positive"
+      return (
+        <div
+          className={
+            expiryStatus.tone === "negative"
+              ? "ctext-red-600 dark:text-red-400"
+              : expiryStatus.tone === "positive"
                 ? "text-emerald-600 dark:text-emerald-400"
                 : "text-muted-foreground"
-            }
-          >
-            {expiryStatus.text}
-          </div>
-        );
-      },
+          }
+        >
+          {expiryStatus.text}
+        </div>
+      );
+    },
   },
   {
     key: "quantity",
     header: "Quantity",
     className: "whitespace-nowrap py-6 text-right",
-    render: (movement) => {
+    render: movement => {
       const isStockIn = movement.direction === "IN";
       const formattedQty = movement.quantity.toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -486,7 +493,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "unit_price_in_usd",
     header: "Purchasing Unit Price",
     className: "whitespace-nowrap py-6 text-right",
-    render: (movement) => (
+    render: movement => (
       <Text.Small color="muted">
         ${movement.unit_price_in_usd.toFixed(2)}
       </Text.Small>
@@ -496,7 +503,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "total_value_in_usd",
     header: "Purchasing Total Value",
     className: "whitespace-nowrap py-6 text-right",
-    render: (movement) => (
+    render: movement => (
       <Text.Small color="default" fontWeight="semibold">
         $
         {movement.total_value_in_usd.toLocaleString(undefined, {
@@ -509,7 +516,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "created_by",
     header: "Created By",
     className: "whitespace-nowrap py-6",
-    render: (movement) => (
+    render: movement => (
       <Link
         to={`/users/update/${movement.created_by?.id}`}
         className="flex items-center gap-3"
@@ -526,7 +533,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
                     .trim()
                     .split(/\s+/)
                     .slice(0, 2)
-                    .map((w) => w[0].toUpperCase())
+                    .map(w => w[0].toUpperCase())
                     .join("")
                 : "U"}
             </AvatarFallback>
@@ -542,7 +549,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "last_updated_by",
     header: "Last Updated By",
     className: "whitespace-nowrap py-6",
-    render: (movement) => (
+    render: movement => (
       <Link
         to={`/users/update/${movement.last_updated_by?.id}`}
         className="flex items-center gap-3"
@@ -559,7 +566,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
                     .trim()
                     .split(/\s+/)
                     .slice(0, 2)
-                    .map((w) => w[0].toUpperCase())
+                    .map(w => w[0].toUpperCase())
                     .join("")
                 : "U"}
             </AvatarFallback>
@@ -577,7 +584,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "note",
     header: "Notes",
     className: "whitespace-nowrap py-6",
-    render: (movement) => (
+    render: movement => (
       <Text.Small color="muted" maxLines={1}>
         {movement.note || "No notes"}
       </Text.Small>
@@ -587,7 +594,7 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
-    render: (movement) => {
+    render: movement => {
       const IS_RE_ORDER = movement.movement_type === "RE_ORDER";
 
       const payload = {

@@ -1,7 +1,11 @@
 import { useCreateCustomer } from "@/api/customers/customer.mutation";
 import { useCustomerCategories } from "@/api/categories/customer-categories/customer-category.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { TextInput, TextAreaInput, SelectInput } from "@/components/reusable/partials/input";
+import {
+  TextInput,
+  TextAreaInput,
+  SelectInput,
+} from "@/components/reusable/partials/input";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
@@ -18,7 +22,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export const CreateCustomerForm = () => {
   const customerMutation = useCreateCustomer();
-  const { data: categoriesData, isLoading: categoriesLoading } = useCustomerCategories();
+const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategories();
   const error = customerMutation.error as AxiosError<ValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
@@ -111,7 +115,7 @@ export const CreateCustomerForm = () => {
   );
 
   return (
-    <div className="animate-in slide-in-from-right-8 duration-300 my-5 mx-6">
+    <div className="animate-in slide-in-from-right-8 duration-300 my-5">
       <div className="mb-6 space-y-1">
         <Text.TitleMedium>Create a new Customer</Text.TitleMedium>
         <p className="text-sm text-muted-foreground">
@@ -261,10 +265,7 @@ export const CreateCustomerForm = () => {
               </CardHeader>
               <Separator />
               <CardContent className="pt-6">
-                <ImageUpload
-                  label="Customer Image"
-                  onChange={handleImageChange}
-                />
+                <ImageUpload onChange={handleImageChange} />
               </CardContent>
             </Card>
           </div>

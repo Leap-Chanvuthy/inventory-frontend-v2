@@ -59,9 +59,8 @@ export const useReorderRawMaterial = (rawMaterialId: number) => {
       reorderRawMaterial(rawMaterialId, payload),
     onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
-      queryClient.invalidateQueries({
-        queryKey: ["raw-material", rawMaterialId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+      queryClient.invalidateQueries({ queryKey: ["raw-material-movements", rawMaterialId] });
       toast.success(response.message || "Raw material reordered successfully");
     },
     onError: (error: any) => {
@@ -82,9 +81,8 @@ export const useUpdateReorderRawMaterial = (
       updateReorderRawMaterial(rawMaterialId, movementId, payload),
     onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: ["raw-materials"] });
-      queryClient.invalidateQueries({
-        queryKey: ["raw-material", rawMaterialId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+      queryClient.invalidateQueries({ queryKey: ["raw-material-movements", rawMaterialId] });
       toast.success(response.message || "Reorder updated successfully");
     },
     onError: (error: any) => {

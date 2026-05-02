@@ -33,6 +33,26 @@ export interface RawMaterialStockMovement {
   note: string | null;
   created_at: string;
   updated_at: string;
+  uom_name?: string;
+  uom_symbol?: string;
+}
+
+export interface StockMovementsQueryParams {
+  page?: number;
+  per_page?: number;
+  "filter[movement_type]"?: string;
+  "filter[direction]"?: string;
+  sort?: string;
+}
+
+export interface PaginatedStockMovementsResponse {
+  current_page: number;
+  data: RawMaterialStockMovement[];
+  last_page: number;
+  total: number;
+  per_page: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
 }
 
 // Raw Material Image

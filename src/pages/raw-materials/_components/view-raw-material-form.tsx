@@ -376,15 +376,11 @@ export function ViewRawMaterialForm() {
       )}
 
       {/* 6. Stock Movements */}
-      {raw_material.rm_stock_movements &&
-        raw_material.rm_stock_movements.length > 0 && (
-          <StockMovementsTable
-            movements={raw_material.rm_stock_movements}
-            rawMaterialId={raw_material.id}
-            materialName={raw_material.material_name}
-            uom={raw_material.uom || null}
-          />
-        )}
+      <StockMovementsTable
+        rawMaterialId={raw_material.id}
+        materialName={raw_material.material_name}
+        uom={raw_material.uom || null}
+      />
     </div>
   );
 }

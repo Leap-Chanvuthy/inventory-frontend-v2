@@ -63,7 +63,6 @@ export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
           perPage={perPage}
           onPerPageChange={setPerPage}
           createHref="/raw-materials/create"
-          isListOptionDisplayed={true}
           deletedPathname="/raw-materials/deleted"
         />
 

@@ -17,6 +17,7 @@ type DataTableProps<T> = {
     isLoading?: boolean;
     loadingText?: string;
     loadingClassName?: string;
+    loadingVariant?: "spinner" | "text";
     emptyText?: string;
 
     /** Optional row selection */
@@ -30,6 +31,7 @@ export function DataTable<T>({
     isLoading = false,
     loadingText,
     loadingClassName = "min-h-[200px]",
+    loadingVariant = "spinner",
     emptyText = "No data found",
     rowSelection,
 }: DataTableProps<T>) {
@@ -117,9 +119,12 @@ export function DataTable<T>({
                         <TableRow>
                             <TableCell
                                 colSpan={columns.length + (hasSelection ? 1 : 0)}
-                                className="p-0"
+                                className={loadingVariant === "text" ? "py-6 text-center text-sm text-muted-foreground" : "p-0"}
                             >
-                                <DataCardLoading text={loadingText} className={loadingClassName} />
+                                {loadingVariant === "text"
+                                    ? (loadingText ?? "Loading...")
+                                    : <DataCardLoading text={loadingText} className={loadingClassName} />
+                                }
                             </TableCell>
                         </TableRow>
                     ) : data?.length ? (
