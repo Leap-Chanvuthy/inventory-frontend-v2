@@ -42,7 +42,7 @@ export function CategoryFilterLayout({
       </div>
 
       <div
-        className="hidden lg:block w-full lg:min-w-[260px] lg:max-w-[280px] xl:min-w-[280px] xl:max-w-[300px] shrink-0"
+        className="hidden lg:block w-full lg:min-w-[220px] lg:max-w-[240px] xl:min-w-[240px] xl:max-w-[260px] shrink-0"
         data-category-key={categoryKey}
       >
         {sidebar}

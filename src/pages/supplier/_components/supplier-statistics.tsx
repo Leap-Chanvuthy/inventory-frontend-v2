@@ -57,7 +57,7 @@ export function SupplierStatistics() {
           />
         </div>
       </section>
-      <div className="w-full my-4 mx-2 grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="w-full my-4 mx-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SupplierChartAreaStacked />
         <SupplierBarchart />
         <SupplierPiechart />

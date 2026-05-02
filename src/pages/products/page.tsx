@@ -68,7 +68,7 @@ const Product = () => {
           sidebar={
             <CategoryFilterSidebar
               categoryKey="product_category_id"
-              categoryLabel="PD Categories"
+              categoryLabel="Product Categories"
               createMode="modal"
               createHref="/categories/product-categories/create"
               categories={categories}

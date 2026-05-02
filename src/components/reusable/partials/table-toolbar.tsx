@@ -198,11 +198,11 @@ export const TableToolbar = ({
   };
 
   return (
-    <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       {/* LEFT */}
-      <div className="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-start">
+      <div className="flex flex-1 flex-wrap gap-2 sm:flex-row sm:items-start">
         {/* Search */}
-        <div className="relative w-full md:max-w-xs">
+        <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
 
           <Input
@@ -230,7 +230,7 @@ export const TableToolbar = ({
         </div>
 
         {/* Actions */}
-        <div className="flex w-full flex-wrap gap-2 md:w-auto">
+        <div className="flex flex-wrap gap-2">
           {/* Sort */}
           {sortOptions.length > 0 && (
             <NavigationMenu>
@@ -342,7 +342,7 @@ export const TableToolbar = ({
       </div>
 
       {/* RIGHT */}
-      <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end xl:w-auto">
+      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
         {/* Extra Actions */}
         {extraActions}
 

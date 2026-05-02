@@ -25,7 +25,7 @@ export function DataCard<T>({
   }
 
   return (
-    <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {data.map((item, index) => (
         <div key={index}>{renderItem(item)}</div>
       ))}

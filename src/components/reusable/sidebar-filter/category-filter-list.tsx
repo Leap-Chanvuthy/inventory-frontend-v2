@@ -1,4 +1,4 @@
-import { GlobalPagination } from "@/components/reusable/partials/pagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CategoryFilterItem } from "./category-filter-item";
 
 interface CategoryFilterListProps<T> {
@@ -96,12 +96,24 @@ export function CategoryFilterList<T>({
       </div>
 
       {lastPage > 1 && (
-        <div className="border-t p-2">
-          <GlobalPagination
-            currentPage={currentPage}
-            lastPage={lastPage}
-            onPageChange={onPageChange}
-          />
+        <div className="border-t px-3 py-2.5 flex items-center justify-between gap-2">
+          <button
+            onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+            className="h-7 w-7 flex items-center justify-center rounded-md border bg-background hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+          <span className="text-xs font-medium text-muted-foreground tabular-nums">
+            Page {currentPage} of {lastPage}
+          </span>
+          <button
+            onClick={() => onPageChange(Math.min(currentPage + 1, lastPage))}
+            disabled={currentPage === lastPage}
+            className="h-7 w-7 flex items-center justify-center rounded-md border bg-background hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
     </div>

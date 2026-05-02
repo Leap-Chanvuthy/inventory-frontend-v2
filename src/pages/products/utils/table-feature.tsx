@@ -1,7 +1,12 @@
 import { Product } from "@/api/product/product.type";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import TableActions from "@/components/reusable/partials/table-actions";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Text } from "@/components/ui/text/app-text";
 import { Badge } from "@/components/ui/badge";
 import { Package, Warehouse, User, Ruler, Tag } from "lucide-react";
@@ -12,7 +17,7 @@ import { RecoverProductAction } from "./deleted-table-feature";
 // Category Badge with consistent sizing and truncation
 const CategoryBadge = ({ product }: { product: Product }) => (
   <Badge
-    className="min-w-[160px] max-w-[160px] h-6 inline-flex items-center justify-center truncate"
+    className="min-w-[140px] max-w-[140px] h-6 inline-flex items-center justify-center truncate"
     style={
       product.category?.label_color
         ? { backgroundColor: product.category.label_color, color: "#fff" }
@@ -50,13 +55,15 @@ export const SORT_OPTIONS = [
 
 // filter by product type
 export const FILTER_OPTIONS = [
-{
-    value: 'external_purchased', label: 'External Purchased'
-},
-{
-    value: 'internal_produced', label: 'Internal Produced'
-}
-]
+  {
+    value: "external_purchased",
+    label: "External Purchased",
+  },
+  {
+    value: "internal_produced",
+    label: "Internal Produced",
+  },
+];
 
 // Table Columns
 export const COLUMNS: DataTableColumn<Product>[] = [
@@ -64,15 +71,17 @@ export const COLUMNS: DataTableColumn<Product>[] = [
     key: "product_name",
     header: "Name",
     className: "whitespace-nowrap py-6",
-    render: (product) => (
-      <span className="font-medium whitespace-nowrap">{product.product_name}</span>
+    render: product => (
+      <span className="font-medium whitespace-nowrap">
+        {product.product_name}
+      </span>
     ),
   },
   {
     key: "product_sku_code",
     header: "SKU",
     className: "whitespace-nowrap py-6",
-    render: (product) => (
+    render: product => (
       <span className="text-muted-foreground whitespace-nowrap">
         {product.product_sku_code}
       </span>
@@ -82,7 +91,7 @@ export const COLUMNS: DataTableColumn<Product>[] = [
     key: "category",
     header: "Category",
     className: "whitespace-nowrap py-6",
-    render: (product) => <CategoryBadge product={product} />,
+    render: product => <CategoryBadge product={product} />,
   },
   // {
   //   key: "supplier",
@@ -108,7 +117,7 @@ export const COLUMNS: DataTableColumn<Product>[] = [
     key: "uom",
     header: "Unit",
     className: "whitespace-nowrap py-6",
-    render: (product) => (
+    render: product => (
       <span className="text-muted-foreground">{product.uom_name || "—"}</span>
     ),
   },
@@ -124,12 +133,18 @@ export const COLUMNS: DataTableColumn<Product>[] = [
     key: "actions",
     header: "Actions",
     className: "whitespace-nowrap py-6",
-    render: (product) => <ProductActions product={product} />,
+    render: product => <ProductActions product={product} />,
   },
 ];
 
 // Card Component for Grid View
-export function ProductCard({ product, isDeleted = false }: { product?: Product; isDeleted?: boolean }) {
+export function ProductCard({
+  product,
+  isDeleted = false,
+}: {
+  product?: Product;
+  isDeleted?: boolean;
+}) {
   if (!product) return null;
 
   return (

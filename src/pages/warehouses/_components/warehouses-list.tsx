@@ -55,7 +55,7 @@ export default function WarehousesList({
 
   return (
     <div className="w-full p-4 sm:p-8 bg-background">
-      <div className="mx-auto max-w-[1600px]">
+      <div className="mx-auto max-w-full">
         {/* Toolbar */}
         <TableToolbar
           searchPlaceholder="Search warehouses...."
