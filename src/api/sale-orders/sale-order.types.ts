@@ -364,6 +364,20 @@ export interface SaleOrderStatistics {
     total_sales_usd: number;
     total_sales_riel: number;
   }>;
+  top_refunded_customers: Array<{
+    customer_id: number | null;
+    customer_name: string;
+    refunded_orders_count: number;
+    total_refund_usd: number;
+    total_refund_riel: number;
+  }>;
+  top_cancelled_customers: Array<{
+    customer_id: number | null;
+    customer_name: string;
+    cancelled_orders_count: number;
+    total_cancelled_usd: number;
+    total_cancelled_riel: number;
+  }>;
   filters?: {
     date_from?: string | null;
     date_to?: string | null;

@@ -26,8 +26,12 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
+  Legend,
+  Cell,
   XAxis,
   YAxis,
 } from "recharts";
@@ -122,6 +126,8 @@ export function StatisticsPanel({
     group_by: groupBy,
     top_customers: [],
     top_products: [],
+    top_refunded_customers: [],
+    top_cancelled_customers: [],
     sales_trend: [],
   } as SaleOrderStatistics;
 
@@ -142,6 +148,47 @@ export function StatisticsPanel({
     label: `${index + 1}. ${product.product_name || "-"}`,
     value: Number(product.quantity_sold ?? 0),
   }));
+
+  const refundedCustomersChart = (safe.top_refunded_customers || []).map(
+    (customer, index) => ({
+      id: Number(customer.customer_id ?? 0),
+      name: customer.customer_name || `Customer #${index + 1}`,
+      value: Number(customer.total_refund_usd ?? 0),
+    }),
+  );
+
+  const cancelledCustomersChart = (safe.top_cancelled_customers || []).map(
+    (customer, index) => ({
+      id: Number(customer.customer_id ?? 0),
+      name: customer.customer_name || `Customer #${index + 1}`,
+      value: Number(customer.total_cancelled_usd ?? 0),
+    }),
+  );
+
+  const refundedColors = [
+    "#7c3aed",
+    "#8b5cf6",
+    "#a78bfa",
+    "#c4b5fd",
+    "#6d28d9",
+    "#5b21b6",
+    "#4c1d95",
+    "#a855f7",
+    "#9333ea",
+    "#581c87",
+  ];
+  const cancelledColors = [
+    "#dc2626",
+    "#ef4444",
+    "#f87171",
+    "#fca5a5",
+    "#b91c1c",
+    "#991b1b",
+    "#7f1d1d",
+    "#fb7185",
+    "#e11d48",
+    "#9f1239",
+  ];
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-muted/20 p-4">
@@ -324,7 +371,15 @@ export function StatisticsPanel({
                 <BarChart data={topCustomersChart} layout="vertical" margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis type="number" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis type="category" dataKey="label" width={160} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis
+                    type="category"
+                    dataKey="label"
+                    width={120}
+                    tick={{ fontSize: 10 }}
+                    tickMargin={6}
+                    stroke="hsl(var(--muted-foreground))"
+                    tickFormatter={value => String(value).slice(0, 18)}
+                  />
                   <Tooltip
                     formatter={(value: number) => [money(Number(value || 0)), "Total Sales"]}
                     labelFormatter={label => `${label} (click bar to view)`}
@@ -365,7 +420,15 @@ export function StatisticsPanel({
                 <BarChart data={topProductsChart} layout="vertical" margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis type="number" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis type="category" dataKey="label" width={160} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis
+                    type="category"
+                    dataKey="label"
+                    width={120}
+                    tick={{ fontSize: 10 }}
+                    tickMargin={6}
+                    stroke="hsl(var(--muted-foreground))"
+                    tickFormatter={value => String(value).slice(0, 18)}
+                  />
                   <Tooltip
                     formatter={(value: number) => [Number(value || 0), "Qty Sold"]}
                     labelFormatter={label => `${label} (click bar to view)`}
@@ -389,6 +452,118 @@ export function StatisticsPanel({
               </ResponsiveContainer>
             ) : (
               <p className="text-xs text-muted-foreground">No product data for the selected filters.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card/95 p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Top 10 Refunded Customers
+            </p>
+            <span className="text-[10px] text-muted-foreground">Refund USD</span>
+          </div>
+          <div className="h-[260px] sm:h-[320px]">
+            {refundedCustomersChart.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip
+                    formatter={(value: number) => money(Number(value || 0))}
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                      background: "#ffffff",
+                      color: "#111827",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Legend
+                    layout="horizontal"
+                    align="center"
+                    verticalAlign="bottom"
+                    wrapperStyle={{ fontSize: "11px" }}
+                  />
+                  <Pie
+                    data={refundedCustomersChart}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius="55%"
+                    outerRadius="80%"
+                    paddingAngle={3}
+                    onClick={entry => {
+                      const id = Number(entry?.id ?? 0);
+                      if (id > 0) onViewCustomer(id);
+                    }}
+                  >
+                    {refundedCustomersChart.map((entry, index) => (
+                      <Cell
+                        key={`${entry.id}-${index}`}
+                        fill={refundedColors[index % refundedColors.length]}
+                        cursor="pointer"
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-xs text-muted-foreground">No refund data for the selected filters.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-card/95 p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Top 10 Cancelled Customers
+            </p>
+            <span className="text-[10px] text-muted-foreground">Cancelled USD</span>
+          </div>
+          <div className="h-[260px] sm:h-[320px]">
+            {cancelledCustomersChart.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Tooltip
+                    formatter={(value: number) => money(Number(value || 0))}
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                      background: "#ffffff",
+                      color: "#111827",
+                      fontSize: "12px",
+                    }}
+                  />
+                  <Legend
+                    layout="horizontal"
+                    align="center"
+                    verticalAlign="bottom"
+                    wrapperStyle={{ fontSize: "11px" }}
+                  />
+                  <Pie
+                    data={cancelledCustomersChart}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius="55%"
+                    outerRadius="80%"
+                    paddingAngle={3}
+                    onClick={entry => {
+                      const id = Number(entry?.id ?? 0);
+                      if (id > 0) onViewCustomer(id);
+                    }}
+                  >
+                    {cancelledCustomersChart.map((entry, index) => (
+                      <Cell
+                        key={`${entry.id}-${index}`}
+                        fill={cancelledColors[index % cancelledColors.length]}
+                        cursor="pointer"
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-xs text-muted-foreground">No cancelled data for the selected filters.</p>
             )}
           </div>
         </div>
