@@ -1,18 +1,14 @@
 import {
   Home,
-  // Calendar,
-  // Search,
-  // Settings,
   User,
-  // Boxes,
   Warehouse,
-  HelpCircle,
+  // HelpCircle,
   Truck,
   PackageSearch, 
   PencilRuler,
   Users,
   CircleDollarSign,
-  NotepadText,
+  // NotepadText,
   Tag,
   type LucideIcon,
   Activity,
@@ -55,25 +51,6 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
 
     ],
   },
-  // {
-  //   label: "Management",
-  //   items: [
-  //     {
-  //       title: "Users",
-  //       url: "/users",
-  //       icon: User,
-  //       roles: [ROLES.ADMIN],
-  //       isQuickMenu: true,
-  //     },
-  //     {
-  //       title: "Audit Logs",
-  //       url: "/audit-logs",
-  //       icon: Activity,
-  //       roles: [ROLES.ADMIN],
-  //       isQuickMenu: true,
-  //     },
-  //   ],
-  // },
   {
     label: "Inventory",
     items: [
@@ -96,7 +73,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Products",
         url: "/products",
         icon: PackageSearch,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER , ROLES.VENDER],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -112,14 +89,6 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
         isQuickMenu: true,
       },
-      // {
-      //   title: "Categories",
-      //   url: "/categories",
-      //   icon: Boxes,
-      //   roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
-      //   isQuickMenu: false,
-      //   isLocked: true,
-      // },
       {
         title: "Unit of Measurement",
         url: "/unit-of-measurement",
@@ -138,6 +107,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         icon: Users,
         roles: [ROLES.ADMIN, ROLES.VENDER],
         isLocked: false,
+        isQuickMenu: true,
       },
       {
         title: "Sale Orders",
@@ -149,29 +119,21 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
       },
     ],
   },
-  {
-    label: "Report & Analytics",
-    items: [
-      {
-        title: "Financial Report",
-        url: "/financial-report",
-        icon: NotepadText,
-        roles: [ROLES.ADMIN, ROLES.VENDER],
-        isLocked: true,
-      },
-    ],
-  },
+  // {
+  //   label: "Report & Analytics",
+  //   items: [
+  //     {
+  //       title: "Financial Report",
+  //       url: "/financial-report",
+  //       icon: NotepadText,
+  //       roles: [ROLES.ADMIN, ROLES.VENDER],
+  //       isLocked: true,
+  //     },
+  //   ],
+  // },
   {
     label: "Settings",
     items: [
-      // {
-      //   title: "Settings",
-      //   url: "/settings",
-      //   icon: Settings,
-      //   roles: [ROLES.ADMIN],
-      //   isLocked: true,
-      //   isQuickMenu: false,
-      // },
       {
         title: "Company",
         url: "/company",
@@ -188,9 +150,9 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
       },
     ],
   },
-  {
-    items: [{ title: "Help", url: "/help", icon: HelpCircle }],
-  },
+  // {
+  //   items: [{ title: "Help", url: "/help", icon: HelpCircle }],
+  // },
 ];
 
 export const quickMenu: SidebarItem[] = SIDEBAR_CONFIG.flatMap(group =>

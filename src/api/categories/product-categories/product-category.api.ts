@@ -17,6 +17,18 @@ export const getProductCategories = async (
   return response.data;
 };
 
+export const getTrashedProductCategories = async (
+  params?: ProductCategoryQueryParams
+): Promise<ProductCategoryResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/product-categories/trashed`,
+    {
+      params,
+    }
+  );
+  return response.data;
+};
+
 export const createProductCategory = async (
   data: CreateProductCategoryRequest
 ): Promise<{ status: boolean; message: string; data: ProductCategory }> => {
@@ -52,4 +64,8 @@ export const updateProductCategory = async (
 
 export const deleteProductCategory = async (id: string | number): Promise<void> => {
   await apiClient.delete(`${BASE_API_URL}/product-categories/${id}`);
+};
+
+export const restoreProductCategory = async (id: string | number): Promise<void> => {
+  await apiClient.patch(`${BASE_API_URL}/product-categories/${id}/restore`);
 };

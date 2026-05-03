@@ -93,12 +93,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/products" element={<Product />} />
-              <Route path="/sale-orders" element={<SaleOrdersPage />} />
-              <Route path="/products/create" element={<CreateProduct />} />
-              <Route path="/products/view/:id" element={<ProductDetail />} />
-              <Route path="/products/deleted" element={<DeletedProducts />} />
-              <Route path="/products/update/:id" element={<UpdateProduct />} />
+
 
               {/* ADMIN ONLY */}
               <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
@@ -112,154 +107,104 @@ export default function App() {
                 <Route path="/audit-logs/view/:id" element={<ViewAuditLog />} />
 
 
-                {/* Supplier */}
-                <Route path="/supplier" element={<Supplier />} />
-                <Route path="/supplier/create" element={<CreateSupplier />} />
-                <Route path="/supplier/import" element={<ImportSuppliers />} />
-                <Route
-                  path="/supplier/import-history"
-                  element={<ImportHistory />}
-                />
-                <Route
-                  path="/supplier/update/:id"
-                  element={<UpdateSupplier />}
-                />
-                <Route path="/supplier/view/:id" element={<SupplierDetail />} />
-                <Route
-                  path="/supplier/deleted"
-                  element={<DeletedSuppliers />}
-                />
-
-                {/* Customer Routes */}
-                <Route path="/customer" element={<Customers />} />
-                <Route path="/customer/create" element={<CreateCustomer />} />
-                <Route
-                  path="/customer/update/:id"
-                  element={<UpdateCustomer />}
-                />
-                <Route path="/customer/view/:id" element={<CustomerDetail />} />
-
-                {/* Warehouse Routes */}
-                <Route path="/warehouses" element={<Warehouses />} />
-                <Route
-                  path="/warehouses/view/:id"
-                  element={<ViewWarehouses />}
-                />
-                <Route
-                  path="/warehouses/update/:id"
-                  element={<UpdateWarehouse />}
-                />
-                <Route
-                  path="/warehouses/create"
-                  element={<CreateWarehouses />}
-                />
-
                 {/* Categories */}
                 <Route path="/categories" element={<Categories />} />
-
-                {/* Raw Material Categories */}
-                <Route
-                  path="categories/raw-material-categories/create"
-                  element={<CreateCategories />}
-                />
-                <Route
-                  path="categories/raw-material-categories/view/:id"
-                  element={<ViewCategories />}
-                />
-                <Route
-                  path="categories/raw-material-categories/edit/:id"
-                  element={<EditCategories />}
-                />
-
-                {/* Product Categories */}
-                <Route
-                  path="categories/product-categories"
-                  element={<ProductCategories />}
-                />
-                <Route
-                  path="categories/product-categories/create"
-                  element={<CreateProductCategories />}
-                />
-                <Route
-                  path="categories/product-categories/view/:id"
-                  element={<ViewProductCategories />}
-                />
-                <Route
-                  path="categories/product-categories/edit/:id"
-                  element={<EditProductCategories />}
-                />
-
-                {/* Customer Categories */}
-                <Route
-                  path="categories/customer-categories/create"
-                  element={<CreateCustomerCategories />}
-                />
-                <Route
-                  path="categories/customer-categories/view/:id"
-                  element={<ViewCustomerCategories />}
-                />
-                <Route
-                  path="categories/customer-categories/edit/:id"
-                  element={<EditCustomerCategories />}
-                />
-
-                <Route path="/unit-of-measurement" element={<UOM />} />
-                <Route
-                  path="/unit-of-measurement/create"
-                  element={<CreateUOM />}
-                />
-                <Route
-                  path="/unit-of-measurement/view/:id"
-                  element={<ViewUOM />}
-                />
-                <Route
-                  path="/unit-of-measurement/edit/:id"
-                  element={<EditUOM />}
-                />
-
-                {/* UOM Categories */}
-                <Route
-                  path="/unit-of-measurement/categories"
-                  element={<UomCategoriesPage />}
-                />
-                <Route
-                  path="/unit-of-measurement/categories/create"
-                  element={<CreateUomCategoryPage />}
-                />
-                <Route
-                  path="/unit-of-measurement/categories/edit/:id"
-                  element={<EditUomCategoryPage />}
-                />
-                <Route
-                  path="/unit-of-measurement/categories/view/:id"
-                  element={<ViewUomCategoryPage />}
-                />
-
-                {/* Raw Materials */}
-                <Route path="/raw-materials" element={<RawMaterials />} />
-                <Route
-                  path="/raw-materials/create"
-                  element={<CreateRawMaterial />}
-                />
-                <Route
-                  path="/raw-materials/view/:id"
-                  element={<RawMaterialDetail />}
-                />
-                <Route
-                  path="/raw-materials/update/:id"
-                  element={<UpdateRawMaterial />}
-                />
-                <Route
-                  path="/raw-materials/deleted"
-                  element={<DeletedRawMaterials />}
-                />
 
                 {/* Company Settings */}
                 <Route path="/company" element={<Company />} />
                 <Route path="/settings" element={<Setting />} />
               </Route>
+
             </Route>
           </Route>
+
+          {/* ADMIN & STOCK_CONTROLLER ACCESS */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STOCK_CONTROLLER]} />}>
+            <Route element={<Layout />}>
+
+              {/* Supplier */}
+              <Route path="/supplier" element={<Supplier />} />
+              <Route path="/supplier/create" element={<CreateSupplier />} />
+              <Route path="/supplier/import" element={<ImportSuppliers />} />
+              <Route path="/supplier/import-history" element={<ImportHistory />}/>
+              <Route path="/supplier/update/:id" element={<UpdateSupplier />}/>
+              <Route path="/supplier/view/:id" element={<SupplierDetail />} />
+              <Route path="/supplier/deleted" element={<DeletedSuppliers />}/>
+
+              {/* Raw Materials */}
+              <Route path="/raw-materials" element={<RawMaterials />} />
+              <Route path="/raw-materials/create" element={<CreateRawMaterial />}/>
+              <Route path="/raw-materials/view/:id" element={<RawMaterialDetail />}/>
+              <Route path="/raw-materials/update/:id" element={<UpdateRawMaterial />}/>
+              <Route path="/raw-materials/deleted" element={<DeletedRawMaterials />}/>
+
+              {/* Raw Material Categories */}
+              <Route path="categories/raw-material-categories/create" element={<CreateCategories />}/>
+              <Route path="categories/raw-material-categories/view/:id" element={<ViewCategories />}/>
+              <Route path="categories/raw-material-categories/edit/:id" element={<EditCategories />}/>              
+              
+              {/* Products */}
+              {/* <Route path="/products" element={<Product />} />               */}
+              <Route path="/products/create" element={<CreateProduct />} />
+              <Route path="/products/deleted" element={<DeletedProducts />} />
+              <Route path="/products/update/:id" element={<UpdateProduct />} />
+
+              {/* Product Categories */}
+              <Route path="categories/product-categories" element={<ProductCategories />}/>
+              <Route path="categories/product-categories/create" element={<CreateProductCategories />}/>
+              <Route path="categories/product-categories/edit/:id" element={<EditProductCategories />}/>              
+                
+              {/* Unit of Measurement */}
+              <Route path="/unit-of-measurement" element={<UOM />} />
+              <Route path="/unit-of-measurement/create" element={<CreateUOM />}/>
+              <Route path="/unit-of-measurement/view/:id" element={<ViewUOM />}/>
+              <Route path="/unit-of-measurement/edit/:id" element={<EditUOM />}/>
+
+              {/* UOM Categories */}
+              <Route path="/unit-of-measurement/categories" element={<UomCategoriesPage />}/>
+              <Route path="/unit-of-measurement/categories/create" element={<CreateUomCategoryPage />}/>
+              <Route path="/unit-of-measurement/categories/edit/:id" element={<EditUomCategoryPage />}/>
+              <Route path="/unit-of-measurement/categories/view/:id" element={<ViewUomCategoryPage />}/>
+
+              {/* Warehouse Routes */}
+              <Route path="/warehouses" element={<Warehouses />} />
+              <Route path="/warehouses/view/:id" element={<ViewWarehouses />} />
+              <Route path="/warehouses/update/:id" element={<UpdateWarehouse />}/>
+              <Route path="/warehouses/create" element={<CreateWarehouses />}/>
+
+            </Route>
+          </Route>
+                        
+          {/* ADMIN & VENDER ACCESS */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.VENDER]} />}>
+            <Route element={<Layout />}>
+
+              {/* Sale Orders */}
+              <Route path="/sale-orders" element={<SaleOrdersPage />} />
+
+              {/* Customer Routes */}
+              <Route path="/customer" element={<Customers />} />
+              <Route path="/customer/create" element={<CreateCustomer />} />
+              <Route path="/customer/update/:id" element={<UpdateCustomer />}/>
+              <Route path="/customer/view/:id" element={<CustomerDetail />} />
+
+              {/* Customer Categories */}
+              <Route path="categories/customer-categories/create" element={<CreateCustomerCategories />}/>
+              <Route path="categories/customer-categories/view/:id" element={<ViewCustomerCategories />}/>
+              <Route path="categories/customer-categories/edit/:id" element={<EditCustomerCategories />}/>              
+                
+            </Route>
+          </Route>
+
+          {/* ACCESS BY EVERYONE WITH SOME LIMIT ACCESS TO VENDER */}
+          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.VENDER , ROLES.STOCK_CONTROLLER]} />}>
+            <Route element={<Layout />}>
+              <Route path="/products" element={<Product />} />
+              <Route path="/products/view/:id" element={<ProductDetail />} />
+              <Route path="categories/product-categories/view/:id" element={<ViewProductCategories />}/>           
+            </Route>
+          </Route>
+
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />

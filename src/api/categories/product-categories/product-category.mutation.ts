@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createProductCategory,
   deleteProductCategory,
+  restoreProductCategory,
   updateProductCategory,
 } from "./product-category.api";
 import { toast } from "sonner";
@@ -66,6 +67,24 @@ export const useDeleteProductCategory = () => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to delete category",
+      );
+    },
+  });
+};
+
+export const useRestoreProductCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => restoreProductCategory(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["product-categories"] });
+      toast.success("Category restored successfully");
+    },
+
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to restore category",
       );
     },
   });
