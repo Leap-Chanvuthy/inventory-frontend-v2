@@ -4,12 +4,28 @@ import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { CreateWarehouseValidationErrors } from "@/api/warehouses/warehouses.types";
+import {
+  CreateWarehouseValidationErrors,
+  SubWarehousePayload,
+} from "@/api/warehouses/warehouses.types";
 import MapPicker from "@/components/reusable/map-picker/map-picker";
 import { useNavigate } from "react-router-dom";
 import { Text } from "@/components/ui/text/app-text";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Plus, Trash2 } from "lucide-react";
+
+const createEmptySubWarehouse = (): SubWarehousePayload => ({
+  warehouse_name: "",
+  warehouse_manager: "",
+  warehouse_manager_contact: "",
+  warehouse_manager_email: "",
+  warehouse_address: "",
+  latitude: "",
+  longitude: "",
+  warehouse_description: "",
+});
 
 export const CreateWarehouseForm = () => {
   const warehouseMutation = useCreateWarehouse();
@@ -31,6 +47,8 @@ export const CreateWarehouseForm = () => {
 
   const [form, setForm] = useState(initialForm);
   const [formKey, setFormKey] = useState(0);
+  const [subWarehouses, setSubWarehouses] = useState<SubWarehousePayload[]>([]);
+  const [showSubWarehouseSection, setShowSubWarehouseSection] = useState(false);
 
   /* ---------- Handlers ---------- */
 
@@ -48,6 +66,33 @@ export const CreateWarehouseForm = () => {
     setForm(prev => ({ ...prev, images: files }));
   };
 
+  const handleSubWarehouseChange = (
+    index: number,
+    field: keyof SubWarehousePayload,
+    value: string,
+  ) => {
+    setSubWarehouses((prev) =>
+      prev.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, [field]: value } : item,
+      ),
+    );
+  };
+
+  const addSubWarehouse = () => {
+    setShowSubWarehouseSection(true);
+    setSubWarehouses((prev) => [...prev, createEmptySubWarehouse()]);
+  };
+
+  const removeSubWarehouse = (index: number) => {
+    setSubWarehouses((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+  };
+
+  const getSubWarehouseError = (index: number, field: keyof SubWarehousePayload) =>
+    fieldErrors?.[`sub_warehouses.${index}.${field}`]?.[0];
+
+  const hasAnySubWarehouseValue = (subWarehouse: SubWarehousePayload) =>
+    Object.values(subWarehouse).some((value) => String(value ?? "").trim() !== "");
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -60,6 +105,18 @@ export const CreateWarehouseForm = () => {
       ...form,
       latitude: form.latitude || undefined,
       longitude: form.longitude || undefined,
+      sub_warehouses: subWarehouses
+        .filter(hasAnySubWarehouseValue)
+        .map((item) => ({
+          warehouse_name: item.warehouse_name,
+          warehouse_address: item.warehouse_address,
+          warehouse_manager: item.warehouse_manager || undefined,
+          warehouse_manager_contact: item.warehouse_manager_contact || undefined,
+          warehouse_manager_email: item.warehouse_manager_email || undefined,
+          latitude: item.latitude || undefined,
+          longitude: item.longitude || undefined,
+          warehouse_description: item.warehouse_description || undefined,
+        })),
     };
 
     warehouseMutation.mutate(payload, {
@@ -69,6 +126,8 @@ export const CreateWarehouseForm = () => {
         } else {
           setForm(initialForm);
           setFormKey(prev => prev + 1);
+          setSubWarehouses([]);
+          setShowSubWarehouseSection(false);
         }
       },
     });
@@ -169,6 +228,154 @@ export const CreateWarehouseForm = () => {
               </div>
             </div>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <Text.TitleSmall>Sub Warehouses</Text.TitleSmall>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Optionally add one or more sub warehouses.
+                </p>
+              </div>
+              <Button type="button" variant="outline" onClick={addSubWarehouse}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Sub Warehouse
+              </Button>
+            </div>
+          </CardHeader>
+          {(showSubWarehouseSection || subWarehouses.length > 0) && (
+            <>
+              <Separator />
+              <CardContent className="pt-6 space-y-4">
+                {subWarehouses.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No sub warehouse added yet.
+                  </p>
+                ) : (
+                  subWarehouses.map((subWarehouse, index) => (
+                    <div key={`sub-warehouse-${index}`} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Text.TitleSmall>Sub Warehouse {index + 1}</Text.TitleSmall>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeSubWarehouse(index)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+
+                      <TextInput
+                        id={`sub_warehouse_name_${index}`}
+                        label="Warehouse Name"
+                        placeholder="Enter sub warehouse name"
+                        value={subWarehouse.warehouse_name || ""}
+                        error={getSubWarehouseError(index, "warehouse_name")}
+                        onChange={(e) =>
+                          handleSubWarehouseChange(index, "warehouse_name", e.target.value)
+                        }
+                      />
+
+                      <TextAreaInput
+                        id={`sub_warehouse_address_${index}`}
+                        label="Warehouse Address"
+                        placeholder="Enter sub warehouse address"
+                        value={subWarehouse.warehouse_address || ""}
+                        error={getSubWarehouseError(index, "warehouse_address")}
+                        onChange={(e) =>
+                          handleSubWarehouseChange(index, "warehouse_address", e.target.value)
+                        }
+                      />
+
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <TextInput
+                          id={`sub_warehouse_manager_${index}`}
+                          label="Warehouse Manager"
+                          placeholder="Enter manager name"
+                          value={subWarehouse.warehouse_manager || ""}
+                          error={getSubWarehouseError(index, "warehouse_manager")}
+                          onChange={(e) =>
+                            handleSubWarehouseChange(index, "warehouse_manager", e.target.value)
+                          }
+                        />
+                        <TextInput
+                          id={`sub_warehouse_manager_contact_${index}`}
+                          label="Manager Contact"
+                          placeholder="Enter contact number"
+                          value={subWarehouse.warehouse_manager_contact || ""}
+                          error={getSubWarehouseError(index, "warehouse_manager_contact")}
+                          onChange={(e) =>
+                            handleSubWarehouseChange(
+                              index,
+                              "warehouse_manager_contact",
+                              e.target.value,
+                            )
+                          }
+                          isNumberOnly={true}
+                        />
+                        <TextInput
+                          id={`sub_warehouse_manager_email_${index}`}
+                          label="Manager Email"
+                          type="email"
+                          placeholder="Enter email address"
+                          value={subWarehouse.warehouse_manager_email || ""}
+                          error={getSubWarehouseError(index, "warehouse_manager_email")}
+                          onChange={(e) =>
+                            handleSubWarehouseChange(
+                              index,
+                              "warehouse_manager_email",
+                              e.target.value,
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <TextInput
+                          id={`sub_warehouse_latitude_${index}`}
+                          label="Latitude"
+                          placeholder="Optional latitude"
+                          value={subWarehouse.latitude || ""}
+                          error={getSubWarehouseError(index, "latitude")}
+                          onChange={(e) =>
+                            handleSubWarehouseChange(index, "latitude", e.target.value)
+                          }
+                        />
+                        <TextInput
+                          id={`sub_warehouse_longitude_${index}`}
+                          label="Longitude"
+                          placeholder="Optional longitude"
+                          value={subWarehouse.longitude || ""}
+                          error={getSubWarehouseError(index, "longitude")}
+                          onChange={(e) =>
+                            handleSubWarehouseChange(index, "longitude", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <TextAreaInput
+                        id={`sub_warehouse_description_${index}`}
+                        label="Description"
+                        placeholder="Enter sub warehouse description"
+                        value={subWarehouse.warehouse_description || ""}
+                        error={getSubWarehouseError(index, "warehouse_description")}
+                        onChange={(e) =>
+                          handleSubWarehouseChange(
+                            index,
+                            "warehouse_description",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </>
+          )}
         </Card>
 
         <FormFooterActions isSubmitting={warehouseMutation.isPending} />

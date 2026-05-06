@@ -19,10 +19,10 @@ export default function WarehousesOpenMap({
       <OpenStreetMap
         title="Warehouse Locations"
         subtitle="View all active warehouse sites on the map."
-        markers={warehousesWithCoordinates.map(w => ({
+        markers={warehousesWithCoordinates.map((w) => ({
           id: w.id,
-          lat: w.latitude,
-          lng: w.longitude,
+          lat: String(w.latitude),
+          lng: String(w.longitude),
           title: w.warehouse_name,
           description: w.warehouse_address,
           viewLink: `/warehouses/view/${w.id}`,

@@ -4,9 +4,11 @@ import {
   updateWarehouse,
   deleteWarehouseImage,
   deleteWarehouse,
+  updateSubWarehouse,
+  deleteSubWarehouse,
 } from "./warehouses.api";
 import { toast } from "sonner";
-import { CreateWarehousesPayload } from "./warehouses.types";
+import { CreateWarehousesPayload, SubWarehousePayload } from "./warehouses.types";
 
 export const useCreateWarehouse = () => {
   const queryClient = useQueryClient();
@@ -77,6 +79,49 @@ export const useDeleteWarehouseImage = (warehouseId: string) => {
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || "Failed to delete image");
+    },
+  });
+};
+
+export const useUpdateSubWarehouse = (warehouseId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      subWarehouseId,
+      payload,
+    }: {
+      subWarehouseId: string | number;
+      payload: SubWarehousePayload;
+    }) => updateSubWarehouse(warehouseId, subWarehouseId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
+      toast.success("Sub warehouse updated successfully");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update sub warehouse"
+      );
+    },
+  });
+};
+
+export const useDeleteSubWarehouse = (warehouseId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (subWarehouseId: string | number) =>
+      deleteSubWarehouse(warehouseId, subWarehouseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      queryClient.invalidateQueries({ queryKey: ["warehouse", warehouseId] });
+      toast.success("Sub warehouse deleted successfully");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete sub warehouse"
+      );
     },
   });
 };
