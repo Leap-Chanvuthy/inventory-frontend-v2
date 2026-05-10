@@ -28,6 +28,9 @@ export interface Product {
   dbId: number;
   sku?: string;
   category?: string;
+  stockQty?: number;
+  uomName?: string;
+  quantityType?: "INTEGER" | "DECIMAL";
 }
 
 export interface OrderItem {

@@ -29,6 +29,13 @@ import { SimplePagination } from "@/components/table/simple-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -69,6 +76,7 @@ function FieldError({ error }: { error?: string }) {
 function AddCategoryDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const mutation = useCreateUomCategory();
   const [name, setName] = useState("");
+  const [quantityType, setQuantityType] = useState<"INTEGER" | "DECIMAL">("DECIMAL");
   const [description, setDescription] = useState("");
 
   const serverErrors = useMemo(
@@ -83,10 +91,15 @@ function AddCategoryDialog({ open, onClose }: { open: boolean; onClose: () => vo
     e.preventDefault();
     if (!name.trim()) return;
     mutation.mutate(
-      { name: name.trim(), description: description.trim() || undefined },
+      {
+        name: name.trim(),
+        quantity_type: quantityType,
+        description: description.trim() || undefined,
+      },
       {
         onSuccess: () => {
           setName("");
+          setQuantityType("DECIMAL");
           setDescription("");
           onClose();
         },
@@ -115,6 +128,28 @@ function AddCategoryDialog({ open, onClose }: { open: boolean; onClose: () => vo
               )}
             />
             <FieldError error={serverErrors.fields.name} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cat-quantity-type">Quantity Type *</Label>
+            <Select
+              value={quantityType}
+              onValueChange={(val) => setQuantityType(val as "INTEGER" | "DECIMAL")}
+            >
+              <SelectTrigger
+                id="cat-quantity-type"
+                className={cn(
+                  serverErrors.fields.quantity_type &&
+                    "border-destructive focus-visible:ring-destructive"
+                )}
+              >
+                <SelectValue placeholder="Select quantity type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="DECIMAL">Decimal (allows fractions)</SelectItem>
+                <SelectItem value="INTEGER">Integer (whole numbers only)</SelectItem>
+              </SelectContent>
+            </Select>
+            <FieldError error={serverErrors.fields.quantity_type} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cat-desc">Description</Label>
@@ -159,10 +194,14 @@ function EditCategoryDialog({
 }) {
   const mutation = useUpdateUomCategory(category.id);
   const [name, setName] = useState(category.name ?? "");
+  const [quantityType, setQuantityType] = useState<"INTEGER" | "DECIMAL">(
+    (category.quantity_type ?? "DECIMAL") as "INTEGER" | "DECIMAL"
+  );
   const [description, setDescription] = useState(category.description ?? "");
 
   useEffect(() => {
     setName(category.name ?? "");
+    setQuantityType((category.quantity_type ?? "DECIMAL") as "INTEGER" | "DECIMAL");
     setDescription(category.description ?? "");
   }, [category]);
 
@@ -178,7 +217,11 @@ function EditCategoryDialog({
     e.preventDefault();
     if (!name.trim()) return;
     mutation.mutate(
-      { name: name.trim(), description: description.trim() || undefined },
+      {
+        name: name.trim(),
+        quantity_type: quantityType,
+        description: description.trim() || undefined,
+      },
       {
         onSuccess: () => {
           onClose();
@@ -208,6 +251,28 @@ function EditCategoryDialog({
               )}
             />
             <FieldError error={serverErrors.fields.name} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-cat-quantity-type">Quantity Type *</Label>
+            <Select
+              value={quantityType}
+              onValueChange={(val) => setQuantityType(val as "INTEGER" | "DECIMAL")}
+            >
+              <SelectTrigger
+                id="edit-cat-quantity-type"
+                className={cn(
+                  serverErrors.fields.quantity_type &&
+                    "border-destructive focus-visible:ring-destructive"
+                )}
+              >
+                <SelectValue placeholder="Select quantity type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="DECIMAL">Decimal (allows fractions)</SelectItem>
+                <SelectItem value="INTEGER">Integer (whole numbers only)</SelectItem>
+              </SelectContent>
+            </Select>
+            <FieldError error={serverErrors.fields.quantity_type} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="edit-cat-desc">Description</Label>

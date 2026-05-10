@@ -1,8 +1,8 @@
 // Customer Status Enum
 export enum CustomerStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  PROSPECTIVE = "PROSPECTIVE",
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  BLACKLISTED = "blacklisted",
 }
 
 // Customer Financial

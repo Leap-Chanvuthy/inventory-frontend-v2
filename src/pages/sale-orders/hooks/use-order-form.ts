@@ -128,7 +128,12 @@ export function useOrderForm(customers: Customer[], products: Product[]) {
   };
 
   const setItemQty = (productId: string, qty: number) => {
-    const normalizedQty = Math.max(1, Math.floor(qty));
+    const product = products.find(item => item.id === productId);
+    const isInteger = product?.quantityType === "INTEGER";
+    const normalizedQty = isInteger
+      ? Math.max(1, Math.floor(qty))
+      : Math.max(0.0001, Number(qty.toFixed(4)));
+
     setFormState(prev => {
       if (!prev) return prev;
       return {

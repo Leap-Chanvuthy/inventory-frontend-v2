@@ -4,6 +4,7 @@ export type UomCategory = {
   id: number;
   name: string;
   description: string | null;
+  quantity_type: "INTEGER" | "DECIMAL";
   units_count?: number;
   base_unit?: UOM | null;
   deleted_at: string | null;
@@ -26,6 +27,7 @@ export type TrashedCategoryQueryParams = {
 
 export type CreateUomCategoryRequest = {
   name: string;
+  quantity_type: "INTEGER" | "DECIMAL";
   description?: string;
 };
 
@@ -33,6 +35,7 @@ export type UomCategoryValidationErrors = {
   message: string;
   errors: {
     name?: string[];
+    quantity_type?: string[];
     description?: string[];
   };
 };

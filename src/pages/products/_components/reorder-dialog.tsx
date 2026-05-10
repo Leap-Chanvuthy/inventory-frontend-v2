@@ -51,6 +51,14 @@ export function ReorderDialog({
   const internalErrors = (
     internalMutation.error as AxiosError<ProductValidationErrors> | null
   )?.response?.data?.errors;
+  const externalErrors = (
+    externalMutation.error as AxiosError<ProductValidationErrors> | null
+  )?.response?.data?.errors;
+  const quantityError = !Array.isArray(internalErrors) && isInternal
+    ? internalErrors?.quantity?.[0]
+    : !Array.isArray(externalErrors) && !isInternal
+      ? externalErrors?.quantity?.[0]
+      : undefined;
   const stockErrors = Array.isArray(internalErrors)
     ? (internalErrors as InsufficientStockError[])
     : undefined;
@@ -244,6 +252,7 @@ export function ReorderDialog({
           external={external}
           bomEntries={bomEntries}
           stockErrors={stockErrors}
+          quantityError={quantityError}
           onInternalFieldChange={handleInternalFieldChange}
           onExternalFieldChange={handleExternalFieldChange}
           onInternalBomScrapChange={updateBomScrap}

@@ -14,6 +14,7 @@ import { DatePickerInput, TextAreaInput, TextInput } from "@/components/reusable
 import { useCreateScrapMovement } from "@/api/product/product.mutation";
 import { CreateScrapMovementPayload } from "@/api/product/product.type";
 import { AxiosError } from "axios";
+import { ProductValidationErrors } from "@/api/product/product.type";
 
 interface ScrapDialogProps {
   productId: number;
@@ -35,9 +36,14 @@ export function ScrapDialog({ productId, productName }: ScrapDialogProps) {
   const apiErrors = (mutation.error as AxiosError<{ errors?: { available_qty?: number } }> | null)
     ?.response?.data?.errors;
   const availableQty = apiErrors?.available_qty;
+  const validationErrors = (mutation.error as AxiosError<ProductValidationErrors> | null)
+    ?.response?.data?.errors;
+  const quantityTypeError = !Array.isArray(validationErrors)
+    ? validationErrors?.quantity?.[0]
+    : undefined;
   const quantityError = availableQty !== undefined
     ? `Insufficient stock. Only ${availableQty} available.`
-    : undefined;
+    : quantityTypeError;
 
   const handleChange = (field: keyof typeof INITIAL) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>

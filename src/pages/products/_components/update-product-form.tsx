@@ -231,6 +231,7 @@ export const UpdateProductForm = () => {
   }, [selectedUomCategoryData]);
 
   const uomCatData = selectedUomCategoryData?.data;
+  const isIntegerQuantityType = uomCatData?.quantity_type === "INTEGER";
   const rawBase = uomCatData?.base_unit;
   const uomBaseUnit = Array.isArray(rawBase) ? rawBase[0] : rawBase;
   const uomSelectedLabel = uomCatData
@@ -270,6 +271,12 @@ export const UpdateProductForm = () => {
 
   const handleBaseSelect = (field: string) => (value: string) =>
     setBase(prev => ({ ...prev, [field]: value }));
+
+  const normalizeQuantityInput = (value: string) => {
+    if (!isIntegerQuantityType) return value;
+    if (!value.includes(".")) return value;
+    return value.split(".")[0];
+  };
 
   const updateBOMQty = (id: number, val: string) => {
     setBomEntries(prev =>
@@ -324,7 +331,7 @@ export const UpdateProductForm = () => {
         {
           ...commonBase,
           supplier_id: Number(base.supplier_id),
-          quantity: Number(external.quantity),
+          quantity: isIntegerQuantityType ? Math.floor(Number(external.quantity)) : Number(external.quantity),
           purchase_unit_price_in_usd: Number(
             external.purchase_unit_price_in_usd,
           ),
@@ -347,7 +354,7 @@ export const UpdateProductForm = () => {
         {
           ...commonBase,
           product_status: internal.product_status,
-          quantity: Number(internal.quantity),
+          quantity: isIntegerQuantityType ? Math.floor(Number(internal.quantity)) : Number(internal.quantity),
           selling_unit_price_in_usd: Number(internal.selling_unit_price_in_usd),
           selling_exchange_rate_from_usd_to_riel: Number(
             internal.selling_exchange_rate_from_usd_to_riel,
@@ -507,7 +514,12 @@ export const UpdateProductForm = () => {
                             id="quantity"
                             label="Quantity"
                             value={external.quantity}
-                            onChange={handleSourceChange(setExternal)}
+                            onChange={event =>
+                              setExternal(prev => ({
+                                ...prev,
+                                quantity: normalizeQuantityInput(event.target.value),
+                              }))
+                            }
                             error={fieldErrors?.quantity?.[0]}
                             isNumberOnly
                             required
@@ -589,7 +601,12 @@ export const UpdateProductForm = () => {
                             id="quantity"
                             label="Production Quantity"
                             value={internal.quantity}
-                            onChange={handleSourceChange(setInternal)}
+                            onChange={event =>
+                              setInternal(prev => ({
+                                ...prev,
+                                quantity: normalizeQuantityInput(event.target.value),
+                              }))
+                            }
                             error={fieldErrors?.quantity?.[0]}
                             isNumberOnly
                             required

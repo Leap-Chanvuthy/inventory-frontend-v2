@@ -7,9 +7,10 @@ import {
   TextAreaInput,
   SelectInput,
 } from "@/components/reusable/partials/input";
+import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -136,15 +137,38 @@ export const UpdateCustomerForm = () => {
   const statusOptions = [
     { value: CustomerStatus.ACTIVE, label: "Active" },
     { value: CustomerStatus.INACTIVE, label: "Inactive" },
-    { value: CustomerStatus.PROSPECTIVE, label: "Prospective" },
+    { value: CustomerStatus.BLACKLISTED, label: "Blacklisted" },
   ];
 
   // Customer category options
-  const categoryOptions =
-    categoriesData?.data.data.map(category => ({
-      value: category.id.toString(),
-      label: category.category_name,
-    })) || [];
+  const categoryOptions = useMemo(() => {
+    const fetchedOptions =
+      categoriesData?.data.data.map(category => ({
+        value: category.id.toString(),
+        label: category.category_name,
+      })) || [];
+
+    const selectedCategoryId = data?.data?.customer_category_id;
+    const selectedCategoryName =
+      data?.data?.customer_category?.category_name ||
+      data?.data?.customer_category_name;
+
+    if (
+      selectedCategoryId &&
+      selectedCategoryName &&
+      !fetchedOptions.some(option => option.value === selectedCategoryId.toString())
+    ) {
+      return [
+        {
+          value: selectedCategoryId.toString(),
+          label: selectedCategoryName,
+        },
+        ...fetchedOptions,
+      ];
+    }
+
+    return fetchedOptions;
+  }, [categoriesData?.data.data, data?.data?.customer_category?.category_name, data?.data?.customer_category_id, data?.data?.customer_category_name]);
 
   const SectionHeader = ({
     title,
@@ -246,7 +270,7 @@ export const UpdateCustomerForm = () => {
                     error={fieldErrors?.customer_status?.[0]}
                     onChange={handleSelectChange("customer_status")}
                   />
-                  <SelectInput
+                  <SearchableSelect
                     required={true}
                     id="customer_category_id"
                     label="Customer Category"
@@ -255,6 +279,10 @@ export const UpdateCustomerForm = () => {
                     }
                     options={categoryOptions}
                     value={form.customer_category_id}
+                    selectedLabel={
+                      data?.data?.customer_category?.category_name ||
+                      data?.data?.customer_category_name
+                    }
                     error={fieldErrors?.customer_category_id?.[0]}
                     onChange={handleSelectChange("customer_category_id")}
                   />

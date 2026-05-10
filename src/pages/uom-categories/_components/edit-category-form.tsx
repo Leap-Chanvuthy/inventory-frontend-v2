@@ -2,6 +2,7 @@ import { useUpdateUomCategory } from "@/api/uom/uom.mutation";
 import { useSingleUomCategory } from "@/api/uom/uom.query";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
+import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { AxiosError } from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,12 +22,22 @@ export const EditCategoryForm = () => {
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: "", description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    quantity_type: "DECIMAL" as "INTEGER" | "DECIMAL",
+    description: "",
+  });
+
+  const quantityTypeOptions = [
+    { value: "DECIMAL", label: "Decimal (allows fractions)" },
+    { value: "INTEGER", label: "Integer (whole numbers only)" },
+  ];
 
   useEffect(() => {
     if (category) {
       setForm({
         name: category.name ?? "",
+        quantity_type: (category.quantity_type ?? "DECIMAL") as "INTEGER" | "DECIMAL",
         description: category.description ?? "",
       });
     }
@@ -49,7 +60,11 @@ export const EditCategoryForm = () => {
     const action = submitter?.value;
 
     mutation.mutate(
-      { name: form.name, description: form.description || undefined },
+      {
+        name: form.name,
+        quantity_type: form.quantity_type,
+        description: form.description || undefined,
+      },
       {
         onSuccess: () => {
           if (action === "save_and_close")
@@ -82,6 +97,20 @@ export const EditCategoryForm = () => {
               error={fieldErrors?.name?.[0]}
               required
               onChange={handleChange}
+            />
+            <SearchableSelect
+              id="quantity_type"
+              label="Quantity Type"
+              placeholder="Select quantity type"
+              value={form.quantity_type}
+              options={quantityTypeOptions}
+              onChange={val =>
+                setForm(prev => ({
+                  ...prev,
+                  quantity_type: val as "INTEGER" | "DECIMAL",
+                }))
+              }
+              error={fieldErrors?.quantity_type?.[0]}
             />
             <TextAreaInput
               id="description"

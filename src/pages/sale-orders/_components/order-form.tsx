@@ -19,6 +19,7 @@ interface OrderFormProps {
   onSetProductSelect: (value: string) => void;
   onRemoveItem: (productId: string) => void;
   onUpdateItemQty: (productId: string, qty: number) => void;
+  itemErrors: Record<string, string>;
   onSaveDraft: () => void;
   onSaveAndProcess: () => void;
 }
@@ -35,6 +36,7 @@ export function OrderForm({
   onSetProductSelect,
   onRemoveItem,
   onUpdateItemQty,
+  itemErrors,
   onSaveDraft,
   onSaveAndProcess,
 }: OrderFormProps) {
@@ -147,6 +149,7 @@ export function OrderForm({
               products={products}
               onRemoveItem={onRemoveItem}
               onUpdateQty={onUpdateItemQty}
+              itemErrors={itemErrors}
             />
             <p className="text-[11px] text-muted-foreground">
               Unit price is derived automatically from product movement history when saving the order. Product click adds quantity = 1 instantly.

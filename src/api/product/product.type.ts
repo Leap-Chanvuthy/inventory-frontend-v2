@@ -75,12 +75,20 @@ export interface Product {
   latest_selling_unit_price_in_riel?: number;
   latest_selling_exchange_rate_from_usd_to_riel?: number;
   latest_selling_exchange_rate_from_riel_to_usd?: number;
+  current_qty_in_stock?: number;
   // Nested relations
   category?: ProductCategory;
   supplier?: Supplier | null;
   warehouse?: Omit<Warehouse, "images">;
   uom?: UOM;
-  base_uom?: UOM & { category?: { id: number; name: string; unit_of_measurements?: UOM[] } };
+  base_uom?: UOM & {
+    category?: {
+      id: number;
+      name: string;
+      quantity_type?: "INTEGER" | "DECIMAL";
+      unit_of_measurements?: UOM[];
+    };
+  };
   product_movements?: ProductMovement[];
   product_images?: { id: number; image: string }[];
   product_raw_materials?: ProductRawMaterial[];

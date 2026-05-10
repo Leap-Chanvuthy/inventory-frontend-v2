@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 
 export const CATEGORY_SORT_OPTIONS = [
   { value: "name", label: "Name" },
+  { value: "quantity_type", label: "Quantity Type" },
   { value: "-created_at", label: "Newest" },
   { value: "created_at", label: "Oldest" },
   { value: "-updated_at", label: "Recently Updated" },
@@ -46,6 +47,16 @@ export const CATEGORY_COLUMNS: DataTableColumn<UomCategory>[] = [
       <span className="text-sm text-muted-foreground line-clamp-2">
         {cat.description ?? <span className="italic opacity-50">No description</span>}
       </span>
+    ),
+  },
+  {
+    key: "quantity_type",
+    header: "Quantity Type",
+    className: "whitespace-nowrap py-6",
+    render: cat => (
+      <Badge variant="secondary">
+        {cat.quantity_type === "INTEGER" ? "Integer" : "Decimal"}
+      </Badge>
     ),
   },
   {
@@ -138,6 +149,9 @@ export function CategoryCard({ category }: { category: UomCategory }) {
             </Text.Small>
           </div>
         )}
+        <Badge variant="outline" className="w-fit">
+          {category.quantity_type === "INTEGER" ? "Integer" : "Decimal"}
+        </Badge>
       </CardContent>
 
       <CardFooter className="flex justify-between items-center pt-0 pb-4">

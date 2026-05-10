@@ -8,9 +8,10 @@ interface FormItemTableProps {
   products: Product[];
   onRemoveItem: (productId: string) => void;
   onUpdateQty: (productId: string, qty: number) => void;
+  itemErrors: Record<string, string>;
 }
 
-export function FormItemTable({ items, products, onRemoveItem, onUpdateQty }: FormItemTableProps) {
+export function FormItemTable({ items, products, onRemoveItem, onUpdateQty, itemErrors }: FormItemTableProps) {
   if (items.length === 0) {
     return (
       <div className="text-center py-8 border border-dashed border-border rounded-md bg-muted/30">
@@ -26,6 +27,8 @@ export function FormItemTable({ items, products, onRemoveItem, onUpdateQty }: Fo
         <thead className="bg-muted/40 border-b border-border">
           <tr className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
             <th className="px-4 py-2.5">Product</th>
+            <th className="px-4 py-2.5 text-right">Stock</th>
+            <th className="px-4 py-2.5 text-left">UOM</th>
             <th className="px-4 py-2.5 text-center">Qty</th>
             <th className="px-4 py-2.5 text-right">Price</th>
             <th className="px-4 py-2.5 text-right">Total</th>
@@ -36,6 +39,10 @@ export function FormItemTable({ items, products, onRemoveItem, onUpdateQty }: Fo
           {items.map(item => {
             const product = products.find(productItem => productItem.id === item.productId);
             const hasResolvedPrice = item.priceAtSale > 0;
+            const stockQty = Number(product?.stockQty ?? 0);
+            const uomName = product?.uomName || "-";
+            const quantityType = product?.quantityType ?? "DECIMAL";
+            const step = quantityType === "INTEGER" ? 1 : 0.01;
             return (
               <tr key={item.productId} className="bg-card">
                 <td className="px-4 py-3 font-medium text-foreground">
@@ -45,14 +52,22 @@ export function FormItemTable({ items, products, onRemoveItem, onUpdateQty }: Fo
                     {item.productCategory ? ` · ${item.productCategory}` : ""}
                   </div>
                 </td>
+                <td className="px-4 py-3 text-right font-medium text-foreground">{stockQty}</td>
+                <td className="px-4 py-3 text-muted-foreground">{uomName}</td>
                 <td className="px-4 py-3 text-center">
                   <Input
                     type="number"
                     min={1}
+                    step={step}
                     className="h-8 w-20 text-center mx-auto"
                     value={item.qty}
                     onChange={event => onUpdateQty(item.productId, Number(event.target.value) || 1)}
                   />
+                  {itemErrors[item.productId] ? (
+                    <p className="mt-1 text-[11px] text-destructive text-left w-40">
+                      {itemErrors[item.productId]}
+                    </p>
+                  ) : null}
                 </td>
                 <td className="px-4 py-3 text-right text-muted-foreground">
                   {hasResolvedPrice ? formatCurrency(item.priceAtSale) : "Auto"}

@@ -71,6 +71,10 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
     value: String(c.id),
     label: c.name,
   }));
+  const selectedCategory = (categoriesData?.data ?? []).find(
+    c => String(c.id) === form.category_id
+  );
+  const isIntegerCategory = selectedCategory?.quantity_type === "INTEGER";
 
   // Base unit options (filtered by category)
   const { data: baseUnitsData } = useUOMs(
@@ -105,6 +109,13 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
+
+    if (id === "conversion_factor" && isIntegerCategory) {
+      const integerOnly = value.replace(/[^\d]/g, "");
+      setForm(prev => ({ ...prev, conversion_factor: integerOnly }));
+      return;
+    }
+
     setForm(prev => ({ ...prev, [id]: value }));
   };
 
@@ -306,7 +317,9 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
                     onChange={handleChange}
                   />
                   <p className="mt-1 text-xs text-muted-foreground">
-                    How many base units are contained in one of this unit.
+                    {isIntegerCategory
+                      ? "This category allows only whole numbers. Conversion factor must be an integer."
+                      : "How many base units are contained in one of this unit."}
                   </p>
                 </div>
               </div>
@@ -322,6 +335,7 @@ export const UpdateUOMForm = ({ uom }: UpdateUOMFormProps) => {
           open={quickCreateOpen}
           onClose={() => setQuickCreateOpen(false)}
           baseUnit={selectedBaseUom}
+          quantityType={isIntegerCategory ? "INTEGER" : "DECIMAL"}
           onCreated={_newUom => {
             // The new derived unit refreshes in place
           }}

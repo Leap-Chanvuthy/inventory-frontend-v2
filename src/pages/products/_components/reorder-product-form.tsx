@@ -45,6 +45,7 @@ interface ReorderProductFormProps {
   external: ReorderExternalFormState;
   bomEntries: ReorderInternalBomEntry[];
   stockErrors?: InsufficientStockError[];
+  quantityError?: string;
   onInternalFieldChange: (
     field: keyof ReorderInternalFormState,
     value: string,
@@ -62,6 +63,7 @@ export function ReorderProductForm({
   external,
   bomEntries,
   stockErrors,
+  quantityError,
   onInternalFieldChange,
   onExternalFieldChange,
   onInternalBomScrapChange,
@@ -102,6 +104,9 @@ export function ReorderProductForm({
                     onInternalFieldChange("quantity", e.target.value)
                   }
                 />
+                {quantityError && (
+                  <p className="text-xs text-destructive">{quantityError}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -328,6 +333,9 @@ export function ReorderProductForm({
                 onChange={e => onExternalFieldChange("quantity", e.target.value)}
                 min={0}
               />
+              {quantityError && (
+                <p className="text-xs text-destructive">{quantityError}</p>
+              )}
             </div>
             <DatePickerInput
               id="movement_date_external"

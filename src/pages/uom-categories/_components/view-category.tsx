@@ -81,6 +81,17 @@ export const ViewCategory = ({ id }: ViewCategoryProps) => {
 
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Quantity Type
+              </p>
+              <Badge variant="outline">
+                {category.quantity_type === "INTEGER"
+                  ? "Integer only"
+                  : "Decimal allowed"}
+              </Badge>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                 Total Units
               </p>
               <Badge variant="outline" className="font-mono">

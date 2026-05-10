@@ -21,7 +21,11 @@ import {
 } from "lucide-react";
 import { useReorderRawMaterial } from "@/api/raw-materials/raw-material.mutation";
 import { DatePickerInput } from "@/components/reusable/partials/input";
-import { ReorderRawMaterialPayload } from "@/api/raw-materials/raw-material.types";
+import {
+  RawMaterialValidationErrors,
+  ReorderRawMaterialPayload,
+} from "@/api/raw-materials/raw-material.types";
+import { AxiosError } from "axios";
 
 interface ReorderDialogProps {
   rawMaterialId: number;
@@ -45,6 +49,9 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
+  const fieldErrors = (
+    reorderMutation.error as AxiosError<RawMaterialValidationErrors> | null
+  )?.response?.data?.errors;
 
   const resetForm = () => setForm(INITIAL_FORM);
 
@@ -113,6 +120,9 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
                 onChange={e => setForm(prev => ({ ...prev, quantity: e.target.value }))}
                 min={0}
               />
+              {fieldErrors?.quantity?.[0] && (
+                <p className="text-xs text-destructive">{fieldErrors.quantity[0]}</p>
+              )}
             </div>
             
             {/* Expiry Date */}

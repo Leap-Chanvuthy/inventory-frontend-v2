@@ -18,6 +18,7 @@ interface QuickCreateUomModalProps {
   onClose: () => void;
   /** Pre-linked base unit. Category will be inherited from it. */
   baseUnit: UOM;
+  quantityType: "INTEGER" | "DECIMAL";
   /** Called with the newly created UOM so the parent can select it */
   onCreated: (uom: UOM) => void;
 }
@@ -26,6 +27,7 @@ export function QuickCreateUomModal({
   open,
   onClose,
   baseUnit,
+  quantityType,
   onCreated,
 }: QuickCreateUomModalProps) {
   const nameRef = useRef<HTMLInputElement>(null);
@@ -42,13 +44,23 @@ export function QuickCreateUomModal({
   // Reset form & focus when modal opens
   useEffect(() => {
     if (open) {
-      setForm({ name: "", symbol: "", conversion_factor: "" });
+      setForm({
+        name: "",
+        symbol: "",
+        conversion_factor: "",
+      });
       setTimeout(() => nameRef.current?.focus(), 80);
     }
   }, [open]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    if (id === "conversion_factor" && quantityType === "INTEGER") {
+      const integerOnly = value.replace(/[^\d]/g, "");
+      setForm(prev => ({ ...prev, conversion_factor: integerOnly }));
+      return;
+    }
+
     setForm(prev => ({ ...prev, [id]: value }));
   };
 
@@ -124,8 +136,9 @@ export function QuickCreateUomModal({
               onChange={handleChange}
             />
             <p className="mt-1 text-xs text-muted-foreground">
-              Defines how many <strong>{baseUnit.name}</strong> are contained in
-              one of this new unit.
+              {quantityType === "INTEGER"
+                ? "This category allows only whole numbers. Conversion factor must be an integer."
+                : `Defines how many ${baseUnit.name} are contained in one of this new unit.`}
             </p>
           </div>
 

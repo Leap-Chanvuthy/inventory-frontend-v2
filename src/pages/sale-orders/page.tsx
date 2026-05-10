@@ -45,6 +45,7 @@ export default function SaleOrdersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("empty");
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
+  const [itemValidationErrors, setItemValidationErrors] = useState<Record<string, string>>({});
 
   const selectedOrderDbId = Number(searchParams.get("sale_order_id") || 0) || null;
   const selectedRefundId = Number(searchParams.get("sale_order_refund_id") || 0) || null;
@@ -86,6 +87,9 @@ export default function SaleOrdersPage() {
         exchangeRateRielToUsd: Number(product.latest_selling_exchange_rate_from_riel_to_usd ?? 0),
         sku: product.product_sku_code,
         category: product.product_category_name || product.category?.category_name || "Uncategorized",
+        stockQty: Number(product.current_qty_in_stock ?? 0),
+        uomName: product.uom_name || product.base_uom?.name || product.uom?.name || "-",
+        quantityType: product.base_uom?.category?.quantity_type,
       })),
     [productsQuery.data],
   );
@@ -320,14 +324,33 @@ export default function SaleOrdersPage() {
 
   const handleSaveOrder = async (shouldProcess: boolean) => {
     if (!formState) return;
+    setItemValidationErrors({});
 
     if (formState.items.length === 0) {
       window.alert("Please add at least one item.");
       return;
     }
 
+    const nextErrors: Record<string, string> = {};
+    formState.items.forEach(item => {
+      const selectedProduct = products.find(product => product.id === item.productId);
+      if (!selectedProduct) return;
+
+      const available = Number(selectedProduct.stockQty ?? 0);
+      if (item.qty > available) {
+        nextErrors[item.productId] = `Insufficient stock. Available: ${available} ${selectedProduct.uomName || ""}`.trim();
+      }
+    });
+
+    if (Object.keys(nextErrors).length > 0) {
+      setItemValidationErrors(nextErrors);
+      toast.error("Some item quantities exceed available stock.");
+      return;
+    }
+
     try {
       await saveOrder(formState, shouldProcess);
+      setItemValidationErrors({});
       resetForm();
       resetRightPanel();
       handleTabChange("ACTIVE", shouldProcess ? "PROCESSING" : "DRAFT");
@@ -524,6 +547,7 @@ export default function SaleOrdersPage() {
         onSetProductSelect={setFormProductSelect}
         onRemoveItem={removeItem}
         onUpdateItemQty={setItemQty}
+        itemErrors={itemValidationErrors}
         onSaveDraft={() => handleSaveOrder(false)}
         onSaveAndProcess={() => handleSaveOrder(true)}
       />

@@ -91,7 +91,7 @@ const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategor
   const statusOptions = [
     { value: CustomerStatus.ACTIVE, label: "Active" },
     { value: CustomerStatus.INACTIVE, label: "Inactive" },
-    { value: CustomerStatus.PROSPECTIVE, label: "Prospective" },
+    { value: CustomerStatus.BLACKLISTED, label: "Blacklisted" },
   ];
 
   // Customer category options
