@@ -152,8 +152,8 @@ export const UpdateProductForm = () => {
   useEffect(() => {
     if (!product || initialized) return;
 
-    const mv = product.product_movements?.find(
-      m => m.movement_type === "INTERNAL_PRODUCED" || m.movement_type === "EXTERNAL_PURCHASED"
+    const mv = data?.data?.initial_movement ?? product.product_movements?.find(
+      m => m.movement_type === "INTERNAL_PRODUCED" || m.movement_type === "EXTERNAL_PURCHASED",
     );
 
     setBase({

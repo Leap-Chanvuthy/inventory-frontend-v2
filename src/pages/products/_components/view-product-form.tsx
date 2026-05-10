@@ -68,7 +68,7 @@ export function ViewProductForm() {
   if (!product) return <DataCardEmpty emptyText="Product not found." />;
 
   const isInternal = product.product_type === "INTERNAL_PRODUCED";
-  const movement = product.product_movements?.[0];
+  const movement = detail?.initial_movement ?? product.product_movements?.[0];
   const stockStatus = detail?.product_stock_status;
   const pnl = detail?.product_pnl;
   const totalCountByMovementType = detail?.total_count_by_movement_type;

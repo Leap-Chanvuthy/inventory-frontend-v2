@@ -8,7 +8,7 @@ export interface ProductMovement {
   product_id: number;
   product_type: string | null;
   product_status: string;
-  quantity: string;
+  quantity: string | number;
   is_sold: boolean;
   direction: "IN" | "OUT";
   movement_type: string;
@@ -17,13 +17,15 @@ export interface ProductMovement {
   purchase_unit_price_in_riel: number;
   purchase_total_price_in_riel: number;
   exchange_rate_from_usd_to_riel: number;
+  exchange_rate_from_riel_to_usd?: number;
   selling_unit_price_in_usd: number;
   selling_unit_price_in_riel: number;
   selling_exchange_rate_from_usd_to_riel: number;
+  selling_exchange_rate_from_riel_to_usd?: number;
   movement_date: string;
   note: string | null;
-  created_by?: { id: number; name: string; email: string; role: string };
-  last_updated_by?: { id: number; name: string; email: string; role: string };
+  created_by?: number | { id: number; name: string; email: string; role: string };
+  last_updated_by?: number | { id: number; name: string; email: string; role: string };
   created_at: string;
   updated_at: string;
 }
@@ -34,7 +36,6 @@ export interface ProductRawMaterial {
   raw_material_id: number;
   quantity_per_unit: string | number;
   scrap_percentage?: string | number;
-  // Legacy fallback from older API responses.
   quantity?: string | number;
   created_at: string;
   updated_at: string;
@@ -43,6 +44,8 @@ export interface ProductRawMaterial {
     material_name: string;
     material_sku_code: string;
     base_uom_id: number;
+    current_qty_in_stock?: number;
+    stock_availability?: number;
     uom_name?: string;
     uom?: UOM;
   };
@@ -83,6 +86,16 @@ export interface Product {
   product_raw_materials?: ProductRawMaterial[];
 }
 
+export interface PnLMovementEntry {
+  count: number;
+  in_quantity: number;
+  out_quantity: number;
+  in_total_usd: number;
+  out_total_usd: number;
+  in_total_riel: number;
+  out_total_riel: number;
+}
+
 export interface ProductPnL {
   revenue_usd: number;
   revenue_riel: number;
@@ -90,7 +103,26 @@ export interface ProductPnL {
     purchase: { count: number; total_usd: number; total_riel: number };
     reorder: { count: number; total_usd: number; total_riel: number };
     scrap: { count: number; total_usd: number; total_riel: number };
-    sales: { count: number; revenue_usd: number; revenue_riel: number; cogs_usd: number; cogs_riel: number };
+    sales: {
+      count: number;
+      revenue_usd: number;
+      revenue_riel: number;
+      cogs_usd: number;
+      cogs_riel: number;
+    };
+    profit_and_loss: {
+      product_type: string;
+      applied_sale_method: string;
+      totals: {
+        revenue_usd: number;
+        revenue_riel: number;
+        cogs_usd: number;
+        cogs_riel: number;
+        gross_profit_usd: number;
+        gross_profit_riel: number;
+      };
+      by_movement_type: Record<string, PnLMovementEntry>;
+    };
   };
   total_loss_usd: number;
   total_loss_riel: number;
@@ -108,6 +140,7 @@ export interface GetProductDetailData {
   is_sold: boolean;
   allow_bom_update?: boolean;
   product: Product;
+  initial_movement?: ProductMovement;
   current_qty_in_stock: number;
   product_stock_status: string;
   total_count_by_movement_type: Record<string, number>;

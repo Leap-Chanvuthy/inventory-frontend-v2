@@ -61,7 +61,7 @@ export const CreateRawMaterialForm = () => {
 
   const [form, setForm] = useState(initialForm);
   const [dropdownError, setDropdownError] = useState(false);
-  const [, setUomValidationError] = useState<string>("");
+  const [uomValidationError, setUomValidationError] = useState<string>("");
   const handleDropdownError = useCallback(() => setDropdownError(true), []);
 
   const INVALID_UOM_MESSAGE =
@@ -199,7 +199,10 @@ export const CreateRawMaterialForm = () => {
       images: form.images.length > 0 ? form.images : undefined,
     };
 
-    if (!uomValidation.isValid || !payload.base_uom_id) {
+    if (
+      form.uom_category_id &&
+      (!uomValidation.isValid || !payload.base_uom_id)
+    ) {
       setUomValidationError(INVALID_UOM_MESSAGE);
       return;
     }
@@ -280,7 +283,7 @@ export const CreateRawMaterialForm = () => {
                     fetchFn={fetchUomCategories}
                     value={form.uom_category_id}
                     onChange={handleSelectChange("uom_category_id")}
-                    error={fieldErrors?.base_uom_id?.[0]}
+                    error={fieldErrors?.base_uom_id?.[0] || uomValidationError}
                     selectedLabel={uomSelectedLabel}
                     onFetchError={handleDropdownError}
                     required
