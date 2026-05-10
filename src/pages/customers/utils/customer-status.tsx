@@ -40,9 +40,9 @@ const statusMap: Record<CustomerStatus, { label: string; className: string }> =
       label: "Inactive",
       className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     },
-    [CustomerStatus.PROSPECTIVE]: {
-      label: "Prospective",
-      className: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    [CustomerStatus.BLACKLISTED]: {
+      label: "Blacklisted",
+      className: "bg-red-500/10 text-red-600 dark:text-red-400",
     },
   };
 

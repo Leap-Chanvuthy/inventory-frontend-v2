@@ -63,6 +63,10 @@ export function MovementHistoryModal({
   open,
   onClose,
 }: MovementHistoryModalProps) {
+  const formatQuantity = (quantity: string | number) => Number(quantity ?? 0).toFixed(2);
+  const getCreatedByName = (createdBy: ProductMovement["created_by"]) =>
+    createdBy && typeof createdBy === "object" ? createdBy.name : "—";
+
   const isInternal = productType === "INTERNAL_PRODUCED";
   const deleteMutation = isInternal
     ? useDeleteInternalReorderMovement(productId)
@@ -252,7 +256,7 @@ export function MovementHistoryModal({
                         </span>
                       </td>
                       <td className="px-3 py-3 font-semibold">
-                        {parseFloat(mv.quantity).toFixed(2)}
+                        {formatQuantity(mv.quantity)}
                       </td>
                       <td className="px-3 py-3">
                         ${mv.selling_unit_price_in_usd.toLocaleString()}
@@ -273,7 +277,7 @@ export function MovementHistoryModal({
                         {formatDate(mv.movement_date)}
                       </td>
                       <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                        {mv.created_by?.name || "—"}
+                        {getCreatedByName(mv.created_by)}
                       </td>
                       <td className="px-3 py-3">
                         {mv.movement_type.replace(/_/g, "").includes("REORDER") && (

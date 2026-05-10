@@ -48,6 +48,9 @@ export function ViewMovementDialog({
     (isInternal
       ? internalDetail?.data?.movement
       : externalDetail?.data?.movement) ?? movement;
+  const formattedQuantity = Number(mv.quantity ?? 0).toFixed(2);
+  const createdByName =
+    mv.created_by && typeof mv.created_by === "object" ? mv.created_by.name : "—";
 
   const rows: { label: string; value: React.ReactNode }[] = [
     { label: "Movement Type", value: mv.movement_type.replace(/_/g, " ") },
@@ -66,7 +69,7 @@ export function ViewMovementDialog({
         </span>
       ),
     },
-    { label: "Quantity", value: parseFloat(mv.quantity).toFixed(2) },
+    { label: "Quantity", value: formattedQuantity },
     { label: "Status", value: mv.product_status ?? "—" },
     {
       label: "Selling Price (USD)",
@@ -90,7 +93,7 @@ export function ViewMovementDialog({
         ]
       : []),
     { label: "Movement Date", value: formatDate(mv.movement_date) },
-    { label: "Created By", value: mv.created_by?.name ?? "—" },
+    { label: "Created By", value: createdByName },
     ...(mv.note ? [{ label: "Note", value: mv.note }] : []),
   ];
 

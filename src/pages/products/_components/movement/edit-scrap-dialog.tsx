@@ -27,16 +27,17 @@ export function EditScrapDialog({
   onClose,
 }: EditScrapDialogProps) {
   const mutation = useUpdateScrapMovement(productId, movement.id);
+  const quantityValue = Number(movement.quantity ?? 0);
 
   const [form, setForm] = useState({
-    quantity: String(parseFloat(movement.quantity)),
+    quantity: String(quantityValue),
     movement_date: movement.movement_date.split("T")[0],
     note: movement.note ?? "",
   });
 
   useEffect(() => {
     setForm({
-      quantity: String(parseFloat(movement.quantity)),
+      quantity: String(Number(movement.quantity ?? 0)),
       movement_date: movement.movement_date.split("T")[0],
       note: movement.note ?? "",
     });

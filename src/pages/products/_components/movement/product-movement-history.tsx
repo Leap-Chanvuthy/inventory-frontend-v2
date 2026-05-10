@@ -36,6 +36,10 @@ export function ProductMovementHistory({
   productId,
   productType,
 }: ProductMovementHistoryProps) {
+  const formatQuantity = (quantity: string | number) => Number(quantity ?? 0).toFixed(2);
+  const getCreatedByName = (createdBy: ProductMovement["created_by"]) =>
+    createdBy && typeof createdBy === "object" ? createdBy.name : "—";
+
   const isInternal = productType === "INTERNAL_PRODUCED";
   const deleteMutation = isInternal
     ? useDeleteInternalReorderMovement(productId)
@@ -92,7 +96,7 @@ export function ProductMovementHistory({
       header: "Qty",
       className: "whitespace-nowrap py-3",
       render: mv => (
-        <span className="font-semibold">{parseFloat(mv.quantity).toFixed(2)}</span>
+        <span className="font-semibold">{formatQuantity(mv.quantity)}</span>
       ),
     },
     {
@@ -134,7 +138,7 @@ export function ProductMovementHistory({
       className: "whitespace-nowrap py-3",
       render: mv => (
         <span className="text-muted-foreground text-xs whitespace-nowrap">
-          {mv.created_by?.name || "—"}
+          {getCreatedByName(mv.created_by)}
         </span>
       ),
     },
