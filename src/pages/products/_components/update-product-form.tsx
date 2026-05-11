@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Package, Layers, ShoppingCart, Trash2, PlusCircle } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
@@ -44,9 +44,21 @@ import { formatDate } from "@/utils/date-format";
 
 type BOMEntry = {
   raw_material: RawMaterial;
-  quantity_per_unit: number;
-  scrap_percentage: number;
+  quantity_per_unit: string;
+  scrap_percentage: string;
 };
+
+const getRawMaterialQuantityType = (
+  rawMaterial: RawMaterial,
+): "INTEGER" | "DECIMAL" | undefined => {
+  return rawMaterial.uom?.category?.quantity_type;
+};
+
+const isWholeNumber = (value: number): boolean => {
+  return Number.isFinite(value) && Math.abs(value - Math.round(value)) < 1e-9;
+};
+const INTEGER_UOM_DECIMAL_ERROR =
+  "This UOM category only allows whole-number quantities. Decimal quantity is not allowed.";
 
 const getRawMaterialUomLabel = (rawMaterial: RawMaterial): string => {
   return (
@@ -112,7 +124,6 @@ export const UpdateProductForm = () => {
   const stockErrors = Array.isArray(responseErrors)
     ? (responseErrors as InsufficientStockError[])
     : undefined;
-
   // Form state
   const [base, setBase] = useState({
     product_name: "",
@@ -147,6 +158,132 @@ export const UpdateProductForm = () => {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const productionQuantity = Number(internal.quantity) || 0;
+  const bomIntegerQtyErrors = useMemo(() => {
+    const errors: Record<number, string> = {};
+
+    if (!isInternal || !canEditBom) return errors;
+
+    bomEntries.forEach(entry => {
+      const quantityType = getRawMaterialQuantityType(entry.raw_material);
+      if (
+        quantityType === "INTEGER" &&
+        !isWholeNumber(Number(entry.quantity_per_unit) || 0)
+      ) {
+        errors[entry.raw_material.id] =
+          "This raw material uses INTEGER UOM. Quantity per unit must be a whole number.";
+      }
+    });
+
+    return errors;
+  }, [bomEntries, canEditBom, isInternal]);
+  const hasBomIntegerQtyError = Object.keys(bomIntegerQtyErrors).length > 0;
+  const bomApiValidationMessages = useMemo(() => {
+    if (!fieldErrors) return [];
+
+    const messages: string[] = [];
+    Object.entries(fieldErrors).forEach(([field, errs]) => {
+      if (!Array.isArray(errs)) return;
+      if (field === "raw_materials") {
+        messages.push(
+          ...errs.filter(
+            message => Boolean(message) && message !== INTEGER_UOM_DECIMAL_ERROR,
+          ),
+        );
+      }
+    });
+
+    return Array.from(new Set(messages));
+  }, [fieldErrors]);
+  const bomRowApiErrors = useMemo(() => {
+    const rowErrors: Record<
+      number,
+      { quantity: string[]; scrap: string[]; general: string[] }
+    > = {};
+    if (!fieldErrors) return rowErrors;
+
+    Object.entries(fieldErrors).forEach(([field, errs]) => {
+      if (!Array.isArray(errs)) return;
+      const match = field.match(/^raw_materials\.(\d+)(?:\.(.+))?$/);
+      if (!match) return;
+
+      const rowIndex = Number(match[1]);
+      const subField = match[2] ?? null;
+      const entry = bomEntries[rowIndex];
+      if (!entry?.raw_material?.id) return;
+
+      const rawMaterialId = entry.raw_material.id;
+      if (!rowErrors[rawMaterialId]) {
+        rowErrors[rawMaterialId] = { quantity: [], scrap: [], general: [] };
+      }
+
+      const target =
+        !subField || subField === "quantity_per_unit"
+          ? rowErrors[rawMaterialId].quantity
+          : subField === "scrap_percentage"
+            ? rowErrors[rawMaterialId].scrap
+            : rowErrors[rawMaterialId].general;
+
+      errs.filter(Boolean).forEach(msg => {
+        if (!target.includes(msg)) target.push(msg);
+      });
+    });
+
+    const globalWholeNumberErrors = Array.isArray(fieldErrors.raw_materials)
+      ? fieldErrors.raw_materials.filter(
+          message => message === INTEGER_UOM_DECIMAL_ERROR,
+        )
+      : [];
+
+    if (globalWholeNumberErrors.length > 0) {
+      let matchedAnyIntegerRow = false;
+
+      bomEntries.forEach(entry => {
+        const quantityType = getRawMaterialQuantityType(entry.raw_material);
+        const hasDecimalQty = !isWholeNumber(
+          Number(entry.quantity_per_unit) || 0,
+        );
+        if (quantityType !== "INTEGER" || !hasDecimalQty) return;
+
+        matchedAnyIntegerRow = true;
+        if (!rowErrors[entry.raw_material.id]) {
+          rowErrors[entry.raw_material.id] = {
+            quantity: [],
+            scrap: [],
+            general: [],
+          };
+        }
+        globalWholeNumberErrors.forEach(message => {
+          if (!rowErrors[entry.raw_material.id].quantity.includes(message)) {
+            rowErrors[entry.raw_material.id].quantity.push(message);
+          }
+        });
+      });
+
+      if (!matchedAnyIntegerRow) {
+        bomEntries.forEach(entry => {
+          const hasDecimalQty = !isWholeNumber(
+            Number(entry.quantity_per_unit) || 0,
+          );
+          if (!hasDecimalQty) return;
+
+          if (!rowErrors[entry.raw_material.id]) {
+            rowErrors[entry.raw_material.id] = {
+              quantity: [],
+              scrap: [],
+              general: [],
+            };
+          }
+          globalWholeNumberErrors.forEach(message => {
+            if (!rowErrors[entry.raw_material.id].quantity.includes(message)) {
+              rowErrors[entry.raw_material.id].quantity.push(message);
+            }
+          });
+        });
+      }
+    }
+
+    return rowErrors;
+  }, [bomEntries, fieldErrors]);
 
   // Pre-fill form when data loads
   useEffect(() => {
@@ -200,10 +337,10 @@ export const UpdateProductForm = () => {
             .filter(rm => rm.raw_material)
             .map(rm => ({
               raw_material: rm.raw_material as unknown as RawMaterial,
-              quantity_per_unit: Number(
-                rm.quantity_per_unit ?? rm.quantity ?? 0,
+              quantity_per_unit: String(
+                Number(rm.quantity_per_unit ?? rm.quantity ?? 0),
               ),
-              scrap_percentage: Number(rm.scrap_percentage ?? 0),
+              scrap_percentage: String(Number(rm.scrap_percentage ?? 0)),
             })),
         );
       }
@@ -282,7 +419,7 @@ export const UpdateProductForm = () => {
     setBomEntries(prev =>
       prev.map(entry =>
         entry.raw_material.id === id
-          ? { ...entry, quantity_per_unit: Number(val) || 0 }
+          ? { ...entry, quantity_per_unit: val }
           : entry,
       ),
     );
@@ -294,7 +431,7 @@ export const UpdateProductForm = () => {
         entry.raw_material.id === id
           ? {
               ...entry,
-              scrap_percentage: Math.max(0, Math.min(100, Number(val) || 0)),
+              scrap_percentage: val,
             }
           : entry,
       ),
@@ -350,6 +487,10 @@ export const UpdateProductForm = () => {
         } },
       );
     } else {
+      if (canEditBom && hasBomIntegerQtyError) {
+        return;
+      }
+
       internalMutation.mutate(
         {
           ...commonBase,
@@ -361,8 +502,8 @@ export const UpdateProductForm = () => {
           ),
           raw_materials: bomEntries.map(e => ({
             raw_material_id: e.raw_material.id,
-            quantity_per_unit: e.quantity_per_unit,
-            scrap_percentage: e.scrap_percentage,
+            quantity_per_unit: Number(e.quantity_per_unit) || 0,
+            scrap_percentage: Math.max(0, Math.min(100, Number(e.scrap_percentage) || 0)),
           })),
         },
         { onSuccess : () => {
@@ -707,24 +848,32 @@ export const UpdateProductForm = () => {
                               ? "Use + Add Raw Material to build the BOM."
                               : "BOM cannot be changed after sales have started."}
                           </p>
-                          {fieldErrors?.raw_materials && (
-                            <Badge variant="destructive" className="text-xs">
-                              {fieldErrors.raw_materials[0]}
-                            </Badge>
+                          {bomApiValidationMessages.length > 0 && (
+                            <div className="mt-1 space-y-1">
+                              {bomApiValidationMessages.map((message, idx) => (
+                                <p
+                                  key={`${message}-${idx}`}
+                                  className="text-xs text-destructive"
+                                >
+                                  {message}
+                                </p>
+                              ))}
+                            </div>
                           )}
                         </div>
                       ) : (
-                        <div className="rounded-xl border overflow-hidden">
-                          <table className="w-full text-sm">
+                        <div className="rounded-xl border">
+                          <div className="overflow-x-auto">
+                            <table className="w-full min-w-[1200px] text-sm whitespace-nowrap">
                             <thead>
                               <tr className="border-b bg-muted/50">
                                 <th className="whitespace-nowrap text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                   Material
                                 </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-32">
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-56">
                                   Qty / Unit
                                 </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-28">
+                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
                                   Scrap %
                                 </th>
                                 <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
@@ -755,6 +904,33 @@ export const UpdateProductForm = () => {
                                   Number(entry.quantity_per_unit) || 0;
                                 const scrapPercentage =
                                   Number(entry.scrap_percentage) || 0;
+                                const quantityType = getRawMaterialQuantityType(
+                                  entry.raw_material,
+                                );
+                                const qtyTypeErr = canEditBom
+                                  ? bomIntegerQtyErrors[entry.raw_material.id]
+                                  : undefined;
+                                const rowApiErrors =
+                                  bomRowApiErrors[entry.raw_material.id] ?? {
+                                    quantity: [],
+                                    scrap: [],
+                                    general: [],
+                                  };
+                                const quantityErrorMessages = Array.from(
+                                  new Set([
+                                    ...(qtyTypeErr ? [qtyTypeErr] : []),
+                                    ...rowApiErrors.quantity,
+                                  ]),
+                                );
+                                const stockErrorMessage = stockErr
+                                  ? `Need ${stockErr.required_qty}, only ${stockErr.available_qty} available`
+                                  : undefined;
+                                const hasRowError = Boolean(
+                                  quantityErrorMessages.length ||
+                                    stockErrorMessage ||
+                                    rowApiErrors.scrap.length ||
+                                    rowApiErrors.general.length,
+                                );
                                 const requiredQty =
                                   qtyPerUnit * productionQuantity;
                                 const scrapQty =
@@ -764,8 +940,8 @@ export const UpdateProductForm = () => {
                                   <tr
                                     key={entry.raw_material.id}
                                     className={`group transition-colors ${
-                                      stockErr
-                                        ? "bg-destructive/5 hover:bg-destructive/10"
+                                      hasRowError
+                                        ? "bg-destructive/5 hover:bg-destructive/10 border-l-2 border-destructive/70"
                                         : idx % 2 === 0
                                           ? "bg-background hover:bg-muted/30"
                                           : "bg-muted/10 hover:bg-muted/30"
@@ -791,10 +967,38 @@ export const UpdateProductForm = () => {
                                               UOM: {unitLabel}
                                             </p>
                                           )}
-                                          {stockErr && (
-                                            <p className="text-xs text-destructive mt-0.5 font-medium">
-                                              Need {stockErr.required_qty}, only{" "}
-                                              {stockErr.available_qty} available
+                                          {quantityType === "INTEGER" && (
+                                            <p className="text-xs text-muted-foreground">
+                                              UOM type: INTEGER
+                                            </p>
+                                          )}
+                                          {quantityErrorMessages.map(message => (
+                                            <p
+                                              key={`qty-${entry.raw_material.id}-${message}`}
+                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
+                                            >
+                                              {message}
+                                            </p>
+                                          ))}
+                                          {rowApiErrors.scrap.map(message => (
+                                            <p
+                                              key={`scrap-${entry.raw_material.id}-${message}`}
+                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
+                                            >
+                                              {message}
+                                            </p>
+                                          ))}
+                                          {rowApiErrors.general.map(message => (
+                                            <p
+                                              key={`general-${entry.raw_material.id}-${message}`}
+                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
+                                            >
+                                              {message}
+                                            </p>
+                                          ))}
+                                          {stockErrorMessage && (
+                                            <p className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">
+                                              {stockErrorMessage}
                                             </p>
                                           )}
                                         </div>
@@ -805,14 +1009,14 @@ export const UpdateProductForm = () => {
                                         <TextInput
                                           id={`qty_${entry.raw_material.id}`}
                                           label=""
-                                          value={String(entry.quantity_per_unit)}
+                                          value={entry.quantity_per_unit}
                                           onChange={e =>
                                             updateBOMQty(
                                               entry.raw_material.id,
                                               e.target.value,
                                             )
                                           }
-                                          error={stockErr ? " " : undefined}
+                                          error={quantityErrorMessages[0] ?? (stockErrorMessage ? " " : undefined)}
                                           isNumberOnly
                                         />
                                       ) : (
@@ -826,13 +1030,14 @@ export const UpdateProductForm = () => {
                                         <TextInput
                                           id={`scrap_${entry.raw_material.id}`}
                                           label=""
-                                          value={String(entry.scrap_percentage)}
+                                          value={entry.scrap_percentage}
                                           onChange={e =>
                                             updateBOMScrap(
                                               entry.raw_material.id,
                                               e.target.value,
                                             )
                                           }
+                                          error={rowApiErrors.scrap[0]}
                                           isNumberOnly
                                         />
                                       ) : (
@@ -881,7 +1086,20 @@ export const UpdateProductForm = () => {
                                 );
                               })}
                             </tbody>
-                          </table>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                      {bomApiValidationMessages.length > 0 && (
+                        <div className="space-y-1">
+                          {bomApiValidationMessages.map((message, idx) => (
+                            <p
+                              key={`${message}-${idx}`}
+                              className="text-xs text-destructive"
+                            >
+                              {message}
+                            </p>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -977,8 +1195,8 @@ export const UpdateProductForm = () => {
               return (
                 existing ?? {
                   raw_material: rm,
-                  quantity_per_unit: 1,
-                  scrap_percentage: 0,
+                  quantity_per_unit: "1",
+                  scrap_percentage: "0",
                 }
               );
             }),

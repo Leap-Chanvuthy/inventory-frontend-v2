@@ -27,6 +27,16 @@ export interface SaleOrderProduct {
   product_name?: string;
   product_sku_code?: string;
   product_category_name?: string;
+  base_uom?: {
+    category?: {
+      quantity_type?: "INTEGER" | "DECIMAL";
+    };
+  };
+  uom?: {
+    category?: {
+      quantity_type?: "INTEGER" | "DECIMAL";
+    };
+  };
 }
 
 export interface SaleOrderItemRecord {

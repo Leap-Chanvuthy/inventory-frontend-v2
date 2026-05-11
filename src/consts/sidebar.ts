@@ -12,6 +12,7 @@ import {
   Tag,
   type LucideIcon,
   Activity,
+  NotepadText,
 } from "lucide-react";
 import { ROLES, Role } from "./role";
 
@@ -119,18 +120,18 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
       },
     ],
   },
-  // {
-  //   label: "Report & Analytics",
-  //   items: [
-  //     {
-  //       title: "Financial Report",
-  //       url: "/financial-report",
-  //       icon: NotepadText,
-  //       roles: [ROLES.ADMIN, ROLES.VENDER],
-  //       isLocked: true,
-  //     },
-  //   ],
-  // },
+  {
+    label: "Report & Analytics",
+    items: [
+      {
+        title: "Financial Report",
+        url: "/financial-report",
+        icon: NotepadText,
+        roles: [ROLES.ADMIN, ROLES.VENDER],
+        isLocked: true,
+      },
+    ],
+  },
   {
     label: "Settings",
     items: [

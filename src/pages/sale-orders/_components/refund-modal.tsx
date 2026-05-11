@@ -92,7 +92,13 @@ export function RefundModal({
 
   if (!open || !refundData.orderId) return null;
 
-  const canMoveNextFromStep1 = selectedItems.length > 0;
+  const hasIntegerQuantityViolation = refundData.items.some(item =>
+    item.quantityType === "INTEGER" &&
+    item.quantity > 0 &&
+    !Number.isInteger(item.quantity),
+  );
+  const canMoveNextFromStep1 = selectedItems.length > 0 && !hasIntegerQuantityViolation;
+  const canConfirmRefund = hasRefundSelection && !hasIntegerQuantityViolation;
 
   return (
     <Dialog open={open} onOpenChange={nextOpen => (!nextOpen ? onClose() : undefined)}>
@@ -132,6 +138,10 @@ export function RefundModal({
               <div className="rounded-md border border-border bg-card divide-y divide-border">
                 {refundData.items.map((item, index) => {
                   const maxQty = Math.max(item.maxReturnQty, item.maxRefundQty);
+                  const hasQuantityTypeError =
+                    item.quantityType === "INTEGER" &&
+                    item.quantity > 0 &&
+                    !Number.isInteger(item.quantity);
                   return (
                     <div key={`${item.productId}-${index}`} className="grid grid-cols-1 gap-2 px-3 py-2 md:grid-cols-[2fr,1fr] md:items-center">
                       <div>
@@ -139,6 +149,16 @@ export function RefundModal({
                         <p className="text-xs text-muted-foreground">
                           Purchased {item.qty} • Returnable {item.maxReturnQty} • Refundable {item.maxRefundQty}
                         </p>
+                        {item.quantityType === "INTEGER" && (
+                          <p className="mt-0.5 text-[10px] text-muted-foreground">
+                            This product allows whole numbers only.
+                          </p>
+                        )}
+                        {hasQuantityTypeError && (
+                          <p className="mt-1 text-[11px] text-destructive">
+                            Decimal quantity is not allowed for integer UOM.
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 md:justify-end">
                         <span className="text-xs text-muted-foreground">Qty</span>
@@ -155,6 +175,12 @@ export function RefundModal({
                   );
                 })}
               </div>
+              {hasIntegerQuantityViolation && (
+                <div className="flex items-center gap-2 rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  One or more selected items use integer UOM and cannot be refunded/returned with decimal quantity.
+                </div>
+              )}
             </section>
           )}
 
@@ -377,6 +403,12 @@ export function RefundModal({
                   Add a reason and at least one valid item action before confirming.
                 </div>
               )}
+              {hasIntegerQuantityViolation && (
+                <div className="flex items-center gap-2 rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  Decimal quantity is selected for an integer-UOM item. Please use whole numbers only.
+                </div>
+              )}
             </section>
           )}
         </div>
@@ -406,7 +438,7 @@ export function RefundModal({
                 <ChevronRight className="ml-1 h-3.5 w-3.5" />
               </Button>
             ) : (
-              <Button onClick={onSubmit} disabled={!hasRefundSelection} size="sm">
+              <Button onClick={onSubmit} disabled={!canConfirmRefund} size="sm">
                 Confirm Refund
               </Button>
             )}

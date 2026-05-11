@@ -28,6 +28,9 @@ function normalizeOrderItems(items: SaleOrderItemRecord[] | undefined): Order["i
     productName: item.product?.product_name,
     productSku: item.product?.product_sku_code,
     productCategory: item.product?.product_category_name,
+    quantityType:
+      item.product?.base_uom?.category?.quantity_type ??
+      item.product?.uom?.category?.quantity_type,
     qty: Number(item.quantity ?? 0),
     priceAtSale: Number(item.unit_price_in_usd ?? 0),
     priceAtSaleRiel: Number(item.unit_price_in_riel ?? 0),

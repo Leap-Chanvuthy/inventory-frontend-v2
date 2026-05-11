@@ -435,7 +435,23 @@ export default function SaleOrdersPage() {
   const handleOpenRefundModal = (order?: typeof currentViewOrder) => {
     const targetOrder = order ?? currentViewOrder;
     if (!targetOrder) return;
-    openRefundModal(targetOrder);
+    const enrichedOrder = {
+      ...targetOrder,
+      items: targetOrder.items.map(item => {
+        const product = products.find(
+          productOption =>
+            productOption.dbId === item.productDbId ||
+            productOption.id === item.productId,
+        );
+
+        return {
+          ...item,
+          quantityType: item.quantityType ?? product?.quantityType,
+        };
+      }),
+    };
+
+    openRefundModal(enrichedOrder);
   };
 
   const handleProcessRefund = async () => {

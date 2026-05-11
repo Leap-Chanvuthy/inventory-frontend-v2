@@ -40,6 +40,7 @@ export interface OrderItem {
   productName?: string;
   productSku?: string;
   productCategory?: string;
+  quantityType?: "INTEGER" | "DECIMAL";
   qty: number;
   priceAtSale: number;
   priceAtSaleRiel?: number;
