@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getProducts, getProductById, getTrashedProducts, getInternalReorderMovement, getExternalReorderMovement, getProductMovements, getScrapMovement } from "./product.api";
-import { ProductQueryParams, ProductMovementQueryParams } from "./product.type";
+import { useDebounce } from "@/hooks/use-debounce";
+import { getProducts, getProductById, getTrashedProducts, getInternalReorderMovement, getExternalReorderMovement, getProductMovements, getProductPnLDetailed, getProductStockLots, getScrapMovement, previewProductSaleAllocation } from "./product.api";
+import { ProductQueryParams, ProductMovementQueryParams, ProductStockLotQueryParams } from "./product.type";
 
 export const useProducts = (params?: ProductQueryParams) => {
   return useQuery({
@@ -50,10 +51,45 @@ export const useProductMovements = (productId: number, params?: ProductMovementQ
   });
 };
 
+export const useProductStockLots = (
+  productId: number,
+  params?: ProductStockLotQueryParams,
+) => {
+  return useQuery({
+    queryKey: ["product-stock-lots", productId, params],
+    queryFn: () => getProductStockLots(productId, params),
+    enabled: !!productId,
+    placeholderData: keepPreviousData,
+  });
+};
+
+export const useProductPnLDetailed = (productId: number) => {
+  return useQuery({
+    queryKey: ["product-pnl-detailed", productId],
+    queryFn: () => getProductPnLDetailed(productId),
+    enabled: !!productId,
+  });
+};
+
 export const useScrapMovement = (productId: number, movementId: number) => {
   return useQuery({
     queryKey: ["product-scrap-movement", productId, movementId],
     queryFn: () => getScrapMovement(productId, movementId),
     enabled: !!productId && !!movementId,
+  });
+};
+
+export const useProductSaleAllocationPreview = (
+  productId: number,
+  quantity: number,
+  enabled = true,
+) => {
+  const debouncedQuantity = useDebounce(quantity, 350);
+
+  return useQuery({
+    queryKey: ["product-sale-allocation-preview", productId, debouncedQuantity],
+    queryFn: () => previewProductSaleAllocation(productId, debouncedQuantity),
+    enabled: enabled && productId > 0 && debouncedQuantity > 0,
+    staleTime: 0,
   });
 };

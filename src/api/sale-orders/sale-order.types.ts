@@ -43,6 +43,7 @@ export interface SaleOrderItemRecord {
   id: number;
   sale_order_id: number;
   product_id: number;
+  sale_movement_id?: number | null;
   quantity: number;
   returned_quantity: number;
   refund_quantity: number;
@@ -54,6 +55,24 @@ export interface SaleOrderItemRecord {
   exchange_rate_from_riel_to_usd: number;
   note?: string | null;
   product?: SaleOrderProduct;
+  allocation_summary?: {
+    sale_method?: "FIFO" | "LIFO" | string;
+    total_quantity?: number;
+    total_amount_usd?: number;
+    total_amount_riel?: number;
+    average_unit_price_usd?: number;
+    average_unit_price_riel?: number;
+    lots?: Array<{
+      source_movement_id: number;
+      movement_type?: string | null;
+      movement_date?: string | null;
+      allocated_quantity: number;
+      selling_unit_price_in_usd: number;
+      selling_unit_price_in_riel?: number;
+      line_total_usd: number;
+      line_total_riel?: number;
+    }>;
+  } | null;
 }
 
 export interface SaleOrderInstallmentRecord {

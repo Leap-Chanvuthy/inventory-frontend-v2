@@ -1,6 +1,7 @@
 import { Layers } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductRawMaterial } from "@/api/product/product.type";
+import { Link } from "react-router-dom";
 
 interface ProductBomCardProps {
   rawMaterials?: ProductRawMaterial[];
@@ -55,7 +56,16 @@ export function ProductBomCard({ rawMaterials = [] }: ProductBomCardProps) {
                       {idx + 1}
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {rm.raw_material?.material_name || "—"}
+                      {rm.raw_material?.id ? (
+                        <Link
+                          to={`/raw-materials/view/${rm.raw_material.id}`}
+                          className="text-primary hover:underline"
+                        >
+                          {rm.raw_material.material_name || "—"}
+                        </Link>
+                      ) : (
+                        rm.raw_material?.material_name || "—"
+                      )}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                       {rm.raw_material?.material_sku_code || "—"}

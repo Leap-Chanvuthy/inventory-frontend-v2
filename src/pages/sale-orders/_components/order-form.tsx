@@ -1,4 +1,9 @@
 import { ArrowLeft, Calendar, Percent, Save, User, X } from "lucide-react";
+import { useMemo } from "react";
+import { useQueries } from "@tanstack/react-query";
+import { previewProductSaleAllocation } from "@/api/product/product.api";
+import type { SaleAllocationPreview } from "@/api/product/product.type";
+import { useDebounce } from "@/hooks/use-debounce";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +45,87 @@ export function OrderForm({
   onSaveDraft,
   onSaveAndProcess,
 }: OrderFormProps) {
+  const previewInputs = useMemo(
+    () =>
+      formState.items.map(item => ({
+        itemKey: item.productId,
+        productId: Number(item.productDbId || item.productId),
+        quantity: Number(item.qty || 0),
+      })),
+    [formState.items],
+  );
+  const debouncedPreviewInputs = useDebounce(previewInputs, 350);
+
+  const previewQueries = useQueries({
+    queries: debouncedPreviewInputs.map(input => ({
+      queryKey: ["product-sale-allocation-preview", input.productId, input.quantity],
+      queryFn: () => previewProductSaleAllocation(input.productId, input.quantity),
+      enabled: input.productId > 0 && input.quantity > 0,
+      retry: false,
+      staleTime: 0,
+    })),
+  });
+
+  const allocationPreviewByProductId = useMemo(() => {
+    const result: Record<string, SaleAllocationPreview | undefined> = {};
+    debouncedPreviewInputs.forEach((input, index) => {
+      const data = previewQueries[index]?.data?.data;
+      result[input.itemKey] = data;
+    });
+    return result;
+  }, [debouncedPreviewInputs, previewQueries]);
+
+  const isPreviewLoadingByProductId = useMemo(() => {
+    const result: Record<string, boolean> = {};
+    debouncedPreviewInputs.forEach((input, index) => {
+      const query = previewQueries[index];
+      result[input.itemKey] = Boolean(query?.isLoading || query?.isFetching);
+    });
+    return result;
+  }, [debouncedPreviewInputs, previewQueries]);
+
+  const previewMessageByProductId = useMemo(() => {
+    const result: Record<string, string | undefined> = {};
+    debouncedPreviewInputs.forEach((input, index) => {
+      const data = previewQueries[index]?.data?.data;
+      const fallbackMessage = previewQueries[index]?.error instanceof Error
+        ? previewQueries[index].error.message
+        : undefined;
+      if (!data?.can_fulfill) {
+        result[input.itemKey] =
+          data?.message || "Not enough stock available. Reduce the quantity or add more stock.";
+      } else {
+        result[input.itemKey] = fallbackMessage;
+      }
+    });
+    return result;
+  }, [debouncedPreviewInputs, previewQueries]);
+
+  const isAnyPreviewLoading = Object.values(isPreviewLoadingByProductId).some(Boolean);
+  const hasUnfulfillablePreview = Object.values(allocationPreviewByProductId).some(
+    preview => preview && !preview.can_fulfill,
+  );
+  const disableSubmit = formState.items.length === 0 || isAnyPreviewLoading || hasUnfulfillablePreview;
+
+  const previewSubtotalUsd = Object.values(allocationPreviewByProductId).reduce((sum, preview) => {
+    if (!preview?.can_fulfill) return sum;
+    return sum + Number(preview.estimated_total_usd ?? 0);
+  }, 0);
+
+  const canUsePreviewTotals =
+    formState.items.length > 0 &&
+    !isAnyPreviewLoading &&
+    formState.items.every(item => Boolean(allocationPreviewByProductId[item.productId]));
+
+  const subtotalForDisplay = canUsePreviewTotals ? previewSubtotalUsd : formTotals.subtotal;
+  const discountPercentage = formState.useCategoryDiscount
+    ? Number(activeCustomer?.discount || 0)
+    : Number(formState.discount || 0);
+  const discountForDisplay = subtotalForDisplay * (discountPercentage / 100);
+  const taxableForDisplay = Math.max(0, subtotalForDisplay - discountForDisplay);
+  const taxForDisplay = taxableForDisplay * (Number(formState.tax || 0) / 100);
+  const grandTotalForDisplay = taxableForDisplay + taxForDisplay;
+
   return (
     <div className="flex-1 flex flex-col bg-muted/20 animate-in slide-in-from-bottom-4 duration-300 h-full">
       <header className="h-16 px-4 border-b border-border bg-card flex justify-between items-center z-20">
@@ -150,9 +236,12 @@ export function OrderForm({
               onRemoveItem={onRemoveItem}
               onUpdateQty={onUpdateItemQty}
               itemErrors={itemErrors}
+              allocationPreviewByProductId={allocationPreviewByProductId}
+              isPreviewLoadingByProductId={isPreviewLoadingByProductId}
+              previewMessageByProductId={previewMessageByProductId}
             />
             <p className="text-[11px] text-muted-foreground">
-              Unit price is derived automatically from product movement history when saving the order. Product click adds quantity = 1 instantly.
+              Unit price is derived automatically from stock batches. If multiple batches are used, the final price is calculated from those batches.
             </p>
           </section>
 
@@ -229,17 +318,17 @@ export function OrderForm({
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium text-foreground">{formatCurrency(formTotals.subtotal)}</span>
+                    <span className="font-medium text-foreground">{formatCurrency(subtotalForDisplay)}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">
                       Discount {formState.useCategoryDiscount ? `(${activeCustomer?.discount || 0}%)` : "(Manual)"}
                     </span>
-                    <span className="font-medium text-red-500">-{formatCurrency(formTotals.discountVal)}</span>
+                    <span className="font-medium text-red-500">-{formatCurrency(discountForDisplay)}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Tax ({formState.tax}%)</span>
-                    <span className="font-medium text-foreground">+{formatCurrency(formTotals.taxVal)}</span>
+                    <span className="font-medium text-foreground">+{formatCurrency(taxForDisplay)}</span>
                   </div>
                 </div>
 
@@ -247,12 +336,17 @@ export function OrderForm({
                   <div className="flex justify-between items-end">
                     <span className="text-xs font-semibold text-primary uppercase tracking-wide">Grand Total</span>
                     <div className="text-right">
-                      <div className="text-2xl font-semibold text-foreground">{formatCurrency(formTotals.total)}</div>
+                      <div className="text-2xl font-semibold text-foreground">{formatCurrency(grandTotalForDisplay)}</div>
                       <div className="text-[10px] text-muted-foreground uppercase tracking-wide mt-1">
-                        {formatCurrency(convertUsdToRiel(formTotals.total), "KHR")}
+                        {formatCurrency(convertUsdToRiel(grandTotalForDisplay), "KHR")}
                       </div>
                     </div>
                   </div>
+                  {hasUnfulfillablePreview ? (
+                    <p className="mt-2 text-[11px] text-destructive">
+                      Not enough stock available. Reduce the quantity or add more stock.
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -264,10 +358,10 @@ export function OrderForm({
         <Button onClick={onCancel} variant="ghost" size="sm">
           Cancel
         </Button>
-        <Button onClick={onSaveDraft} variant="outline" size="sm">
+        <Button onClick={onSaveDraft} variant="outline" size="sm" disabled={disableSubmit}>
           Save as Draft
         </Button>
-        <Button onClick={onSaveAndProcess} size="sm">
+        <Button onClick={onSaveAndProcess} size="sm" disabled={disableSubmit}>
           <Save className="w-3.5 h-3.5" />
           Save & Process
         </Button>

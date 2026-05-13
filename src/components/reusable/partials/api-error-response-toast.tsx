@@ -34,7 +34,7 @@ export const resolveApiErrorToast = (
 
   const title = payload?.message || payload?.error || fallbackTitle;
 
-  const errorsInput = payload?.errors && typeof payload.errors === "object" ? payload.errors : undefined;
+  const errorsInput = payload?.errors;
   const errorMessages = toMessages(errorsInput);
   const dataMessages = toMessages(payload?.data);
   const description = [...errorMessages, ...dataMessages].join(" ").trim() || undefined;

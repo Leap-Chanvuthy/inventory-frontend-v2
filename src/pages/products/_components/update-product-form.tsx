@@ -7,7 +7,7 @@ import {
   useUpdateExternalPurchase,
   useUpdateInternalManufacturing,
 } from "@/api/product/product.mutation";
-import { useSingleProduct } from "@/api/product/product.query";
+import { useProductMovements, useSingleProduct } from "@/api/product/product.query";
 import {
   ProductValidationErrors,
   InsufficientStockError,
@@ -103,6 +103,16 @@ export const UpdateProductForm = () => {
   const productId = Number(id);
 
   const { data, isLoading, isError, isFetching } = useSingleProduct(productId);
+  const {
+    data: initialMovementData,
+    isFetched: isInitialMovementFetched,
+    isError: isInitialMovementError,
+  } = useProductMovements(productId, {
+    page: 1,
+    per_page: 100,
+    sort: "movement_date",
+    "filter[direction]": "IN",
+  });
   const externalMutation = useUpdateExternalPurchase(productId);
   const internalMutation = useUpdateInternalManufacturing(productId);
 
@@ -285,13 +295,41 @@ export const UpdateProductForm = () => {
     return rowErrors;
   }, [bomEntries, fieldErrors]);
 
+  useEffect(() => {
+    setInitialized(false);
+  }, [productId]);
+
   // Pre-fill form when data loads
   useEffect(() => {
     if (!product || initialized) return;
 
-    const mv = data?.data?.initial_movement ?? product.product_movements?.find(
-      m => m.movement_type === "INTERNAL_PRODUCED" || m.movement_type === "EXTERNAL_PURCHASED",
+    const isInitialMovementType = (movementType?: string) =>
+      movementType === "INTERNAL_PRODUCED" || movementType === "EXTERNAL_PURCHASED";
+
+    const movementRows = (initialMovementData?.data ?? []).filter(
+      m => m.product_id === productId && isInitialMovementType(m.movement_type),
     );
+
+    if (
+      !isInitialMovementFetched &&
+      !isInitialMovementError &&
+      movementRows.length === 0
+    ) {
+      return;
+    }
+
+    const mv = movementRows
+      .slice()
+      .sort((a, b) => {
+        const aTime = new Date(a.movement_date).getTime();
+        const bTime = new Date(b.movement_date).getTime();
+        if (aTime !== bTime) return aTime - bTime;
+        return a.id - b.id;
+      })[0];
+
+    const pricingLot = data?.data?.pricing_reference_lot ?? null;
+    const movementDateValue =
+      mv?.movement_date ?? pricingLot?.movement_date ?? "";
 
     setBase({
       product_name: product.product_name ?? "",
@@ -303,31 +341,47 @@ export const UpdateProductForm = () => {
       supplier_id: String(product.supplier_id ?? ""),
       warehouse_id: String(product.warehouse_id ?? ""),
       sale_method: product.sale_method ?? "FIFO",
-      movement_date: mv?.movement_date ? mv.movement_date.substring(0, 10) : "",
+      movement_date: movementDateValue ? movementDateValue.substring(0, 10) : "",
       note: mv?.note ?? "",
     });
 
-    if (!isInternal && mv) {
+    if (!isInternal) {
       setExternal({
-        quantity: String(mv.quantity ?? ""),
-        purchase_unit_price_in_usd: String(mv.purchase_unit_price_in_usd ?? ""),
-        exchange_rate_from_usd_to_riel: String(
-          mv.exchange_rate_from_usd_to_riel ?? "4100",
+        quantity: String(mv?.quantity ?? pricingLot?.quantity ?? ""),
+        purchase_unit_price_in_usd: String(
+          mv?.purchase_unit_price_in_usd ?? pricingLot?.purchase_unit_price_in_usd ?? "",
         ),
-        selling_unit_price_in_usd: String(mv.selling_unit_price_in_usd ?? ""),
+        exchange_rate_from_usd_to_riel: String(
+          mv?.exchange_rate_from_usd_to_riel ?? "4100",
+        ),
+        selling_unit_price_in_usd: String(
+          mv?.selling_unit_price_in_usd ??
+            pricingLot?.selling_unit_price_in_usd ??
+            product.latest_selling_unit_price_in_usd ??
+            "",
+        ),
         selling_exchange_rate_from_usd_to_riel: String(
-          mv.selling_exchange_rate_from_usd_to_riel ?? "4100",
+          mv?.selling_exchange_rate_from_usd_to_riel ??
+            product.latest_selling_exchange_rate_from_usd_to_riel ??
+            "4100",
         ),
       });
     }
 
-    if (isInternal && mv) {
+    if (isInternal) {
       setInternal({
-        product_status: mv.product_status ?? "COMPLETED",
-        quantity: String(mv.quantity ?? ""),
-        selling_unit_price_in_usd: String(mv.selling_unit_price_in_usd ?? ""),
+        product_status: mv?.product_status ?? "COMPLETED",
+        quantity: String(mv?.quantity ?? pricingLot?.quantity ?? ""),
+        selling_unit_price_in_usd: String(
+          mv?.selling_unit_price_in_usd ??
+            pricingLot?.selling_unit_price_in_usd ??
+            product.latest_selling_unit_price_in_usd ??
+            "",
+        ),
         selling_exchange_rate_from_usd_to_riel: String(
-          mv.selling_exchange_rate_from_usd_to_riel ?? "4100",
+          mv?.selling_exchange_rate_from_usd_to_riel ??
+            product.latest_selling_exchange_rate_from_usd_to_riel ??
+            "4100",
         ),
       });
 
@@ -347,7 +401,15 @@ export const UpdateProductForm = () => {
     }
 
     setInitialized(true);
-  }, [product, isInternal, initialized]);
+  }, [
+    data?.data?.pricing_reference_lot,
+    initialMovementData,
+    initialized,
+    isInitialMovementError,
+    isInitialMovementFetched,
+    isInternal,
+    product,
+  ]);
 
   // UOM category selection
   const { data: selectedCategoryData } = useSingleProductCategory(

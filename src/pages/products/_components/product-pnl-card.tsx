@@ -1,31 +1,25 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Inbox } from "lucide-react";
-import { ProductPnL } from "@/api/product/product.type";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { ProductPnLDetailed } from "@/api/product/product.type";
+import { DollarSign, Factory, Inbox, Layers, TrendingDown, TrendingUp } from "lucide-react";
 
 interface ProductPnlCardProps {
-  pnl: ProductPnL;
+  pnl: ProductPnLDetailed;
 }
 
-const fmt = (value: number | null | undefined) =>
-  value != null ? value.toLocaleString() : "—";
+const money = (value?: number | null) =>
+  typeof value === "number" ? value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "—";
+
+const qty = (value?: number | null) =>
+  typeof value === "number" ? value.toLocaleString(undefined, { maximumFractionDigits: 4 }) : "—";
 
 export function ProductPnlCard({ pnl }: ProductPnlCardProps) {
-  if (!pnl.costs) {
+  if (!pnl?.summary) {
     return (
       <Card>
         <CardHeader className="pb-4">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950">
-              <DollarSign className="h-4 w-4 text-emerald-600" />
-            </div>
-            <div>
-              <CardTitle className="text-base">P&L Summary</CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Revenue, costs and profit overview
-              </p>
-            </div>
-          </div>
+          <CardTitle className="text-base">P&L Summary</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
@@ -37,141 +31,197 @@ export function ProductPnlCard({ pnl }: ProductPnlCardProps) {
     );
   }
 
-  const totalCost =
-    (pnl.costs.purchase.total_usd ?? 0) +
-    (pnl.costs.reorder.total_usd ?? 0) +
-    (pnl.costs.scrap.total_usd ?? 0);
-
-  const totalCostRiel =
-    (pnl.costs.purchase.total_riel ?? 0) +
-    (pnl.costs.reorder.total_riel ?? 0) +
-    (pnl.costs.scrap.total_riel ?? 0);
-
-  const isProfit = pnl.net_profit_usd >= 0;
+  const isNetProfit = pnl.summary.net_profit_usd >= 0;
+  const isGrossProfit = pnl.summary.gross_profit_usd >= 0;
+  const isInternal = pnl.internal_manufacturing?.is_internal_product;
+  const rmSpend = pnl.internal_manufacturing?.raw_material_spending;
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="pb-4">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950">
-            <DollarSign className="h-4 w-4 text-emerald-600" />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950">
+              <DollarSign className="h-4 w-4 text-emerald-600" />
+            </div>
+            <div>
+              <CardTitle className="text-base">Detailed P&L</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Revenue, COGS, inventory valuation, and production spend
+              </p>
+            </div>
           </div>
-          <div>
-            <CardTitle className="text-base">P&L Summary</CardTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Revenue, costs and profit overview
-            </p>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">{pnl.product?.sale_method || "FIFO"}</Badge>
+            <Badge variant="outline">
+              Rate: 1 USD = {money(pnl.currency?.usd_to_riel_rate)} Riel
+            </Badge>
           </div>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-4">
-        {/* Key numbers */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950 p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Revenue</p>
-            <p className="text-sm font-bold text-blue-600">
-              ${fmt(pnl.revenue_usd)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="rounded-lg border p-3 bg-blue-50/60 dark:bg-blue-950/40">
+            <p className="text-xs text-muted-foreground">Revenue</p>
+            <p className="text-sm font-bold text-blue-700 dark:text-blue-300">
+              ${money(pnl.summary.revenue_usd)}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              ៛{fmt(pnl.revenue_riel)}
-            </p>
+            <p className="text-[11px] text-muted-foreground">៛{money(pnl.summary.revenue_riel)}</p>
           </div>
-          <div className="rounded-lg bg-orange-50 dark:bg-orange-950 p-3 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Total Cost</p>
-            <p className="text-sm font-bold text-orange-600">
-              ${fmt(totalCost)}
+
+          <div className="rounded-lg border p-3 bg-amber-50/60 dark:bg-amber-950/40">
+            <p className="text-xs text-muted-foreground">Sales COGS</p>
+            <p className="text-sm font-bold text-amber-700 dark:text-amber-300">
+              ${money(pnl.summary.sales_cogs_usd)}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              ៛{fmt(totalCostRiel)}
-            </p>
+            <p className="text-[11px] text-muted-foreground">៛{money(pnl.summary.sales_cogs_riel)}</p>
           </div>
+
           <div
-            className={`rounded-lg p-3 text-center ${
-              isProfit
-                ? "bg-green-50 dark:bg-green-950"
-                : "bg-red-50 dark:bg-red-950"
+            className={`rounded-lg border p-3 ${
+              isGrossProfit ? "bg-emerald-50/60 dark:bg-emerald-950/40" : "bg-rose-50/60 dark:bg-rose-950/40"
             }`}
           >
-            <p className="text-xs text-muted-foreground mb-1">Net Profit</p>
-            <p
-              className={`text-sm font-bold ${
-                isProfit ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {isProfit ? "+" : ""}${fmt(pnl.net_profit_usd)}
+            <p className="text-xs text-muted-foreground">Gross Profit</p>
+            <p className={`text-sm font-bold ${isGrossProfit ? "text-emerald-700 dark:text-emerald-300" : "text-rose-700 dark:text-rose-300"}`}>
+              ${money(pnl.summary.gross_profit_usd)}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              ៛{fmt(pnl.net_profit_riel)}
+            <p className="text-[11px] text-muted-foreground">{money(pnl.summary.gross_margin_pct)}%</p>
+          </div>
+
+          <div
+            className={`rounded-lg border p-3 ${
+              isNetProfit ? "bg-green-50/60 dark:bg-green-950/40" : "bg-red-50/60 dark:bg-red-950/40"
+            }`}
+          >
+            <p className="text-xs text-muted-foreground">Net Profit</p>
+            <p className={`text-sm font-bold ${isNetProfit ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
+              ${money(pnl.summary.net_profit_usd)}
             </p>
+            <p className="text-[11px] text-muted-foreground">{money(pnl.summary.net_margin_pct)}%</p>
           </div>
         </div>
 
-        {/* Cost breakdown */}
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-            Cost Breakdown
-          </p>
-          <div className="space-y-2">
-            {[
-              {
-                label: "Purchase",
-                count: pnl.costs.purchase.count,
-                usd: pnl.costs.purchase.total_usd,
-                riel: pnl.costs.purchase.total_riel,
-              },
-              {
-                label: "Reorder",
-                count: pnl.costs.reorder.count,
-                usd: pnl.costs.reorder.total_usd,
-                riel: pnl.costs.reorder.total_riel,
-              },
-              {
-                label: "Scrap Loss",
-                count: pnl.costs.scrap.count,
-                usd: pnl.costs.scrap.total_usd,
-                riel: pnl.costs.scrap.total_riel,
-              },
-              {
-                label: "Sales COGS",
-                count: pnl.costs.sales.count,
-                usd: pnl.costs.sales.cogs_usd,
-                riel: pnl.costs.sales.cogs_riel,
-              },
-            ].map(item => (
-              <div
-                key={item.label}
-                className="flex items-center justify-between text-sm py-1.5 border-b border-border last:border-0"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">{item.label}</span>
-                  {item.count > 0 && (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] px-1.5 py-0"
-                    >
-                      {item.count}x
-                    </Badge>
-                  )}
+        <Separator />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="rounded-lg border p-3 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5" />
+              Inventory Valuation
+            </p>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Incoming Qty</span>
+              <span className="font-semibold">{qty(pnl.inventory?.incoming_total_qty)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Incoming Cost</span>
+              <span className="font-semibold">${money(pnl.inventory?.incoming_total_cost_usd)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Remaining Qty</span>
+              <span className="font-semibold">{qty(pnl.inventory?.remaining_qty)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Remaining Cost</span>
+              <span className="font-semibold">${money(pnl.inventory?.remaining_cost_usd)}</span>
+            </div>
+          </div>
+
+          <div className="rounded-lg border p-3 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+              <TrendingDown className="w-3.5 h-3.5" />
+              Cost Breakdown
+            </p>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">External Purchase</span>
+              <span className="font-semibold">${money(pnl.cost_breakdown?.external_purchase?.cost_usd)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Internal Production</span>
+              <span className="font-semibold">${money(pnl.cost_breakdown?.internal_production?.cost_usd)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Reorder</span>
+              <span className="font-semibold">${money(pnl.cost_breakdown?.reorder?.cost_usd)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Scrap Loss</span>
+              <span className="font-semibold">${money(pnl.cost_breakdown?.scrap?.cost_usd)}</span>
+            </div>
+            <div className="text-sm flex items-center justify-between">
+              <span className="text-muted-foreground">Other Losses</span>
+              <span className="font-semibold">${money(pnl.cost_breakdown?.other_losses?.cost_usd)}</span>
+            </div>
+          </div>
+        </div>
+
+        {isInternal && (
+          <>
+            <Separator />
+            <div className="rounded-lg border p-3 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                <Factory className="w-3.5 h-3.5" />
+                Internal Manufacturing Spend
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="rounded-md border p-2">
+                  <p className="text-[11px] text-muted-foreground">Initial Production RM Cost</p>
+                  <p className="text-sm font-semibold">${money(rmSpend?.initial_production_usd)}</p>
                 </div>
-                <div className="text-right">
-                  <p
-                    className={`font-semibold ${
-                      (item.usd ?? 0) > 0
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    ${fmt(item.usd)}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    ៛{fmt(item.riel)}
-                  </p>
+                <div className="rounded-md border p-2">
+                  <p className="text-[11px] text-muted-foreground">Internal Reorder RM Cost</p>
+                  <p className="text-sm font-semibold">${money(rmSpend?.reorder_usd)}</p>
+                </div>
+                <div className="rounded-md border p-2">
+                  <p className="text-[11px] text-muted-foreground">Total RM Spend</p>
+                  <p className="text-sm font-semibold">${money(rmSpend?.total_usd)}</p>
                 </div>
               </div>
-            ))}
+
+              {Array.isArray(rmSpend?.by_raw_material) && rmSpend.by_raw_material.length > 0 && (
+                <div className="overflow-x-auto rounded-md border">
+                  <table className="w-full text-xs">
+                    <thead className="bg-muted/40">
+                      <tr>
+                        <th className="text-left px-2 py-2">Raw Material</th>
+                        <th className="text-right px-2 py-2">Consumed Qty</th>
+                        <th className="text-right px-2 py-2">Total USD</th>
+                        <th className="text-right px-2 py-2">Reorder USD</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rmSpend.by_raw_material.slice(0, 8).map(item => (
+                        <tr key={item.raw_material_id} className="border-t">
+                          <td className="px-2 py-2">
+                            <div className="font-medium">{item.material_name || `#${item.raw_material_id}`}</div>
+                            <div className="text-muted-foreground">{item.material_sku_code || "—"}</div>
+                          </td>
+                          <td className="px-2 py-2 text-right">{qty(item.consumed_qty)}</td>
+                          <td className="px-2 py-2 text-right">${money(item.total_usd)}</td>
+                          <td className="px-2 py-2 text-right">${money(item.reorder_usd)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        <div className="rounded-md border p-3 bg-muted/20">
+          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+            <TrendingUp className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+            <p>
+              COGS is calculated from sale allocations and source-lot unit cost. For internal manufacturing lots,
+              unit cost is derived from raw-material OUT movements linked by reference token.
+            </p>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 }
+

@@ -121,7 +121,7 @@ export const useReorderExternalPurchase = (productId: number) => {
       toast.success(response.message || "Reorder created successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to create reorder");
+      showApiErrorToast(error, "Failed to create reorder");
     },
   });
 };
@@ -138,7 +138,7 @@ export const useReorderInternalManufacturing = (productId: number) => {
       toast.success(response.message || "Reorder created successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to create reorder");
+      showApiErrorToast(error, "Failed to create reorder");
     },
   });
 };
@@ -154,7 +154,7 @@ export const useUpdateExternalReorderMovement = (productId: number, movementId: 
       toast.success(response.message || "Movement updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update movement");
+      showApiErrorToast(error, "Failed to update movement");
     },
   });
 };
@@ -170,7 +170,7 @@ export const useUpdateInternalReorderMovement = (productId: number, movementId: 
       toast.success(response.message || "Movement updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update movement");
+      showApiErrorToast(error, "Failed to update movement");
     },
   });
 };
@@ -186,7 +186,7 @@ export const useDeleteExternalReorderMovement = (productId: number) => {
       toast.success(response.message || "Movement deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to delete movement");
+      showApiErrorToast(error, "Failed to delete movement");
     },
   });
 };
@@ -202,7 +202,7 @@ export const useDeleteInternalReorderMovement = (productId: number) => {
       toast.success(response.message || "Movement deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to delete movement");
+      showApiErrorToast(error, "Failed to delete movement");
     },
   });
 };
@@ -219,7 +219,7 @@ export const useCreateScrapMovement = (productId: number) => {
       toast.success(response.message || "Product scrapped successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to create scrap movement");
+      showApiErrorToast(error, "Failed to create scrap movement");
     },
   });
 };
@@ -236,7 +236,7 @@ export const useUpdateScrapMovement = (productId: number, movementId: number) =>
       toast.success(response.message || "Scrap movement updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to update scrap movement");
+      showApiErrorToast(error, "Failed to update scrap movement");
     },
   });
 };

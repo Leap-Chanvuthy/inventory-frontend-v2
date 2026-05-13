@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useSingleProduct } from "@/api/product/product.query";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useProductPnLDetailed, useSingleProduct } from "@/api/product/product.query";
 import { useDeleteProduct } from "@/api/product/product.mutation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import { ReorderDialog } from "./reorder-dialog";
 import { ScrapDialog } from "./scrap-dialog";
 import { ProductBomCard } from "./product-bom-card";
 import { ProductMovementChart } from "./movement/product-movement-chart";
+import { ProductStockLotsTable } from "./stock-lots-table";
 
 function Field({
   label,
@@ -45,12 +46,14 @@ function Field({
 
 export function ViewProductForm() {
   const { id } = useParams<{ id: string }>();
+  const productId = Number(id);
   const navigate = useNavigate();
-  const { data, isLoading, isError, isFetching } = useSingleProduct(Number(id));
+  const { data, isLoading, isError, isFetching } = useSingleProduct(productId);
+  const { data: pnlDetailResponse } = useProductPnLDetailed(productId);
   const deleteMutation = useDeleteProduct();
 
   const handleDelete = () => {
-    deleteMutation.mutate(Number(id), {
+    deleteMutation.mutate(productId, {
       onSuccess: () => navigate("/products"),
     });
   };
@@ -68,10 +71,11 @@ export function ViewProductForm() {
   if (!product) return <DataCardEmpty emptyText="Product not found." />;
 
   const isInternal = product.product_type === "INTERNAL_PRODUCED";
-  const movement = detail?.initial_movement ?? product.product_movements?.[0];
+  const pricingLot = detail?.pricing_reference_lot ?? null;
   const stockStatus = detail?.product_stock_status;
-  const pnl = detail?.product_pnl;
+  const pnl = pnlDetailResponse?.data;
   const totalCountByMovementType = detail?.total_count_by_movement_type;
+  const saleMethod = String(product.sale_method || "FIFO").toUpperCase() === "LIFO" ? "LIFO" : "FIFO";
 
   const stockStatusStyle =
     stockStatus === "IN_STOCK"
@@ -137,20 +141,24 @@ export function ViewProductForm() {
           icon={<Package className="h-5 w-5 text-blue-600" />}
           label="Current Stock"
           value={`${detail?.current_qty_in_stock ?? 0} ${product.base_uom?.symbol ?? ""}`}
-          sub={product.base_uom?.name}
+          sub={
+            product.base_uom?.category?.quantity_type
+              ? `${product.base_uom?.name} (${product.base_uom.category.quantity_type} Type)`
+              : product.base_uom?.name
+          }
           iconBg="bg-blue-50 dark:bg-blue-950"
         />
         <IconStatCard
           icon={<DollarSign className="h-5 w-5 text-green-600" />}
           label="Selling Price"
           value={
-            movement
-              ? `$${movement.selling_unit_price_in_usd.toLocaleString()}`
+            pricingLot
+              ? `$${Number(pricingLot.selling_unit_price_in_usd || 0).toLocaleString()}`
               : "—"
           }
           sub={
-            movement
-              ? `៛${movement.selling_unit_price_in_riel.toLocaleString()}`
+            pricingLot
+              ? `៛${Number(pricingLot.selling_unit_price_in_riel || 0).toLocaleString()}`
               : undefined
           }
           iconBg="bg-green-50 dark:bg-green-950"
@@ -168,13 +176,13 @@ export function ViewProductForm() {
             icon={<TrendingUp className="h-5 w-5 text-purple-600" />}
             label="Purchase Price"
             value={
-              movement?.purchase_unit_price_in_usd
-                ? `$${movement.purchase_unit_price_in_usd.toLocaleString()}`
+              pricingLot?.purchase_unit_price_in_usd
+                ? `$${Number(pricingLot.purchase_unit_price_in_usd).toLocaleString()}`
                 : "—"
             }
             sub={
-              movement?.purchase_unit_price_in_riel
-                ? `៛${movement.purchase_unit_price_in_riel.toLocaleString()}`
+              pricingLot?.purchase_unit_price_in_riel
+                ? `៛${Number(pricingLot.purchase_unit_price_in_riel).toLocaleString()}`
                 : undefined
             }
             iconBg="bg-purple-50 dark:bg-purple-950"
@@ -235,20 +243,30 @@ export function ViewProductForm() {
                 </>
               }
               value={
-                <Badge
-                  variant="outline"
-                  style={
-                    product.category?.label_color
-                      ? {
-                          backgroundColor: `${product.category.label_color}20`,
-                          borderColor: product.category.label_color,
-                          color: product.category.label_color,
-                        }
-                      : undefined
-                  }
-                >
-                  {product.category?.category_name || "—"}
-                </Badge>
+                product.category ? (
+                  <Link
+                    to={`/categories/product-categories/view/${product.category.id}`}
+                    className="inline-flex"
+                  >
+                    <Badge
+                      variant="outline"
+                      className="hover:underline"
+                      style={
+                        product.category?.label_color
+                          ? {
+                              backgroundColor: `${product.category.label_color}20`,
+                              borderColor: product.category.label_color,
+                              color: product.category.label_color,
+                            }
+                          : undefined
+                      }
+                    >
+                      {product.category?.category_name || "—"}
+                    </Badge>
+                  </Link>
+                ) : (
+                  "—"
+                )
               }
             />
             <Field
@@ -258,9 +276,16 @@ export function ViewProductForm() {
                 </>
               }
               value={
-                product.base_uom
-                  ? `${product.base_uom.name} (${product.base_uom.symbol})`
-                  : "—"
+                product.base_uom ? (
+                  <Link
+                    to={`/unit-of-measurement/view/${product.base_uom.id}`}
+                    className="text-primary hover:underline"
+                  >
+                    {product.base_uom.name} ({product.base_uom.symbol})
+                  </Link>
+                ) : (
+                  "—"
+                )
               }
             />
             <Field
@@ -269,7 +294,18 @@ export function ViewProductForm() {
                   <IconBadge label="warehouse" variant="indigo" /> Warehouse
                 </>
               }
-              value={product.warehouse?.warehouse_name || "—"}
+              value={
+                product.warehouse ? (
+                  <Link
+                    to={`/warehouses/view/${product.warehouse.id}`}
+                    className="text-primary hover:underline"
+                  >
+                    {product.warehouse.warehouse_name}
+                  </Link>
+                ) : (
+                  "—"
+                )
+              }
             />
             {!isInternal && (
               <Field
@@ -278,18 +314,29 @@ export function ViewProductForm() {
                     <IconBadge label="supplier" /> Supplier
                   </>
                 }
-                value={product.supplier?.official_name || "—"}
+                value={
+                  product.supplier ? (
+                    <Link
+                      to={`/supplier/view/${product.supplier.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {product.supplier.official_name}
+                    </Link>
+                  ) : (
+                    "—"
+                  )
+                }
               />
             )}
-            {movement && (
+            {pricingLot?.movement_date && (
               <Field
                 label={
                   <>
-                    <IconBadge label="expiry_date" variant="orange" /> Movement
-                    Date
+                    <IconBadge label="expiry_date" variant="orange" /> Pricing
+                    Lot Date
                   </>
                 }
-                value={formatDate(movement.movement_date)}
+                value={formatDate(pricingLot.movement_date)}
               />
             )}
             <Field
@@ -327,6 +374,8 @@ export function ViewProductForm() {
         <ProductMovementChart data={totalCountByMovementType ?? {}} />
         {pnl && <ProductPnlCard pnl={pnl} />}
       </div>
+
+      <ProductStockLotsTable productId={product.id} saleMethod={saleMethod} />
 
       {/* ── BOM & Movement History row ── */}
       <div

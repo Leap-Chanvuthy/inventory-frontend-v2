@@ -25,6 +25,7 @@ function normalizeOrderItems(items: SaleOrderItemRecord[] | undefined): Order["i
     id: item.id,
     productId: String(item.product_id),
     productDbId: Number(item.product_id),
+    saleMovementId: item.sale_movement_id ?? null,
     productName: item.product?.product_name,
     productSku: item.product?.product_sku_code,
     productCategory: item.product?.product_category_name,
@@ -37,6 +38,26 @@ function normalizeOrderItems(items: SaleOrderItemRecord[] | undefined): Order["i
     returnedQty: Number(item.returned_quantity ?? 0),
     refundQty: Number(item.refund_quantity ?? 0),
     exchangeRateUsdToRiel: Number(item.exchange_rate_from_usd_to_riel ?? 0),
+    allocationSummary: item.allocation_summary
+      ? {
+          saleMethod: item.allocation_summary.sale_method,
+          totalQuantity: Number(item.allocation_summary.total_quantity ?? 0),
+          totalAmountUsd: Number(item.allocation_summary.total_amount_usd ?? 0),
+          totalAmountRiel: Number(item.allocation_summary.total_amount_riel ?? 0),
+          averageUnitPriceUsd: Number(item.allocation_summary.average_unit_price_usd ?? 0),
+          averageUnitPriceRiel: Number(item.allocation_summary.average_unit_price_riel ?? 0),
+          lots: (item.allocation_summary.lots ?? []).map(lot => ({
+            sourceMovementId: Number(lot.source_movement_id),
+            movementType: lot.movement_type ?? null,
+            movementDate: lot.movement_date ?? null,
+            allocatedQuantity: Number(lot.allocated_quantity ?? 0),
+            sellingUnitPriceInUsd: Number(lot.selling_unit_price_in_usd ?? 0),
+            sellingUnitPriceInRiel: Number(lot.selling_unit_price_in_riel ?? 0),
+            lineTotalUsd: Number(lot.line_total_usd ?? 0),
+            lineTotalRiel: Number(lot.line_total_riel ?? 0),
+          })),
+        }
+      : null,
   }));
 }
 

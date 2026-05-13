@@ -19,7 +19,7 @@ export function IconStatCard({ icon, label, value, sub, iconBg }: IconStatCardPr
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground mb-0.5 truncate">{label}</p>
             <p className="text-lg font-bold leading-snug truncate">{value}</p>
-            {sub && <p className="text-xs text-muted-foreground mt-0.5 truncate">{sub}</p>}
+            {sub && <p className="text-xs text-muted-foreground mt-0.5 break-words leading-relaxed">{sub}</p>}
           </div>
         </div>
       </CardContent>

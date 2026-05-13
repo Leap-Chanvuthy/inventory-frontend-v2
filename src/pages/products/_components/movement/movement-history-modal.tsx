@@ -64,13 +64,23 @@ export function MovementHistoryModal({
   onClose,
 }: MovementHistoryModalProps) {
   const formatQuantity = (quantity: string | number) => Number(quantity ?? 0).toFixed(2);
+  const getLotStatusLabel = (mv: ProductMovement) => {
+    if (mv.direction !== "IN") return "OUT";
+    const qty = Number(mv.quantity ?? 0);
+    const remaining = Number(mv.remaining_quantity ?? 0);
+    if (remaining <= 0) return "SOLD_OUT";
+    if (remaining < qty) return "PARTIALLY_SOLD";
+    return "AVAILABLE";
+  };
   const getCreatedByName = (createdBy: ProductMovement["created_by"]) =>
     createdBy && typeof createdBy === "object" ? createdBy.name : "—";
 
   const isInternal = productType === "INTERNAL_PRODUCED";
+  const deleteInternalReorderMutation = useDeleteInternalReorderMovement(productId);
+  const deleteExternalReorderMutation = useDeleteExternalReorderMovement(productId);
   const deleteMutation = isInternal
-    ? useDeleteInternalReorderMovement(productId)
-    : useDeleteExternalReorderMovement(productId);
+    ? deleteInternalReorderMutation
+    : deleteExternalReorderMutation;
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -195,8 +205,9 @@ export function MovementHistoryModal({
                     "Type",
                     "Dir",
                     "Qty",
+                    "Remaining",
                     "Sell (USD)",
-                    "Status",
+                    "Lot Status",
                     "Date",
                     "By",
                     "Action",
@@ -214,7 +225,7 @@ export function MovementHistoryModal({
                 {isLoading ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="px-3 py-10 text-center text-sm text-muted-foreground"
                     >
                       Loading...
@@ -223,7 +234,7 @@ export function MovementHistoryModal({
                 ) : movements.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="px-3 py-10 text-center text-sm text-muted-foreground"
                     >
                       No movements found
@@ -258,6 +269,9 @@ export function MovementHistoryModal({
                       <td className="px-3 py-3 font-semibold">
                         {formatQuantity(mv.quantity)}
                       </td>
+                      <td className="px-3 py-3 font-semibold">
+                        {formatQuantity(mv.remaining_quantity ?? 0)}
+                      </td>
                       <td className="px-3 py-3">
                         ${mv.selling_unit_price_in_usd.toLocaleString()}
                       </td>
@@ -265,12 +279,16 @@ export function MovementHistoryModal({
                         <Badge
                           variant="outline"
                           className={
-                            mv.product_status === "COMPLETED"
-                              ? "border-green-500 text-green-600 text-xs"
-                              : "text-xs"
+                            getLotStatusLabel(mv) === "SOLD_OUT"
+                              ? "border-red-500 text-red-600 text-xs"
+                              : getLotStatusLabel(mv) === "PARTIALLY_SOLD"
+                                ? "border-amber-500 text-amber-600 text-xs"
+                                : getLotStatusLabel(mv) === "AVAILABLE"
+                                  ? "border-green-500 text-green-600 text-xs"
+                                  : "text-xs"
                           }
                         >
-                          {mv.product_status}
+                          {getLotStatusLabel(mv).replace(/_/g, " ")}
                         </Badge>
                       </td>
                       <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">

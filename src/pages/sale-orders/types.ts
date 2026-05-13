@@ -29,7 +29,9 @@ export interface Product {
   sku?: string;
   category?: string;
   stockQty?: number;
+  availableQty?: number;
   uomName?: string;
+  saleMethod?: "FIFO" | "LIFO" | string;
   quantityType?: "INTEGER" | "DECIMAL";
 }
 
@@ -37,6 +39,7 @@ export interface OrderItem {
   id?: number;
   productId: string;
   productDbId: number;
+  saleMovementId?: number | null;
   productName?: string;
   productSku?: string;
   productCategory?: string;
@@ -47,6 +50,24 @@ export interface OrderItem {
   returnedQty?: number;
   refundQty?: number;
   exchangeRateUsdToRiel?: number;
+  allocationSummary?: {
+    saleMethod?: "FIFO" | "LIFO" | string;
+    totalQuantity?: number;
+    totalAmountUsd?: number;
+    totalAmountRiel?: number;
+    averageUnitPriceUsd?: number;
+    averageUnitPriceRiel?: number;
+    lots?: Array<{
+      sourceMovementId: number;
+      movementType?: string | null;
+      movementDate?: string | null;
+      allocatedQuantity: number;
+      sellingUnitPriceInUsd: number;
+      sellingUnitPriceInRiel?: number;
+      lineTotalUsd: number;
+      lineTotalRiel?: number;
+    }>;
+  } | null;
 }
 
 export interface Order {

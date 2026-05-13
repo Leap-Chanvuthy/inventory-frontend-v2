@@ -6,6 +6,8 @@ import {
   ProductQueryParams,
   ProductMovementQueryParams,
   GetProductMovementsResponse,
+  ProductStockLotQueryParams,
+  GetProductStockLotsResponse,
   CreateProductRequest,
   UpdateProductRequest,
   CreateExternalPurchaseRequest,
@@ -17,6 +19,8 @@ import {
   ScrapMovementResponse,
   ScrapMovementMutationResponse,
   GetMovementDetailResponse,
+  SaleAllocationPreviewResponse,
+  GetProductPnLDetailedResponse,
 } from "./product.type";
 
 export const getProducts = async (
@@ -33,6 +37,17 @@ export const getProductById = async (
   return response.data;
 };
 
+export const previewProductSaleAllocation = async (
+  productId: number,
+  quantity: number,
+): Promise<SaleAllocationPreviewResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/products/${productId}/sale-allocation-preview`,
+    { quantity },
+  );
+  return response.data;
+};
+
 export const getProductMovements = async (
   id: number,
   params?: ProductMovementQueryParams,
@@ -41,6 +56,24 @@ export const getProductMovements = async (
     `${BASE_API_URL}/products/${id}/movements`,
     { params },
   );
+  return response.data;
+};
+
+export const getProductStockLots = async (
+  id: number,
+  params?: ProductStockLotQueryParams,
+): Promise<GetProductStockLotsResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/products/${id}/stock-lots`,
+    { params },
+  );
+  return response.data;
+};
+
+export const getProductPnLDetailed = async (
+  id: number,
+): Promise<GetProductPnLDetailedResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/products/${id}/pnl-detail`);
   return response.data;
 };
 

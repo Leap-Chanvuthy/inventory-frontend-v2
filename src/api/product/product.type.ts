@@ -9,6 +9,7 @@ export interface ProductMovement {
   product_type: string | null;
   product_status: string;
   quantity: string | number;
+  remaining_quantity?: string | number;
   is_sold: boolean;
   direction: "IN" | "OUT";
   movement_type: string;
@@ -28,6 +29,23 @@ export interface ProductMovement {
   last_updated_by?: number | { id: number; name: string; email: string; role: string };
   created_at: string;
   updated_at: string;
+}
+
+export type StockLotStatus = "AVAILABLE" | "PARTIALLY_CONSUMED" | "CONSUMED";
+
+export interface ProductStockLot {
+  id: number;
+  movement_type: string;
+  product_status?: string | null;
+  quantity: number;
+  remaining_quantity: number;
+  allocated_quantity: number;
+  lot_status: StockLotStatus;
+  selling_unit_price_in_usd: number;
+  selling_unit_price_in_riel: number;
+  purchase_unit_price_in_usd: number;
+  purchase_unit_price_in_riel: number;
+  movement_date?: string | null;
 }
 
 export interface ProductRawMaterial {
@@ -144,15 +162,155 @@ export interface ProductPnL {
   };
 }
 
+export interface ProductPnLDetailed {
+  product: {
+    id: number;
+    name: string;
+    sku: string;
+    product_type: string;
+    sale_method: "FIFO" | "LIFO" | string;
+  };
+  currency: {
+    base: string;
+    display: string;
+    usd_to_riel_rate: number;
+  };
+  summary: {
+    revenue_usd: number;
+    revenue_riel: number;
+    sales_cogs_usd: number;
+    sales_cogs_riel: number;
+    scrap_loss_usd: number;
+    scrap_loss_riel: number;
+    other_loss_usd: number;
+    other_loss_riel: number;
+    gross_profit_usd: number;
+    gross_profit_riel: number;
+    net_profit_usd: number;
+    net_profit_riel: number;
+    gross_margin_pct: number;
+    net_margin_pct: number;
+  };
+  sales: {
+    count: number;
+    quantity: number;
+    revenue_usd: number;
+    revenue_riel: number;
+    cogs_usd: number;
+    cogs_riel: number;
+    gross_profit_usd: number;
+    gross_profit_riel: number;
+    lines: Array<{
+      sale_movement_id: number;
+      movement_date?: string | null;
+      quantity: number;
+      revenue_usd: number;
+      revenue_riel: number;
+      cogs_usd: number;
+      cogs_riel: number;
+      gross_profit_usd: number;
+      sources: Array<{
+        source_movement_id: number;
+        allocated_quantity?: number;
+        consumed_quantity?: number;
+        unit_revenue_usd?: number;
+        unit_cost_usd?: number;
+        line_revenue_usd?: number;
+        line_cost_usd?: number;
+        cost_source?: string;
+      }>;
+    }>;
+  };
+  inventory: {
+    incoming_total_qty: number;
+    incoming_total_cost_usd: number;
+    incoming_total_cost_riel: number;
+    remaining_qty: number;
+    remaining_cost_usd: number;
+    remaining_cost_riel: number;
+  };
+  cost_breakdown: {
+    external_purchase: {
+      count: number;
+      quantity: number;
+      cost_usd: number;
+      cost_riel: number;
+    };
+    internal_production: {
+      count: number;
+      quantity: number;
+      cost_usd: number;
+      cost_riel: number;
+    };
+    reorder: {
+      count: number;
+      quantity: number;
+      cost_usd: number;
+      cost_riel: number;
+    };
+    scrap: {
+      count: number;
+      cost_usd: number;
+      cost_riel: number;
+    };
+    other_losses: {
+      cost_usd: number;
+      cost_riel: number;
+    };
+  };
+  internal_manufacturing: {
+    is_internal_product: boolean;
+    raw_material_spending: {
+      initial_production_usd: number;
+      initial_production_riel: number;
+      reorder_usd: number;
+      reorder_riel: number;
+      total_usd: number;
+      total_riel: number;
+      by_raw_material: Array<{
+        raw_material_id: number;
+        material_name?: string | null;
+        material_sku_code?: string | null;
+        consumed_qty: number;
+        total_usd: number;
+        total_riel: number;
+        initial_production_usd: number;
+        initial_production_riel: number;
+        reorder_usd: number;
+        reorder_riel: number;
+        average_unit_cost_usd: number;
+        average_unit_cost_riel: number;
+      }>;
+    };
+    production_batches: Array<{
+      movement_id: number;
+      movement_type: string;
+      movement_date?: string | null;
+      quantity: number;
+      remaining_quantity: number;
+      unit_cost_usd: number;
+      unit_cost_riel: number;
+      total_cost_usd: number;
+      total_cost_riel: number;
+      cost_source: string;
+    }>;
+  };
+  movement_counts: {
+    total_movements: number;
+    by_type: Record<string, number>;
+  };
+}
+
 export interface GetProductDetailData {
   is_sold: boolean;
   allow_bom_update?: boolean;
   product: Product;
-  initial_movement?: ProductMovement;
+  pricing_reference_lot?: ProductStockLot | null;
   current_qty_in_stock: number;
+  available_qty_in_stock?: number;
+  ledger_qty_in_stock?: number;
   product_stock_status: string;
   total_count_by_movement_type: Record<string, number>;
-  product_pnl: ProductPnL;
 }
 
 export interface PaginatedData<T> {
@@ -179,6 +337,12 @@ export interface GetProductResponse {
   data: GetProductDetailData;
 }
 
+export interface GetProductPnLDetailedResponse {
+  status: boolean;
+  message: string;
+  data: ProductPnLDetailed;
+}
+
 export interface ProductQueryParams {
   page?: number;
   per_page?: number;
@@ -200,6 +364,19 @@ export interface ProductMovementQueryParams {
 }
 
 export type GetProductMovementsResponse = PaginatedData<ProductMovement>;
+
+export interface ProductStockLotQueryParams {
+  page?: number;
+  per_page?: number;
+  sort?: string;
+  "filter[search]"?: string;
+  "filter[movement_type]"?: string;
+  "filter[product_status]"?: string;
+  "filter[lot_status]"?: string;
+  "filter[has_remaining_stock]"?: "true" | "false";
+}
+
+export type GetProductStockLotsResponse = PaginatedData<ProductStockLot>;
 
 // External Purchase creation
 export interface CreateExternalPurchaseRequest {
@@ -281,7 +458,7 @@ export interface CreateProductRequest {
   sale_method?: "FIFO" | "LIFO" | string;
 }
 
-export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
+export type UpdateProductRequest = Partial<CreateProductRequest>;
 
 export interface CreateScrapMovementPayload {
   movement_date: string;
@@ -371,4 +548,38 @@ export interface ProductValidationErrors {
   status: boolean;
   message: string;
   errors?: Record<string, string[]> | InsufficientStockError[];
+}
+
+export interface SaleAllocationPreviewLot {
+  source_movement_id: number;
+  movement_type: string;
+  movement_date?: string | null;
+  allocated_quantity: number;
+  remaining_quantity_before_sale: number;
+  remaining_quantity_after_sale: number;
+  selling_unit_price_in_usd: number;
+  selling_unit_price_in_riel?: number;
+  line_total_usd: number;
+  line_total_riel?: number;
+}
+
+export interface SaleAllocationPreview {
+  product_id: number;
+  product_name: string;
+  sale_method: "FIFO" | "LIFO";
+  requested_quantity: number;
+  available_quantity: number;
+  can_fulfill: boolean;
+  estimated_total_usd: number;
+  estimated_total_riel?: number;
+  estimated_average_unit_price_usd: number;
+  estimated_average_unit_price_riel?: number;
+  lots: SaleAllocationPreviewLot[];
+  message?: string | null;
+}
+
+export interface SaleAllocationPreviewResponse {
+  status: boolean;
+  message: string;
+  data: SaleAllocationPreview;
 }
