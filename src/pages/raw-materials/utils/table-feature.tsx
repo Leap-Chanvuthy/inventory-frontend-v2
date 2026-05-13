@@ -228,17 +228,17 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
       />
     ),
   },
-  {
-    key: "production_method",
-    header: "Production Method",
-    className: "whitespace-nowrap py-6",
-    render: rawMaterial => (
-      <div>
-        {rawMaterial.production_method == "FIFO" && "FIFO (First In First Out)"}
-        {rawMaterial.production_method == "LIFO" && "LIFO (Last In First Out)"}
-      </div>
-    ),
-  },
+  // {
+  //   key: "production_method",
+  //   header: "Production Method",
+  //   className: "whitespace-nowrap py-6",
+  //   render: rawMaterial => (
+  //     <div>
+  //       {rawMaterial.production_method == "FIFO" && "FIFO (First In First Out)"}
+  //       {rawMaterial.production_method == "LIFO" && "LIFO (Last In First Out)"}
+  //     </div>
+  //   ),
+  // },
   {
     key: "quantity",
     header: "Quantity",
@@ -250,14 +250,14 @@ export const COLUMNS: DataTableColumn<RawMaterial>[] = [
       </span>
     ),
   },
-  {
-    key: "uom",
-    header: "Unit of Measure",
-    className: "whitespace-nowrap py-6",
-    render: rawMaterial => (
-      <span className="text-muted-foreground">{rawMaterial.uom_name}</span>
-    ),
-  },
+  // {
+  //   key: "uom",
+  //   header: "Unit of Measure",
+  //   className: "whitespace-nowrap py-6",
+  //   render: rawMaterial => (
+  //     <span className="text-muted-foreground">{rawMaterial.uom_name}</span>
+  //   ),
+  // },
   {
     key: "actions",
     header: "Actions",
