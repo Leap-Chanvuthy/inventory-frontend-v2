@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/date-format";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { RawMaterialStockLot } from "@/api/raw-materials/raw-material.types";
+import { Link } from "react-router-dom";
 
 export type RawMaterialStockLotRow = RawMaterialStockLot;
 
@@ -101,32 +102,80 @@ export const RAW_MATERIAL_STOCK_LOT_COLUMNS = (
 
 export const renderRawMaterialStockLotHistory = (lot: RawMaterialStockLotRow) => {
   const children = lot.children ?? [];
+  // const batchCode = lot.batch_code ?? `RM-${lot.id}`;
   if (children.length === 0) {
-    return <span className="text-xs text-muted-foreground">No child activity for this batch yet.</span>;
+    return (
+      <div className="py-2 pl-12">
+        {/* <p className="text-xs font-semibold text-foreground mb-1">{batchCode}</p> */}
+        <p className="text-xs font-semibold text-foreground">Batch History</p>
+        <span className="text-xs text-muted-foreground">No child activity for this batch yet.</span>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-2 py-1">
-      <p className="text-xs font-semibold text-foreground">Batch History</p>
-      <div className="space-y-1">
-        {children.map(child => (
-          <div key={`${lot.id}-${child.id}`} className="text-xs text-muted-foreground">
-            <span className="font-medium text-foreground mr-2">{String(child.type || "").replace(/_/g, " ")}</span>
-            <span>{child.reference || "—"}</span>
-            <span className="mx-2">·</span>
-            <span>{child.product_name || "—"}</span>
-            <span className="mx-2">·</span>
-            <span>{child.date ? formatDate(child.date) : "—"}</span>
-            <span className="mx-2">·</span>
-            <span>{Number(child.quantity || 0).toFixed(2)}</span>
-            {child.line_cost_usd !== undefined ? (
-              <>
-                <span className="mx-2">·</span>
-                <span>${Number(child.line_cost_usd).toFixed(2)}</span>
-              </>
-            ) : null}
-          </div>
-        ))}
+    <div className="space-y-2 py-2 pl-12">
+      <div className="space-y-0.5">
+        {/* <p className="text-xs font-semibold text-foreground">{batchCode}</p> */}
+        <p className="text-xs font-semibold text-foreground">Batch History</p>
+      </div>
+      <div className="overflow-x-auto rounded-md border">
+        <table className="min-w-full text-xs">
+          <thead className="bg-muted/40">
+            <tr>
+              <th className="px-3 py-2 text-left font-medium">Type</th>
+              <th className="px-3 py-2 text-left font-medium">Reference</th>
+              <th className="px-3 py-2 text-left font-medium">Product</th>
+              <th className="px-3 py-2 text-left font-medium">Date</th>
+              <th className="px-3 py-2 text-right font-medium">Quantity</th>
+              <th className="px-3 py-2 text-right font-medium">Unit Cost</th>
+              <th className="px-3 py-2 text-right font-medium">Line Cost</th>
+              <th className="px-3 py-2 text-left font-medium w-[140px]">Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {children.map(child => (
+              <tr key={`${lot.id}-${child.id}`} className="border-t">
+                <td className="px-3 py-2 font-medium text-foreground whitespace-nowrap">
+                  {String(child.type || "").replace(/_/g, " ")}
+                </td>
+                <td className="px-3 py-2 whitespace-nowrap">{child.reference || "—"}</td>
+                <td className="px-3 py-2 whitespace-nowrap">
+                  {child.product_id && child.product_name ? (
+                    <Link
+                      to={`/products/view/${child.product_id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {child.product_name}
+                    </Link>
+                  ) : (
+                    child.product_name || "—"
+                  )}
+                </td>
+                <td className="px-3 py-2 whitespace-nowrap">
+                  {child.date ? formatDate(child.date) : "—"}
+                </td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {Number(child.quantity || 0).toFixed(2)}
+                </td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {child.unit_cost_usd !== undefined ? `$${Number(child.unit_cost_usd).toFixed(2)}` : "—"}
+                </td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  {child.line_cost_usd !== undefined ? `$${Number(child.line_cost_usd).toFixed(2)}` : "—"}
+                </td>
+                <td className="px-3 py-2 w-[140px] max-w-[140px]">
+                  <span
+                    className="block truncate"
+                    title={child.reason || "—"}
+                  >
+                    {child.reason || "—"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

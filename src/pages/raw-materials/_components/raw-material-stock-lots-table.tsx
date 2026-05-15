@@ -2,7 +2,14 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RefreshCw } from "lucide-react";
+import {
+  AlertTriangle,
+  FlaskConical,
+  Layers,
+  Package,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import { useRawMaterialStockLots } from "@/api/raw-materials/raw-material.query";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import {
@@ -99,18 +106,24 @@ export function RawMaterialStockLotsTable({
   const method = String(productionMethod || summary?.production_method || "FIFO").toUpperCase() === "LIFO" ? "LIFO" : "FIFO";
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle className="text-base">Raw Material Stock Batches</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                <FlaskConical className="h-4 w-4" />
+              </div>
+              <CardTitle className="text-base">Raw Material Stock Batches</CardTitle>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
               {method === "LIFO"
                 ? "LIFO: newest raw material batch is used first during production."
                 : "FIFO: oldest raw material batch is used first during production."}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex flex-wrap justify-end items-center gap-2">
             <Badge variant="outline">Batches: {totals.batches}</Badge>
             <Badge variant="outline">Expiring Soon: {totals.expiringSoon}</Badge>
             <Badge variant="outline">Expired: {totals.expired}</Badge>
@@ -121,22 +134,37 @@ export function RawMaterialStockLotsTable({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <div className="rounded-lg border p-3">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-green-100 text-green-700">
+              <Layers className="h-4 w-4" />
+            </div>
             <p className="text-xs text-muted-foreground">Available Stock</p>
             <p className="text-lg font-semibold">{Number(summary?.available_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-blue-100 text-blue-700">
+              <Package className="h-4 w-4" />
+            </div>
             <p className="text-xs text-muted-foreground">Total Batches</p>
             <p className="text-lg font-semibold">{Number(summary?.total_batches ?? lots.length)}</p>
           </div>
           <div className="rounded-lg border p-3">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-indigo-100 text-indigo-700">
+              <FlaskConical className="h-4 w-4" />
+            </div>
             <p className="text-xs text-muted-foreground">Used In Production</p>
             <p className="text-lg font-semibold">{Number(summary?.used_in_production_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-amber-100 text-amber-700">
+              <Trash2 className="h-4 w-4" />
+            </div>
             <p className="text-xs text-muted-foreground">Scrapped Qty</p>
             <p className="text-lg font-semibold">{Number(summary?.scrapped_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
+            <div className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-red-100 text-red-700">
+              <AlertTriangle className="h-4 w-4" />
+            </div>
             <p className="text-xs text-muted-foreground">Expired Qty</p>
             <p className="text-lg font-semibold">{Number(summary?.expired_quantity ?? 0).toFixed(2)}</p>
           </div>
