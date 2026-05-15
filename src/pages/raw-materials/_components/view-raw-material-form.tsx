@@ -1,6 +1,5 @@
 import { useSingleRawMaterial } from "@/api/raw-materials/raw-material.query";
 import { useNavigate, useParams } from "react-router-dom";
-import { HorizontalImageScroll } from "@/components/reusable/partials/horizontal-image-scroll";
 import { Text } from "@/components/ui/text/app-text";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RawMaterialPiechart } from "./charts/raw-material-piechart";
@@ -12,7 +11,8 @@ import { useDeleteRawMaterial } from "@/api/raw-materials/raw-material.mutation"
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 import UnexpectedError from "@/components/reusable/partials/error";
-import { UomHierarchyPreview } from "./uom-hierarchy-preview";
+import { RawMaterialStockLotsTable } from "./raw-material-stock-lots-table";
+import { RawMaterialScrapDialog } from "./raw-material-scrap-dialog";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,7 +23,6 @@ import {
   CalendarClock,
   Factory,
   BoxesIcon,
-  ImageIcon,
 } from "lucide-react";
 import {
   StockStatusBadge,
@@ -50,8 +49,12 @@ export function ViewRawMaterialForm() {
     return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
   if (!data?.data) return <DataCardEmpty emptyText="Raw material not found." />;
 
-  const { raw_material, current_qty_in_stock, total_count_by_movement_type } =
-    data.data;
+  const {
+    raw_material,
+    current_qty_in_stock,
+    total_count_by_movement_type,
+    uom_hierarchy_quantities,
+  } = data.data;
 
   const uomLabel = raw_material.uom?.symbol || raw_material.uom?.name || "";
   const totalMovements = total_count_by_movement_type
@@ -148,6 +151,12 @@ export function ViewRawMaterialForm() {
             <ReorderDialog
               rawMaterialId={raw_material.id}
               materialName={raw_material.material_name}
+              quantityType={raw_material.uom?.category?.quantity_type}
+            />
+            <RawMaterialScrapDialog
+              rawMaterialId={raw_material.id}
+              materialName={raw_material.material_name}
+              quantityType={raw_material.uom?.category?.quantity_type}
             />
             <HeaderActionButtons
               editPath={`/raw-materials/update/${id}`}
@@ -223,21 +232,36 @@ export function ViewRawMaterialForm() {
 
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-md">
-                <ImageIcon className="w-4 h-4 text-primary" />
-              </div>
-              Material Images
-            </CardTitle>
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-base">Material Images</CardTitle>
+              <Badge variant="outline">
+                Total: {(raw_material.rm_images || []).length}
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent>
-            <HorizontalImageScroll
-              images={raw_material.rm_images || []}
-              imageWidth="450px"
-              imageHeight="260px"
-              gap="1.5rem"
-              emptyMessage="No images available"
-            />
+            {(raw_material.rm_images || []).length === 0 ? (
+              <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
+                No images available.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {(raw_material.rm_images || []).map(image => (
+                  <div
+                    key={image.id}
+                    className="rounded-lg border overflow-hidden bg-card"
+                  >
+                    <div className="relative h-40 bg-muted/30">
+                      <img
+                        src={image.image}
+                        alt={`raw-material-${image.id}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -316,11 +340,18 @@ export function ViewRawMaterialForm() {
               variant="info"
             />
             {raw_material.production_method && (
-              <InfoField
-                icon="description"
-                label="Production Method"
-                value={raw_material.production_method}
-              />
+              <div className="space-y-1.5">
+                <InfoField
+                  icon="description"
+                  label="Production Method"
+                  value={raw_material.production_method}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {String(raw_material.production_method).toUpperCase() === "LIFO"
+                    ? "LIFO means the newest raw material stock batch is used first during production."
+                    : "FIFO means the oldest raw material stock batch is used first during production."}
+                </p>
+              </div>
             )}
             <Separator />
             <div className="space-y-1">
@@ -356,31 +387,78 @@ export function ViewRawMaterialForm() {
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-base">
-              Unit of Measurement Hierarchy
+              Raw Material Quantity Based on UOM Conversion Factor
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              All units in the{" "}
+              Available stock is converted across all units in the{" "}
               <span className="font-medium">
                 {raw_material.uom?.category?.name ?? "selected"}
               </span>{" "}
               category. The highlighted unit is assigned to this raw material.
             </p>
           </CardHeader>
-          <CardContent>
-            <UomHierarchyPreview
-              categoryId={raw_material.uom.category_id}
-              highlightUomId={raw_material.base_uom_id}
-            />
+          <CardContent className="space-y-4">
+            {uom_hierarchy_quantities && uom_hierarchy_quantities.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[...uom_hierarchy_quantities]
+                  .sort((a, b) => {
+                    if (a.is_base_uom === b.is_base_uom) {
+                      return Number(b.conversion_factor || 0) - Number(a.conversion_factor || 0);
+                    }
+                    return a.is_base_uom ? -1 : 1;
+                  })
+                  .map(row => (
+                  <div key={row.uom_id} className="rounded-lg border p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium">
+                        {row.uom_name}
+                        {row.uom_symbol ? ` (${row.uom_symbol})` : ""}
+                      </p>
+                      {row.is_base_uom && (
+                        <Badge variant="outline" className="border-blue-500 text-blue-600">
+                          Base
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Conversion factor: {Number(row.conversion_factor || 0).toLocaleString()}
+                    </p>
+                    <p className="text-base font-semibold mt-2">
+                      {Number(row.equivalent_quantity || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 4,
+                      })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {/* 6. Stock Movements */}
-      <StockMovementsTable
+      {/* 6. Stock Batches */}
+      <RawMaterialStockLotsTable
         rawMaterialId={raw_material.id}
-        materialName={raw_material.material_name}
-        uom={raw_material.uom || null}
+        productionMethod={raw_material.production_method}
       />
+
+      {/* 7. Legacy Movement History (Restored) */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-base">Raw Material Movement History</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Full chronological movement history is preserved for audit and operational review.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <StockMovementsTable
+            rawMaterialId={raw_material.id}
+            materialName={raw_material.material_name}
+            uom={raw_material.uom || null}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

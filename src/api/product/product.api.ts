@@ -8,6 +8,7 @@ import {
   GetProductMovementsResponse,
   ProductStockLotQueryParams,
   GetProductStockLotsResponse,
+  GetProductScrapEligibleLotsResponse,
   CreateProductRequest,
   UpdateProductRequest,
   CreateExternalPurchaseRequest,
@@ -21,6 +22,7 @@ import {
   GetMovementDetailResponse,
   SaleAllocationPreviewResponse,
   GetProductPnLDetailedResponse,
+  ProductBomSummaryResponse,
 } from "./product.type";
 
 export const getProducts = async (
@@ -70,10 +72,38 @@ export const getProductStockLots = async (
   return response.data;
 };
 
+export const getProductScrapEligibleStockLots = async (
+  id: number,
+  params?: { include_disabled?: boolean },
+): Promise<GetProductScrapEligibleLotsResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/products/${id}/scrap-eligible-stock-lots`,
+    { params },
+  );
+  return response.data;
+};
+
 export const getProductPnLDetailed = async (
   id: number,
 ): Promise<GetProductPnLDetailedResponse> => {
   const response = await apiClient.get(`${BASE_API_URL}/products/${id}/pnl-detail`);
+  return response.data;
+};
+
+export const getProductBomSummary = async (
+  id: number,
+): Promise<ProductBomSummaryResponse> => {
+  const response = await apiClient.get(`${BASE_API_URL}/products/${id}/bom-summary`);
+  return response.data;
+};
+
+export const getProductMovementBomSummary = async (
+  productId: number,
+  movementId: number,
+): Promise<ProductBomSummaryResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/products/${productId}/movements/${movementId}/bom-summary`,
+  );
   return response.data;
 };
 
@@ -256,7 +286,7 @@ export const createScrapMovement = async (
   data: CreateScrapMovementPayload,
 ): Promise<ScrapMovementResponse> => {
   const response = await apiClient.post(
-    `${BASE_API_URL}/products/${productId}/scrap`,
+    `${BASE_API_URL}/products/${productId}/scraps`,
     data,
   );
   return response.data;
@@ -280,6 +310,38 @@ export const getScrapMovement = async (
 ): Promise<ScrapMovementResponse> => {
   const response = await apiClient.get(
     `${BASE_API_URL}/products/${productId}/scrap/${movementId}`,
+  );
+  return response.data;
+};
+
+export const uploadProductImages = async (
+  productId: number,
+  data: FormData,
+): Promise<{ status: boolean; message: string; data: { images: Array<{ id: number; image: string; is_primary?: boolean }> } }> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/products/${productId}/images`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
+  return response.data;
+};
+
+export const deleteProductImage = async (
+  productId: number,
+  imageId: number,
+): Promise<{ status: boolean; message: string; data: { images: Array<{ id: number; image: string; is_primary?: boolean }> } }> => {
+  const response = await apiClient.delete(
+    `${BASE_API_URL}/products/${productId}/images/${imageId}`,
+  );
+  return response.data;
+};
+
+export const setPrimaryProductImage = async (
+  productId: number,
+  imageId: number,
+): Promise<{ status: boolean; message: string; data: { images: Array<{ id: number; image: string; is_primary?: boolean }> } }> => {
+  const response = await apiClient.patch(
+    `${BASE_API_URL}/products/${productId}/images/${imageId}/primary`,
   );
   return response.data;
 };

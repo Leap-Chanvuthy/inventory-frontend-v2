@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumn, RowSelection } from "./data-table.type";
 import DataCardLoading from "@/components/reusable/data-card/data-card-loading";
 import DataTableEmpty from "./data-table-empty";
+import { Fragment, ReactNode } from "react";
 
 type DataTableProps<T> = {
     columns: DataTableColumn<T>[];
@@ -22,6 +23,13 @@ type DataTableProps<T> = {
 
     /** Optional row selection */
     rowSelection?: RowSelection<T>;
+
+    /** Optional expandable row content rendered under each parent row */
+    expandableRow?: {
+        isExpanded: (row: T) => boolean;
+        render: (row: T) => ReactNode;
+        className?: string;
+    };
 };
 
 
@@ -34,6 +42,7 @@ export function DataTable<T>({
     loadingVariant = "spinner",
     emptyText = "No data found",
     rowSelection,
+    expandableRow,
 }: DataTableProps<T>) {
     const hasSelection = !!rowSelection;
     const isMultiple = rowSelection?.mode === "multiple";
@@ -138,32 +147,44 @@ export function DataTable<T>({
                                 );
 
                             return (
-                                <TableRow
-                                    key={idx}
-                                    data-state={selected ? "selected" : undefined}
-                                    className={hasSelection ? "cursor-pointer" : undefined}
-                                    onClick={() => hasSelection && toggleRow(row)}
-                                >
-                                    {hasSelection && (
-                                        <TableCell onClick={e => e.stopPropagation()}>
-                                            <Checkbox
-                                                checked={!!selected}
-                                                onCheckedChange={() => toggleRow(row)}
-                                            />
-                                        </TableCell>
-                                    )}
+                                <Fragment key={idx}>
+                                    <TableRow
+                                        data-state={selected ? "selected" : undefined}
+                                        className={hasSelection ? "cursor-pointer" : undefined}
+                                        onClick={() => hasSelection && toggleRow(row)}
+                                    >
+                                        {hasSelection && (
+                                            <TableCell onClick={e => e.stopPropagation()}>
+                                                <Checkbox
+                                                    checked={!!selected}
+                                                    onCheckedChange={() => toggleRow(row)}
+                                                />
+                                            </TableCell>
+                                        )}
 
-                                    {columns.map((col) => (
-                                        <TableCell
-                                            key={col.key}
-                                            className={`${col.className} whitespace-nowrap`}
-                                        >
-                                            {col.render
-                                                ? col.render(row)
-                                                : (row as any)[col.key]}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                        {columns.map((col) => (
+                                            <TableCell
+                                                key={col.key}
+                                                className={`${col.className} whitespace-nowrap`}
+                                            >
+                                                {col.render
+                                                    ? col.render(row)
+                                                    : (row as any)[col.key]}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+
+                                    {expandableRow?.isExpanded(row) && (
+                                        <TableRow className={expandableRow.className}>
+                                            <TableCell
+                                                colSpan={columns.length + (hasSelection ? 1 : 0)}
+                                                className="bg-muted/20"
+                                            >
+                                                {expandableRow.render(row)}
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </Fragment>
                             );
                         })
                     ) : (

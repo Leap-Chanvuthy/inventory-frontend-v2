@@ -24,6 +24,7 @@ export interface ProductMovement {
   selling_exchange_rate_from_usd_to_riel: number;
   selling_exchange_rate_from_riel_to_usd?: number;
   movement_date: string;
+  expiry_date?: string | null;
   note: string | null;
   created_by?: number | { id: number; name: string; email: string; role: string };
   last_updated_by?: number | { id: number; name: string; email: string; role: string };
@@ -33,19 +34,63 @@ export interface ProductMovement {
 
 export type StockLotStatus = "AVAILABLE" | "PARTIALLY_CONSUMED" | "CONSUMED";
 
+export interface ProductStockLotChild {
+  id: number;
+  type: string;
+  reference?: string | null;
+  quantity: number;
+  date: string | null;
+  unit_price?: number;
+  total?: number;
+  reason?: string | null;
+  customer_id?: number | null;
+  customer_name?: string | null;
+  sale_order_id?: number | null;
+  sale_order_number?: string | null;
+}
+
 export interface ProductStockLot {
   id: number;
+  batch_code?: string;
   movement_type: string;
+  direction?: "IN" | "OUT";
+  movement_date?: string | null;
+  expiry_date?: string | null;
+  is_expired?: boolean;
+  days_until_expiry?: number | null;
   product_status?: string | null;
   quantity: number;
   remaining_quantity: number;
-  allocated_quantity: number;
-  lot_status: StockLotStatus;
+  allocated_quantity?: number;
+  sold_quantity?: number;
+  scrapped_quantity?: number;
+  adjusted_out_quantity?: number;
+  available_quantity?: number;
+  lot_status?: StockLotStatus;
+  status?: "AVAILABLE" | "PARTIALLY_USED" | "FULLY_USED" | "EXPIRED" | "LOCKED" | string;
   selling_unit_price_in_usd: number;
-  selling_unit_price_in_riel: number;
-  purchase_unit_price_in_usd: number;
-  purchase_unit_price_in_riel: number;
-  movement_date?: string | null;
+  selling_unit_price_in_riel?: number;
+  purchase_unit_price_in_usd?: number;
+  purchase_unit_price_in_riel?: number;
+  can_sale?: boolean;
+  can_scrap?: boolean;
+  disabled_reason?: string | null;
+  children?: ProductStockLotChild[];
+}
+
+export interface ProductStockLotSummary {
+  available_quantity: number;
+  expired_quantity: number;
+  total_original_quantity: number;
+  total_sold_quantity: number;
+  total_scrapped_quantity: number;
+  total_remaining_quantity: number;
+  sale_method: "FIFO" | "LIFO" | string;
+}
+
+export interface ProductStockLotsPayload {
+  stock_lot_summary: ProductStockLotSummary;
+  stock_lots: ProductStockLot[];
 }
 
 export interface ProductRawMaterial {
@@ -108,7 +153,7 @@ export interface Product {
     };
   };
   product_movements?: ProductMovement[];
-  product_images?: { id: number; image: string }[];
+  product_images?: { id: number; image: string; is_primary?: boolean }[];
   product_raw_materials?: ProductRawMaterial[];
 }
 
@@ -311,6 +356,8 @@ export interface GetProductDetailData {
   ledger_qty_in_stock?: number;
   product_stock_status: string;
   total_count_by_movement_type: Record<string, number>;
+  stock_lot_summary?: ProductStockLotSummary;
+  stock_lots?: ProductStockLot[];
 }
 
 export interface PaginatedData<T> {
@@ -366,17 +413,58 @@ export interface ProductMovementQueryParams {
 export type GetProductMovementsResponse = PaginatedData<ProductMovement>;
 
 export interface ProductStockLotQueryParams {
-  page?: number;
-  per_page?: number;
-  sort?: string;
-  "filter[search]"?: string;
-  "filter[movement_type]"?: string;
-  "filter[product_status]"?: string;
-  "filter[lot_status]"?: string;
-  "filter[has_remaining_stock]"?: "true" | "false";
+  include_children?: boolean;
+  include_disabled?: boolean;
 }
 
-export type GetProductStockLotsResponse = PaginatedData<ProductStockLot>;
+export interface GetProductStockLotsResponse {
+  status: boolean;
+  message: string;
+  data: ProductStockLotsPayload;
+}
+
+export interface GetProductScrapEligibleLotsResponse {
+  status: boolean;
+  message: string;
+  data: ProductStockLotsPayload;
+}
+
+export interface ProductBomMaterialSummary {
+  raw_material_id: number;
+  raw_material_name: string;
+  uom_name?: string;
+  required_qty_per_unit: number;
+  planned_total_qty: number;
+  actual_consumed_qty: number;
+  scrap_qty: number;
+  scrap_percentage: number;
+  unit_cost_usd: number;
+  total_spend_usd: number;
+  production_method: "FIFO" | "LIFO" | string;
+  stock_lots_used: Array<{
+    source_movement_id: number;
+    allocated_quantity: number;
+    unit_cost_usd: number;
+    line_cost_usd: number;
+  }>;
+}
+
+export interface ProductBomSummary {
+  product_id: number;
+  product_name: string;
+  product_movement_id?: number | null;
+  produced_quantity: number;
+  total_bom_cost_usd: number;
+  average_bom_cost_per_unit_usd: number;
+  total_scrap_cost_usd: number;
+  materials: ProductBomMaterialSummary[];
+}
+
+export interface ProductBomSummaryResponse {
+  status: boolean;
+  message: string;
+  data: ProductBomSummary;
+}
 
 // External Purchase creation
 export interface CreateExternalPurchaseRequest {
@@ -392,6 +480,7 @@ export interface CreateExternalPurchaseRequest {
   selling_unit_price_in_usd: number;
   selling_exchange_rate_from_usd_to_riel: number;
   movement_date?: string;
+  expiry_date?: string;
   note?: string;
   sale_method: "FIFO" | "LIFO" | string;
 }
@@ -414,6 +503,7 @@ export interface CreateInternalManufacturingRequest {
   selling_unit_price_in_usd: number;
   selling_exchange_rate_from_usd_to_riel: number;
   movement_date?: string;
+  expiry_date?: string;
   note?: string;
   raw_materials: RawMaterialBOM[];
   sale_method: "FIFO" | "LIFO" | string;
@@ -421,6 +511,7 @@ export interface CreateInternalManufacturingRequest {
 
 export interface ReorderInternalManufacturingPayload {
   movement_date: string;
+  expiry_date?: string;
   product_status: string;
   quantity: number;
   selling_unit_price_in_usd: number;
@@ -439,6 +530,7 @@ export interface ReorderInternalManufacturingPayload {
 
 export interface ReorderExternalPurchasePayload {
   movement_date: string;
+  expiry_date?: string;
   quantity: number;
   purchase_unit_price_in_usd: number;
   exchange_rate_from_usd_to_riel: number;
@@ -461,14 +553,18 @@ export interface CreateProductRequest {
 export type UpdateProductRequest = Partial<CreateProductRequest>;
 
 export interface CreateScrapMovementPayload {
-  movement_date: string;
+  source_movement_id: number;
+  movement_date?: string;
   quantity: number;
+  reason?: string;
   note?: string;
 }
 
 export interface UpdateScrapMovementPayload {
+  source_movement_id?: number;
   movement_date?: string;
   quantity?: number;
+  reason?: string;
   note?: string;
 }
 
@@ -503,8 +599,11 @@ export interface ScrapMovementResponse {
   status: boolean;
   message: string;
   data: {
-    product: Product;
-    movement: ScrapMovement;
+    product?: Product;
+    movement?: ScrapMovement;
+    source_lot?: ProductStockLot;
+    scrap_movement?: ScrapMovement;
+    stock_lot_summary?: ProductStockLotSummary;
   };
 }
 

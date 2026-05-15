@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { AxiosError } from "axios";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,16 +11,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2 } from "lucide-react";
 import { DatePickerInput, TextAreaInput, TextInput } from "@/components/reusable/partials/input";
-import { useCreateScrapMovement } from "@/api/product/product.mutation";
-import { CreateScrapMovementPayload, ProductStockLot } from "@/api/product/product.type";
-import { useProductScrapEligibleStockLots } from "@/api/product/product.query";
+import { useCreateRawMaterialScrap } from "@/api/raw-materials/raw-material.mutation";
+import { useRawMaterialScrapEligibleStockLots } from "@/api/raw-materials/raw-material.query";
+import { CreateRawMaterialScrapPayload, RawMaterialStockLot } from "@/api/raw-materials/raw-material.types";
 import { formatDate } from "@/utils/date-format";
-import { AxiosError } from "axios";
-import { ProductValidationErrors } from "@/api/product/product.type";
+import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -31,9 +30,9 @@ import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { validateQuantityType } from "@/utils/uom-quantity";
 
-interface ScrapDialogProps {
-  productId: number;
-  productName: string;
+interface RawMaterialScrapDialogProps {
+  rawMaterialId: number;
+  materialName: string;
   quantityType?: "INTEGER" | "DECIMAL" | string;
 }
 
@@ -44,14 +43,18 @@ const INITIAL = {
   note: "",
 };
 
-function lotDisabledReason(lot: ProductStockLot): string | null {
+function lotDisabledReason(lot: RawMaterialStockLot): string | null {
   if (lot.disabled_reason) return lot.disabled_reason;
   if (lot.is_expired) return "Expired stock cannot be scrapped.";
   if (Number(lot.remaining_quantity || 0) <= 0) return "No remaining stock.";
   return null;
 }
 
-export function ScrapDialog({ productId, productName, quantityType }: ScrapDialogProps) {
+export function RawMaterialScrapDialog({
+  rawMaterialId,
+  materialName,
+  quantityType,
+}: RawMaterialScrapDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
   const [form, setForm] = useState(INITIAL);
@@ -61,21 +64,22 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const mutation = useCreateScrapMovement(productId);
-  const { data: lotData, isLoading: loadingLots } = useProductScrapEligibleStockLots(productId, true);
+  const mutation = useCreateRawMaterialScrap(rawMaterialId);
+  const { data: lotData, isLoading: loadingLots } = useRawMaterialScrapEligibleStockLots(rawMaterialId, true);
 
   const lots = lotData?.data?.stock_lots ?? [];
   const selectedLot = useMemo(
     () => lots.find(l => l.id === selectedLotId) ?? null,
     [lots, selectedLotId],
   );
+  const quantityTypeError = validateQuantityType(form.quantity, quantityType);
 
   const filteredLots = useMemo(() => {
     const keyword = search.trim().toLowerCase();
     return lots.filter(lot => {
-      const normalizedStatus = String(lot.status || lot.lot_status || "").toUpperCase();
+      const normalizedStatus = String(lot.status || "").toUpperCase();
       const normalizedMovementType = String(lot.movement_type || "").toUpperCase();
-      const batchCode = String(lot.batch_code || `PM-${lot.id}`);
+      const batchCode = String(lot.batch_code || `RM-${lot.id}`);
       const haystack = [
         batchCode,
         normalizedStatus,
@@ -108,22 +112,12 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
   const currentPage = Math.min(page, lastPage);
   const startIndex = (currentPage - 1) * perPage;
   const paginatedLots = filteredLots.slice(startIndex, startIndex + perPage);
-  const quantityTypeError = validateQuantityType(form.quantity, quantityType);
 
-  const apiErrors = (mutation.error as AxiosError<{ errors?: { available_qty?: number } }> | null)
-    ?.response?.data?.errors;
-  const validationErrors = (mutation.error as AxiosError<ProductValidationErrors> | null)
+  const validationErrors = (mutation.error as AxiosError<{ errors?: Record<string, string[]> }> | null)
     ?.response?.data?.errors;
 
-  const quantityFieldError = !Array.isArray(validationErrors)
-    ? validationErrors?.quantity?.[0]
-    : undefined;
-  const sourceError = !Array.isArray(validationErrors)
-    ? validationErrors?.source_movement_id?.[0]
-    : undefined;
-  const quantityError = apiErrors?.available_qty !== undefined
-    ? `Insufficient stock. Only ${apiErrors.available_qty} available.`
-    : quantityFieldError;
+  const quantityError = validationErrors?.quantity?.[0];
+  const sourceError = validationErrors?.source_movement_id?.[0];
 
   const handleChange = (field: keyof typeof INITIAL) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -153,7 +147,7 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
   const handleSubmit = () => {
     if (!isValid || !selectedLot) return;
 
-    const payload: CreateScrapMovementPayload = {
+    const payload: CreateRawMaterialScrapPayload = {
       source_movement_id: selectedLot.id,
       quantity: Number(form.quantity),
       movement_date: form.movement_date || undefined,
@@ -177,14 +171,11 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
           Scrap
         </Button>
       </DialogTrigger>
-      <DialogContent
-        className="max-w-5xl"
-        onInteractOutside={e => e.preventDefault()}
-      >
+      <DialogContent className="max-w-5xl" onInteractOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Scrap Product Stock Batch</DialogTitle>
+          <DialogTitle>Scrap Raw Material Stock Batch</DialogTitle>
           <DialogDescription>
-            Select a stock batch on the left, then submit scrap details on the right for <strong>{productName}</strong>.
+            Select a stock batch on the left, then submit scrap details on the right for <strong>{materialName}</strong>.
           </DialogDescription>
         </DialogHeader>
 
@@ -293,7 +284,7 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
                         } ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-muted/40"}`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-medium">{lot.batch_code ?? `PM-${lot.id}`}</p>
+                          <p className="text-sm font-medium">{lot.batch_code ?? `RM-${lot.id}`}</p>
                           <Badge variant="outline">{String(lot.status || "AVAILABLE").replace(/_/g, " ")}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
@@ -314,7 +305,6 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
                       </button>
                     );
                     })}
-
                     {filteredLots.length > 0 && (
                       <div className="pt-2">
                         <GlobalPagination
@@ -335,7 +325,7 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
 
             {selectedLot ? (
               <div className="rounded-md border bg-muted/30 p-3 text-xs space-y-1">
-                <p><strong>Selected Batch:</strong> {selectedLot.batch_code ?? `PM-${selectedLot.id}`}</p>
+                <p><strong>Selected Batch:</strong> {selectedLot.batch_code ?? `RM-${selectedLot.id}`}</p>
                 <p><strong>Remaining Stock:</strong> {selectedRemaining.toFixed(2)}</p>
                 <p><strong>Expiry:</strong> {selectedLot.expiry_date ? formatDate(selectedLot.expiry_date) : "—"}</p>
               </div>
@@ -346,7 +336,7 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
             )}
 
             <TextInput
-              id="scrap-quantity"
+              id="rm-scrap-quantity"
               label="Scrap Quantity"
               placeholder="e.g. 5"
               value={form.quantity}
@@ -363,22 +353,22 @@ export function ScrapDialog({ productId, productName, quantityType }: ScrapDialo
             )}
 
             <DatePickerInput
-              id="scrap-movement-date"
+              id="rm-scrap-movement-date"
               label="Scrap Date"
               value={form.movement_date}
               onChange={v => setForm(prev => ({ ...prev, movement_date: v }))}
             />
 
             <TextInput
-              id="scrap-reason"
+              id="rm-scrap-reason"
               label="Reason"
-              placeholder="e.g. Damaged packaging"
+              placeholder="e.g. Damaged bag"
               value={form.reason}
               onChange={handleChange("reason")}
             />
 
             <TextAreaInput
-              id="scrap-note"
+              id="rm-scrap-note"
               label="Note"
               placeholder="Optional note"
               value={form.note}

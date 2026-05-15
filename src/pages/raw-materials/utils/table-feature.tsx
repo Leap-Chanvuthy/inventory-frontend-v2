@@ -54,49 +54,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const isInUsed = (value: unknown): boolean =>
   value === true || value === 1 || value === "1" || value === "true";
 
-const getExpiryDayStatus = (
-  expiryDate?: string | null,
-): { text: string; tone: "positive" | "negative" | "neutral" } => {
-  if (!expiryDate) {
-    return { text: "No expiry date", tone: "neutral" };
-  }
-
-  const parsed = new Date(expiryDate);
-  if (Number.isNaN(parsed.getTime())) {
-    return { text: "Invalid expiry date", tone: "neutral" };
-  }
-
-  const today = new Date();
-  const todayStart = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  );
-  const expiryStart = new Date(
-    parsed.getFullYear(),
-    parsed.getMonth(),
-    parsed.getDate(),
-  );
-
-  const msPerDay = 1000 * 60 * 60 * 24;
-  const dayDiff = Math.floor(
-    (expiryStart.getTime() - todayStart.getTime()) / msPerDay,
-  );
-
-  if (dayDiff >= 0) {
-    return {
-      text: `Expires in ${dayDiff} day${dayDiff === 1 ? "" : "s"}`,
-      tone: "positive",
-    };
-  }
-
-  const expiredDays = Math.abs(dayDiff);
-  return {
-    text: `Expired ${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`,
-    tone: "negative",
-  };
-};
-
 // Actions Component
 const RawMaterialActions = ({ rawMaterial }: { rawMaterial: RawMaterial }) => {
   const deleteMutation = useDeleteRawMaterial();
@@ -351,8 +308,10 @@ export function RawMaterialCard({
 }
 
 export const RM_STOCK_MOVEMENT_SORT_OPTIONS = [
-  { value: "-movement_date", label: "Newest First" },
-  { value: "movement_date", label: "Oldest First" },
+  { value: "-created_at", label: "Newest First" },
+  { value: "created_at", label: "Oldest First" },
+  { value: "-movement_date", label: "Latest Movement Date" },
+  { value: "movement_date", label: "Earliest Movement Date" },
   { value: "-quantity", label: "Highest Quantity" },
   { value: "quantity", label: "Lowest Quantity" },
 ];
@@ -447,28 +406,28 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       );
     },
   },
-  {
-    key: "expiry_date",
-    header: "Expiry Date",
-    className: "whitespace-nowrap py-6",
-    render: movement => {
-      const expiryStatus = getExpiryDayStatus(movement.expiry_date);
+  // {
+  //   key: "expiry_date",
+  //   header: "Expiry Date",
+  //   className: "whitespace-nowrap py-6",
+  //   render: movement => {
+  //     const expiryStatus = getExpiryDayStatus(movement.expiry_date);
 
-      return (
-        <div
-          className={
-            expiryStatus.tone === "negative"
-              ? "ctext-red-600 dark:text-red-400"
-              : expiryStatus.tone === "positive"
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-muted-foreground"
-          }
-        >
-          {expiryStatus.text}
-        </div>
-      );
-    },
-  },
+  //     return (
+  //       <div
+  //         className={
+  //           expiryStatus.tone === "negative"
+  //             ? "ctext-red-600 dark:text-red-400"
+  //             : expiryStatus.tone === "positive"
+  //               ? "text-emerald-600 dark:text-emerald-400"
+  //               : "text-muted-foreground"
+  //         }
+  //       >
+  //         {expiryStatus.text}
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     key: "quantity",
     header: "Quantity",
@@ -489,29 +448,29 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
       );
     },
   },
-  {
-    key: "unit_price_in_usd",
-    header: "Purchasing Unit Price",
-    className: "whitespace-nowrap py-6 text-right",
-    render: movement => (
-      <Text.Small color="muted">
-        ${movement.unit_price_in_usd.toFixed(2)}
-      </Text.Small>
-    ),
-  },
-  {
-    key: "total_value_in_usd",
-    header: "Purchasing Total Value",
-    className: "whitespace-nowrap py-6 text-right",
-    render: movement => (
-      <Text.Small color="default" fontWeight="semibold">
-        $
-        {movement.total_value_in_usd.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-        })}
-      </Text.Small>
-    ),
-  },
+  // {
+  //   key: "unit_price_in_usd",
+  //   header: "Purchasing Unit Price",
+  //   className: "whitespace-nowrap py-6 text-right",
+  //   render: movement => (
+  //     <Text.Small color="muted">
+  //       ${movement.unit_price_in_usd.toFixed(2)}
+  //     </Text.Small>
+  //   ),
+  // },
+  // {
+  //   key: "total_value_in_usd",
+  //   header: "Purchasing Total Value",
+  //   className: "whitespace-nowrap py-6 text-right",
+  //   render: movement => (
+  //     <Text.Small color="default" fontWeight="semibold">
+  //       $
+  //       {movement.total_value_in_usd.toLocaleString(undefined, {
+  //         minimumFractionDigits: 2,
+  //       })}
+  //     </Text.Small>
+  //   ),
+  // },
   {
     key: "created_by",
     header: "Created By",
@@ -584,11 +543,25 @@ export const RM_STOCK_MOVEMENT_COLUMNS = (
     key: "note",
     header: "Notes",
     className: "whitespace-nowrap py-6",
-    render: movement => (
-      <Text.Small color="muted" maxLines={1}>
-        {movement.note || "No notes"}
-      </Text.Small>
-    ),
+    render: movement => {
+      const note = movement.note || "No notes";
+      return (
+        <TooltipProvider delayDuration={150}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="max-w-[120px]">
+                <Text.Small color="muted" className="truncate block">
+                  {note}
+                </Text.Small>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-sm whitespace-normal break-words">
+              {note}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
   },
   {
     key: "actions",

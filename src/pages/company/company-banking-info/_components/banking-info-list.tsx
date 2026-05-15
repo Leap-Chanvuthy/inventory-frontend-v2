@@ -13,6 +13,8 @@ import {
 import { Text } from "@/components/ui/text/app-text";
 import { BankingInfo } from "@/api/company/company.type";
 import { AddBankingForm } from "./add-banking-form";
+import { DataTable } from "@/components/reusable/data-table/data-table";
+import { buildBankingInfoColumns } from "../utils/table-feature";
 
 export const BankingInfoList = () => {
   const { data, isLoading } = useCompanyInfo();
@@ -191,76 +193,11 @@ export const BankingInfoList = () => {
         ) : (
           // List View
           <div className="border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                    Bank Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                    Account Number
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                    Account Holder
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                    KHQR
-                  </th>
-
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {bankingInfos.map(bank => (
-                  <tr key={bank.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm">{bank.bank_name}</td>
-                    <td className="px-4 py-3 text-sm">
-                      {bank.bank_account_number}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {bank.bank_account_holder_name}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {bank.khqr_code ? (
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={bank.khqr_code}
-                            alt="KHQR"
-                            className="w-8 h-8 object-contain border rounded"
-                          />
-                          {bank.payment_link && (
-                            <a
-                              href={bank.payment_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-purple-600 hover:underline"
-                            >
-                              Pay
-                            </a>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">No QR</span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-3 text-sm">
-                      <div className="flex justify-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditClick(bank)}
-                        >
-                          <Pencil className="h-4 w-4 text-gray-500" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <DataTable
+              columns={buildBankingInfoColumns(handleEditClick)}
+              data={bankingInfos}
+              emptyText="No banking information configured yet."
+            />
           </div>
         )}
       </CardContent>

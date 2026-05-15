@@ -7,11 +7,14 @@ import {
   reorderRawMaterial,
   updateReorderRawMaterial,
   recoverRawMaterial,
+  createRawMaterialScrap,
+  uploadRawMaterialImages,
 } from "./raw-material.api";
 import {
   CreateRawMaterialRequest,
   UpdateRawMaterialRequest,
   ReorderRawMaterialPayload,
+  CreateRawMaterialScrapPayload,
 } from "./raw-material.types";
 import { toast } from "sonner";
 
@@ -140,6 +143,41 @@ export const useDeleteRawMaterialImages = (rawMaterialId: number) => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to delete image(s)");
+    },
+  });
+};
+
+export const useCreateRawMaterialScrap = (rawMaterialId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateRawMaterialScrapPayload) =>
+      createRawMaterialScrap(rawMaterialId, payload),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+      queryClient.invalidateQueries({ queryKey: ["raw-material-stock-lots", rawMaterialId] });
+      queryClient.invalidateQueries({ queryKey: ["raw-material-scrap-eligible-stock-lots", rawMaterialId] });
+      queryClient.invalidateQueries({ queryKey: ["raw-material-movements", rawMaterialId] });
+      toast.success(response.message || "Raw material scrapped successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to scrap raw material");
+    },
+  });
+};
+
+export const useUploadRawMaterialImages = (rawMaterialId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData: FormData) =>
+      uploadRawMaterialImages(rawMaterialId, formData),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["raw-material", rawMaterialId] });
+      toast.success(response.message || "Raw material images uploaded successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to upload image(s)");
     },
   });
 };

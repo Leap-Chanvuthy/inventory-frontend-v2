@@ -1,18 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Hash,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  Pencil,
-  Eye,
-  List,
-  RefreshCw,
-} from "lucide-react";
-import DeleteModal from "@/components/reusable/partials/delete-modal";
-import { formatDate } from "@/utils/date-format";
+import { Hash, List, RefreshCw } from "lucide-react";
 import { ProductMovement } from "@/api/product/product.type";
 import { useProductMovements } from "@/api/product/product.query";
 import {
@@ -25,7 +14,7 @@ import { ViewScrapDialog } from "./view-scrap-dialog";
 import { EditScrapDialog } from "./edit-scrap-dialog";
 import { MovementHistoryModal } from "./movement-history-modal";
 import { DataTable } from "@/components/reusable/data-table/data-table";
-import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
+import { buildProductMovementColumns } from "./table-feature";
 
 interface ProductMovementHistoryProps {
   productId: number;
@@ -36,18 +25,6 @@ export function ProductMovementHistory({
   productId,
   productType,
 }: ProductMovementHistoryProps) {
-  const formatQuantity = (quantity: string | number) => Number(quantity ?? 0).toFixed(2);
-  const getLotStatusLabel = (mv: ProductMovement) => {
-    if (mv.direction !== "IN") return "OUT";
-    const qty = Number(mv.quantity ?? 0);
-    const remaining = Number(mv.remaining_quantity ?? 0);
-    if (remaining <= 0) return "SOLD_OUT";
-    if (remaining < qty) return "PARTIALLY_SOLD";
-    return "AVAILABLE";
-  };
-  const getCreatedByName = (createdBy: ProductMovement["created_by"]) =>
-    createdBy && typeof createdBy === "object" ? createdBy.name : "—";
-
   const isInternal = productType === "INTERNAL_PRODUCED";
   const deleteInternalReorderMutation = useDeleteInternalReorderMovement(productId);
   const deleteExternalReorderMutation = useDeleteExternalReorderMovement(productId);
@@ -73,162 +50,13 @@ export function ProductMovementHistory({
   const [editingScrap, setEditingScrap] = useState<ProductMovement | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const columns: DataTableColumn<ProductMovement>[] = [
-    {
-      key: "movement_type",
-      header: "Type",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <Badge variant="outline" className="text-xs whitespace-nowrap">
-          {mv.movement_type.replace(/_/g, " ")}
-        </Badge>
-      ),
-    },
-    {
-      key: "direction",
-      header: "Dir",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <span
-          className={`inline-flex items-center gap-1 text-xs font-semibold ${mv.direction === "IN" ? "text-green-600" : "text-red-600"}`}
-        >
-          {mv.direction === "IN" ? (
-            <ArrowDownToLine className="h-3.5 w-3.5" />
-          ) : (
-            <ArrowUpFromLine className="h-3.5 w-3.5" />
-          )}
-          {mv.direction}
-        </span>
-      ),
-    },
-    {
-      key: "quantity",
-      header: "Qty",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <span className="font-semibold">{formatQuantity(mv.quantity)}</span>
-      ),
-    },
-    {
-      key: "remaining_quantity",
-      header: "Remaining",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <span className="font-semibold">{formatQuantity(mv.remaining_quantity ?? 0)}</span>
-      ),
-    },
-    {
-      key: "selling_unit_price_in_usd",
-      header: "Sell (USD)",
-      className: "whitespace-nowrap py-3",
-      render: mv => <span>${mv.selling_unit_price_in_usd.toLocaleString()}</span>,
-    },
-    {
-      key: "product_status",
-      header: "Lot Status",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <Badge
-          variant="outline"
-          className={
-            getLotStatusLabel(mv) === "SOLD_OUT"
-              ? "border-red-500 text-red-600 text-xs"
-              : getLotStatusLabel(mv) === "PARTIALLY_SOLD"
-                ? "border-amber-500 text-amber-600 text-xs"
-                : getLotStatusLabel(mv) === "AVAILABLE"
-                  ? "border-green-500 text-green-600 text-xs"
-                  : "text-xs"
-          }
-        >
-          {getLotStatusLabel(mv).replace(/_/g, " ")}
-        </Badge>
-      ),
-    },
-    {
-      key: "movement_date",
-      header: "Date",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <span className="text-muted-foreground text-xs whitespace-nowrap">
-          {formatDate(mv.movement_date)}
-        </span>
-      ),
-    },
-    {
-      key: "created_by",
-      header: "By",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <span className="text-muted-foreground text-xs whitespace-nowrap">
-          {getCreatedByName(mv.created_by)}
-        </span>
-      ),
-    },
-    {
-      key: "id",
-      header: "Action",
-      className: "whitespace-nowrap py-3",
-      render: mv => (
-        <div className="flex items-center gap-1">
-          {mv.movement_type.replace(/_/g, "").includes("REORDER") && (
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground hover:text-teal-600 hover:bg-teal-50"
-                onClick={() => setViewingMovement(mv)}
-              >
-                <Eye className="w-3.5 h-3.5" />
-              </Button>
-              {!mv.is_sold && (
-                <>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
-                    onClick={() => setEditingMovement(mv)}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </Button>
-                  <DeleteModal
-                    heading="Delete Movement"
-                    subheading="Are you sure you want to delete this reorder movement? This action cannot be undone."
-                    onDelete={() => deleteMutation.mutate(mv.id)}
-                  />
-                </>
-              )}
-            </>
-          )}
-          {mv.movement_type === "SCRAP" && (
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground hover:text-teal-600 hover:bg-teal-50"
-                onClick={() => setViewingScrap(mv)}
-              >
-                <Eye className="w-3.5 h-3.5" />
-              </Button>
-              {!mv.is_sold && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
-                  onClick={() => setEditingScrap(mv)}
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </Button>
-              )}
-            </>
-          )}
-        </div>
-      ),
-    },
-  ];
+  const columns = buildProductMovementColumns({
+    onViewMovement: mv => setViewingMovement(mv),
+    onEditMovement: mv => setEditingMovement(mv),
+    onDeleteMovement: movementId => deleteMutation.mutate(movementId),
+    onViewScrap: mv => setViewingScrap(mv),
+    onEditScrap: mv => setEditingScrap(mv),
+  });
 
   const renderContent = () => {
     if (isError && !isFetching) {

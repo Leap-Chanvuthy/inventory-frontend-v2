@@ -13,7 +13,8 @@ import {
 
 export type ImageItem = {
     id: number;
-    raw_material_id: number;
+    raw_material_id?: number;
+    product_id?: number;
     image: string;
     created_at?: string;
     updated_at?: string;

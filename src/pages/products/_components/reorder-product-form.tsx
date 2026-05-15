@@ -3,7 +3,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePickerInput } from "@/components/reusable/partials/input";
+import { DataTable } from "@/components/reusable/data-table/data-table";
 import { InsufficientStockError } from "@/api/product/product.type";
+import { RawMaterialAllocationPreviewResponse } from "@/api/raw-materials/raw-material.types";
 import {
   ArrowRightLeft,
   DollarSign,
@@ -11,6 +13,7 @@ import {
   FlaskConical,
   Package,
 } from "lucide-react";
+import { buildReorderBomColumns } from "../utils/bom-editor-table-feature";
 
 export type ReorderExternalFormState = {
   quantity: string;
@@ -19,6 +22,7 @@ export type ReorderExternalFormState = {
   selling_unit_price_in_usd: string;
   selling_exchange_rate_from_usd_to_riel: string;
   movement_date: string;
+  expiry_date: string;
   note: string;
 };
 
@@ -27,6 +31,7 @@ export type ReorderInternalFormState = {
   selling_unit_price_in_usd: string;
   selling_exchange_rate_from_usd_to_riel: string;
   movement_date: string;
+  expiry_date: string;
   note: string;
 };
 
@@ -39,6 +44,15 @@ export type ReorderInternalBomEntry = {
   available_qty?: number | null;
 };
 
+export type ReorderInternalAllocationPreviewRow = {
+  raw_material_id: number;
+  raw_material_name: string;
+  requested_quantity: number;
+  is_loading: boolean;
+  error_message: string | null;
+  preview?: RawMaterialAllocationPreviewResponse["data"];
+};
+
 interface ReorderProductFormProps {
   isInternal: boolean;
   internal: ReorderInternalFormState;
@@ -46,6 +60,8 @@ interface ReorderProductFormProps {
   bomEntries: ReorderInternalBomEntry[];
   stockErrors?: InsufficientStockError[];
   quantityError?: string;
+  quantityTypeError?: string;
+  allocationPreviewRows?: ReorderInternalAllocationPreviewRow[];
   onInternalFieldChange: (
     field: keyof ReorderInternalFormState,
     value: string,
@@ -64,6 +80,8 @@ export function ReorderProductForm({
   bomEntries,
   stockErrors,
   quantityError,
+  quantityTypeError,
+  allocationPreviewRows = [],
   onInternalFieldChange,
   onExternalFieldChange,
   onInternalBomScrapChange,
@@ -87,6 +105,35 @@ export function ReorderProductForm({
     [bomEntries, productionQuantity],
   );
 
+  const reorderBomRows = useMemo(
+    () =>
+      bomEntries.map(entry => {
+        const requiredQty = entry.quantity_per_unit * productionQuantity;
+        const scrapQty = (requiredQty * entry.scrap_percentage) / 100;
+        const totalConsumption = requiredQty + scrapQty;
+        const stockErr = stockErrors?.find(
+          e => e.raw_material_id === entry.raw_material_id,
+        );
+
+        return {
+          raw_material_id: entry.raw_material_id,
+          material_name: entry.name,
+          uom_label: entry.uom_label,
+          quantity_per_unit: entry.quantity_per_unit,
+          scrap_percentage: entry.scrap_percentage,
+          required_qty: requiredQty,
+          scrap_qty: scrapQty,
+          total_consumption: totalConsumption,
+          available_qty:
+            entry.available_qty == null ? null : Number(entry.available_qty),
+          stock_error: stockErr
+            ? `Need ${stockErr.required_qty}, available ${stockErr.available_qty} (short by ${stockErr.shortfall_qty})`
+            : undefined,
+        };
+      }),
+    [bomEntries, productionQuantity, stockErrors],
+  );
+
   return (
     <div className="max-h-[72vh] overflow-y-auto px-6 py-5 space-y-5">
       {isInternal ? (
@@ -106,6 +153,9 @@ export function ReorderProductForm({
                 />
                 {quantityError && (
                   <p className="text-xs text-destructive">{quantityError}</p>
+                )}
+                {quantityTypeError && (
+                  <p className="text-xs text-destructive">{quantityTypeError}</p>
                 )}
               </div>
 
@@ -157,6 +207,12 @@ export function ReorderProductForm({
                 value={internal.movement_date}
                 onChange={value => onInternalFieldChange("movement_date", value)}
               />
+              <DatePickerInput
+                id="expiry_date_internal"
+                label="Stock Expiry Date"
+                value={internal.expiry_date}
+                onChange={value => onInternalFieldChange("expiry_date", value)}
+              />
             </div>
           </div>
 
@@ -179,114 +235,11 @@ export function ReorderProductForm({
               </div>
 
               <div className="rounded-xl border bg-background overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm min-w-[960px]">
-                    <thead className="bg-muted/50 sticky top-0">
-                      <tr>
-                        <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Raw Material
-                        </th>
-                        <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-40">
-                          Qty per Unit
-                        </th>
-                        <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-32">
-                          Scrap %
-                        </th>
-                        <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-40">
-                          Required Qty
-                        </th>
-                        <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-40">
-                          Scrap Qty
-                        </th>
-                        <th className="text-right px-3 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-44">
-                          Total Consumption
-                        </th>
-                        <th className="text-right px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground w-40">
-                          Available
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody className="divide-y divide-border">
-                      {bomEntries.map((entry, idx) => {
-                        const requiredQty =
-                          entry.quantity_per_unit * productionQuantity;
-                        const scrapQty =
-                          (requiredQty * entry.scrap_percentage) / 100;
-                        const totalConsumption = requiredQty + scrapQty;
-                        const stockErr = stockErrors?.find(
-                          e => e.raw_material_id === entry.raw_material_id,
-                        );
-
-                        return (
-                          <tr
-                            key={entry.raw_material_id}
-                            className={
-                              stockErr
-                                ? "bg-destructive/5"
-                                : idx % 2 === 0
-                                  ? "bg-background"
-                                  : "bg-muted/10"
-                            }
-                          >
-                            <td className="px-4 py-3">
-                              <p className="text-sm font-medium">{entry.name}</p>
-                              {entry.uom_label && (
-                                <p className="text-xs text-muted-foreground">
-                                  UOM: {entry.uom_label}
-                                </p>
-                              )}
-                              {stockErr && (
-                                <p className="text-xs text-destructive mt-1">
-                                  Need {stockErr.required_qty}, available{" "}
-                                  {stockErr.available_qty} (short by{" "}
-                                  {stockErr.shortfall_qty})
-                                </p>
-                              )}
-                            </td>
-
-                            <td className="px-3 py-3 text-right font-medium">
-                              {entry.quantity_per_unit.toFixed(2)}{" "}
-                              {entry.uom_label}
-                            </td>
-
-                            <td className="px-3 py-3">
-                              <Input
-                                type="number"
-                                min={0}
-                                max={100}
-                                step="0.01"
-                                value={String(entry.scrap_percentage)}
-                                onChange={e =>
-                                  onInternalBomScrapChange(
-                                    entry.raw_material_id,
-                                    e.target.value,
-                                  )
-                                }
-                                className="text-right"
-                              />
-                            </td>
-
-                            <td className="px-3 py-3 text-right font-medium">
-                              {requiredQty.toFixed(2)} {entry.uom_label}
-                            </td>
-                            <td className="px-3 py-3 text-right font-medium text-amber-700">
-                              {scrapQty.toFixed(2)} {entry.uom_label}
-                            </td>
-                            <td className="px-3 py-3 text-right text-sm font-semibold">
-                              {totalConsumption.toFixed(2)} {entry.uom_label}
-                            </td>
-                            <td className="px-4 py-3 text-right font-medium">
-                              {entry.available_qty == null
-                                ? "-"
-                                : `${Number(entry.available_qty).toFixed(2)} ${entry.uom_label}`}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <DataTable
+                  columns={buildReorderBomColumns(onInternalBomScrapChange)}
+                  data={reorderBomRows}
+                  emptyText="No BOM materials."
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 rounded-xl border bg-muted/30 p-3 text-sm">
@@ -315,6 +268,73 @@ export function ReorderProductForm({
                   </p>
                 </div>
               </div>
+
+              {productionQuantity > 0 && (
+                <div className="space-y-2 rounded-xl border bg-background p-3">
+                  <p className="text-sm font-semibold">
+                    Stock Lots Used In Production (Preview)
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Preview of FIFO/LIFO lot consumption for each raw material before reorder submission.
+                  </p>
+
+                  <div className="space-y-3">
+                    {allocationPreviewRows.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No allocation preview available.</p>
+                    )}
+
+                    {allocationPreviewRows.map(row => (
+                      <div key={row.raw_material_id} className="rounded-lg border p-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-sm font-medium">{row.raw_material_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Requested: {row.requested_quantity.toFixed(4)}
+                          </p>
+                        </div>
+
+                        {row.is_loading ? (
+                          <p className="text-xs text-muted-foreground mt-2">Loading lot preview...</p>
+                        ) : row.error_message ? (
+                          <p className="text-xs text-destructive mt-2">{row.error_message}</p>
+                        ) : !row.preview ? (
+                          <p className="text-xs text-muted-foreground mt-2">No preview data.</p>
+                        ) : (
+                          <div className="mt-2 space-y-2">
+                            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                              <span>Method: {String(row.preview.production_method || "FIFO").toUpperCase()}</span>
+                              <span>Available: {Number(row.preview.available_quantity || 0).toFixed(4)}</span>
+                              <span>
+                                Fulfillable: {row.preview.can_fulfill ? "Yes" : "No"}
+                              </span>
+                            </div>
+
+                            {row.preview.message && (
+                              <p className="text-xs text-destructive">{row.preview.message}</p>
+                            )}
+
+                            {(row.preview.lots || []).length > 0 ? (
+                              <div className="space-y-1">
+                                {row.preview.lots.map(lot => (
+                                  <div key={`${row.raw_material_id}-${lot.source_movement_id}`} className="text-xs text-muted-foreground">
+                                    <span className="font-medium text-foreground mr-2">RM-{lot.source_movement_id}</span>
+                                    <span>{String(lot.movement_type || "").replace(/_/g, " ")}</span>
+                                    <span className="mx-2">·</span>
+                                    <span>{lot.movement_date ? lot.movement_date.slice(0, 10) : "—"}</span>
+                                    <span className="mx-2">·</span>
+                                    <span>Allocated: {Number(lot.allocated_quantity || 0).toFixed(4)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">No lot allocations.</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
@@ -336,6 +356,9 @@ export function ReorderProductForm({
               {quantityError && (
                 <p className="text-xs text-destructive">{quantityError}</p>
               )}
+              {quantityTypeError && (
+                <p className="text-xs text-destructive">{quantityTypeError}</p>
+              )}
             </div>
             <DatePickerInput
               id="movement_date_external"
@@ -343,6 +366,12 @@ export function ReorderProductForm({
               label="Reorder Date"
               value={external.movement_date}
               onChange={value => onExternalFieldChange("movement_date", value)}
+            />
+            <DatePickerInput
+              id="expiry_date_external"
+              label="Stock Expiry Date"
+              value={external.expiry_date}
+              onChange={value => onExternalFieldChange("expiry_date", value)}
             />
           </div>
 

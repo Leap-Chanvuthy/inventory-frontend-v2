@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct, updateExternalPurchase, updateInternalManufacturing, reorderExternalPurchase, reorderInternalManufacturing, updateExternalReorderMovement, updateInternalReorderMovement, deleteExternalReorderMovement, deleteInternalReorderMovement, createScrapMovement, updateScrapMovement } from "./product.api";
+import { createProduct, updateProduct, deleteProduct, createExternalPurchase, createInternalManufacturing, recoverProduct, updateExternalPurchase, updateInternalManufacturing, reorderExternalPurchase, reorderInternalManufacturing, updateExternalReorderMovement, updateInternalReorderMovement, deleteExternalReorderMovement, deleteInternalReorderMovement, createScrapMovement, updateScrapMovement, uploadProductImages, deleteProductImage, setPrimaryProductImage } from "./product.api";
 import { CreateProductRequest, UpdateProductRequest, CreateExternalPurchaseRequest, CreateInternalManufacturingRequest, ReorderExternalPurchasePayload, ReorderInternalManufacturingPayload, CreateScrapMovementPayload, UpdateScrapMovementPayload } from "./product.type";
 import { toast } from "sonner";
 import { showApiErrorToast } from "@/components/reusable/partials/api-error-response-toast";
@@ -216,6 +216,8 @@ export const useCreateScrapMovement = (productId: number) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
       queryClient.invalidateQueries({ queryKey: ["product-movements", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-stock-lots", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-scrap-eligible-stock-lots", productId] });
       toast.success(response.message || "Product scrapped successfully");
     },
     onError: (error: any) => {
@@ -232,6 +234,8 @@ export const useUpdateScrapMovement = (productId: number, movementId: number) =>
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["product", productId] });
       queryClient.invalidateQueries({ queryKey: ["product-movements", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-stock-lots", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product-scrap-eligible-stock-lots", productId] });
       queryClient.invalidateQueries({ queryKey: ["product-scrap-movement", productId, movementId] });
       toast.success(response.message || "Scrap movement updated successfully");
     },
@@ -252,6 +256,51 @@ export const useDeleteProduct = () => {
     },
     onError: (error: any) => {
       showApiErrorToast(error, "Failed to delete product");
+    },
+  });
+};
+
+export const useUploadProductImages = (productId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData: FormData) => uploadProductImages(productId, formData),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
+      toast.success(response.message || "Product images uploaded successfully");
+    },
+    onError: (error: any) => {
+      showApiErrorToast(error, "Failed to upload product images");
+    },
+  });
+};
+
+export const useDeleteProductImage = (productId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (imageId: number) => deleteProductImage(productId, imageId),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
+      toast.success(response.message || "Product image deleted successfully");
+    },
+    onError: (error: any) => {
+      showApiErrorToast(error, "Failed to delete product image");
+    },
+  });
+};
+
+export const useSetPrimaryProductImage = (productId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (imageId: number) => setPrimaryProductImage(productId, imageId),
+    onSuccess: response => {
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
+      toast.success(response.message || "Primary image updated successfully");
+    },
+    onError: (error: any) => {
+      showApiErrorToast(error, "Failed to set primary image");
     },
   });
 };

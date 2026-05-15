@@ -8,7 +8,9 @@ import { User } from "../users/user.types";
 export interface RawMaterialStockMovement {
   id: number;
   raw_material_id: number;
+  source_movement_id?: number | null;
   quantity: number;
+  remaining_quantity?: number;
   in_used?: boolean;
   direction: "IN" | "OUT";
   movement_type:
@@ -35,6 +37,60 @@ export interface RawMaterialStockMovement {
   updated_at: string;
   uom_name?: string;
   uom_symbol?: string;
+}
+
+export interface RawMaterialStockLotChild {
+  id: number;
+  type: string;
+  reference?: string | null;
+  quantity: number;
+  date: string | null;
+  reason?: string | null;
+  product_id?: number | null;
+  product_name?: string | null;
+  product_movement_id?: number | null;
+  unit_cost_usd?: number;
+  line_cost_usd?: number;
+}
+
+export interface RawMaterialStockLot {
+  id: number;
+  batch_code: string;
+  movement_type: string;
+  movement_date: string | null;
+  expiry_date: string | null;
+  is_expired: boolean;
+  days_until_expiry?: number | null;
+  quantity: number;
+  remaining_quantity: number;
+  used_in_production_quantity: number;
+  scrapped_quantity: number;
+  available_quantity: number;
+  unit_cost_usd: number;
+  unit_cost_riel?: number;
+  status: string;
+  can_use_for_production: boolean;
+  can_scrap: boolean;
+  disabled_reason?: string | null;
+  children: RawMaterialStockLotChild[];
+}
+
+export interface RawMaterialStockLotSummary {
+  available_quantity: number;
+  expired_quantity: number;
+  scrapped_quantity: number;
+  used_in_production_quantity: number;
+  production_method: "FIFO" | "LIFO" | string;
+  total_batches: number;
+}
+
+export interface UomHierarchyQuantity {
+  uom_id: number;
+  uom_name: string;
+  uom_symbol?: string | null;
+  conversion_factor: number;
+  equivalent_quantity: number;
+  is_base_uom: boolean;
 }
 
 export interface StockMovementsQueryParams {
@@ -131,8 +187,11 @@ export interface GetRawMaterialResponse {
   data: {
     raw_material: RawMaterial;
     current_qty_in_stock: number;
-    raw_material_status: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
+    raw_material_status: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK" | "EXPIRED";
     total_count_by_movement_type: Record<string, number>;
+    stock_lot_summary: RawMaterialStockLotSummary;
+    stock_lots: RawMaterialStockLot[];
+    uom_hierarchy_quantities: UomHierarchyQuantity[];
   };
 }
 
@@ -210,6 +269,50 @@ export interface ReorderRawMaterialResponse {
   status: boolean;
   message: string;
   data: RawMaterialStockMovement;
+}
+
+export interface RawMaterialStockLotsResponse {
+  status: boolean;
+  message: string;
+  data: {
+    stock_lot_summary: RawMaterialStockLotSummary;
+    stock_lots: RawMaterialStockLot[];
+  };
+}
+
+export interface RawMaterialAllocationPreviewResponse {
+  status: boolean;
+  message: string;
+  data: {
+    raw_material_id: number;
+    material_name: string;
+    production_method: "FIFO" | "LIFO" | string;
+    requested_quantity: number;
+    available_quantity: number;
+    can_fulfill: boolean;
+    lots: Array<{
+      source_movement_id: number;
+      movement_type: string;
+      movement_date: string | null;
+      expiry_date: string | null;
+      allocated_quantity: number;
+      remaining_before: number;
+      remaining_after: number;
+      unit_cost_usd: number;
+      unit_cost_riel: number;
+      line_cost_usd: number;
+      line_cost_riel: number;
+    }>;
+    message?: string | null;
+  };
+}
+
+export interface CreateRawMaterialScrapPayload {
+  source_movement_id: number;
+  quantity: number;
+  movement_date?: string;
+  reason?: string;
+  note?: string;
 }
 
 // Validation Errors

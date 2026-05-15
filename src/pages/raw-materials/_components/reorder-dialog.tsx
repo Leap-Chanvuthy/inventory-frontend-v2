@@ -26,13 +26,19 @@ import {
   ReorderRawMaterialPayload,
 } from "@/api/raw-materials/raw-material.types";
 import { AxiosError } from "axios";
+import { validateQuantityType } from "@/utils/uom-quantity";
 
 interface ReorderDialogProps {
   rawMaterialId: number;
   materialName: string;
+  quantityType?: "INTEGER" | "DECIMAL" | string;
 }
 
-export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProps) {
+export function ReorderDialog({
+  rawMaterialId,
+  materialName,
+  quantityType,
+}: ReorderDialogProps) {
   const reorderMutation = useReorderRawMaterial(rawMaterialId);
 
   const INITIAL_FORM = useMemo(
@@ -52,6 +58,7 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
   const fieldErrors = (
     reorderMutation.error as AxiosError<RawMaterialValidationErrors> | null
   )?.response?.data?.errors;
+  const quantityTypeError = validateQuantityType(form.quantity, quantityType);
 
   const resetForm = () => setForm(INITIAL_FORM);
 
@@ -64,8 +71,8 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
     const quantity = Number(form.quantity);
     const unitPrice = Number(form.unit_price_in_usd);
     const exchangeRate = Number(form.exchange_rate_from_usd_to_riel);
-    return quantity > 0 && unitPrice > 0 && exchangeRate > 0 && form.movement_date !== "";
-  }, [form]);
+    return quantity > 0 && unitPrice > 0 && exchangeRate > 0 && form.movement_date !== "" && !quantityTypeError;
+  }, [form, quantityTypeError]);
 
   const handleSubmit = () => {
     if (!isValid || reorderMutation.isPending) return;
@@ -122,6 +129,9 @@ export function ReorderDialog({ rawMaterialId, materialName }: ReorderDialogProp
               />
               {fieldErrors?.quantity?.[0] && (
                 <p className="text-xs text-destructive">{fieldErrors.quantity[0]}</p>
+              )}
+              {quantityTypeError && (
+                <p className="text-xs text-destructive">{quantityTypeError}</p>
               )}
             </div>
             

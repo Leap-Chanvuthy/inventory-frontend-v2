@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
-import { useProductStockLots } from "@/api/product/product.query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw } from "lucide-react";
+import { useRawMaterialStockLots } from "@/api/raw-materials/raw-material.query";
 import { DataTable } from "@/components/reusable/data-table/data-table";
 import {
-  PRODUCT_STOCK_LOT_COLUMNS,
-  renderProductStockLotHistory,
+  RAW_MATERIAL_STOCK_LOT_COLUMNS,
+  renderRawMaterialStockLotHistory,
 } from "../utils/stock-lot-table-feature";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,12 +20,15 @@ import {
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 
-interface ProductStockLotsTableProps {
-  productId: number;
-  saleMethod: "FIFO" | "LIFO";
+interface RawMaterialStockLotsTableProps {
+  rawMaterialId: number;
+  productionMethod?: string;
 }
 
-export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLotsTableProps) {
+export function RawMaterialStockLotsTable({
+  rawMaterialId,
+  productionMethod,
+}: RawMaterialStockLotsTableProps) {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -33,7 +36,7 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  const { data, isLoading, isError, isFetching, refetch } = useProductStockLots(productId, {
+  const { data, isLoading, isError, isFetching, refetch } = useRawMaterialStockLots(rawMaterialId, {
     include_children: true,
     include_disabled: true,
   });
@@ -53,9 +56,9 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
     const keyword = search.trim().toLowerCase();
 
     return lots.filter(lot => {
-      const normalizedStatus = String(lot.status || lot.lot_status || "").toUpperCase();
+      const normalizedStatus = String(lot.status || "").toUpperCase();
       const normalizedMovementType = String(lot.movement_type || "").toUpperCase();
-      const batchCode = String(lot.batch_code || `PM-${lot.id}`);
+      const batchCode = String(lot.batch_code || `RM-${lot.id}`);
       const haystack = [
         batchCode,
         normalizedStatus,
@@ -93,16 +96,18 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
     setPage(1);
   };
 
+  const method = String(productionMethod || summary?.production_method || "FIFO").toUpperCase() === "LIFO" ? "LIFO" : "FIFO";
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle className="text-base">Product Stock Batches</CardTitle>
+            <CardTitle className="text-base">Raw Material Stock Batches</CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
-              {saleMethod === "LIFO"
-                ? "LIFO: newest batch is consumed first."
-                : "FIFO: oldest batch is consumed first."}
+              {method === "LIFO"
+                ? "LIFO: newest raw material batch is used first during production."
+                : "FIFO: oldest raw material batch is used first during production."}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -120,16 +125,16 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
             <p className="text-lg font-semibold">{Number(summary?.available_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
-            <p className="text-xs text-muted-foreground">Original Qty</p>
-            <p className="text-lg font-semibold">{Number(summary?.total_original_quantity ?? 0).toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground">Total Batches</p>
+            <p className="text-lg font-semibold">{Number(summary?.total_batches ?? lots.length)}</p>
           </div>
           <div className="rounded-lg border p-3">
-            <p className="text-xs text-muted-foreground">Sold Qty</p>
-            <p className="text-lg font-semibold">{Number(summary?.total_sold_quantity ?? 0).toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground">Used In Production</p>
+            <p className="text-lg font-semibold">{Number(summary?.used_in_production_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
             <p className="text-xs text-muted-foreground">Scrapped Qty</p>
-            <p className="text-lg font-semibold">{Number(summary?.total_scrapped_quantity ?? 0).toFixed(2)}</p>
+            <p className="text-lg font-semibold">{Number(summary?.scrapped_quantity ?? 0).toFixed(2)}</p>
           </div>
           <div className="rounded-lg border p-3">
             <p className="text-xs text-muted-foreground">Expired Qty</p>
@@ -215,7 +220,7 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
             </div>
 
             <DataTable
-              columns={PRODUCT_STOCK_LOT_COLUMNS(
+              columns={RAW_MATERIAL_STOCK_LOT_COLUMNS(
                 expanded,
                 lotId => setExpanded(prev => ({ ...prev, [lotId]: !prev[lotId] })),
               )}
@@ -226,7 +231,7 @@ export function ProductStockLotsTable({ productId, saleMethod }: ProductStockLot
               emptyText="No stock batches found."
               expandableRow={{
                 isExpanded: lot => !!expanded[lot.id],
-                render: lot => renderProductStockLotHistory(lot),
+                render: lot => renderRawMaterialStockLotHistory(lot),
               }}
             />
 

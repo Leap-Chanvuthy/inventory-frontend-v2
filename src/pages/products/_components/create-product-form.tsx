@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Package, PlusCircle } from "lucide-react";
+import { Package, PlusCircle } from "lucide-react";
 import { useRawMaterials } from "@/api/raw-materials/raw-material.query";
 import { RawMaterial } from "@/api/raw-materials/raw-material.types";
 
@@ -27,12 +27,14 @@ import { useSingleProductCategory } from "@/api/categories/product-categories/pr
 import { useSingleUomCategory } from "@/api/uom/uom.query";
 
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
+import { MultiImageUpload } from "@/components/reusable/partials/multiple-image-upload";
 import {
   TextInput,
   TextAreaInput,
   DatePickerInput,
   SelectInput,
 } from "@/components/reusable/partials/input";
+import { DataTable } from "@/components/reusable/data-table/data-table";
 import { SearchableSelect } from "@/components/reusable/partials/searchable-select";
 import { Text } from "@/components/ui/text/app-text";
 import { Button } from "@/components/ui/button";
@@ -40,6 +42,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { uploadProductImages } from "@/api/product/product.api";
+import { buildBomEditorColumns } from "../utils/bom-editor-table-feature";
 
 type BOMEntry = {
   raw_material: RawMaterial;
@@ -84,6 +88,7 @@ const initialBaseForm = {
   warehouse_id: "",
   sale_method: "",
   movement_date: "",
+  expiry_date: "",
   note: "",
 };
 
@@ -145,6 +150,8 @@ export const CreateProductForm = () => {
   const [base, setBase] = useState(initialBaseForm);
   const [external, setExternal] = useState(initialExternalForm);
   const [internal, setInternal] = useState(initialInternalForm);
+  const [productImages, setProductImages] = useState<File[]>([]);
+  const [uploaderKey, setUploaderKey] = useState(0);
   const [bomEntries, setBomEntries] = useState<BOMEntry[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const productionQuantity = Number(internal.quantity) || 0;
@@ -275,6 +282,63 @@ export const CreateProductForm = () => {
     return rowErrors;
   }, [bomEntries, fieldErrors]);
 
+  const bomTableRows = useMemo(() => {
+    return bomEntries.map((entry, idx) => {
+      const stockErr = stockErrors?.find(
+        e => e.raw_material_id === entry.raw_material.id,
+      );
+      const unitLabel =
+        entry.raw_material.uom?.symbol || entry.raw_material.uom_name || "";
+      const qtyPerUnit = Number(entry.quantity_per_unit) || 0;
+      const scrapPercentage = Number(entry.scrap_percentage) || 0;
+      const quantityType = getRawMaterialQuantityType(entry.raw_material);
+      const qtyTypeErr = bomIntegerQtyErrors[entry.raw_material.id];
+      const rowApiErrors = bomRowApiErrors[entry.raw_material.id] ?? {
+        quantity: [],
+        scrap: [],
+        general: [],
+      };
+      const quantityErrorMessages = Array.from(
+        new Set([...(qtyTypeErr ? [qtyTypeErr] : []), ...rowApiErrors.quantity]),
+      );
+      const stockErrorMessage = stockErr
+        ? `Need ${stockErr.required_qty}, only ${stockErr.available_qty} available`
+        : undefined;
+      const requiredQty = qtyPerUnit * productionQuantity;
+      const scrapQty = (requiredQty * scrapPercentage) / 100;
+      const totalUse = requiredQty + scrapQty;
+
+      return {
+        raw_material_id: entry.raw_material.id,
+        index: idx,
+        material_name: entry.raw_material.material_name,
+        material_sku_code: entry.raw_material.material_sku_code,
+        quantity_type: quantityType,
+        unit_label: unitLabel,
+        quantity_per_unit: String(entry.quantity_per_unit),
+        scrap_percentage: String(entry.scrap_percentage),
+        required_qty: requiredQty,
+        scrap_qty: scrapQty,
+        total_use: totalUse,
+        available_qty:
+          (entry.raw_material as any).current_qty_in_stock != null
+            ? Number((entry.raw_material as any).current_qty_in_stock)
+            : null,
+        quantity_errors: quantityErrorMessages,
+        scrap_errors: rowApiErrors.scrap,
+        general_errors: rowApiErrors.general,
+        stock_error: stockErrorMessage,
+        can_edit: true,
+      };
+    });
+  }, [
+    bomEntries,
+    stockErrors,
+    bomIntegerQtyErrors,
+    bomRowApiErrors,
+    productionQuantity,
+  ]);
+
   const [rmSearch, setRmSearch] = useState("");
   const [rmPage, setRmPage] = useState(1);
   const rmLastPageRef = useRef(1);
@@ -376,10 +440,21 @@ export const CreateProductForm = () => {
       warehouse_id: Number(base.warehouse_id),
       sale_method: base.sale_method,
       movement_date: base.movement_date || undefined,
+      expiry_date: base.expiry_date || undefined,
       note: base.note || undefined,
     };
 
-    const onSuccess = () => {
+    const onSuccess = async (response: any) => {
+      const createdProductId = response?.data?.product?.id;
+      if (createdProductId && productImages.length > 0) {
+        const formData = new FormData();
+        productImages.forEach(file => formData.append("images[]", file));
+        await uploadProductImages(createdProductId, formData);
+      }
+
+      setProductImages([]);
+      setUploaderKey(prev => prev + 1);
+
       if (action === "save_and_close") {
         navigate("/products");
       } else {
@@ -745,217 +820,20 @@ export const CreateProductForm = () => {
                         </div>
                       ) : (
                         <div className="rounded-xl border">
-                          <div className="overflow-x-auto">
-                            <table className="w-full min-w-[1200px] text-sm whitespace-nowrap">
-                            <thead>
-                              <tr className="border-b bg-muted/50">
-                                <th className="whitespace-nowrap text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                  Material
-                                </th>
-                                <th className="whitespace-nowrap text-left px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-56">
-                                  Qty / Unit
-                                </th>
-                                <th className="whitespace-nowrap text-left px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-44">
-                                  Scrap %
-                                </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
-                                  Required
-                                </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
-                                  Scrap Qty
-                                </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
-                                  Total Use
-                                </th>
-                                <th className="whitespace-nowrap text-right px-3 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground w-36">
-                                  Available
-                                </th>
-                                <th className="w-12 px-4 py-3" />
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-border">
-                              {bomEntries.map((entry, idx) => {
-                                const stockErr = stockErrors?.find(
-                                  e =>
-                                    e.raw_material_id === entry.raw_material.id,
-                                );
-                                const unitLabel =
-                                  entry.raw_material.uom?.symbol ||
-                                  entry.raw_material.uom_name ||
-                                  "";
-                                const qtyPerUnit =
-                                  Number(entry.quantity_per_unit) || 0;
-                                const scrapPercentage =
-                                  Number(entry.scrap_percentage) || 0;
-                                const quantityType = getRawMaterialQuantityType(
-                                  entry.raw_material,
-                                );
-                                const qtyTypeErr =
-                                  bomIntegerQtyErrors[entry.raw_material.id];
-                                const rowApiErrors =
-                                  bomRowApiErrors[entry.raw_material.id] ?? {
-                                    quantity: [],
-                                    scrap: [],
-                                    general: [],
-                                  };
-                                const quantityErrorMessages = Array.from(
-                                  new Set([
-                                    ...(qtyTypeErr ? [qtyTypeErr] : []),
-                                    ...rowApiErrors.quantity,
-                                  ]),
-                                );
-                                const stockErrorMessage = stockErr
-                                  ? `Need ${stockErr.required_qty}, only ${stockErr.available_qty} available`
-                                  : undefined;
-                                const hasRowError = Boolean(
-                                  quantityErrorMessages.length ||
-                                    stockErrorMessage ||
-                                    rowApiErrors.scrap.length ||
-                                    rowApiErrors.general.length,
-                                );
-                                const requiredQty =
-                                  qtyPerUnit * productionQuantity;
-                                const scrapQty =
-                                  (requiredQty * scrapPercentage) / 100;
-                                const totalUse = requiredQty + scrapQty;
-
-                                return (
-                                  <tr
-                                    key={entry.raw_material.id}
-                                    className={`group transition-colors ${
-                                      hasRowError
-                                        ? "bg-destructive/5 hover:bg-destructive/10 border-l-2 border-destructive/70"
-                                        : idx % 2 === 0
-                                          ? "bg-background hover:bg-muted/30"
-                                          : "bg-muted/10 hover:bg-muted/30"
-                                    }`}
-                                  >
-                                    <td className="px-4 py-3">
-                                      <div className="flex items-center gap-2">
-                                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-bold text-muted-foreground">
-                                          {idx + 1}
-                                        </div>
-                                        <div>
-                                          <p className="font-medium text-foreground text-sm">
-                                            {entry.raw_material.material_name}
-                                          </p>
-                                          <p className="text-xs text-muted-foreground">
-                                            {entry.raw_material.material_sku_code}
-                                          </p>
-                                          {quantityType === "INTEGER" && (
-                                            <p className="text-xs text-muted-foreground">
-                                              UOM type: INTEGER
-                                            </p>
-                                          )}
-                                          {quantityErrorMessages.map(message => (
-                                            <p
-                                              key={`qty-${entry.raw_material.id}-${message}`}
-                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
-                                            >
-                                              {message}
-                                            </p>
-                                          ))}
-                                          {rowApiErrors.scrap.map(message => (
-                                            <p
-                                              key={`scrap-${entry.raw_material.id}-${message}`}
-                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
-                                            >
-                                              {message}
-                                            </p>
-                                          ))}
-                                          {rowApiErrors.general.map(message => (
-                                            <p
-                                              key={`general-${entry.raw_material.id}-${message}`}
-                                              className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive"
-                                            >
-                                              {message}
-                                            </p>
-                                          ))}
-                                          {stockErrorMessage && (
-                                            <p className="mt-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">
-                                              {stockErrorMessage}
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </td>
-
-                                    <td className="px-3 py-3">
-                                      <TextInput
-                                        id={`qty_${entry.raw_material.id}`}
-                                        label=""
-                                        value={entry.quantity_per_unit}
-                                        onChange={e =>
-                                          updateBOMQty(
-                                            entry.raw_material.id,
-                                            e.target.value,
-                                          )
-                                        }
-                                        error={quantityErrorMessages[0] ?? (stockErrorMessage ? " " : undefined)}
-                                        isNumberOnly
-                                      />
-                                    </td>
-
-                                    <td className="px-3 py-3">
-                                      <TextInput
-                                        id={`scrap_${entry.raw_material.id}`}
-                                        label=""
-                                        value={entry.scrap_percentage}
-                                        onChange={e =>
-                                          updateBOMScrap(
-                                            entry.raw_material.id,
-                                            e.target.value,
-                                          )
-                                        }
-                                        error={rowApiErrors.scrap[0]}
-                                        isNumberOnly
-                                      />
-                                    </td>
-
-                                    <td className="px-3 py-3 text-right text-xs font-medium">
-                                      {requiredQty.toFixed(2)} {unitLabel}
-                                    </td>
-                                    <td className="px-3 py-3 text-right text-xs font-medium">
-                                      {scrapQty.toFixed(2)} {unitLabel}
-                                    </td>
-                                    <td className="px-3 py-3 text-right text-sm font-semibold">
-                                      {totalUse.toFixed(2)} {unitLabel}
-                                    </td>
-
-                                    <td className="px-3 py-3 text-right">
-                                      <div className="text-sm font-medium">
-                                        {(entry.raw_material as any)
-                                          .current_qty_in_stock != null
-                                          ? `${Number((entry.raw_material as any).current_qty_in_stock).toString()} ${unitLabel}`
-                                          : "-"}
-                                      </div>
-                                    </td>
-
-                                    <td className="px-4 py-3">
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-                                        onClick={() =>
-                                          setBomEntries(p =>
-                                            p.filter(
-                                              e =>
-                                                e.raw_material.id !==
-                                                entry.raw_material.id,
-                                            ),
-                                          )
-                                        }
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </Button>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                            </table>
-                          </div>
+                          <DataTable
+                            columns={buildBomEditorColumns({
+                              onQtyChange: updateBOMQty,
+                              onScrapChange: updateBOMScrap,
+                              onRemove: rawMaterialId =>
+                                setBomEntries(prev =>
+                                  prev.filter(
+                                    item => item.raw_material.id !== rawMaterialId,
+                                  ),
+                                ),
+                            })}
+                            data={bomTableRows}
+                            emptyText="No materials linked yet."
+                          />
                         </div>
                       )}
                       {bomApiValidationMessages.length > 0 && (
@@ -1017,6 +895,13 @@ export const CreateProductForm = () => {
                     onChange={v => setBase(p => ({ ...p, movement_date: v }))}
                     error={fieldErrors?.movement_date?.[0]}
                   />
+                  <DatePickerInput
+                    id="expiry_date"
+                    label="Stock Expiry Date"
+                    value={base.expiry_date}
+                    onChange={v => setBase(p => ({ ...p, expiry_date: v }))}
+                    error={fieldErrors?.expiry_date?.[0]}
+                  />
                 </CardContent>
               </Card>
 
@@ -1073,6 +958,23 @@ export const CreateProductForm = () => {
                   </CardContent>
                 </Card>
               )}
+
+              <Card>
+                <CardHeader className="pb-4">
+                  <SectionHeader
+                    title="Product Images"
+                    description="Upload up to 4 images for this product."
+                  />
+                </CardHeader>
+                <Separator />
+                <CardContent className="pt-5">
+                  <MultiImageUpload
+                    key={uploaderKey}
+                    onChange={setProductImages}
+                    maxImages={4}
+                  />
+                </CardContent>
+              </Card>
             </div>
           </div>
 

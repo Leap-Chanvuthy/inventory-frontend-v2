@@ -93,6 +93,19 @@ export function ViewMovementDialog({
         ]
       : []),
     { label: "Movement Date", value: formatDate(mv.movement_date) },
+    { label: "Expiry Date", value: formatDate(mv.expiry_date) },
+    {
+      label: "Expiry Status",
+      value: (() => {
+        if (!mv.expiry_date) return "No Expiry";
+        const exp = new Date(mv.expiry_date);
+        if (Number.isNaN(exp.getTime())) return "No Expiry";
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        exp.setHours(0, 0, 0, 0);
+        return exp < today ? "EXPIRED" : "VALID";
+      })(),
+    },
     { label: "Created By", value: createdByName },
     ...(mv.note ? [{ label: "Note", value: mv.note }] : []),
   ];

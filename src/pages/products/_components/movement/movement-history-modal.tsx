@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,15 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  Pencil,
-  Eye,
-} from "lucide-react";
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
-import DeleteModal from "@/components/reusable/partials/delete-modal";
-import { formatDate } from "@/utils/date-format";
 import { ProductMovement } from "@/api/product/product.type";
 import { useProductMovements } from "@/api/product/product.query";
 import {
@@ -33,6 +24,8 @@ import { ViewMovementDialog } from "./view-movement-dialog";
 import { EditMovementDialog } from "./edit-movement-dialog";
 import { ViewScrapDialog } from "./view-scrap-dialog";
 import { EditScrapDialog } from "./edit-scrap-dialog";
+import { DataTable } from "@/components/reusable/data-table/data-table";
+import { buildProductMovementColumns } from "./table-feature";
 
 const MOVEMENT_TYPE_OPTIONS = [
   { value: "", label: "All Types" },
@@ -63,18 +56,6 @@ export function MovementHistoryModal({
   open,
   onClose,
 }: MovementHistoryModalProps) {
-  const formatQuantity = (quantity: string | number) => Number(quantity ?? 0).toFixed(2);
-  const getLotStatusLabel = (mv: ProductMovement) => {
-    if (mv.direction !== "IN") return "OUT";
-    const qty = Number(mv.quantity ?? 0);
-    const remaining = Number(mv.remaining_quantity ?? 0);
-    if (remaining <= 0) return "SOLD_OUT";
-    if (remaining < qty) return "PARTIALLY_SOLD";
-    return "AVAILABLE";
-  };
-  const getCreatedByName = (createdBy: ProductMovement["created_by"]) =>
-    createdBy && typeof createdBy === "object" ? createdBy.name : "—";
-
   const isInternal = productType === "INTERNAL_PRODUCED";
   const deleteInternalReorderMutation = useDeleteInternalReorderMovement(productId);
   const deleteExternalReorderMutation = useDeleteExternalReorderMovement(productId);
@@ -106,6 +87,13 @@ export function MovementHistoryModal({
 
   const movements: ProductMovement[] = data?.data ?? [];
   const lastPage = data?.last_page ?? 1;
+  const columns = buildProductMovementColumns({
+    onViewMovement: mv => setViewingMovement(mv),
+    onEditMovement: mv => setEditingMovement(mv),
+    onDeleteMovement: movementId => deleteMutation.mutate(movementId),
+    onViewScrap: mv => setViewingScrap(mv),
+    onEditScrap: mv => setEditingScrap(mv),
+  });
 
   const handleClose = () => {
     setPage(1);
@@ -198,167 +186,14 @@ export function MovementHistoryModal({
 
           {/* Table */}
           <div className="flex-1 overflow-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 sticky top-0">
-                <tr>
-                  {[
-                    "Type",
-                    "Dir",
-                    "Qty",
-                    "Remaining",
-                    "Sell (USD)",
-                    "Lot Status",
-                    "Date",
-                    "By",
-                    "Action",
-                  ].map((h, i) => (
-                    <th
-                      key={i}
-                      className="text-left px-3 py-3 text-xs font-semibold text-muted-foreground whitespace-nowrap"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      className="px-3 py-10 text-center text-sm text-muted-foreground"
-                    >
-                      Loading...
-                    </td>
-                  </tr>
-                ) : movements.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      className="px-3 py-10 text-center text-sm text-muted-foreground"
-                    >
-                      No movements found
-                    </td>
-                  </tr>
-                ) : (
-                  movements.map(mv => (
-                    <tr
-                      key={mv.id}
-                      className="border-t hover:bg-muted/30 transition-colors"
-                    >
-                      <td className="px-3 py-3">
-                        <Badge
-                          variant="outline"
-                          className="text-xs whitespace-nowrap"
-                        >
-                          {mv.movement_type.replace(/_/g, " ")}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span
-                          className={`inline-flex items-center gap-1 text-xs font-semibold ${mv.direction === "IN" ? "text-green-600" : "text-red-600"}`}
-                        >
-                          {mv.direction === "IN" ? (
-                            <ArrowDownToLine className="h-3.5 w-3.5" />
-                          ) : (
-                            <ArrowUpFromLine className="h-3.5 w-3.5" />
-                          )}
-                          {mv.direction}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 font-semibold">
-                        {formatQuantity(mv.quantity)}
-                      </td>
-                      <td className="px-3 py-3 font-semibold">
-                        {formatQuantity(mv.remaining_quantity ?? 0)}
-                      </td>
-                      <td className="px-3 py-3">
-                        ${mv.selling_unit_price_in_usd.toLocaleString()}
-                      </td>
-                      <td className="px-3 py-3">
-                        <Badge
-                          variant="outline"
-                          className={
-                            getLotStatusLabel(mv) === "SOLD_OUT"
-                              ? "border-red-500 text-red-600 text-xs"
-                              : getLotStatusLabel(mv) === "PARTIALLY_SOLD"
-                                ? "border-amber-500 text-amber-600 text-xs"
-                                : getLotStatusLabel(mv) === "AVAILABLE"
-                                  ? "border-green-500 text-green-600 text-xs"
-                                  : "text-xs"
-                          }
-                        >
-                          {getLotStatusLabel(mv).replace(/_/g, " ")}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                        {formatDate(mv.movement_date)}
-                      </td>
-                      <td className="px-3 py-3 text-muted-foreground text-xs whitespace-nowrap">
-                        {getCreatedByName(mv.created_by)}
-                      </td>
-                      <td className="px-3 py-3">
-                        {mv.movement_type.replace(/_/g, "").includes("REORDER") && (
-                          <div className="flex items-center gap-1">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-teal-600 hover:bg-teal-50"
-                              onClick={() => setViewingMovement(mv)}
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </Button>
-                            {!mv.is_sold && (
-                              <>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
-                                  onClick={() => setEditingMovement(mv)}
-                                >
-                                  <Pencil className="w-3.5 h-3.5" />
-                                </Button>
-                                <DeleteModal
-                                  heading="Delete Movement"
-                                  subheading="Are you sure you want to delete this reorder movement? This action cannot be undone."
-                                  onDelete={() => deleteMutation.mutate(mv.id)}
-                                />
-                              </>
-                            )}
-                          </div>
-                        )}
-                        {mv.movement_type === "SCRAP" && (
-                          <div className="flex items-center gap-1">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-muted-foreground hover:text-teal-600 hover:bg-teal-50"
-                              onClick={() => setViewingScrap(mv)}
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </Button>
-                            {!mv.is_sold && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
-                                onClick={() => setEditingScrap(mv)}
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <DataTable
+              columns={columns}
+              data={movements}
+              isLoading={isLoading}
+              loadingVariant="text"
+              loadingText="Loading..."
+              emptyText="No movements found"
+            />
           </div>
 
           {/* Pagination */}

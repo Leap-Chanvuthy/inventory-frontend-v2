@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQueries } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,10 +20,12 @@ import {
   useUpdateInternalReorderMovement,
 } from "@/api/product/product.mutation";
 import { useInternalReorderMovement } from "@/api/product/product.query";
+import { previewRawMaterialProductionAllocation } from "@/api/raw-materials/raw-material.api";
 import {
   ReorderExternalFormState,
   ReorderInternalBomEntry,
   ReorderInternalFormState,
+  ReorderInternalAllocationPreviewRow,
   ReorderProductForm,
 } from "../reorder-product-form";
 
@@ -53,6 +56,9 @@ const buildExternalFormState = (
   movement_date: movement.movement_date
     ? movement.movement_date.substring(0, 10)
     : "",
+  expiry_date: movement.expiry_date
+    ? movement.expiry_date.substring(0, 10)
+    : "",
   note: movement.note ?? "",
 });
 
@@ -67,6 +73,9 @@ const buildInternalFormState = (
   ),
   movement_date: movement.movement_date
     ? movement.movement_date.substring(0, 10)
+    : "",
+  expiry_date: movement.expiry_date
+    ? movement.expiry_date.substring(0, 10)
     : "",
   note: movement.note ?? "",
 });
@@ -188,6 +197,58 @@ export function EditMovementDialog({
     );
   };
 
+  const productionQuantity = Number(internal.quantity) || 0;
+  const allocationRequests = useMemo(
+    () =>
+      internalBomEntries
+        .map(entry => {
+          const requiredQty = Number(entry.quantity_per_unit || 0) * productionQuantity;
+          const scrapQty = (requiredQty * Number(entry.scrap_percentage || 0)) / 100;
+          return {
+            raw_material_id: entry.raw_material_id,
+            raw_material_name: entry.name,
+            requested_quantity: Number((requiredQty + scrapQty).toFixed(4)),
+          };
+        })
+        .filter(entry => entry.requested_quantity > 0),
+    [internalBomEntries, productionQuantity],
+  );
+
+  const allocationQueries = useQueries({
+    queries: allocationRequests.map(request => ({
+      queryKey: [
+        "edit-reorder-internal-rm-allocation-preview",
+        productId,
+        movement.id,
+        request.raw_material_id,
+        request.requested_quantity,
+      ],
+      queryFn: () =>
+        previewRawMaterialProductionAllocation(
+          request.raw_material_id,
+          request.requested_quantity,
+        ),
+      enabled: open && isInternal && request.requested_quantity > 0,
+      staleTime: 0,
+    })),
+  });
+
+  const allocationPreviewRows = useMemo<ReorderInternalAllocationPreviewRow[]>(
+    () =>
+      allocationRequests.map((request, index) => {
+        const query = allocationQueries[index];
+        return {
+          raw_material_id: request.raw_material_id,
+          raw_material_name: request.raw_material_name,
+          requested_quantity: request.requested_quantity,
+          is_loading: query?.isLoading ?? false,
+          error_message: query?.isError ? "Failed to load lot preview." : null,
+          preview: query?.data?.data,
+        };
+      }),
+    [allocationQueries, allocationRequests],
+  );
+
   const handleSubmit = () => {
     if (isPending) return;
 
@@ -196,6 +257,7 @@ export function EditMovementDialog({
 
       const payload: ReorderInternalManufacturingPayload = {
         movement_date: internal.movement_date,
+        expiry_date: internal.expiry_date || undefined,
         product_status: internal.product_status,
         quantity: Number(internal.quantity),
         selling_unit_price_in_usd: Number(internal.selling_unit_price_in_usd),
@@ -221,6 +283,7 @@ export function EditMovementDialog({
 
     const payload: ReorderExternalPurchasePayload = {
       movement_date: external.movement_date,
+      expiry_date: external.expiry_date || undefined,
       quantity: Number(external.quantity),
       purchase_unit_price_in_usd: Number(external.purchase_unit_price_in_usd),
       exchange_rate_from_usd_to_riel: Number(
@@ -251,6 +314,7 @@ export function EditMovementDialog({
           internal={internal}
           external={external}
           bomEntries={internalBomEntries}
+          allocationPreviewRows={allocationPreviewRows}
           onInternalFieldChange={handleInternalFieldChange}
           onExternalFieldChange={handleExternalFieldChange}
           onInternalBomScrapChange={updateInternalBomScrap}

@@ -125,10 +125,12 @@ export function ViewProductForm() {
                 productName={product.product_name}
                 productType={product.product_type}
                 productRawMaterials={product.product_raw_materials}
+                quantityType={product.base_uom?.category?.quantity_type}
               />
               <ScrapDialog
                 productId={product.id}
                 productName={product.product_name}
+                quantityType={product.base_uom?.category?.quantity_type}
               />
             </div>
           }
@@ -195,6 +197,68 @@ export function ViewProductForm() {
           iconBg="bg-indigo-50 dark:bg-indigo-950"
         />
       </div>
+
+      {product.base_uom?.category?.unit_of_measurements &&
+        product.base_uom.category.unit_of_measurements.length > 0 && (
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-base">
+                Product Quantity Based on UOM Conversion Factor
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Available stock is converted across all units in the{" "}
+                <span className="font-medium">
+                  {product.base_uom?.category?.name ?? "selected"}
+                </span>{" "}
+                category. The highlighted unit is the base UOM.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {[...product.base_uom.category.unit_of_measurements]
+                  .sort((a, b) => {
+                    const aIsBase = Number(a.id) === Number(product.base_uom?.id);
+                    const bIsBase = Number(b.id) === Number(product.base_uom?.id);
+                    if (aIsBase === bIsBase) {
+                      return Number(b.conversion_factor || 0) - Number(a.conversion_factor || 0);
+                    }
+                    return aIsBase ? -1 : 1;
+                  })
+                  .map(unit => {
+                    const conversionFactor = Number(unit.conversion_factor || 1);
+                    const availableQty = Number(detail?.available_qty_in_stock ?? detail?.current_qty_in_stock ?? 0);
+                    const equivalentQty = conversionFactor > 0 ? availableQty / conversionFactor : 0;
+                    const isBase = Number(unit.id) === Number(product.base_uom?.id);
+
+                    return (
+                      <div key={unit.id} className="rounded-lg border p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium">
+                            {unit.name}
+                            {unit.symbol ? ` (${unit.symbol})` : ""}
+                          </p>
+                          {isBase && (
+                            <Badge variant="outline" className="border-blue-500 text-blue-600">
+                              Base
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Conversion factor: {conversionFactor.toLocaleString()}
+                        </p>
+                        <p className="text-base font-semibold mt-2">
+                          {equivalentQty.toLocaleString(undefined, {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 4,
+                          })}
+                        </p>
+                      </div>
+                    );
+                  })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* ── Product Information ── */}
       <Card>
@@ -377,13 +441,56 @@ export function ViewProductForm() {
 
       <ProductStockLotsTable productId={product.id} saleMethod={saleMethod} />
 
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-base">Product Images</CardTitle>
+            <Badge variant="outline">
+              Total: {(product.product_images || []).length}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {(product.product_images || []).length === 0 ? (
+            <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
+              No product images uploaded yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {(product.product_images || []).map(image => (
+                <div
+                  key={image.id}
+                  className="rounded-lg border overflow-hidden bg-card"
+                >
+                  <div className="relative h-40 bg-muted/30">
+                    <img
+                      src={image.image}
+                      alt={`product-${image.id}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {image.is_primary && (
+                      <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-500 text-white border-0">
+                        Primary
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* ── BOM & Movement History row ── */}
-      <div
+      {/* <div
         className={isInternal ? "grid grid-cols-1 lg:grid-cols-2 gap-6" : ""}
-      >
+      > */}
         {/* Bill of Materials (internal only) */}
         {isInternal && (
-          <ProductBomCard rawMaterials={product.product_raw_materials} />
+          <ProductBomCard
+            productId={product.id}
+            rawMaterials={product.product_raw_materials}
+          />
         )}
 
         {/* Movement History */}
@@ -391,7 +498,7 @@ export function ViewProductForm() {
           productId={product.id}
           productType={product.product_type}
         />
-      </div>
+      {/* </div> */}
     </div>
   );
 }

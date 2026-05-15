@@ -4,6 +4,9 @@ import {
   getRawMaterialById,
   getDeletedRawMaterials,
   getRawMaterialMovements,
+  getRawMaterialStockLots,
+  getRawMaterialScrapEligibleStockLots,
+  previewRawMaterialProductionAllocation,
 } from "./raw-material.api";
 import { RawMaterialQueryParams, StockMovementsQueryParams } from "./raw-material.types";
 
@@ -35,6 +38,41 @@ export const useRawMaterialMovements = (
     queryFn: () => getRawMaterialMovements(rawMaterialId, params),
     enabled: !!rawMaterialId,
     placeholderData: keepPreviousData,
+  });
+};
+
+export const useRawMaterialStockLots = (
+  rawMaterialId: number,
+  params?: { include_children?: boolean; include_disabled?: boolean },
+) => {
+  return useQuery({
+    queryKey: ["raw-material-stock-lots", rawMaterialId, params],
+    queryFn: () => getRawMaterialStockLots(rawMaterialId, params),
+    enabled: !!rawMaterialId,
+  });
+};
+
+export const useRawMaterialScrapEligibleStockLots = (
+  rawMaterialId: number,
+  includeDisabled = true,
+) => {
+  return useQuery({
+    queryKey: ["raw-material-scrap-eligible-stock-lots", rawMaterialId, includeDisabled],
+    queryFn: () => getRawMaterialScrapEligibleStockLots(rawMaterialId, { include_disabled: includeDisabled }),
+    enabled: !!rawMaterialId,
+  });
+};
+
+export const useRawMaterialProductionAllocationPreview = (
+  rawMaterialId: number,
+  quantity: number,
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: ["raw-material-production-allocation-preview", rawMaterialId, quantity],
+    queryFn: () => previewRawMaterialProductionAllocation(rawMaterialId, quantity),
+    enabled: enabled && rawMaterialId > 0 && quantity > 0,
+    staleTime: 0,
   });
 };
 

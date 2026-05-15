@@ -96,6 +96,7 @@ export const UpdateRawMaterialForm = () => {
     movement_date: "",
     note: "",
   });
+  const [uploaderKey, setUploaderKey] = useState(0);
 
   const [dropdownError, setDropdownError] = useState(false);
   const [, setUomValidationError] = useState<string>("");
@@ -304,6 +305,8 @@ export const UpdateRawMaterialForm = () => {
 
     updateMutation.mutate(payload, {
       onSuccess: () => {
+        setForm(prev => ({ ...prev, images: [] }));
+        setUploaderKey(prev => prev + 1);
         if (action === "save_and_close") {
           navigate("/raw-materials");
         }
@@ -616,7 +619,11 @@ export const UpdateRawMaterialForm = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Add more images (max 4 total across existing + new).
               </p>
-              <MultiImageUpload onChange={handleImagesChange} maxImages={4} />
+              <MultiImageUpload
+                key={uploaderKey}
+                onChange={handleImagesChange}
+                maxImages={4}
+              />
             </div>
 
             <SelectableImageDelete

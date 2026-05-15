@@ -57,7 +57,7 @@ export function StockMovementsTable({
 }: StockMovementsTableProps) {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [sort, setSort] = useState("-movement_date");
+  const [sort, setSort] = useState("-created_at");
   const [movementType, setMovementType] = useState("ALL");
   const [direction, setDirection] = useState("ALL");
 
@@ -100,11 +100,6 @@ export function StockMovementsTable({
             </CardTitle>
             <CardDescription className="mt-1">
               Recent inventory activity and price logs
-            </CardDescription>
-            <CardDescription>
-              <span className="font-bold text-red-500">*</span> Reorder stock
-              quantity which is not already in use for production are allowed to
-              update to ensure stock quantity consistency.
             </CardDescription>
           </div>
           {!isLoading && (

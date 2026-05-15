@@ -60,6 +60,7 @@ export const CreateRawMaterialForm = () => {
   };
 
   const [form, setForm] = useState(initialForm);
+  const [uploaderKey, setUploaderKey] = useState(0);
   const [dropdownError, setDropdownError] = useState(false);
   const [uomValidationError, setUomValidationError] = useState<string>("");
   const handleDropdownError = useCallback(() => setDropdownError(true), []);
@@ -209,6 +210,7 @@ export const CreateRawMaterialForm = () => {
 
     rawMaterialMutation.mutate(payload, {
       onSuccess: () => {
+        setUploaderKey(prev => prev + 1);
         if (action === "save_and_close") {
           navigate("/raw-materials");
         } else {
@@ -513,6 +515,7 @@ export const CreateRawMaterialForm = () => {
                 <Separator />
                 <CardContent className="pt-6">
                   <MultiImageUpload
+                    key={uploaderKey}
                     onChange={handleImagesChange}
                     maxImages={3}
                   />

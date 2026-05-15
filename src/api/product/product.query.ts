@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
-import { getProducts, getProductById, getTrashedProducts, getInternalReorderMovement, getExternalReorderMovement, getProductMovements, getProductPnLDetailed, getProductStockLots, getScrapMovement, previewProductSaleAllocation } from "./product.api";
+import { getProducts, getProductById, getTrashedProducts, getInternalReorderMovement, getExternalReorderMovement, getProductMovements, getProductPnLDetailed, getProductStockLots, getProductScrapEligibleStockLots, getProductBomSummary, getProductMovementBomSummary, getScrapMovement, previewProductSaleAllocation } from "./product.api";
 import { ProductQueryParams, ProductMovementQueryParams, ProductStockLotQueryParams } from "./product.type";
 
 export const useProducts = (params?: ProductQueryParams) => {
@@ -63,11 +63,38 @@ export const useProductStockLots = (
   });
 };
 
+export const useProductScrapEligibleStockLots = (
+  productId: number,
+  includeDisabled = true,
+) => {
+  return useQuery({
+    queryKey: ["product-scrap-eligible-stock-lots", productId, includeDisabled],
+    queryFn: () => getProductScrapEligibleStockLots(productId, { include_disabled: includeDisabled }),
+    enabled: !!productId,
+  });
+};
+
 export const useProductPnLDetailed = (productId: number) => {
   return useQuery({
     queryKey: ["product-pnl-detailed", productId],
     queryFn: () => getProductPnLDetailed(productId),
     enabled: !!productId,
+  });
+};
+
+export const useProductBomSummary = (productId: number) => {
+  return useQuery({
+    queryKey: ["product-bom-summary", productId],
+    queryFn: () => getProductBomSummary(productId),
+    enabled: !!productId,
+  });
+};
+
+export const useProductMovementBomSummary = (productId: number, movementId: number) => {
+  return useQuery({
+    queryKey: ["product-bom-summary-movement", productId, movementId],
+    queryFn: () => getProductMovementBomSummary(productId, movementId),
+    enabled: !!productId && !!movementId,
   });
 };
 

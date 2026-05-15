@@ -11,6 +11,9 @@ import {
   ReorderRawMaterialResponse,
   StockMovementsQueryParams,
   PaginatedStockMovementsResponse,
+  RawMaterialStockLotsResponse,
+  RawMaterialAllocationPreviewResponse,
+  CreateRawMaterialScrapPayload,
 } from "./raw-material.types";
 
 // Get all raw materials with pagination and filters
@@ -111,9 +114,58 @@ export const getRawMaterialMovements = async (
   rawMaterialId: number,
   params?: StockMovementsQueryParams,
 ): Promise<PaginatedStockMovementsResponse> => {
+  const normalizedParams: StockMovementsQueryParams = {
+    sort: "-created_at",
+    ...(params ?? {}),
+  };
+
   const response = await apiClient.get(
     `${BASE_API_URL}/raw-materials/${rawMaterialId}/movements`,
+    { params: normalizedParams },
+  );
+  return response.data;
+};
+
+export const getRawMaterialStockLots = async (
+  rawMaterialId: number,
+  params?: { include_children?: boolean; include_disabled?: boolean },
+): Promise<RawMaterialStockLotsResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/stock-lots`,
     { params },
+  );
+  return response.data;
+};
+
+export const getRawMaterialScrapEligibleStockLots = async (
+  rawMaterialId: number,
+  params?: { include_disabled?: boolean },
+): Promise<RawMaterialStockLotsResponse> => {
+  const response = await apiClient.get(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/scrap-eligible-stock-lots`,
+    { params },
+  );
+  return response.data;
+};
+
+export const previewRawMaterialProductionAllocation = async (
+  rawMaterialId: number,
+  quantity: number,
+): Promise<RawMaterialAllocationPreviewResponse> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/production-allocation-preview`,
+    { quantity },
+  );
+  return response.data;
+};
+
+export const createRawMaterialScrap = async (
+  rawMaterialId: number,
+  payload: CreateRawMaterialScrapPayload,
+): Promise<{ status: boolean; message: string; data: any }> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/scraps`,
+    payload,
   );
   return response.data;
 };
@@ -168,5 +220,21 @@ export const deleteRawMaterialImages = async (
     },
   );
 
+  return response.data;
+};
+
+export const uploadRawMaterialImages = async (
+  rawMaterialId: number,
+  data: FormData,
+): Promise<{
+  status: boolean;
+  message: string;
+  data: { images: Array<{ id: number; image: string }> };
+}> => {
+  const response = await apiClient.post(
+    `${BASE_API_URL}/raw-materials/${rawMaterialId}/images`,
+    data,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
   return response.data;
 };

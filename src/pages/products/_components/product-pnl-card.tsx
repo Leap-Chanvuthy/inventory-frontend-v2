@@ -1,8 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { DataTable } from "@/components/reusable/data-table/data-table";
 import { ProductPnLDetailed } from "@/api/product/product.type";
 import { DollarSign, Factory, Inbox, Layers, TrendingDown, TrendingUp } from "lucide-react";
+import { PRODUCT_PNL_RAW_MATERIAL_SPEND_COLUMNS } from "../utils/product-pnl-table-feature";
 
 interface ProductPnlCardProps {
   pnl: ProductPnLDetailed;
@@ -181,31 +183,11 @@ export function ProductPnlCard({ pnl }: ProductPnlCardProps) {
               </div>
 
               {Array.isArray(rmSpend?.by_raw_material) && rmSpend.by_raw_material.length > 0 && (
-                <div className="overflow-x-auto rounded-md border">
-                  <table className="w-full text-xs">
-                    <thead className="bg-muted/40">
-                      <tr>
-                        <th className="text-left px-2 py-2">Raw Material</th>
-                        <th className="text-right px-2 py-2">Consumed Qty</th>
-                        <th className="text-right px-2 py-2">Total USD</th>
-                        <th className="text-right px-2 py-2">Reorder USD</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rmSpend.by_raw_material.slice(0, 8).map(item => (
-                        <tr key={item.raw_material_id} className="border-t">
-                          <td className="px-2 py-2">
-                            <div className="font-medium">{item.material_name || `#${item.raw_material_id}`}</div>
-                            <div className="text-muted-foreground">{item.material_sku_code || "—"}</div>
-                          </td>
-                          <td className="px-2 py-2 text-right">{qty(item.consumed_qty)}</td>
-                          <td className="px-2 py-2 text-right">${money(item.total_usd)}</td>
-                          <td className="px-2 py-2 text-right">${money(item.reorder_usd)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <DataTable
+                  columns={PRODUCT_PNL_RAW_MATERIAL_SPEND_COLUMNS}
+                  data={rmSpend.by_raw_material.slice(0, 8)}
+                  emptyText="No raw material spend rows."
+                />
               )}
             </div>
           </>
@@ -224,4 +206,3 @@ export function ProductPnlCard({ pnl }: ProductPnlCardProps) {
     </Card>
   );
 }
-
