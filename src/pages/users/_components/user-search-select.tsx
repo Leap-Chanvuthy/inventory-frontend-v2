@@ -27,7 +27,11 @@ const UserSearchSelect = () => {
             selected={selectedUsers}
             onChange={setSelectedUsers}
             getId={user => user.id}
-            getLabels={user => [user.name, user.email, user.role]}
+            getLabels={user => [
+              user.name,
+              user.email,
+              typeof user.role === "string" ? user.role : (user.role?.key || ""),
+            ]}
             currentPage={data?.current_page}
             lastPage={data?.last_page}
             onPageChange={setPage}

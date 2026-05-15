@@ -3,7 +3,17 @@ export interface User {
   name: string;
   phone_number: string | null;
   profile_picture: string | null;
-  role: string;
+  role_id?: number | null;
+  role:
+    | string
+    | {
+        id: number;
+        name: string;
+        key: string;
+        is_system: boolean;
+      }
+    | null;
+  role_name?: string | null;
   email: string;
   last_activity: string | null;
   created_at: string;
@@ -55,7 +65,8 @@ export interface CreateUserPayload {
     email: string;
     password: string;
     password_confirmation: string;
-    role: string | 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
+    role_id: number;
+    role?: string;
     phone_number: string;
     profile_picture: File | null,
 }
@@ -63,7 +74,8 @@ export interface CreateUserPayload {
 export interface UpdateUserPayload {
     name: string;
     email: string;
-    role: string | 'ADMIN' | 'STOCK_CONTROLLER' | 'VENDER';
+    role_id: number;
+    role?: string;
     phone_number: string;
     profile_picture: File | string | null,
 }

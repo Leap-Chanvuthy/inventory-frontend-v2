@@ -17,7 +17,6 @@ import Users from "./pages/users/page";
 import CreateUser from "./pages/users/create/page";
 import Setting from "./pages/settings/page";
 import Company from "./pages/company/page";
-import { ROLES } from "./consts/role";
 import UpdateUser from "./pages/users/update/page";
 import Warehouses from "./pages/warehouses/page";
 import ViewWarehouses from "./pages/warehouses/view/page";
@@ -68,14 +67,20 @@ import DeletedRawMaterials from "./pages/raw-materials/deleted/page";
 import AuditLog from "./pages/audit-logs/page";
 import ViewAuditLog from "./pages/audit-logs/view/page";
 import SaleOrdersPage from "./pages/sale-orders/page";
+import RolesPage from "./pages/roles/page";
+import CreateRolePage from "./pages/roles/create/page";
+import EditRolePage from "./pages/roles/edit/page";
+import ViewRolePage from "./pages/roles/view/page";
+import AuthSessionSync from "./components/auth/auth-session-sync";
 
 export default function App() {
   const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
+      <AuthSessionSync>
+        <BrowserRouter>
+          <Routes>
           {/* Public Routes */}
           <Route path="/403" element={<Forbidden />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
@@ -91,35 +96,91 @@ export default function App() {
           {/* Protected Routes (Authenticated Users) */}
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
-              <Route path="/" element={<Home />} />
+              <Route element={<ProtectedRoute permissions={["dashboard.read"]} />}>
+                <Route path="/" element={<Home />} />
+              </Route>
               <Route path="/profile" element={<Profile />} />
 
+              <Route
+                element={<ProtectedRoute permissions={["roles.read_all"]} />}
+              >
+                <Route path="/roles" element={<RolesPage />} />
+                <Route path="/roles/view/:id" element={<ViewRolePage />} />
+              </Route>
 
-              {/* ADMIN ONLY */}
-              <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]} />}>
+              <Route
+                element={<ProtectedRoute permissions={["roles.create"]} />}
+              >
+                <Route path="/roles/create" element={<CreateRolePage />} />
+              </Route>
+
+              <Route
+                element={
+                  <ProtectedRoute
+                    permissions={["roles.update", "roles.assign_permissions"]}
+                  />
+                }
+              >
+                <Route path="/roles/edit/:id" element={<EditRolePage />} />
+              </Route>
+
+              {/* Users */}
+              <Route element={<ProtectedRoute permissions={["users.read_all"]} />}>
                 {/* User Routes */}
                 <Route path="/users" element={<Users />} />
+              </Route>
+              <Route element={<ProtectedRoute permissions={["users.create"]} />}>
                 <Route path="/users/create" element={<CreateUser />} />
+              </Route>
+              <Route element={<ProtectedRoute permissions={["users.update_all", "users.update_own"]} />}>
                 <Route path="/users/update/:id" element={<UpdateUser />} />
-                
-                {/* Audit Logs */}
+              </Route>
+
+              {/* Audit Logs */}
+              <Route element={<ProtectedRoute permissions={["audit_logs.read"]} />}>
                 <Route path="/audit-logs" element={<AuditLog />} />
                 <Route path="/audit-logs/view/:id" element={<ViewAuditLog />} />
+              </Route>
 
-
-                {/* Categories */}
+              {/* Categories */}
+              <Route
+                element={
+                  <ProtectedRoute
+                    permissions={[
+                      "raw_material_categories.read_all",
+                      "product_categories.read_all",
+                      "customer_categories.read_all",
+                    ]}
+                  />
+                }
+              >
                 <Route path="/categories" element={<Categories />} />
+              </Route>
 
-                {/* Company Settings */}
+              {/* Company Settings */}
+              <Route element={<ProtectedRoute permissions={["company.read"]} />}>
                 <Route path="/company" element={<Company />} />
                 <Route path="/settings" element={<Setting />} />
               </Route>
-
             </Route>
           </Route>
 
           {/* ADMIN & STOCK_CONTROLLER ACCESS */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.STOCK_CONTROLLER]} />}>
+          <Route
+            element={
+              <ProtectedRoute
+                permissions={[
+                  "suppliers.read_all",
+                  "raw_materials.read_all",
+                  "products.read_all",
+                  "products.update_all",
+                  "products.create",
+                  "warehouses.read_all",
+                  "uom.read_all",
+                ]}
+              />
+            }
+          >
             <Route element={<Layout />}>
 
               {/* Supplier */}
@@ -176,7 +237,18 @@ export default function App() {
           </Route>
                         
           {/* ADMIN & VENDER ACCESS */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.VENDER]} />}>
+          <Route
+            element={
+              <ProtectedRoute
+                permissions={[
+                  "customers.read_all",
+                  "customers.read_own",
+                  "sale_orders.read_all",
+                  "sale_orders.read_own",
+                ]}
+              />
+            }
+          >
             <Route element={<Layout />}>
 
               {/* Sale Orders */}
@@ -197,7 +269,7 @@ export default function App() {
           </Route>
 
           {/* ACCESS BY EVERYONE WITH SOME LIMIT ACCESS TO VENDER */}
-          <Route element={<ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.VENDER , ROLES.STOCK_CONTROLLER]} />}>
+          <Route element={<ProtectedRoute permissions={["products.read_all", "products.read_own"]} />}>
             <Route element={<Layout />}>
               <Route path="/products" element={<Product />} />
               <Route path="/products/view/:id" element={<ProductDetail />} />
@@ -208,8 +280,9 @@ export default function App() {
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </AuthSessionSync>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

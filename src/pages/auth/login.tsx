@@ -11,6 +11,7 @@ import { IMAGES } from "@/consts/image";
 import { Text } from "@/components/ui/text/app-text";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/slices/auth-slice";
+import { getFirstAccessibleRoute } from "@/utils/permission-routes";
 
 function Login() {
   return (
@@ -95,7 +96,8 @@ const loginForm = () => {
                 user: response.data.user,
               }),
             );
-            navigate("/");
+            const redirectTo = getFirstAccessibleRoute(response.data.user?.permissions || []);
+            navigate(redirectTo);
           }
         },
       },

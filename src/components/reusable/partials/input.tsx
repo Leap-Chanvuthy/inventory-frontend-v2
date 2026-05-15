@@ -40,6 +40,7 @@ type TextAreaInputProps = {
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   required?: boolean;
   maxLength?: number;
+  disabled?: boolean;
 };
 
 type SelectInputProps = {
@@ -144,6 +145,7 @@ export const TextAreaInput = ({
   onChange,
   required = false,
   maxLength,
+  disabled = false,
 }: TextAreaInputProps) => {
   return (
     <div className="space-y-1.5 w-full">
@@ -166,6 +168,7 @@ export const TextAreaInput = ({
           value={value}
           onChange={onChange}
           maxLength={maxLength}
+          disabled={disabled}
           className={`pr-10 ${error ? "border-red-500 focus-visible:ring-red-500" : ""
             }`}
         />

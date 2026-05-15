@@ -121,6 +121,7 @@ export const renderProductStockLotHistory = (lot: ProductStockLotRow) => {
               <th className="px-3 py-2 text-left font-medium">Reference</th>
               <th className="px-3 py-2 text-left font-medium">Customer</th>
               <th className="px-3 py-2 text-left font-medium">Sale Order</th>
+              <th className="px-3 py-2 text-left font-medium">Raw Materials</th>
               <th className="px-3 py-2 text-left font-medium">Date</th>
               <th className="px-3 py-2 text-right font-medium">Quantity</th>
               <th className="px-3 py-2 text-right font-medium">Unit Price</th>
@@ -154,6 +155,23 @@ export const renderProductStockLotHistory = (lot: ProductStockLotRow) => {
                     <Link to="/sale-orders" className="text-primary hover:underline">
                       {child.sale_order_number}
                     </Link>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td className="px-3 py-2">
+                  {Array.isArray(child.related_raw_materials) && child.related_raw_materials.length > 0 ? (
+                    <div className="flex flex-wrap gap-x-2 gap-y-1">
+                      {child.related_raw_materials.map(rawMaterial => (
+                        <Link
+                          key={`${child.id}-rm-${rawMaterial.raw_material_id}`}
+                          to={`/raw-materials/view/${rawMaterial.raw_material_id}`}
+                          className="text-primary hover:underline whitespace-nowrap"
+                        >
+                          {rawMaterial.raw_material_name || `RM #${rawMaterial.raw_material_id}`}
+                        </Link>
+                      ))}
+                    </div>
                   ) : (
                     "—"
                   )}

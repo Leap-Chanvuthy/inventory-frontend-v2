@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { type Role } from "@/consts/role";
 import { quickMenu, type SidebarItem } from "@/consts/sidebar";
 
 interface QuickMenuDashboardProps {
@@ -22,11 +21,13 @@ const QuickMenuDashboard = ({
   description = "Fast access to commonly used features",
   actions = quickMenu,
 }: QuickMenuDashboardProps) => {
-  const { role } = useAuth();
+  const { canAny } = useAuth();
 
   const visibleActions = actions.filter(
     (action) =>
-      !action.roles || (role ? action.roles.includes(role as Role) : false),
+      !action.permissions ||
+      action.permissions.length === 0 ||
+      canAny(action.permissions),
   );
 
   return (

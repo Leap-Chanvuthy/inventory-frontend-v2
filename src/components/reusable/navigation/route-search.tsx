@@ -19,13 +19,13 @@ import { getAvailableRoutesByRole } from "./route-search.utils";
 
 const RouteSearch = () => {
   const navigate = useNavigate();
-  const { role } = useAuth();
+  const { canAny } = useAuth();
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const routes = useMemo(
-    () => getAvailableRoutesByRole(SIDEBAR_CONFIG, role),
-    [role]
+    () => getAvailableRoutesByRole(SIDEBAR_CONFIG, canAny),
+    [canAny]
   );
 
   // Keyboard shortcut: press "P" to open route search

@@ -1,17 +1,14 @@
 import { SidebarGroup, SidebarItem } from "@/consts/sidebar";
-import { Role } from "@/consts/role";
 
 export function getAvailableRoutesByRole(
   groups: SidebarGroup[],
-  role: Role | string | null
+  canAny: (permissionList: string[]) => boolean
 ): SidebarItem[] {
   return groups
     .flatMap(group => group.items)
     .filter(item => {
-      if (!item.roles) return true;
-      if (!role) return false;
-
-      return item.roles.includes(role as Role);
+      if (!item.permissions || item.permissions.length === 0) return true;
+      return canAny(item.permissions);
     })
     .filter(item => !item.isLocked);
 }

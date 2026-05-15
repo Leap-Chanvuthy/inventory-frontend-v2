@@ -9,6 +9,7 @@ import { IMAGES } from "@/consts/image";
 import { Text } from "@/components/ui/text/app-text";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getFirstAccessibleRoute } from "@/utils/permission-routes";
 
 function TwoFactorVerify() {
   return (
@@ -76,9 +77,10 @@ const verifyForm = () => {
     };
 
     verifyMutation.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: response => {
         toast.success("Login successful");
-        navigate("/");
+        const redirectTo = getFirstAccessibleRoute(response.data.user?.permissions || []);
+        navigate(redirectTo);
       },
       onError: () => {
         toast.error(errorMessage || "Verification failed");

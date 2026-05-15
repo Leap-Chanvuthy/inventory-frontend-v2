@@ -1,28 +1,26 @@
 import {
-  Home,
-  User,
-  Warehouse,
-  // HelpCircle,
-  Truck,
-  PackageSearch, 
-  PencilRuler,
-  Users,
-  CircleDollarSign,
-  // NotepadText,
-  Tag,
-  type LucideIcon,
   Activity,
+  CircleDollarSign,
+  Home,
   NotepadText,
+  PackageSearch,
+  PencilRuler,
+  ShieldCheck,
+  Tag,
+  Truck,
+  type LucideIcon,
+  User,
+  Users,
+  Warehouse,
 } from "lucide-react";
-import { ROLES, Role } from "./role";
 
 export interface SidebarItem {
   title: string;
   url: string;
   icon: LucideIcon;
-  roles?: Role[];
-  isLocked?: boolean | false;
-  isQuickMenu?: boolean | false;
+  permissions?: string[];
+  isLocked?: boolean;
+  isQuickMenu?: boolean;
 }
 
 export interface SidebarGroup {
@@ -34,22 +32,33 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
   {
     label: "Application & Management",
     items: [
-      { title: "Dashboard", url: "/", icon: Home },
+      { title: "Dashboard", url: "/", icon: Home, permissions: ["dashboard.read"] },
       {
         title: "Users",
         url: "/users",
         icon: User,
-        roles: [ROLES.ADMIN],
+        permissions: ["users.read_all", "users.create", "users.update_all"],
         isQuickMenu: true,
       },
       {
         title: "Audit Logs",
         url: "/audit-logs",
         icon: Activity,
-        roles: [ROLES.ADMIN],
+        permissions: ["audit_logs.read"],
         isQuickMenu: true,
       },
-
+      {
+        title: "Roles & Permissions",
+        url: "/roles",
+        icon: ShieldCheck,
+        permissions: [
+          "roles.read_all",
+          "roles.create",
+          "roles.update",
+          "roles.assign_permissions",
+        ],
+        isQuickMenu: true,
+      },
     ],
   },
   {
@@ -59,14 +68,14 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Supplier",
         url: "/supplier",
         icon: Truck,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        permissions: ["suppliers.read_all", "suppliers.read_own"],
         isQuickMenu: true,
       },
       {
         title: "Raw Materials",
         url: "/raw-materials",
         icon: Tag,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        permissions: ["raw_materials.read_all", "raw_materials.read_own"],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -74,7 +83,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Products",
         url: "/products",
         icon: PackageSearch,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER , ROLES.VENDER],
+        permissions: ["products.read_all", "products.read_own"],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -87,14 +96,14 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Muti Warehouses",
         url: "/warehouses",
         icon: Warehouse,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        permissions: ["warehouses.read_all"],
         isQuickMenu: true,
       },
       {
         title: "Unit of Measurement",
         url: "/unit-of-measurement",
         icon: PencilRuler,
-        roles: [ROLES.ADMIN, ROLES.STOCK_CONTROLLER],
+        permissions: ["uom.read_all", "uom.read_own"],
         isQuickMenu: true,
       },
     ],
@@ -106,7 +115,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Customer",
         url: "/customer",
         icon: Users,
-        roles: [ROLES.ADMIN, ROLES.VENDER],
+        permissions: ["customers.read_all", "customers.read_own"],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -114,7 +123,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Sale Orders",
         url: "/sale-orders",
         icon: CircleDollarSign,
-        roles: [ROLES.ADMIN, ROLES.VENDER],
+        permissions: ["sale_orders.read_all", "sale_orders.read_own"],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -127,7 +136,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Financial Report",
         url: "/financial-report",
         icon: NotepadText,
-        roles: [ROLES.ADMIN, ROLES.VENDER],
+        permissions: ["sale_orders.read_sale_dashboard", "dashboard.read"],
         isLocked: true,
       },
     ],
@@ -139,7 +148,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Company",
         url: "/company",
         icon: User,
-        roles: [ROLES.ADMIN],
+        permissions: ["company.read", "company.update", "company.create"],
         isLocked: false,
         isQuickMenu: true,
       },
@@ -147,13 +156,10 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         title: "Profile",
         url: "/profile",
         icon: User,
-        roles: [ROLES.ADMIN, ROLES.VENDER, ROLES.STOCK_CONTROLLER],
+        permissions: [],
       },
     ],
   },
-  // {
-  //   items: [{ title: "Help", url: "/help", icon: HelpCircle }],
-  // },
 ];
 
 export const quickMenu: SidebarItem[] = SIDEBAR_CONFIG.flatMap(group =>

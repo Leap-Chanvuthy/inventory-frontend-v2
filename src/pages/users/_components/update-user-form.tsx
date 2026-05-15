@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { useSingleUser } from "@/api/users/user.query";
 import { useUpdateUser } from "@/api/users/user.mutation";
+import { useRoleSelectOptions } from "@/api/roles/role.query";
 import { CreateUserValidationErrors } from "@/api/users/user.types";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { USER_ROLES } from "@/consts/role";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
 import { Info } from "lucide-react";
@@ -22,6 +22,7 @@ export const UpdateUserForm = () => {
   const navigate = useNavigate();
 
   const { data: user, isError, isLoading, isFetching } = useSingleUser(userId);
+  const { data: roleOptionsData } = useRoleSelectOptions();
 
   const updateMutation = useUpdateUser(userId);
 
@@ -32,7 +33,7 @@ export const UpdateUserForm = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    role: "",
+    role_id: "",
     phone_number: "",
     profile_picture: null as File | null,
   });
@@ -43,7 +44,7 @@ export const UpdateUserForm = () => {
         ...prev,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role_id: String(user.role_id || (typeof user.role === "object" && user.role ? user.role.id : "")),
         phone_number: user.phone_number || "",
         profile_picture: null,
       }));
@@ -66,8 +67,12 @@ export const UpdateUserForm = () => {
       .submitter as HTMLButtonElement | null;
 
     const action = submitter?.value;
+    const payload = {
+      ...form,
+      role_id: Number(form.role_id || 0),
+    };
 
-    updateMutation.mutate(form, {
+    updateMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/users");
@@ -146,13 +151,16 @@ export const UpdateUserForm = () => {
                     required={true}
                   />
                   <SelectInput
-                    id="role"
+                    id="role_id"
                     label="Role"
-                    options={USER_ROLES}
-                    value={form.role}
-                    error={fieldErrors?.role?.[0]}
+                    options={(roleOptionsData || []).map(roleOption => ({
+                      value: String(roleOption.id),
+                      label: `${roleOption.name}${roleOption.is_system ? " (System)" : ""}`,
+                    }))}
+                    value={form.role_id}
+                    error={fieldErrors?.role_id?.[0] || fieldErrors?.role?.[0]}
                     onChange={value =>
-                      setForm(prev => ({ ...prev, role: value }))
+                      setForm(prev => ({ ...prev, role_id: value }))
                     }
                     required={true}
                   />

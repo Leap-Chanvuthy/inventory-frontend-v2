@@ -10,7 +10,7 @@ import { SidebarMenuGroup } from "./sidebar-menu";
 import SidebarFooterComponent from "./sidebar-footer";
 
 export function AppSidebar() {
-  const { role } = useAuth();
+  const { canAny } = useAuth();
 
   return (
     <Sidebar>
@@ -27,7 +27,10 @@ export function AppSidebar() {
       <SidebarContent>
         {SIDEBAR_CONFIG.map((group, idx) => {
           const filteredItems = group.items.filter(
-            item => !item.roles || item.roles.includes(role as any)
+            item =>
+              !item.permissions ||
+              item.permissions.length === 0 ||
+              canAny(item.permissions)
           );
 
           if (filteredItems.length === 0) return null;

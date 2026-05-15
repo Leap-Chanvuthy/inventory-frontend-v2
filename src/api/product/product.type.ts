@@ -47,6 +47,10 @@ export interface ProductStockLotChild {
   customer_name?: string | null;
   sale_order_id?: number | null;
   sale_order_number?: string | null;
+  related_raw_materials?: Array<{
+    raw_material_id: number;
+    raw_material_name?: string | null;
+  }>;
 }
 
 export interface ProductStockLot {

@@ -1,12 +1,14 @@
 import { Outlet , Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { getFirstAccessibleRoute } from "@/utils/permission-routes";
 
 
 const UnauthicatedRoute = () =>{
 
-    const {user} = useAuth();
+    const { user, permissions } = useAuth();
 
-    return !user ? <Outlet /> : <Navigate to='/' />
+    const redirectTo = getFirstAccessibleRoute(permissions);
+    return !user ? <Outlet /> : <Navigate to={redirectTo} />
 
 }
 

@@ -1,9 +1,9 @@
 import { useCreateUser } from "@/api/users/user.mutation";
+import { useRoleSelectOptions } from "@/api/roles/role.query";
 import { CreateUserValidationErrors } from "@/api/users/user.types";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { SelectInput, TextInput } from "@/components/reusable/partials/input";
-import { USER_ROLES } from "@/consts/role";
 import { AxiosError } from "axios";
 import { Info } from "lucide-react";
 import { useState } from "react";
@@ -18,13 +18,14 @@ export const CreateUserForm = () => {
     userMutation.error as AxiosError<CreateUserValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
+  const { data: roleOptionsData } = useRoleSelectOptions();
 
   const initialForm = {
     name: "",
     email: "",
     password: "",
     password_confirmation: "",
-    role: "",
+    role_id: "",
     phone_number: "",
     profile_picture: null as File | null,
   };
@@ -50,7 +51,12 @@ export const CreateUserForm = () => {
 
     const action = submitter?.value;
 
-    userMutation.mutate(form, {
+    const payload = {
+      ...form,
+      role_id: Number(form.role_id || 0),
+    };
+
+    userMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
           navigate("/users");
@@ -115,14 +121,17 @@ export const CreateUserForm = () => {
                     onChange={handleChange}
                   />
                   <SelectInput
-                    id="role"
+                    id="role_id"
                     label="Role"
                     placeholder="Select role"
-                    options={USER_ROLES}
-                    value={form.role}
-                    error={fieldErrors?.role?.[0]}
+                    options={(roleOptionsData || []).map(roleOption => ({
+                      value: String(roleOption.id),
+                      label: `${roleOption.name}${roleOption.is_system ? " (System)" : ""}`,
+                    }))}
+                    value={form.role_id}
+                    error={fieldErrors?.role_id?.[0] || fieldErrors?.role?.[0]}
                     onChange={value =>
-                      setForm(prev => ({ ...prev, role: value }))
+                      setForm(prev => ({ ...prev, role_id: value }))
                     }
                     required={true}
                   />

@@ -1,8 +1,19 @@
+export interface UserRolePayload {
+  id: number;
+  name: string;
+  key: string;
+  is_system: boolean;
+  updated_at?: string | null;
+}
+
 export interface User {
+  id?: number;
   name: string;
   phone_number: string | null;
   profile_picture: string | null;
-  role: string;
+  role: UserRolePayload | null;
+  permissions: string[];
+  permissions_version?: number | null;
   email: string;
   email_verified_at: string | null;
   ip_address: string | null;
@@ -27,6 +38,14 @@ export interface LoginResponse {
       token: string;
       type: string;
     };
+  };
+}
+
+export interface CurrentUserResponse {
+  status: boolean;
+  message: string;
+  data: {
+    user: User;
   };
 }
 
