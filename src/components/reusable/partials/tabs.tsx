@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TabItem {
-  label: string;
+  label: React.ReactNode;
   value: string;
   content: React.ReactNode;
 }
