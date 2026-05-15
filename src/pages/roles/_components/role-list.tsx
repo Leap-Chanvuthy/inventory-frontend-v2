@@ -30,7 +30,7 @@ export default function RoleList() {
 
   return (
     <div className="min-h-screen w-full p-4 sm:p-6 bg-background">
-      <div className="mx-auto max-w-[1600px]">
+      <div className="mx-auto max-w-full">
         <TableToolbar
           searchPlaceholder="Search roles..."
           onSearch={value => {

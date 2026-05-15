@@ -60,8 +60,9 @@ function SectionHeading({
 
 const Home = () => {
   const { user } = useAuth();
-  const [appliedStart, setAppliedStart] = useState("");
-  const [appliedEnd, setAppliedEnd] = useState("");
+  const currentYear = new Date().getFullYear();
+  const [appliedStart, setAppliedStart] = useState(`${currentYear}-01-01`);
+  const [appliedEnd, setAppliedEnd] = useState(`${currentYear}-12-31`);
 
   const { data, isLoading, isFetching, refetch, isError } = useDashboardSummary({
     start_date: appliedStart || undefined,

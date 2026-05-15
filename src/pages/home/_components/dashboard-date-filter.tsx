@@ -73,7 +73,7 @@ interface Props {
 }
 
 export function DashboardDateFilter({ onApply, isFetching, onRefresh }: Props) {
-  const [activePreset, setActivePreset] = useState("All");
+  const [activePreset, setActivePreset] = useState("This Year");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [showCustom, setShowCustom] = useState(false);

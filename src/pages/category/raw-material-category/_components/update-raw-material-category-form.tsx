@@ -125,7 +125,7 @@ export const UpdateCategoryForm = ({
     <div
       className={
         embedded
-          ? "animate-in slide-in-from-right-8 duration-300"
+          ? "animate-in slide-in-from-right-8 duration-300 py-5 px-6"
           : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"
       }
     >

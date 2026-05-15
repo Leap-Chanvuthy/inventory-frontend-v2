@@ -3,7 +3,11 @@ import { Text } from "@/components/ui/text/app-text";
 import RoleList from "./_components/role-list";
 
 const breadcrumbItems = [
-  { name: "application-management", label: "Application & Management", link: "/" },
+  {
+    name: "application-management",
+    label: "Application & Management",
+    link: "/",
+  },
   { name: "roles-permissions", label: "Roles & Permissions" },
 ];
 
@@ -21,7 +25,7 @@ export default function RolesPage() {
         </p>
       </div>
 
-      <div className="mx-6 mt-8">
+      <div className=" mt-8">
         <RoleList />
       </div>
     </div>

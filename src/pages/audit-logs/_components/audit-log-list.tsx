@@ -43,7 +43,7 @@ export default function AuditLogList() {
 
   return (
     <div className="min-h-screen w-full bg-background p-4 sm:p-6">
-      <div className="mx-auto max-w-[1600px]">
+      <div className="mx-auto max-w-full">
         <TableToolbar
           searchPlaceholder="Search logs..."
           onSearch={setSearch}
@@ -55,7 +55,9 @@ export default function AuditLogList() {
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           onPerPageChange={setPerPage}
           perPage={perPage}
-          onFilterChange={val => setFilter(val === "" ? undefined : val || undefined)}
+          onFilterChange={val =>
+            setFilter(val === "" ? undefined : val || undefined)
+          }
           isListOptionDisplayed={true}
         />
 

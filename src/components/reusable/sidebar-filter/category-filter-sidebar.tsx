@@ -2,7 +2,10 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Archive, CirclePlus, Folder, Search } from "lucide-react";
-import { CategoryCreateUpdateDialog, CategoryDialogValues } from "./category-create-update-dialog";
+import {
+  CategoryCreateUpdateDialog,
+  CategoryDialogValues,
+} from "./category-create-update-dialog";
 import { CategoryFilterList } from "./category-filter-list";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Link } from "react-router-dom";
@@ -84,10 +87,15 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
   onDeleteCategory,
   onRestoreCategory,
   getCategoryId = (category: T) => category.id,
-  getCategoryLabel = (category: T) => category.category_name || category.name || "",
+  getCategoryLabel = (category: T) =>
+    category.category_name || category.name || "",
   getCategoryDescription = (category: T) => category.description || "",
   getCategoryColor = (category: T) => category.label_color,
-  getCategoryCount = (category: T) => category.items_count || category.units_count || category.raw_materials_count || 0,
+  getCategoryCount = (category: T) =>
+    category.items_count ||
+    category.units_count ||
+    category.raw_materials_count ||
+    0,
   getCategoryViewHref,
   renderCreateForm,
   renderUpdateForm,
@@ -115,7 +123,7 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
             label_color: getCategoryColor(updateTarget) || "#5c52d6",
           }
         : undefined,
-    [updateTarget, getCategoryColor, getCategoryDescription, getCategoryLabel]
+    [updateTarget, getCategoryColor, getCategoryDescription, getCategoryLabel],
   );
 
   return (
@@ -125,7 +133,9 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
     >
       <div className="px-4 pt-4 pb-3 border-b space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-foreground">{categoryLabel}</h2>
+          <h2 className="text-sm font-semibold text-foreground">
+            {categoryLabel}
+          </h2>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -152,7 +162,12 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
                 </Link>
               </Button>
             ) : (
-              <Button type="button" size="sm" className="h-8" onClick={() => setCreateOpen(true)}>
+              <Button
+                type="button"
+                size="sm"
+                className="h-8"
+                onClick={() => setCreateOpen(true)}
+              >
                 <CirclePlus className="h-3.5 w-3.5 mr-1.5" />
                 Create
               </Button>

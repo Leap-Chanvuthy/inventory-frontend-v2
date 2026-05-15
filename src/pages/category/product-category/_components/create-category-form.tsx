@@ -73,7 +73,7 @@ export const CreateCategoryForm = ({
     });
   };
   return (
-    <div className={embedded ? "animate-in slide-in-from-right-8 duration-300" : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"}>
+    <div className={embedded ? "animate-in slide-in-from-right-8 duration-300 py-5 px-6" : "animate-in slide-in-from-right-8 duration-300 my-5 mx-6"}>
       <Text.TitleMedium className="mb-2">
         Create Product Category
       </Text.TitleMedium>

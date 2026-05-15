@@ -3,10 +3,23 @@ import { SupplierChartAreaStacked } from "./charts/supplier-chart-area-stack";
 import { SupplierBarchart } from "./charts/supplier-barchart";
 import { SupplierPiechart } from "./charts/supplier-piechart";
 import { useSupplierStatistics } from "@/api/suppliers/supplier.query";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function SupplierStatistics() {
-  const { data, isPending } = useSupplierStatistics();
+  const { data, isPending, isError, isFetching, refetch } = useSupplierStatistics();
   const stats = data?.data;
+
+  if (isError && !isFetching)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+        <p className="text-sm text-muted-foreground">Failed to load supplier statistics.</p>
+        <Button size="sm" variant="outline" onClick={() => refetch()}>
+          <RefreshCw className="h-3.5 w-3.5" />
+          Try again
+        </Button>
+      </div>
+    );
 
   return (
     <div>
