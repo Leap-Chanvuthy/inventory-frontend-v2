@@ -7,6 +7,7 @@ import { useProductCategories } from "@/api/categories/product-categories/produc
 import {
   useCreateProductCategory,
   useDeleteProductCategory,
+  useRestoreProductCategory,
   useUpdateProductCategory,
 } from "@/api/categories/product-categories/product-category.mutation";
 import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
@@ -33,19 +34,22 @@ const Product = () => {
     handleCreateCategory,
     handleUpdateCategory,
     handleDeleteCategory,
+    handleRestoreCategory,
     isCreatingCategory,
     isUpdatingCategory,
   } = useCategoryFilterController<ProductCategory, CategoryQueryParams>({
-    mapQueryParams: ({ page, perPage, search, sort }) => ({
+    mapQueryParams: ({ page, perPage, search, status, sort }) => ({
       page,
       per_page: perPage,
       sort,
       "filter[search]": search || undefined,
+      "filter[is_deleted]": status === "deleted" ? 1 : 0,
     }),
     useCategoriesQuery: useProductCategories,
     useCreateMutation: useCreateProductCategory,
     useUpdateMutation: useUpdateProductCategory,
     useDeleteMutation: useDeleteProductCategory,
+    useRestoreMutation: useRestoreProductCategory,
   });
 
   const breadcrumbItems = [
@@ -87,6 +91,7 @@ const Product = () => {
               onCreateCategory={handleCreateCategory}
               onUpdateCategory={handleUpdateCategory}
               onDeleteCategory={handleDeleteCategory}
+              onRestoreCategory={handleRestoreCategory}
               getCategoryId={category => category.id}
               getCategoryLabel={category => category.category_name}
               getCategoryDescription={category => category.description}

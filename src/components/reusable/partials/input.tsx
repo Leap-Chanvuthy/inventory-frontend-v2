@@ -280,6 +280,7 @@ export const DatePickerInput = ({
   displayFormat = "PPP",
 }: DateInputProps) => {
   const isControlled = value !== undefined
+  const currentYear = new Date().getFullYear()
 
   const [internalDate, setInternalDate] = React.useState<Date | undefined>(() =>
     isControlled ? coerceToDate(value) : undefined,
@@ -327,6 +328,9 @@ export const DatePickerInput = ({
         <PopoverContent className="w-auto p-0">
           <Calendar
             mode="single"
+            captionLayout="dropdown"
+            startMonth={new Date(currentYear - 100, 0)}
+            endMonth={new Date(currentYear + 20, 11)}
             selected={selectedDate}
             onSelect={(date) => {
               if (!isControlled) {

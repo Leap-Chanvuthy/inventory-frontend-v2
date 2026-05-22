@@ -1,10 +1,26 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DeleteModal from "@/components/reusable/partials/delete-modal";
 import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CategoryFilterItemProps {
   name: string;
@@ -33,6 +49,8 @@ function CategoryFilterItemComponent({
   showActions = true,
   viewHref,
 }: CategoryFilterItemProps) {
+  const [openRestoreDialog, setOpenRestoreDialog] = useState(false);
+
   return (
     <li>
       <button
@@ -45,7 +63,20 @@ function CategoryFilterItemComponent({
       >
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{name}</p>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="text-sm font-medium truncate">{name}</p>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  align="start"
+                  className="max-w-[260px] break-words"
+                >
+                  {name}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {(count !== undefined || color) && (
               <div className="mt-1 flex items-center gap-2">
                 {count !== undefined && (
@@ -83,18 +114,53 @@ function CategoryFilterItemComponent({
                 </Button>
               )}
               {isDeletedView ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={e => {
-                  e.stopPropagation();
-                  onRestore?.();
-                }}
-              >
-                <RotateCcw className="h-3.5 w-3.5 text-emerald-600" />
-              </Button>
+                <Dialog
+                  open={openRestoreDialog}
+                  onOpenChange={setOpenRestoreDialog}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={e => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 text-emerald-600" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent
+                    className="sm:max-w-lg"
+                    onPointerDownOutside={e => e.preventDefault()}
+                    onEscapeKeyDown={e => e.preventDefault()}
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Recover This Category</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to recover "{name}"? It will be
+                        restored to the active category list.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="outline" type="button">
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          onRestore?.();
+                          setOpenRestoreDialog(false);
+                        }}
+                      >
+                        Recover
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               ) : (
                 <>
                   <Button

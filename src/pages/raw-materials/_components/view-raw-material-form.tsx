@@ -24,6 +24,7 @@ import {
   Factory,
   BoxesIcon,
 } from "lucide-react";
+import { useMemo } from "react";
 import {
   StockStatusBadge,
   StatCard,
@@ -44,6 +45,11 @@ export function ViewRawMaterialForm() {
     });
   };
 
+  const purchaseMovement = useMemo(() => {
+    const movements = data?.data?.raw_material?.rm_stock_movements ?? [];
+    return movements.find(m => m.movement_type === "PURCHASE") ?? null;
+  }, [data?.data?.raw_material?.rm_stock_movements]);
+
   if (isLoading) return <DataCardLoading text="Loading raw material..." />;
   if (isError && !isFetching)
     return <UnexpectedError kind="fetch" homeTo="/raw-materials" />;
@@ -61,6 +67,7 @@ export function ViewRawMaterialForm() {
     ? Object.values(total_count_by_movement_type).reduce((a, b) => a + b, 0)
     : 0;
   const heroImage = raw_material.rm_images?.[0]?.image ?? null;
+  const displayExpiryDate = purchaseMovement?.expiry_date ?? raw_material.expiry_date;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
@@ -211,15 +218,15 @@ export function ViewRawMaterialForm() {
           label="Expiry Date"
           value={
             <Text.Small fontWeight="bold" color="default" className="text-base">
-              {raw_material.expiry_date
-                ? new Date(raw_material.expiry_date).toLocaleDateString(
+              {displayExpiryDate
+                ? new Date(displayExpiryDate).toLocaleDateString(
                     "en-US",
                     { year: "numeric", month: "short", day: "numeric" },
                   )
                 : "—"}
             </Text.Small>
           }
-          sub={raw_material.expiry_date ? "expiration date" : "no expiry set"}
+          sub={displayExpiryDate ? "expiration date" : "no expiry set"}
         />
       </div>
 
