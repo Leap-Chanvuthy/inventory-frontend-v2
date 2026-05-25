@@ -22,7 +22,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export const CreateCustomerForm = () => {
   const customerMutation = useCreateCustomer();
-const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategories();
+  const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategories();
   const error = customerMutation.error as AxiosError<ValidationErrors> | null;
   const fieldErrors = error?.response?.data?.errors;
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategor
     customerMutation.mutate(payload, {
       onSuccess: () => {
         if (action === "save_and_close") {
-          navigate("/customers");
+          navigate("/customer");
         }
       },
     });
@@ -225,7 +225,6 @@ const { data: categoriesData, isLoading: categoriesLoading } =useCustomerCategor
                 />
 
                 <TextInput
-                  required={true}
                   id="customer_address"
                   label="Customer Address"
                   placeholder="Enter customer address"
