@@ -31,7 +31,8 @@ const fmtMoney = (n: number | null | undefined) => {
 };
 
 const pct = (t: { percentage_change_display: string | null; change: number }) =>
-  t.percentage_change_display ?? (t.change >= 0 ? `+${t.change}` : String(t.change));
+  t.percentage_change_display ??
+  (t.change >= 0 ? `+${t.change}` : String(t.change));
 
 interface KpiCardProps {
   title: string;
@@ -45,7 +46,17 @@ interface KpiCardProps {
   large?: boolean;
 }
 
-function KpiCard({ title, value, subtitle, trend, change, icon, iconBg, cardBg, large }: KpiCardProps) {
+function KpiCard({
+  title,
+  value,
+  subtitle,
+  trend,
+  change,
+  icon,
+  iconBg,
+  cardBg,
+  large,
+}: KpiCardProps) {
   const isUp = trend === "up";
   const isNeutral = trend === "neutral";
 
@@ -62,13 +73,25 @@ function KpiCard({ title, value, subtitle, trend, change, icon, iconBg, cardBg, 
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">
             {title}
           </p>
-          <p className={cn("font-bold tracking-tight text-foreground", large ? "text-4xl" : "text-3xl")}>
+          <p
+            className={cn(
+              "font-bold tracking-tight text-foreground",
+              large ? "text-4xl" : "text-3xl",
+            )}
+          >
             {value}
           </p>
-          <p className="text-xs text-muted-foreground mt-1.5 truncate">{subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-1.5 truncate">
+            {subtitle}
+          </p>
         </div>
 
-        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-full", iconBg)}>
+        <div
+          className={cn(
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+            iconBg,
+          )}
+        >
           {icon}
         </div>
       </div>
@@ -80,21 +103,36 @@ function KpiCard({ title, value, subtitle, trend, change, icon, iconBg, cardBg, 
             isNeutral
               ? "bg-muted text-muted-foreground"
               : isUp
-              ? "text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400"
-              : "text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400"
+                ? "text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400"
+                : "text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400",
           )}
         >
-          {!isNeutral && (isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />)}
+          {!isNeutral &&
+            (isUp ? (
+              <TrendingUp className="h-3 w-3" />
+            ) : (
+              <TrendingDown className="h-3 w-3" />
+            ))}
           {change}
         </span>
-        <span className="text-xs text-muted-foreground">vs previous period</span>
+        <span className="text-xs text-muted-foreground">
+          vs previous period
+        </span>
       </div>
     </div>
   );
 }
 
 export function DashboardKpiCards({ data }: Props) {
-  const { products, raw_materials, suppliers, warehouses, users, sale_orders, customers } = data.summary;
+  const {
+    products,
+    raw_materials,
+    suppliers,
+    warehouses,
+    users,
+    sale_orders,
+    customers,
+  } = data.summary;
 
   const heroCards: KpiCardProps[] = [
     {
@@ -103,7 +141,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: `Avg order: ${fmtMoney(sale_orders.metrics.average_order_value.current)}`,
       trend: sale_orders.metrics.total_revenue.direction,
       change: pct(sale_orders.metrics.total_revenue),
-      icon: <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />,
+      icon: (
+        <DollarSign className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+      ),
       iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
       large: true,
     },
@@ -113,7 +153,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: `Discount: ${fmtMoney(sale_orders.metrics.total_discount.current)}`,
       trend: sale_orders.metrics.total_sale_orders.direction,
       change: pct(sale_orders.metrics.total_sale_orders),
-      icon: <ShoppingCart className="h-5 w-5 text-blue-600 dark:text-blue-400" />,
+      icon: (
+        <ShoppingCart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      ),
       iconBg: "bg-blue-100 dark:bg-blue-900/30",
       large: true,
     },
@@ -126,7 +168,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: `${products.metrics.new_products_in_period.current} new this period`,
       trend: products.metrics.total_products.direction,
       change: pct(products.metrics.total_products),
-      icon: <Package className="h-5 w-5 text-violet-600 dark:text-violet-400" />,
+      icon: (
+        <Package className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+      ),
       iconBg: "bg-violet-100 dark:bg-violet-900/30",
     },
     {
@@ -135,7 +179,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: `${raw_materials.metrics.out_of_stock_raw_materials.current} out of stock`,
       trend: raw_materials.metrics.total_raw_materials.direction,
       change: pct(raw_materials.metrics.total_raw_materials),
-      icon: <FlaskConical className="h-5 w-5 text-orange-600 dark:text-orange-400" />,
+      icon: (
+        <FlaskConical className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+      ),
       iconBg: "bg-orange-100 dark:bg-orange-900/30",
     },
     {
@@ -153,7 +199,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: `${warehouses.metrics.warehouses_with_stock.current} with stock`,
       trend: warehouses.metrics.total_warehouses.direction,
       change: pct(warehouses.metrics.total_warehouses),
-      icon: <Warehouse className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />,
+      icon: (
+        <Warehouse className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+      ),
       iconBg: "bg-indigo-100 dark:bg-indigo-900/30",
     },
     {
@@ -178,9 +226,14 @@ export function DashboardKpiCards({ data }: Props) {
       title: "Out of Stock",
       value: fmt(raw_materials.metrics.out_of_stock_raw_materials.current),
       subtitle: "raw materials need restock",
-      trend: raw_materials.metrics.out_of_stock_raw_materials.direction === "down" ? "up" : "down",
+      trend:
+        raw_materials.metrics.out_of_stock_raw_materials.direction === "down"
+          ? "up"
+          : "down",
       change: pct(raw_materials.metrics.out_of_stock_raw_materials),
-      icon: <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />,
+      icon: (
+        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+      ),
       iconBg: "bg-red-100 dark:bg-red-900/30",
     },
     {
@@ -189,7 +242,9 @@ export function DashboardKpiCards({ data }: Props) {
       subtitle: "raw materials low",
       trend: raw_materials.metrics.low_stock_raw_materials.direction,
       change: pct(raw_materials.metrics.low_stock_raw_materials),
-      icon: <BarChart2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />,
+      icon: (
+        <BarChart2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+      ),
       iconBg: "bg-amber-100 dark:bg-amber-900/30",
     },
   ];
@@ -197,12 +252,12 @@ export function DashboardKpiCards({ data }: Props) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {heroCards.map((card) => (
+        {heroCards.map(card => (
           <KpiCard key={card.title} {...card} />
         ))}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {statCards.map((card) => (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map(card => (
           <KpiCard key={card.title} {...card} />
         ))}
       </div>

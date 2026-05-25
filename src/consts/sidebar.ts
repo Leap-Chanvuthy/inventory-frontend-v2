@@ -93,7 +93,7 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
     label: "Catalogs",
     items: [
       {
-        title: "Muti Warehouses",
+        title: "Multi Warehouses",
         url: "/warehouses",
         icon: Warehouse,
         permissions: ["warehouses.read_all"],

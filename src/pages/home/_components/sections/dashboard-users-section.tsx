@@ -38,8 +38,8 @@ function RoleRing({ value, total, label, gradId, from, to, textColor }: RingProp
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="relative drop-shadow-sm" style={{ width: RING_SIZE, height: RING_SIZE }}>
-        <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
+      <div className="relative drop-shadow-sm w-full aspect-square">
+        <svg width="100%" height="100%" viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}>
           <defs>
             <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor={from} />
@@ -102,7 +102,7 @@ export function DashboardUsersByRole({ data, total }: UsersProps) {
         </CardTitle>
         <CardDescription>{total} total users</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-around py-6">
+      <CardContent className="grid grid-cols-2 gap-3 py-4 place-items-center">
         {data.map((row, i) => {
           const label = ROLE_LABELS[row.role] ?? row.role.replace(/_/g, " ");
           const ring = ROLE_RINGS[row.role] ?? { from: "#a855f7", to: "#06b6d4", textColor: "#a855f7" };

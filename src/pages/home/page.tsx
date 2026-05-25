@@ -41,19 +41,24 @@ import DataCardEmpty from "@/components/reusable/data-card/data-card-empty";
 function SectionHeading({
   title,
   description,
+  action,
 }: {
   title: string;
   description?: string;
+  action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 pb-1 border-b border-border/50">
-      <div className="h-5 w-1 rounded-full bg-primary shrink-0" />
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-        <h2 className="text-base font-bold text-foreground">{title}</h2>
-        {description && (
-          <span className="text-xs text-muted-foreground">{description}</span>
-        )}
+    <div className="flex items-center justify-between pb-1 border-b border-border/50">
+      <div className="flex items-stretch gap-3">
+        <div className="w-1 rounded-full bg-primary shrink-0" />
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
+          <h2 className="text-base font-bold text-foreground">{title}</h2>
+          {description && (
+            <span className="text-xs text-muted-foreground">{description}</span>
+          )}
+        </div>
       </div>
+      {action}
     </div>
   );
 }
@@ -64,48 +69,40 @@ const Home = () => {
   const [appliedStart, setAppliedStart] = useState(`${currentYear}-01-01`);
   const [appliedEnd, setAppliedEnd] = useState(`${currentYear}-12-31`);
 
-  const { data, isLoading, isFetching, refetch, isError } = useDashboardSummary({
-    start_date: appliedStart || undefined,
-    end_date: appliedEnd || undefined,
-  });
+  const { data, isLoading, isFetching, refetch, isError } = useDashboardSummary(
+    {
+      start_date: appliedStart || undefined,
+      end_date: appliedEnd || undefined,
+    },
+  );
 
   if (isLoading) return <DataCardLoading text="Loading dashboard..." />;
-  if (isError && !isFetching) return <UnexpectedError kind="fetch" homeTo="/" />;
-  if (!data?.data) return <DataCardEmpty emptyText="No dashboard data available." />;
+  if (isError && !isFetching)
+    return <UnexpectedError kind="fetch" homeTo="/" />;
+  if (!data?.data)
+    return <DataCardEmpty emptyText="No dashboard data available." />;
 
   const summary = data.data;
 
   return (
     <div className="space-y-8">
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <Text.Large>Hi {user?.name}, Welcome Back.</Text.Large>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Inventory dashboard overview
-            {appliedStart && appliedEnd && (
-              <>
-                {" "}
-                &nbsp;·&nbsp;{" "}
-                <span className="font-medium text-foreground">
-                  {appliedStart}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium text-foreground">
-                  {appliedEnd}
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-        <DashboardDateFilter
-          onApply={(start, end) => {
-            setAppliedStart(start);
-            setAppliedEnd(end);
-          }}
-          isFetching={isFetching}
-          onRefresh={() => refetch()}
-        />
+      <div>
+        <Text.Large>Hi {user?.name}, Welcome Back.</Text.Large>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Inventory dashboard overview
+          {appliedStart && appliedEnd && (
+            <>
+              {" "}
+              &nbsp;·&nbsp;{" "}
+              <span className="font-medium text-foreground">
+                {appliedStart}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium text-foreground">{appliedEnd}</span>
+            </>
+          )}
+        </p>
       </div>
 
       {/* ── Quick Menu ─────────────────────────────────────────────────── */}
@@ -113,7 +110,20 @@ const Home = () => {
 
       {/* ── KPI Cards ──────────────────────────────────────────────────── */}
       <section className="space-y-3">
-        <SectionHeading title="Overview" description="Key numbers at a glance" />
+        <SectionHeading
+          title="Overview"
+          description="Key numbers at a glance"
+          action={
+            <DashboardDateFilter
+              onApply={(start, end) => {
+                setAppliedStart(start);
+                setAppliedEnd(end);
+              }}
+              isFetching={isFetching}
+              onRefresh={() => refetch()}
+            />
+          }
+        />
         <DashboardKpiCards data={summary} isLoading={false} />
       </section>
 
@@ -184,7 +194,8 @@ const Home = () => {
           />
           <DashboardExpensiveRmTable
             data={
-              summary.summary.raw_materials.tables.top_10_expensive_raw_materials
+              summary.summary.raw_materials.tables
+                .top_10_expensive_raw_materials
             }
           />
         </div>
@@ -199,7 +210,8 @@ const Home = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DashboardTopSuppliersTable
             data={
-              summary.summary.suppliers.tables.top_10_suppliers_by_supplied_items
+              summary.summary.suppliers.tables
+                .top_10_suppliers_by_supplied_items
             }
           />
           <DashboardSuppliersTrendChart
@@ -273,7 +285,8 @@ const Home = () => {
               .top_10_categories_by_raw_materials_count
           }
           customers={
-            summary.summary.categories.tables.top_10_categories_by_customers_count
+            summary.summary.categories.tables
+              .top_10_categories_by_customers_count
           }
         />
       </section>
