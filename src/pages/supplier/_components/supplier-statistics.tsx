@@ -12,8 +12,9 @@ export function SupplierStatistics() {
 
   if (isError && !isFetching)
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-        <p className="text-sm text-muted-foreground">Failed to load supplier statistics.</p>
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-center"> <p className="text-sm text-muted-foreground">
+          Failed to load supplier statistics.
+        </p>
         <Button size="sm" variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-3.5 w-3.5" />
           Try again

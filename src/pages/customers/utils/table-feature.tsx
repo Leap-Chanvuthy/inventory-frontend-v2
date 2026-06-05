@@ -33,10 +33,9 @@ const CustomerActions = ({ customer }: { customer: Customer }) => {
 };
 
 export const FILTER_OPTIONS = [
-  { value: " ", label: "All" },
   { value: "ACTIVE", label: "Active" },
   { value: "INACTIVE", label: "Inactive" },
-  { value: "PROSPECTIVE", label: "Prospective" },
+  { value: "BLACKLISTED", label: "Blacklist" },
 ];
 
 export const SORT_OPTIONS = [
@@ -74,7 +73,7 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
       <span className="font-medium whitespace-nowrap">{customer.fullname}</span>
     ),
   },
-    {
+  {
     key: "customer_category_name",
     header: "Category",
     className: "whitespace-nowrap py-6",
@@ -82,12 +81,14 @@ export const COLUMNS: DataTableColumn<Customer>[] = [
       <CustomerCategoryBadge categoryName={customer.customer_category_name} />
     ),
   },
-    {
+  {
     key: "discount_applicable",
     header: "Discount",
     className: "whitespace-nowrap py-6",
     render: customer => (
-      <span className="font-bold text-green-500">{customer?.customer_category?.discount_percentage ?? 0}%</span>
+      <span className="font-bold text-green-500">
+        {customer?.customer_category?.discount_percentage ?? 0}%
+      </span>
     ),
   },
   {

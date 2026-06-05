@@ -137,7 +137,7 @@ export const UpdateCustomerForm = () => {
   const statusOptions = [
     { value: CustomerStatus.ACTIVE, label: "Active" },
     { value: CustomerStatus.INACTIVE, label: "Inactive" },
-    { value: CustomerStatus.BLACKLISTED, label: "Blacklisted" },
+    { value: CustomerStatus.BLACKLISTED, label: "Blacklist" },
   ];
 
   // Customer category options
@@ -156,7 +156,9 @@ export const UpdateCustomerForm = () => {
     if (
       selectedCategoryId &&
       selectedCategoryName &&
-      !fetchedOptions.some(option => option.value === selectedCategoryId.toString())
+      !fetchedOptions.some(
+        option => option.value === selectedCategoryId.toString(),
+      )
     ) {
       return [
         {
@@ -168,7 +170,12 @@ export const UpdateCustomerForm = () => {
     }
 
     return fetchedOptions;
-  }, [categoriesData?.data.data, data?.data?.customer_category?.category_name, data?.data?.customer_category_id, data?.data?.customer_category_name]);
+  }, [
+    categoriesData?.data.data,
+    data?.data?.customer_category?.category_name,
+    data?.data?.customer_category_id,
+    data?.data?.customer_category_name,
+  ]);
 
   const SectionHeader = ({
     title,

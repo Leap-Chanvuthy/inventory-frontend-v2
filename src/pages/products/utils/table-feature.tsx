@@ -56,6 +56,10 @@ export const SORT_OPTIONS = [
 // filter by product type
 export const FILTER_OPTIONS = [
   {
+    value: "expired",
+    label: "Expired",
+  },
+  {
     value: "external_purchased",
     label: "External Purchased",
   },
