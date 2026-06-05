@@ -112,7 +112,6 @@ export const RecoverSupplierAction = ({ supplier }: { supplier: Supplier }) => {
 };
 
 export const FILTER_OPTIONS = [
-  { value: " ", label: "All" },
   { value: "PRODUCTS", label: "Products" },
   { value: "FOOD", label: "Food" },
   { value: "CLOTHING", label: "Clothing" },

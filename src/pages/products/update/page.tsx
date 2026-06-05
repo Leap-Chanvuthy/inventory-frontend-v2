@@ -10,7 +10,7 @@ const UpdateProduct = () => {
   const productName = data?.data?.product?.product_name || "";
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "products", label: "Products", link: "/products" },
     { name: "update", label: "Update Product" },
     {

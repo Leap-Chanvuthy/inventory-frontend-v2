@@ -3,7 +3,7 @@ import { ViewSupplierForm } from "../_components/view-detail/view-supplier-form"
 
 export function SupplierDetail() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "detail", label: "Supplier Detail" },
   ];

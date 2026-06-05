@@ -9,7 +9,7 @@ export const ViewCustomerCategories = () => {
   const { data: category } = useSingleCustomerCategory(categoryId);
 
   const breadcrumbItems = [
-    { name: "catalogs", label: "Catalogs", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "" },
     {
       name: "customer-categories",
       label: "Customer Categories",

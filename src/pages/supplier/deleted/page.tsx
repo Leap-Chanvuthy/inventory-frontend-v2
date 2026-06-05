@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export default function DeletedSuppliers() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "supplier", label: "Suppliers", link: "/supplier" },
     { name: "deleted", label: "Deleted Suppliers" },
   ];

@@ -10,7 +10,7 @@ export function RawMaterialDetail() {
   const materialName = data?.data?.raw_material?.material_name || "";
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
     { name: "detail", label: "Raw Material Detail" },
     {

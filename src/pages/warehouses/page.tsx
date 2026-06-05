@@ -7,7 +7,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export default function Warehouses() {
   const breadcrumbItems = [
-    { name: "catalogs", label: "Catalogs", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "" },
     { name: "warehouses", label: "Warehouses", link: "/warehouses" },
     { name: "list", label: "List of Warehouses" },
   ];

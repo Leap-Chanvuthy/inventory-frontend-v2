@@ -9,7 +9,7 @@ export default function UpdateRawMaterial() {
   const materialName = data?.data?.raw_material?.material_name;
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
     { name: "update-raw-material", label: "Update Raw Material" },
     {

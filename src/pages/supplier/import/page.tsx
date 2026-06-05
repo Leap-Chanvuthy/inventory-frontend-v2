@@ -3,7 +3,7 @@ import { ImportSupplierForm } from "../_components/import-supplier-form";
 
 function ImportSuppliers() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "import-suppliers", label: "Import Suppliers" },
   ];

@@ -9,7 +9,7 @@ export const EditCategories = () => {
   const categoryName = data?.data?.category_name;
 
   const breadcrumbItems = [
-    { name: "catalogs", label: "Catalogs", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "" },
     {
       name: "categories",
       label: "Category",

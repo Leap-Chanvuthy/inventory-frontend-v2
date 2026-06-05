@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
 const breadcrumbItems = [
-  { name: "catalog", label: "Catalog", link: "/categories" },
+  { name: "catalog", label: "Catalog", link: "" },
   { name: "uom", label: "UOM", link: "/unit-of-measurement" },
   { name: "list", label: "List of Unit of Measurement" },
 ];
@@ -25,19 +25,22 @@ export default function UOM() {
 
   function setSelectedCategoryId(id: number | null) {
     setSearchParams(
-      (prev) => {
+      prev => {
         const next = new URLSearchParams(prev);
         if (id == null) next.delete("category_id");
         else next.set("category_id", String(id));
         return next;
       },
-      { replace: true }
+      { replace: true },
     );
   }
 
   const { data: categoriesData } = useUomCategories();
-  const categories: any[] = (categoriesData as any)?.data ?? categoriesData ?? [];
-  const selectedCategory = categories.find((c: any) => c.id === selectedCategoryId);
+  const categories: any[] =
+    (categoriesData as any)?.data ?? categoriesData ?? [];
+  const selectedCategory = categories.find(
+    (c: any) => c.id === selectedCategoryId,
+  );
 
   // On mobile, close the drawer after a category is selected
   function handleCategorySelect(id: number) {
@@ -48,7 +51,7 @@ export default function UOM() {
   return (
     <div className="flex flex-col h-[calc(100vh-56px)] min-h-0">
       {/* Top bar: breadcrumb + mobile sidebar toggle */}
-      <div className="px-4 md:px-6 py-3 border-b shrink-0 flex items-center gap-2">
+      <div className="px-4 md:px-6 pb-3 border-b shrink-0 flex items-center gap-2">
         {/* Hamburger — visible only below md */}
         <Button
           variant="ghost"
@@ -64,7 +67,6 @@ export default function UOM() {
 
       {/* Split panel body */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-
         {/* ── Desktop sidebar (md+) ── */}
         <div className="hidden md:flex md:w-64 lg:w-72 shrink-0 border-r overflow-y-auto flex-col">
           <CategorySidebar
@@ -93,13 +95,16 @@ export default function UOM() {
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-foreground">No category selected</p>
+                <p className="font-medium text-foreground">
+                  No category selected
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   <span className="md:hidden">
                     Tap the <strong>≡</strong> menu to choose a category.
                   </span>
                   <span className="hidden md:inline">
-                    Select a category from the left panel to view and manage its units.
+                    Select a category from the left panel to view and manage its
+                    units.
                   </span>
                 </p>
               </div>

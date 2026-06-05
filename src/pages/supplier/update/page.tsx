@@ -9,7 +9,7 @@ function UpdateSupplier() {
   const supplierName = data?.data?.supplier?.official_name;
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "update-supplier", label: "Update Supplier" },
     {

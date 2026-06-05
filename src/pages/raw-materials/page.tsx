@@ -53,7 +53,7 @@ export default function RawMaterials() {
   });
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
     { name: "list", label: "List of Raw Materials" },
   ];

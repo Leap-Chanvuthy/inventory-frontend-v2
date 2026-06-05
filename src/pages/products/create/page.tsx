@@ -3,7 +3,7 @@ import { CreateProductForm } from "../_components/create-product-form";
 
 const CreateProduct = () => {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "products", label: "Products", link: "/products" },
     {
       name: "create",

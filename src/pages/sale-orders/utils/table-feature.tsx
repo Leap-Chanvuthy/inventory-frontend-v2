@@ -145,6 +145,9 @@ export const buildOrderItemsFormColumns = ({
       const product = products.find(p => p.id === item.productId);
       const quantityType = product?.quantityType ?? "DECIMAL";
       const step = quantityType === "INTEGER" ? 1 : 0.01;
+      const preview = allocationPreviewByProductId[item.productId];
+      const hasStockError = preview !== undefined && !preview?.can_fulfill;
+      const hasError = !!itemErrors[item.productId] || hasStockError;
 
       return (
         <div>
@@ -152,7 +155,7 @@ export const buildOrderItemsFormColumns = ({
             type="number"
             min={1}
             step={step}
-            className="h-8 w-20 text-center"
+            className={`h-8 w-20 text-center ${hasError ? "border-destructive focus-visible:ring-destructive" : ""}`}
             value={item.qty}
             onChange={event => onUpdateQty(item.productId, Number(event.target.value) || 1)}
           />

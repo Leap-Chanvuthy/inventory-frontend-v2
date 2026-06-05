@@ -7,6 +7,14 @@ import { useSearchParams } from "react-router-dom";
 import { Building2, MapPin, CreditCard, Bell } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text/app-text";
+import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+
+const TAB_LABELS: Record<string, string> = {
+  "general-info": "General",
+  "address-info": "Address",
+  "banking-info": "Banking",
+  "notification-info": "Notification",
+};
 
 type CompanyTab =
   | "general-info"
@@ -50,8 +58,15 @@ const Company = () => {
     setSearchParams({ tab });
   };
 
+  const breadcrumbItems = [
+    { name: "settings", label: "Settings", link: "" },
+    { name: "company", label: "Company", link: "/company" },
+    { name: activeTab, label: TAB_LABELS[activeTab] ?? activeTab },
+  ];
+
   return (
-    <div className="max-w-[1500px] mx-auto p-10 space-y-6 min-h-screen">
+    <div className="max-w-full mx-auto px-6 pb-10 space-y-6 min-h-screen">
+      <BreadCrumb items={breadcrumbItems} />
       <div className="space-y-0.5">
         <Text.TitleMedium className="tracking-tight">
           Company Settings

@@ -3,7 +3,7 @@ import { CreateCategoryForm } from "../_components/create-category-form";
 
 export const CreateProductCategories = () => {
   const breadcrumbItems = [
-    { name: "catalogs", label: "Catalogs", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "" },
     {
       name: "product-categories",
       label: "Product Categories",

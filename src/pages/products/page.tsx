@@ -53,7 +53,7 @@ const Product = () => {
   });
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "products", label: "Products", link: "/products" },
     { name: "list", label: "List of Products" },
   ];

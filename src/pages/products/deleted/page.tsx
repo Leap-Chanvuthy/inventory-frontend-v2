@@ -4,7 +4,7 @@ import { DeletedProductList } from "../_components/deleted-product-list";
 
 export default function DeletedProducts() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "products", label: "Products", link: "/products" },
     { name: "deleted", label: "Deleted Products" },
   ];

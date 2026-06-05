@@ -16,6 +16,15 @@ import SidebarFooter from "@/components/layout/sidebar-footer";
 import { ForgetPassword } from "./_components/forget-password";
 import { ApiDocsGuide } from "./_components/api-docs";
 import { Text } from "@/components/ui/text/app-text";
+import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+
+const TAB_LABELS: Record<string, string> = {
+  "profile": "Profile",
+  "forget-password": "Forget Password",
+  "two-factor-auth": "Two Factor Auth",
+  "appearance": "Appearance",
+  "api-docs": "API Docs",
+};
 
 export const PROFILE_SIDEBAR_MENU_ITEMS: {
   title: string;
@@ -54,8 +63,15 @@ const Profile = () => {
     setSearchParams({ tab });
   };
 
+  const breadcrumbItems = [
+    { name: "settings", label: "Settings", link: "" },
+    { name: "profile", label: "Profile", link: "/profile" },
+    { name: activeTab, label: TAB_LABELS[activeTab] ?? activeTab },
+  ];
+
   return (
-    <div className="max-w-[1500px] mx-auto p-10 space-y-6 min-h-screen">
+    <div className="max-w-full mx-auto px-6 pb-10 space-y-6 min-h-screen">
+      <BreadCrumb items={breadcrumbItems} />
       <div className="space-y-0.5">
         <Text.TitleMedium className="tracking-tight">
           Profile Settings

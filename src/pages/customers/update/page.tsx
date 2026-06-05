@@ -9,7 +9,7 @@ function UpdateCustomer() {
   const customerName = data?.data?.fullname;
 
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "customer", label: "Customer", link: "/customer" },
     { name: "update-customer", label: "Update Customer" },
     {

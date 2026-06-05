@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export const ProductCategories = () => {
   const breadcrumbItems = [
-    { name: "catalogs", label: "Catalogs", link: "/" },
+    { name: "catalogs", label: "Catalogs", link: "" },
     { name: "product-categories", label: "Product Categories" },
   ];
 

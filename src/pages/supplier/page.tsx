@@ -5,7 +5,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export function Supplier() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "supplier", label: "Supplier", link: "/supplier" },
     { name: "list", label: "List of Supplier" },
   ];

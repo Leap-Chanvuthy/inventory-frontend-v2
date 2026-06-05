@@ -3,7 +3,7 @@ import { CreateRawMaterialForm } from "../_components/create-raw-material-form";
 
 const CreateRawMaterial = () => {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/raw-materials" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
     {
       name: "create",

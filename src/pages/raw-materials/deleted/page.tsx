@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text/app-text";
 
 export default function DeletedRawMaterials() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "raw-materials", label: "Raw Materials", link: "/raw-materials" },
     { name: "deleted", label: "Deleted Raw Materials" },
   ];

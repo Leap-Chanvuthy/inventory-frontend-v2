@@ -3,7 +3,7 @@ import { CreateCustomerForm } from "../_components/create-customer-form";
 
 function CreateCustomer() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "sale-management&pos", label: "Sale Management & POS", link: "" },
     { name: "customers", label: "Customers", link: "/customer" },
     { name: "create-customer", label: "Create a new Customer" },
   ];

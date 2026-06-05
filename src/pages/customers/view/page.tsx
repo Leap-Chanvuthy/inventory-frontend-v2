@@ -3,7 +3,7 @@ import { ViewCustomerForm } from "../_components/view-customer-form";
 
 export function CustomerDetail() {
   const breadcrumbItems = [
-    { name: "inventory", label: "Inventory", link: "/" },
+    { name: "inventory", label: "Inventory", link: "" },
     { name: "customer", label: "Customer", link: "/customer" },
     { name: "detail", label: "Customer Detail" },
   ];
