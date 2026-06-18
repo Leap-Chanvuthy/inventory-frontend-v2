@@ -4,7 +4,6 @@ import {
   ChevronRight,
   Edit3,
   FileText,
-  MoreVertical,
   PauseCircle,
   Printer,
   RotateCcw,
@@ -171,9 +170,9 @@ export function OrderDetailsPanel({
           >
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground">
+          {/* <Button variant="outline" size="icon" className="h-8 w-8 text-muted-foreground">
             <MoreVertical className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       </header>
 

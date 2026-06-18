@@ -41,6 +41,17 @@ interface RefundModalProps {
 }
 
 const STEPS = ["Select Items", "Return Decision", "Refund Decision", "Summary"];
+const DECIMAL_QUANTITY_STEP = 0.01;
+
+const getQuantityStep = (quantityType?: string | null) =>
+  quantityType === "INTEGER" ? 1 : DECIMAL_QUANTITY_STEP;
+
+const normalizeQuantityInput = (value: string) => {
+  if (value.trim() === "") return 0;
+
+  const quantity = Number(value);
+  return Number.isFinite(quantity) ? quantity : 0;
+};
 
 export function RefundModal({
   open,
@@ -138,6 +149,7 @@ export function RefundModal({
               <div className="rounded-md border border-border bg-card divide-y divide-border">
                 {refundData.items.map((item, index) => {
                   const maxQty = Math.max(item.maxReturnQty, item.maxRefundQty);
+                  const quantityStep = getQuantityStep(item.quantityType);
                   const hasQuantityTypeError =
                     item.quantityType === "INTEGER" &&
                     item.quantity > 0 &&
@@ -166,9 +178,13 @@ export function RefundModal({
                           type="number"
                           min="0"
                           max={maxQty}
+                          step={quantityStep}
+                          inputMode={item.quantityType === "INTEGER" ? "numeric" : "decimal"}
                           className="h-8 w-24 text-center"
                           value={item.quantity}
-                          onChange={event => onChangeQty(index, Number(event.target.value) || 0)}
+                          onChange={event =>
+                            onChangeQty(index, normalizeQuantityInput(event.target.value))
+                          }
                         />
                       </div>
                     </div>

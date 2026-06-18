@@ -74,6 +74,7 @@ export const CreateCustomerForm = () => {
     const payload: CreateCustomerFormPayload = {
       ...form,
       customer_category_id: Number(form.customer_category_id),
+      customer_address: form.customer_address.trim() || null,
       customer_status: form.customer_status as CustomerStatus,
       image,
     };

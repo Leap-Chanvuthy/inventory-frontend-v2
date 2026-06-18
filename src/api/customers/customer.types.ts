@@ -129,7 +129,7 @@ export interface CreateCustomerFormPayload {
   email_address: string;
   phone_number: string;
   social_media: string;
-  customer_address: string;
+  customer_address: string | null;
   google_map_link: string;
   customer_status: CustomerStatus;
   customer_category_id: number;
