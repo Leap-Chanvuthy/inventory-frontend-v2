@@ -22,6 +22,7 @@ export function DeletedRawMaterialList() {
     perPage,
     filter,
     search,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams({ defaultSort: "-deleted_at" });
 
@@ -49,6 +50,7 @@ export function DeletedRawMaterialList() {
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           isListOptionDisplayed={true}
         />
 

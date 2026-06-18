@@ -21,6 +21,8 @@ export default function UomCategoryList() {
     setSort,
     perPage,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -43,11 +45,13 @@ export default function UomCategoryList() {
           onSearch={setSearch}
           search={search}
           sortOptions={CATEGORY_SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           createHref="/unit-of-measurement/categories/create"
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           isListOptionDisplayed={true}
         />
 

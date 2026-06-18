@@ -6,10 +6,24 @@ import {
 } from "./customer-category.api";
 import { CustomerCategoryQueryParams } from "@/api/categories/types/category.type";
 
+const customerCategoryQueryKey = (
+  scope: string,
+  params?: CustomerCategoryQueryParams,
+) => [
+  scope,
+  params?.page,
+  params?.per_page,
+  params?.["filter[search]"],
+  params?.["filter[is_deleted]"],
+  params?.sort,
+];
+
 export const useCustomerCategories = (params?: CustomerCategoryQueryParams) => {
   return useQuery({
-    queryKey: ["customer-categories", params],
+    queryKey: customerCategoryQueryKey("customer-categories", params),
     queryFn: () => getCustomerCategories(params),
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -24,7 +38,9 @@ export const useSingleCustomerCategory = (id: number) => {
 
 export const useTrashedCustomerCategories = (params?: CustomerCategoryQueryParams) => {
   return useQuery({
-    queryKey: ["customer-categories", "trashed"],
+    queryKey: customerCategoryQueryKey("customer-categories-trashed", params),
     queryFn: () => getTrashedCustomerCategories(params),
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 }

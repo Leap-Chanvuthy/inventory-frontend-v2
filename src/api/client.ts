@@ -57,6 +57,10 @@ const shouldAutoLogoutOn401 = (error: any): boolean => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error?.response?.status === 429) {
+      console.warn("Too many requests. Filtering is being applied too quickly.");
+    }
+
     if (shouldAutoLogoutOn401(error)) {
       store.dispatch(logout());
     }

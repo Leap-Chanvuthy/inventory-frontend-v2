@@ -19,7 +19,9 @@ export default function UserList() {
     setFilter,
     filter,
     search,
+    sort,
     perPage,
+    clearQueryParams,
 
     // api ready params
     apiParams,
@@ -49,6 +51,7 @@ export default function UserList() {
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
           selectedFilter={filter || ""}
@@ -56,6 +59,7 @@ export default function UserList() {
           onPerPageChange={setPerPage}
           perPage={perPage}
           onFilterChange={val => setFilter(val || undefined)}
+          onClearFilters={clearQueryParams}
           createHref="/users/create"
           isListOptionDisplayed={true}
         />

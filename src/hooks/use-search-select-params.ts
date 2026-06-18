@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 type TableQueryConfig = {
   defaultPage?: number;
@@ -15,10 +15,25 @@ export function useSearchSelectParams(config?: TableQueryConfig) {
   const [sort, setSort] = useState<string | undefined>(config?.defaultSort);
   const [filter, setFilter] = useState<string | undefined>(config?.defaultFilter);
 
-  // ✅ reset page when search changes
-  useEffect(() => {
+  const updateSearch = useCallback((value: string) => {
+    setSearch(value);
     setPage(1);
-  }, [search]);
+  }, []);
+
+  const updateSort = useCallback((value?: string) => {
+    setSort(value);
+    setPage(1);
+  }, []);
+
+  const updateFilter = useCallback((value?: string) => {
+    setFilter(value);
+    setPage(1);
+  }, []);
+
+  const updatePerPage = useCallback((value: number) => {
+    setPerPage(value);
+    setPage(1);
+  }, []);
 
   const apiParams = useMemo(
     () => ({
@@ -38,10 +53,10 @@ export function useSearchSelectParams(config?: TableQueryConfig) {
     filter,
     perPage,
     setPage,
-    setSearch,
-    setSort,
-    setFilter,
-    setPerPage,
+    setSearch: updateSearch,
+    setSort: updateSort,
+    setFilter: updateFilter,
+    setPerPage: updatePerPage,
     apiParams,
   };
 }

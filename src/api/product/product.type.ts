@@ -143,6 +143,10 @@ export interface Product {
   latest_selling_exchange_rate_from_usd_to_riel?: number;
   latest_selling_exchange_rate_from_riel_to_usd?: number;
   current_qty_in_stock?: number;
+  expired_stock_quantity?: number;
+  has_expired_stock?: number;
+  next_expiry_date?: string | null;
+  next_expiry_sort_date?: string;
   // Nested relations
   category?: ProductCategory;
   supplier?: Supplier | null;
@@ -403,6 +407,7 @@ export interface ProductQueryParams {
   "filter[supplier_id]"?: number;
   "filter[warehouse_id]"?: number;
   "filter[uom_id]"?: number;
+  "filter[has_expired_stock]"?: boolean;
   sort?: string;
 }
 

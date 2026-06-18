@@ -19,6 +19,8 @@ export function ImportHistoryList() {
     perPage,
     filter,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -41,11 +43,13 @@ export function ImportHistoryList() {
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           selectedFilter={filter}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           extraActions={
             <Button variant="outline" asChild>
               <Link to="/supplier/create?tab=import">

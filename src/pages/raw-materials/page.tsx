@@ -1,4 +1,5 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { useCallback } from "react";
 import { RawMaterialList } from "./_components/raw-material-list";
 import { Text } from "@/components/ui/text/app-text";
 import { CategoryFilterLayout } from "@/components/reusable/sidebar-filter/category-filter-layout";
@@ -10,7 +11,10 @@ import {
   useRestoreRawMaterialCategory,
   useUpdateRawMaterialCategory,
 } from "@/api/categories/raw-material-categories/raw-material-category.mutation";
-import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
+import {
+  CategoryFilterQueryMapperArgs,
+  useCategoryFilterController,
+} from "@/components/reusable/sidebar-filter/use-category-filter-controller";
 import {
   CategoryQueryParams,
   RawMaterialCategory,
@@ -19,6 +23,17 @@ import { CreateCategoryForm } from "@/pages/category/raw-material-category/_comp
 import { UpdateCategoryForm } from "@/pages/category/raw-material-category/_components/update-raw-material-category-form";
 
 export default function RawMaterials() {
+  const mapRawMaterialCategoryQueryParams = useCallback(
+    ({ page, perPage, search, status, sort }: CategoryFilterQueryMapperArgs) => ({
+      page,
+      per_page: perPage,
+      sort,
+      "filter[search]": search || undefined,
+      "filter[is_deleted]": status === "deleted" ? 1 : 0,
+    }),
+    [],
+  );
+
   const {
     categories,
     categoriesLoading,
@@ -38,13 +53,7 @@ export default function RawMaterials() {
     isCreatingCategory,
     isUpdatingCategory,
   } = useCategoryFilterController<RawMaterialCategory, CategoryQueryParams>({
-    mapQueryParams: ({ page, perPage, search, status, sort }) => ({
-      page,
-      per_page: perPage,
-      sort,
-      "filter[search]": search || undefined,
-      "filter[is_deleted]": status === "deleted" ? 1 : 0,
-    }),
+    mapQueryParams: mapRawMaterialCategoryQueryParams,
     useCategoriesQuery: useRawMaterialCategories,
     useCreateMutation: useCreateRawMaterialCategory,
     useUpdateMutation: useUpdateRawMaterialCategory,

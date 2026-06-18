@@ -1,4 +1,5 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { useCallback } from "react";
 import { Text } from "@/components/ui/text/app-text";
 import { ProductList } from "./_components/product-list";
 import { CategoryFilterLayout } from "@/components/reusable/sidebar-filter/category-filter-layout";
@@ -10,7 +11,10 @@ import {
   useRestoreProductCategory,
   useUpdateProductCategory,
 } from "@/api/categories/product-categories/product-category.mutation";
-import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
+import {
+  CategoryFilterQueryMapperArgs,
+  useCategoryFilterController,
+} from "@/components/reusable/sidebar-filter/use-category-filter-controller";
 import {
   CategoryQueryParams,
   ProductCategory,
@@ -19,6 +23,17 @@ import { CreateCategoryForm } from "@/pages/category/product-category/_component
 import { UpdateCategoryForm } from "@/pages/category/product-category/_components/update-product-category-form";
 
 const Product = () => {
+  const mapProductCategoryQueryParams = useCallback(
+    ({ page, perPage, search, status, sort }: CategoryFilterQueryMapperArgs) => ({
+      page,
+      per_page: perPage,
+      sort,
+      "filter[search]": search || undefined,
+      "filter[is_deleted]": status === "deleted" ? 1 : 0,
+    }),
+    [],
+  );
+
   const {
     categories,
     categoriesLoading,
@@ -38,13 +53,7 @@ const Product = () => {
     isCreatingCategory,
     isUpdatingCategory,
   } = useCategoryFilterController<ProductCategory, CategoryQueryParams>({
-    mapQueryParams: ({ page, perPage, search, status, sort }) => ({
-      page,
-      per_page: perPage,
-      sort,
-      "filter[search]": search || undefined,
-      "filter[is_deleted]": status === "deleted" ? 1 : 0,
-    }),
+    mapQueryParams: mapProductCategoryQueryParams,
     useCategoriesQuery: useProductCategories,
     useCreateMutation: useCreateProductCategory,
     useUpdateMutation: useUpdateProductCategory,

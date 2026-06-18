@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import debounce from "debounce";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +34,7 @@ import {
 } from "lucide-react";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import ListOptionToggle from "./list-option-toggle";
+import { useDebounce } from "@/hooks/use-debounce";
 
 /* ===================== Types ===================== */
 
@@ -75,6 +75,8 @@ interface TableToolbarProps {
   onFilterChange?: (value: string) => void;
   filterFetchFn?: (params: FetchParams) => Promise<FetchResult>;
   filterSelectedLabel?: string;
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
 
   /* Actions */
   deletedPathname?: string;
@@ -98,7 +100,7 @@ export const TableToolbar = ({
   onPerPageChange,
 
   sortOptions = [],
-  selectedSort = [],
+  selectedSort,
   onSortChange,
 
   filterOptions = [],
@@ -106,6 +108,8 @@ export const TableToolbar = ({
   onFilterChange,
   filterFetchFn,
   filterSelectedLabel,
+  hasActiveFilters = false,
+  onClearFilters,
 
   deletedPathname,
   onExport,
@@ -114,14 +118,16 @@ export const TableToolbar = ({
   isListOptionDisplayed = false,
   extraActions,
 }: TableToolbarProps) => {
-  const [searchValue, setSearchValue] = useState<string>(search || "");
-  const [sortValues, setSortValues] = useState<string[]>(selectedSort || []);
+  const normalizedSearch = search || "";
+  const [searchValue, setSearchValue] = useState<string>(normalizedSearch);
+  const [sortValues, setSortValues] = useState<string[]>(selectedSort ?? []);
   const [filterValue, setFilterValue] = useState<string>(selectedFilter ?? "");
   const [perPageValue, setPerPageValue] = useState<number | undefined>(
     perPage || undefined,
   );
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const debouncedSearchValue = useDebounce(searchValue, 500);
 
   /* ---------- Keyboard shortcut: press "/" to focus search ---------- */
   useEffect(() => {
@@ -154,22 +160,42 @@ export const TableToolbar = ({
   const onSearchRef = useRef(onSearch);
   useEffect(() => { onSearchRef.current = onSearch; });
 
-  const debouncedSearch = useCallback(
-    debounce((value: string) => {
-      onSearchRef.current(value);
-    }, 500),
-    [],
-  );
+  useEffect(() => {
+    setSearchValue(prev =>
+      prev === normalizedSearch ? prev : normalizedSearch,
+    );
+  }, [normalizedSearch]);
 
   useEffect(() => {
-    debouncedSearch(searchValue);
-  }, [searchValue]);
+    setFilterValue(selectedFilter ?? "");
+  }, [selectedFilter]);
+
+  useEffect(() => {
+    setPerPageValue(perPage || undefined);
+  }, [perPage]);
+
+  useEffect(() => {
+    if (selectedSort === undefined) return;
+
+    setSortValues(prev => {
+      const isSame =
+        prev.length === selectedSort.length &&
+        prev.every((value, index) => value === selectedSort[index]);
+
+      return isSame ? prev : [...selectedSort];
+    });
+  }, [selectedSort]);
+
+  useEffect(() => {
+    if (debouncedSearchValue === normalizedSearch) return;
+    if (debouncedSearchValue !== searchValue) return;
+
+    onSearchRef.current(debouncedSearchValue);
+  }, [debouncedSearchValue, normalizedSearch, searchValue]);
 
   /* ---------- Sort Toggle ---------- */
   const toggleSort = (value: string) => {
-    const updated = sortValues.includes(value)
-      ? sortValues.filter(v => v !== value)
-      : [...sortValues, value];
+    const updated = sortValues.includes(value) ? [] : [value];
 
     setSortValues(updated);
     onSortChange?.(updated);
@@ -184,17 +210,26 @@ export const TableToolbar = ({
   /* ---------- Filter Change ---------- */
   const handleFilterChange = (value: string) => {
     setFilterValue(value);
-    onFilterChange?.(value);
+    if (value !== (selectedFilter ?? "")) {
+      onFilterChange?.(value);
+    }
   };
 
-  const clearShortAndFilter = () => {
+  const clearSortAndFilter = () => {
     setSearchValue("");
     setFilterValue("");
     setSortValues([]);
+    setPerPageValue(10);
+
+    if (onClearFilters) {
+      onClearFilters();
+      return;
+    }
+
+    onSearchRef.current("");
     onSortChange?.([]);
     onFilterChange?.("");
     onPerPageChange?.(10);
-    setPerPageValue(10);
   };
 
   return (
@@ -207,7 +242,7 @@ export const TableToolbar = ({
 
           <Input
             ref={searchInputRef}
-            value={search || searchValue}
+            value={searchValue}
             onChange={e => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
             className="pl-9 pr-12"
@@ -252,7 +287,7 @@ export const TableToolbar = ({
                             onCheckedChange={() => toggleSort(opt.value)}
                           />
                           <span className="text-sm">
-                            {opt.label == selectedSort[0]
+                            {opt.label == selectedSort?.[0]
                               ? `${opt.label}`
                               : opt.label}
                           </span>
@@ -320,12 +355,12 @@ export const TableToolbar = ({
 
           {isListOptionDisplayed && <ListOptionToggle />}
 
-          {(filterValue || sortValues.length > 0) && (
+          {(hasActiveFilters || filterValue || sortValues.length > 0) && (
             <Button
               variant="outline"
               className="text-red-500 h-9"
               size="sm"
-              onClick={clearShortAndFilter}
+              onClick={clearSortAndFilter}
             >
               Clear Filter
             </Button>

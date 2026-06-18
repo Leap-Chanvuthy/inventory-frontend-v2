@@ -1,4 +1,4 @@
-import { Customer } from "@/api/customers/customer.types";
+import { Customer, CustomerStatus } from "@/api/customers/customer.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import TableActions from "@/components/reusable/partials/table-actions";
 import {
@@ -33,9 +33,9 @@ const CustomerActions = ({ customer }: { customer: Customer }) => {
 };
 
 export const FILTER_OPTIONS = [
-  { value: "ACTIVE", label: "Active" },
-  { value: "INACTIVE", label: "Inactive" },
-  { value: "BLACKLISTED", label: "Blacklist" },
+  { value: CustomerStatus.ACTIVE, label: "Active" },
+  { value: CustomerStatus.INACTIVE, label: "Inactive" },
+  { value: CustomerStatus.BLACKLISTED, label: "Blacklisted" },
 ];
 
 export const SORT_OPTIONS = [

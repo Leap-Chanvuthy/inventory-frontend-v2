@@ -137,7 +137,7 @@ export const UpdateCustomerForm = () => {
   const statusOptions = [
     { value: CustomerStatus.ACTIVE, label: "Active" },
     { value: CustomerStatus.INACTIVE, label: "Inactive" },
-    { value: CustomerStatus.BLACKLISTED, label: "Blacklist" },
+    { value: CustomerStatus.BLACKLISTED, label: "Blacklisted" },
   ];
 
   // Customer category options

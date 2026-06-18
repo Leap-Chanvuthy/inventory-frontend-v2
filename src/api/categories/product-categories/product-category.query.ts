@@ -6,6 +6,18 @@ import {
 } from "./product-category.api";
 import { ProductCategoryQueryParams } from "@/api/categories/types/category.type";
 
+const productCategoryQueryKey = (
+  scope: string,
+  params?: ProductCategoryQueryParams,
+) => [
+  scope,
+  params?.page,
+  params?.per_page,
+  params?.["filter[search]"],
+  params?.["filter[is_deleted]"],
+  params?.sort,
+];
+
 export const useProductCategories = (params?: ProductCategoryQueryParams) => {
   const isDeletedFilter = params?.["filter[is_deleted]"] as unknown;
   const normalizedDeletedFilter =
@@ -20,9 +32,14 @@ export const useProductCategories = (params?: ProductCategoryQueryParams) => {
     normalizedDeletedFilter === "true";
 
   return useQuery({
-    queryKey: ["product-categories", useTrashed ? "trashed" : "active", params],
+    queryKey: productCategoryQueryKey(
+      useTrashed ? "product-categories-trashed" : "product-categories",
+      params,
+    ),
     queryFn: () =>
       useTrashed ? getTrashedProductCategories(params) : getProductCategories(params),
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 

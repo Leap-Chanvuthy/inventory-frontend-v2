@@ -48,9 +48,9 @@ export function statusMeta(status: CustomerStatus) {
       label: "Inactive",
     };
   return {
-    icon: <Clock className="w-4 h-4 text-blue-500" />,
-    bg: "bg-blue-500/10",
-    label: "Prospective",
+    icon: <Clock className="w-4 h-4 text-red-500" />,
+    bg: "bg-red-500/10",
+    label: "Blacklisted",
   };
 }
 

@@ -15,6 +15,7 @@ export function UserSelectModal() {
         setSort,
         filter,
         setFilter,
+        clearQueryParams,
         // api ready params
         apiParams,
     } = useTableQueryParams();
@@ -59,6 +60,7 @@ export function UserSelectModal() {
                 onSortChange={setSort}
                 filterOptions={FILTER_OPTIONS}
                 onFilterChange={setFilter}
+                onClearFilters={clearQueryParams}
                 createHref="/users/create"
 
                 onConfirm={users => {

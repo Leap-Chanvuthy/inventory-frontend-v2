@@ -49,6 +49,8 @@ const ProductActions = ({ product }: { product: Product }) => {
 export const SORT_OPTIONS = [
   { value: "-created_at", label: "Newest" },
   { value: "created_at", label: "Oldest" },
+  { value: "-has_expired_stock,next_expiry_sort_date", label: "Expired First" },
+  { value: "next_expiry_sort_date", label: "Expiry Date (Soonest)" },
   { value: "product_name", label: "Name (A-Z)" },
   { value: "-product_name", label: "Name (Z-A)" },
 ];

@@ -1,12 +1,28 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
 import { getProducts, getProductById, getTrashedProducts, getInternalReorderMovement, getExternalReorderMovement, getProductMovements, getProductPnLDetailed, getProductStockLots, getProductScrapEligibleStockLots, getProductBomSummary, getProductMovementBomSummary, getScrapMovement, previewProductSaleAllocation } from "./product.api";
 import { ProductQueryParams, ProductMovementQueryParams, ProductStockLotQueryParams } from "./product.type";
 
+const productListQueryKey = (scope: string, params?: ProductQueryParams) => [
+  scope,
+  params?.page,
+  params?.per_page,
+  params?.["filter[search]"],
+  params?.["filter[product_type]"],
+  params?.["filter[product_category_id]"],
+  params?.["filter[supplier_id]"],
+  params?.["filter[warehouse_id]"],
+  params?.["filter[uom_id]"],
+  params?.["filter[has_expired_stock]"],
+  params?.sort,
+];
+
 export const useProducts = (params?: ProductQueryParams) => {
   return useQuery({
-    queryKey: ["products", params],
+    queryKey: productListQueryKey("products", params),
     queryFn: () => getProducts(params),
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -20,9 +36,10 @@ export const useSingleProduct = (id: number) => {
 
 export const useTrashedProducts = (params?: ProductQueryParams) => {
   return useQuery({
-    queryKey: ["products-trashed", params],
+    queryKey: productListQueryKey("products-trashed", params),
     queryFn: () => getTrashedProducts(params),
-    placeholderData: keepPreviousData,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -44,10 +61,19 @@ export const useExternalReorderMovement = (productId: number, movementId: number
 
 export const useProductMovements = (productId: number, params?: ProductMovementQueryParams) => {
   return useQuery({
-    queryKey: ["product-movements", productId, params],
+    queryKey: [
+      "product-movements",
+      productId,
+      params?.page,
+      params?.per_page,
+      params?.sort,
+      params?.["filter[movement_type]"],
+      params?.["filter[direction]"],
+    ],
     queryFn: () => getProductMovements(productId, params),
     enabled: !!productId,
-    placeholderData: keepPreviousData,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -56,10 +82,16 @@ export const useProductStockLots = (
   params?: ProductStockLotQueryParams,
 ) => {
   return useQuery({
-    queryKey: ["product-stock-lots", productId, params],
+    queryKey: [
+      "product-stock-lots",
+      productId,
+      params?.include_children,
+      params?.include_disabled,
+    ],
     queryFn: () => getProductStockLots(productId, params),
     enabled: !!productId,
-    placeholderData: keepPreviousData,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 

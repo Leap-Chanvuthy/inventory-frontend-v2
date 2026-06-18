@@ -22,7 +22,9 @@ export default function UOMList() {
     setSort,
     perPage,
     search,
+    sort,
     filter,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -94,11 +96,17 @@ export default function UOMList() {
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           createHref="/unit-of-measurement/create"
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          hasActiveFilters={Boolean(selectedCategory)}
+          onClearFilters={() => {
+            setSelectedCategory(undefined);
+            clearQueryParams();
+          }}
           isListOptionDisplayed={true}
         />
 

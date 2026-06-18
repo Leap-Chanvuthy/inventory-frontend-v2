@@ -18,6 +18,8 @@ export const RawMaterialCategoryList = () => {
     setPerPage,
     perPage,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -38,11 +40,13 @@ export const RawMaterialCategoryList = () => {
         onSearch={setSearch}
         search={search}
         sortOptions={SORT_OPTIONS}
+        selectedSort={sort ? [sort] : []}
         onSortChange={values => setSort(values[0])}
         createHref="raw-material-categories/create"
         requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
         perPage={perPage}
         onPerPageChange={setPerPage}
+        onClearFilters={clearQueryParams}
         isListOptionDisplayed={true}
       />
 

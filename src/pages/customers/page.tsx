@@ -1,10 +1,14 @@
 import { BreadCrumb } from "@/components/reusable/partials/breadcrumb";
+import { useCallback } from "react";
 import { CustomerList } from "./_components/customer-list";
 import { Text } from "@/components/ui/text/app-text";
 
 import { CategoryFilterLayout } from "@/components/reusable/sidebar-filter/category-filter-layout";
 import { CategoryFilterSidebar } from "@/components/reusable/sidebar-filter/category-filter-sidebar";
-import { useCategoryFilterController } from "@/components/reusable/sidebar-filter/use-category-filter-controller";
+import {
+  CategoryFilterQueryMapperArgs,
+  useCategoryFilterController,
+} from "@/components/reusable/sidebar-filter/use-category-filter-controller";
 import {
   CustomerCategoryQueryParams,
   CustomerCategory,
@@ -20,6 +24,17 @@ import { CreateCustomerCategoryForm } from "../category/customer-category/_compo
 import { UpdateCustomerCategoryForm } from "../category/customer-category/_components/update-customer-category-form";
 
 export function Customers() {
+  const mapCustomerCategoryQueryParams = useCallback(
+    ({ page, perPage, search, status, sort }: CategoryFilterQueryMapperArgs) => ({
+      page,
+      per_page: perPage,
+      sort,
+      "filter[search]": search || undefined,
+      "filter[is_deleted]": status === "deleted" ? 1 : 0,
+    }),
+    [],
+  );
+
   const breadcrumbItems = [
     { name: "sale-management&pos", label: "Sale Management & POS", link: "" },
     { name: "customers", label: "Customers", link: "" },
@@ -48,13 +63,7 @@ export function Customers() {
     CustomerCategory,
     CustomerCategoryQueryParams
   >({
-    mapQueryParams: ({ page, perPage, search, status, sort }) => ({
-      page,
-      per_page: perPage,
-      sort,
-      "filter[search]": search || undefined,
-      "filter[is_deleted]": status === "deleted" ? 1 : 0,
-    }),
+    mapQueryParams: mapCustomerCategoryQueryParams,
     useCategoriesQuery: useCustomerCategories,
     useCreateMutation: useCreateCustomerCategory,
     useUpdateMutation: useUpdateCustomerCategory,

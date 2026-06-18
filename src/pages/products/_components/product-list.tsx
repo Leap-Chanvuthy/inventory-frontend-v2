@@ -8,7 +8,6 @@ import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { COLUMNS, SORT_OPTIONS, FILTER_OPTIONS, ProductCard } from "../utils/table-feature";
 import UnexpectedError from "@/components/reusable/partials/error";
 import { useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
 
 interface ProductListProps {
   embedded?: boolean;
@@ -24,6 +23,8 @@ export function ProductList({ embedded = false }: ProductListProps) {
     perPage,
     filter,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -31,21 +32,23 @@ export function ProductList({ embedded = false }: ProductListProps) {
   const selectedCategoryId = searchParams.get("category_id")
     ? Number(searchParams.get("category_id"))
     : undefined;
-
-  useEffect(() => {
-    setPage(1);
-  }, [selectedCategoryId, setPage]);
-
+  const hasSidebarFilters =
+    Boolean(selectedCategoryId) ||
+    Boolean(searchParams.get("category_search")) ||
+    searchParams.get("category_status") === "deleted" ||
+    Boolean(searchParams.get("category_page"));
 
   const baseParams = { ...apiParams } as Record<string, unknown>;
   delete baseParams.filter;
 
   const isNumericFilter = filter ? /^\d+$/.test(String(filter)) : false;
+  const isExpiredFilter = filter === "expired";
 
   const apiCallParams = {
     ...baseParams,
     "filter[product_category_id]": selectedCategoryId || (isNumericFilter ? Number(filter) : undefined),
-    "filter[product_type]": !isNumericFilter && filter ? filter : undefined,
+    "filter[product_type]": !isNumericFilter && !isExpiredFilter && filter ? filter : undefined,
+    "filter[has_expired_stock]": isExpiredFilter ? true : undefined,
   } as any;
 
   const { data, isLoading, isError, isFetching } = useProducts(apiCallParams);
@@ -65,7 +68,20 @@ export function ProductList({ embedded = false }: ProductListProps) {
           onFilterChange={(val) => setFilter(val || undefined)}
           filterOptions={FILTER_OPTIONS}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={(values) => setSort(values[0])}
+          hasActiveFilters={hasSidebarFilters}
+          onClearFilters={() =>
+            clearQueryParams({
+              extraParams: [
+                "category_id",
+                "category_page",
+                "category_search",
+                "category_status",
+                "category_per_page",
+              ],
+            })
+          }
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}

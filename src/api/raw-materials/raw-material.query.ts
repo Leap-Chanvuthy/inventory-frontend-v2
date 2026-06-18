@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   getRawMaterials,
   getRawMaterialById,
@@ -10,12 +10,25 @@ import {
 } from "./raw-material.api";
 import { RawMaterialQueryParams, StockMovementsQueryParams } from "./raw-material.types";
 
+const rawMaterialListQueryKey = (scope: string, params?: RawMaterialQueryParams) => [
+  scope,
+  params?.page,
+  params?.per_page,
+  params?.["filter[search]"],
+  params?.["filter[raw_material_category_id]"],
+  params?.["filter[uom_id]"],
+  params?.["filter[supplier_id]"],
+  params?.["filter[warehouse_id]"],
+  params?.sort,
+];
+
 // Get all raw materials with pagination and filters
 export const useRawMaterials = (params?: RawMaterialQueryParams) => {
-  const normalizedParams = params ? { ...params } : {};
   return useQuery({
-    queryKey: ["raw-materials", normalizedParams],
+    queryKey: rawMaterialListQueryKey("raw-materials", params),
     queryFn: () => getRawMaterials(params),
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -34,10 +47,19 @@ export const useRawMaterialMovements = (
   params?: StockMovementsQueryParams
 ) => {
   return useQuery({
-    queryKey: ["raw-material-movements", rawMaterialId, params],
+    queryKey: [
+      "raw-material-movements",
+      rawMaterialId,
+      params?.page,
+      params?.per_page,
+      params?.sort,
+      params?.["filter[movement_type]"],
+      params?.["filter[direction]"],
+    ],
     queryFn: () => getRawMaterialMovements(rawMaterialId, params),
     enabled: !!rawMaterialId,
-    placeholderData: keepPreviousData,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -46,9 +68,16 @@ export const useRawMaterialStockLots = (
   params?: { include_children?: boolean; include_disabled?: boolean },
 ) => {
   return useQuery({
-    queryKey: ["raw-material-stock-lots", rawMaterialId, params],
+    queryKey: [
+      "raw-material-stock-lots",
+      rawMaterialId,
+      params?.include_children,
+      params?.include_disabled,
+    ],
     queryFn: () => getRawMaterialStockLots(rawMaterialId, params),
     enabled: !!rawMaterialId,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };
 
@@ -78,10 +107,10 @@ export const useRawMaterialProductionAllocationPreview = (
 
 // Get deleted (soft-deleted) raw materials
 export const useDeletedRawMaterials = (params?: RawMaterialQueryParams) => {
-  const normalizedParams = params ? { ...params } : {};
   return useQuery({
-    queryKey: ["raw-materials-deleted", normalizedParams],
+    queryKey: rawMaterialListQueryKey("raw-materials-deleted", params),
     queryFn: () => getDeletedRawMaterials(params),
-    placeholderData: keepPreviousData,
+    placeholderData: previousData => previousData,
+    staleTime: 10_000,
   });
 };

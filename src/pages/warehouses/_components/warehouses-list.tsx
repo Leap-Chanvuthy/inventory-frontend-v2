@@ -28,7 +28,9 @@ export default function WarehousesList({
     setSort,
     perPage,
     search,
+    sort,
     filter,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -62,11 +64,13 @@ export default function WarehousesList({
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           createHref="/warehouses/create"
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           isListOptionDisplayed={true}
         />
 

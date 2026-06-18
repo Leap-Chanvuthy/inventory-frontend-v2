@@ -5,6 +5,14 @@ import { CategoryDialogValues } from "./category-create-update-dialog";
 
 type CategoryStatus = "active" | "deleted";
 
+export type CategoryFilterQueryMapperArgs = {
+  page: number;
+  perPage: number;
+  search: string;
+  status: CategoryStatus;
+  sort: string;
+};
+
 interface CategoriesEnvelope<TCategory> {
   data?: {
     data?: TCategory[];
@@ -47,13 +55,7 @@ interface UseCategoryFilterControllerOptions<
   perPage?: number;
   sort?: string;
   defaultStatus?: CategoryStatus;
-  mapQueryParams: (args: {
-    page: number;
-    perPage: number;
-    search: string;
-    status: CategoryStatus;
-    sort: string;
-  }) => TQueryParams;
+  mapQueryParams: (args: CategoryFilterQueryMapperArgs) => TQueryParams;
   useCategoriesQuery: (params: TQueryParams) => CategoriesQueryResult<TCategory>;
   useCreateMutation: () => CreateMutation<TCreatePayload>;
   useUpdateMutation: () => UpdateMutation<TUpdatePayload>;
@@ -137,11 +139,16 @@ export function useCategoryFilterController<
   const restoreCategoryMutation = useRestoreMutation?.();
 
   const clearSelectedCategory = useCallback(() => {
-    const next = new URLSearchParams(searchParams);
-    next.delete(selectedCategoryParam);
-    next.delete("page");
-    setSearchParams(next, { replace: true });
-  }, [searchParams, selectedCategoryParam, setSearchParams]);
+    setSearchParams(
+      currentParams => {
+        const next = new URLSearchParams(currentParams);
+        next.delete(selectedCategoryParam);
+        next.delete("page");
+        return next;
+      },
+      { replace: true },
+    );
+  }, [selectedCategoryParam, setSearchParams]);
 
   const setSelectedCategory = useCallback(
     (categoryId: number | null) => {
@@ -150,26 +157,29 @@ export function useCategoryFilterController<
         return;
       }
 
-      const next = new URLSearchParams(searchParams);
-      next.set(selectedCategoryParam, String(categoryId));
-      next.delete("page");
-      setSearchParams(next, { replace: true });
+      setSearchParams(
+        currentParams => {
+          const next = new URLSearchParams(currentParams);
+          next.set(selectedCategoryParam, String(categoryId));
+          next.delete("page");
+          return next;
+        },
+        { replace: true },
+      );
     },
-    [clearSelectedCategory, searchParams, selectedCategoryParam, setSearchParams]
+    [clearSelectedCategory, selectedCategoryParam, setSearchParams]
   );
 
   const onCategorySearchChange = useCallback(
     (value: string) => {
       setCategorySearch(value);
-      setCategoryPage(1);
     },
-    [setCategorySearch, setCategoryPage]
+    [setCategorySearch]
   );
 
   const onCategoryStatusToggle = useCallback(() => {
     setCategoryStatusFilter(categoryStatus === "active" ? "deleted" : "active");
-    setCategoryPage(1);
-  }, [categoryStatus, setCategoryStatusFilter, setCategoryPage]);
+  }, [categoryStatus, setCategoryStatusFilter]);
 
   const handleCreateCategory = useCallback(
     async (values: CategoryDialogValues) => {

@@ -26,6 +26,8 @@ export function SupplierList() {
     perPage,
     filter,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -50,10 +52,12 @@ export function SupplierList() {
           selectedFilter={filter}
           onFilterChange={val => setFilter(val || undefined)}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           createHref="/supplier/create"
           extraActions={
             <>

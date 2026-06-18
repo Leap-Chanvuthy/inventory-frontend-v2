@@ -8,7 +8,6 @@ import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
 import { COLUMNS, SORT_OPTIONS, RawMaterialCard } from "../utils/table-feature";
 import { useSearchParams } from "react-router-dom";
 import UnexpectedError from "@/components/reusable/partials/error";
-import { useEffect } from "react";
 
 interface RawMaterialListProps {
   embedded?: boolean;
@@ -23,6 +22,8 @@ export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
     perPage,
     filter,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -30,10 +31,11 @@ export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
   const selectedCategoryId = searchParams.get("category_id")
     ? Number(searchParams.get("category_id"))
     : undefined;
-
-  useEffect(() => {
-    setPage(1);
-  }, [selectedCategoryId, setPage]);
+  const hasSidebarFilters =
+    Boolean(selectedCategoryId) ||
+    Boolean(searchParams.get("category_search")) ||
+    searchParams.get("category_status") === "deleted" ||
+    Boolean(searchParams.get("category_page"));
 
   const { data, isLoading, isError, isFetching } = useRawMaterials({
     ...apiParams,
@@ -58,7 +60,20 @@ export function RawMaterialList({ embedded = false }: RawMaterialListProps) {
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
+          hasActiveFilters={hasSidebarFilters}
+          onClearFilters={() =>
+            clearQueryParams({
+              extraParams: [
+                "category_id",
+                "category_page",
+                "category_search",
+                "category_status",
+                "category_per_page",
+              ],
+            })
+          }
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}

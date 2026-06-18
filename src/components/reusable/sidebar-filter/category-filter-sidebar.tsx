@@ -106,7 +106,7 @@ export function CategoryFilterSidebar<T extends Record<string, any>>({
   const debouncedSearchInput = useDebounce(searchInput, 500);
 
   useEffect(() => {
-    setSearchInput(categorySearch);
+    setSearchInput(prev => (prev === categorySearch ? prev : categorySearch));
   }, [categorySearch]);
 
   useEffect(() => {

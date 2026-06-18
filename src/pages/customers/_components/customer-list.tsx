@@ -12,7 +12,6 @@ import {
   CustomerCard,
 } from "../utils/table-feature";
 import UnexpectedError from "@/components/reusable/partials/error";
-import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface CustomerListProps {
@@ -29,6 +28,8 @@ export function CustomerList({ embedded = false }: CustomerListProps) {
     perPage,
     filter,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -36,10 +37,11 @@ export function CustomerList({ embedded = false }: CustomerListProps) {
   const selectedCategoryId = searchParams.get("category_id")
     ? Number(searchParams.get("category_id"))
     : undefined;
-
-  useEffect(() => {
-    setPage(1);
-  }, [selectedCategoryId, setPage]);
+  const hasSidebarFilters =
+    Boolean(selectedCategoryId) ||
+    Boolean(searchParams.get("category_search")) ||
+    searchParams.get("category_status") === "deleted" ||
+    Boolean(searchParams.get("category_page"));
 
   const { data, isLoading, isFetching, isError } = useCustomers({
     ...apiParams,
@@ -69,7 +71,20 @@ export function CustomerList({ embedded = false }: CustomerListProps) {
           selectedFilter={filter}
           onFilterChange={val => setFilter(val || undefined)}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
+          hasActiveFilters={hasSidebarFilters}
+          onClearFilters={() =>
+            clearQueryParams({
+              extraParams: [
+                "category_id",
+                "category_page",
+                "category_search",
+                "category_status",
+                "category_per_page",
+              ],
+            })
+          }
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}

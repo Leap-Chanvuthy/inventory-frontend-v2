@@ -35,6 +35,8 @@ export function SupplierTransactionTab({
     setPerPage,
     perPage,
     search,
+    sort,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -87,10 +89,12 @@ export function SupplierTransactionTab({
             onSearch={setSearch}
             search={search}
             sortOptions={TRANSACTION_SORT_OPTIONS}
+            selectedSort={sort ? [sort] : []}
             onSortChange={values => setSort(values[0])}
             requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
             perPage={perPage}
             onPerPageChange={setPerPage}
+            onClearFilters={clearQueryParams}
           />
 
           <DataTable<SupplierTransactionItem>

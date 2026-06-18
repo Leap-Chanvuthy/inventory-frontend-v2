@@ -18,6 +18,7 @@ export function DeletedSupplierList() {
     perPage,
     filter,
     search,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams({ defaultSort: "-deleted_at" });
 
@@ -47,6 +48,7 @@ export function DeletedSupplierList() {
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           perPage={perPage}
           onPerPageChange={setPerPage}
+          onClearFilters={clearQueryParams}
           isListOptionDisplayed={true}
         />
 

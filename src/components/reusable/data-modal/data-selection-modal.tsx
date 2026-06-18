@@ -59,6 +59,7 @@ type DataSelectionModalProps<T> = {
     filterOptions?: { label: string; value: string }[];
     onFilterChange?: (filter: string | undefined) => void;
     filterFetchFn?: (params: FetchParams) => Promise<FetchResult>;
+    onClearFilters?: () => void;
     createHref?: string;
 };
 
@@ -85,6 +86,7 @@ export function DataSelectionModal<T>({
     filterOptions,
     onFilterChange,
     filterFetchFn,
+    onClearFilters,
     createHref,
     defaultSelected,
     getRowLabel,
@@ -157,6 +159,7 @@ export function DataSelectionModal<T>({
                         filterOptions={filterOptions}
                         onFilterChange={val => onFilterChange && onFilterChange(val || undefined)}
                         filterFetchFn={filterFetchFn}
+                        onClearFilters={onClearFilters}
                         createHref={createHref}
                     />
 

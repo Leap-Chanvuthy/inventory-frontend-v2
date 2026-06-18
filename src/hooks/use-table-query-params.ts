@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
 type TableQueryConfig = {
@@ -14,9 +14,18 @@ type TableQueryConfig = {
   filterParam?: string;
 };
 
+type QueryParamValue = string | number | undefined | null;
+
+type ClearQueryParamsOptions = {
+  includeSearch?: boolean;
+  includeSort?: boolean;
+  includeFilter?: boolean;
+  includePerPage?: boolean;
+  extraParams?: string[];
+};
+
 export function useTableQueryParams(config?: TableQueryConfig) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const searchParamsString = searchParams.toString();
 
   const pageParam = config?.pageParam || "page";
   const perPageParam = config?.perPageParam || "per_page";
@@ -24,117 +33,154 @@ export function useTableQueryParams(config?: TableQueryConfig) {
   const sortParam = config?.sortParam || "sort";
   const filterParam = config?.filterParam || "filter";
 
-  const [page, setPage] = useState(
-    Number(searchParams.get(pageParam)) || config?.defaultPage || 1
+  const defaultPage = config?.defaultPage || 1;
+  const defaultPerPage = config?.defaultPerPage || 10;
+  const defaultSearch = config?.defaultSearch || "";
+  const defaultSort = config?.defaultSort;
+  const defaultFilter = config?.defaultFilter;
+
+  const page = Number(searchParams.get(pageParam)) || defaultPage;
+  const perPage = Number(searchParams.get(perPageParam)) || defaultPerPage;
+  const search = searchParams.get(searchParam) || defaultSearch;
+  const sort = searchParams.get(sortParam) || defaultSort;
+  const filter = searchParams.get(filterParam) || defaultFilter;
+
+  const updateParams = useCallback(
+    (
+      updates: Record<string, QueryParamValue>,
+      options?: { resetPage?: boolean },
+    ) => {
+      setSearchParams(
+        currentParams => {
+          const next = new URLSearchParams(currentParams);
+
+          Object.entries(updates).forEach(([key, value]) => {
+            if (value === undefined || value === null || value === "") {
+              next.delete(key);
+              return;
+            }
+
+            next.set(key, String(value));
+          });
+
+          if (options?.resetPage) {
+            next.delete(pageParam);
+          }
+
+          return next.toString() === currentParams.toString()
+            ? currentParams
+            : next;
+        },
+        { replace: true },
+      );
+    },
+    [pageParam, setSearchParams],
   );
 
-  const [perPage, setPerPage] = useState(
-    Number(searchParams.get(perPageParam)) || config?.defaultPerPage || 10
+  const setPage = useCallback(
+    (value: number) => {
+      updateParams({
+        [pageParam]: value > 1 ? value : undefined,
+      });
+    },
+    [pageParam, updateParams],
   );
 
-  const [search, setSearch] = useState(
-    searchParams.get(searchParam) || config?.defaultSearch || ""
+  const setPerPage = useCallback(
+    (value: number) => {
+      updateParams(
+        {
+          [perPageParam]: value !== defaultPerPage ? value : undefined,
+        },
+        { resetPage: true },
+      );
+    },
+    [defaultPerPage, perPageParam, updateParams],
   );
 
-  const [sort, setSort] = useState<string | undefined>(
-    searchParams.get(sortParam) || config?.defaultSort
+  const setSearch = useCallback(
+    (value?: string) => {
+      const nextValue = value || "";
+
+      updateParams(
+        {
+          [searchParam]:
+            nextValue !== defaultSearch ? nextValue : undefined,
+        },
+        { resetPage: true },
+      );
+    },
+    [defaultSearch, searchParam, updateParams],
   );
 
-  const [filter, setFilter] = useState<string | undefined>(
-    searchParams.get(filterParam) || config?.defaultFilter
+  const setSort = useCallback(
+    (value?: string) => {
+      updateParams(
+        {
+          [sortParam]:
+            value && value !== defaultSort ? value : undefined,
+        },
+        { resetPage: true },
+      );
+    },
+    [defaultSort, sortParam, updateParams],
   );
 
-  // Sync URL -> state (supports back/forward navigation)
-  useEffect(() => {
-    const params = new URLSearchParams(searchParamsString);
-    const nextPage = Number(params.get(pageParam)) || config?.defaultPage || 1;
-    const nextPerPage =
-      Number(params.get(perPageParam)) || config?.defaultPerPage || 10;
-    const nextSearch = params.get(searchParam) || config?.defaultSearch || "";
-    const nextSort = params.get(sortParam) || config?.defaultSort;
-    const nextFilter = params.get(filterParam) || config?.defaultFilter;
+  const setFilter = useCallback(
+    (value?: string) => {
+      updateParams(
+        {
+          [filterParam]:
+            value && value !== defaultFilter ? value : undefined,
+        },
+        { resetPage: true },
+      );
+    },
+    [defaultFilter, filterParam, updateParams],
+  );
 
-    setPage(prev => (prev === nextPage ? prev : nextPage));
-    setPerPage(prev => (prev === nextPerPage ? prev : nextPerPage));
-    setSearch(prev => (prev === nextSearch ? prev : nextSearch));
-    setSort(prev => (prev === nextSort ? prev : nextSort));
-    setFilter(prev => (prev === nextFilter ? prev : nextFilter));
-  }, [
-    searchParamsString,
-    pageParam,
-    perPageParam,
-    searchParam,
-    sortParam,
-    filterParam,
-    config?.defaultPage,
-    config?.defaultPerPage,
-    config?.defaultSearch,
-    config?.defaultSort,
-    config?.defaultFilter,
-  ]);
+  const clearQueryParams = useCallback(
+    (options?: ClearQueryParamsOptions) => {
+      const {
+        includeSearch = true,
+        includeSort = true,
+        includeFilter = true,
+        includePerPage = true,
+        extraParams = [],
+      } = options || {};
 
-  // Sync state -> URL while preserving unrelated params
-  useEffect(() => {
-    const currentParams = new URLSearchParams(searchParamsString);
-    const newParams = new URLSearchParams(searchParamsString);
+      setSearchParams(
+        currentParams => {
+          const next = new URLSearchParams(currentParams);
 
-    const setOrDelete = (key: string, value?: string) => {
-      if (!value) {
-        if (newParams.has(key)) newParams.delete(key);
-        return;
-      }
+          next.delete(pageParam);
 
-      if (newParams.get(key) !== value) {
-        newParams.set(key, value);
-      }
-    };
+          if (includeSearch) next.delete(searchParam);
+          if (includeSort) next.delete(sortParam);
+          if (includeFilter) next.delete(filterParam);
+          if (includePerPage) next.delete(perPageParam);
 
-    setOrDelete(searchParam, search || undefined);
-    setOrDelete(pageParam, page > 1 ? String(page) : undefined);
-    setOrDelete(
+          extraParams.forEach(param => {
+            next.delete(param);
+          });
+
+          return next.toString() === currentParams.toString()
+            ? currentParams
+            : next;
+        },
+        { replace: true },
+      );
+    },
+    [
+      filterParam,
+      pageParam,
       perPageParam,
-      perPage && perPage !== (config?.defaultPerPage || 10)
-        ? String(perPage)
-        : undefined,
-    );
-    setOrDelete(sortParam, sort || undefined);
-    setOrDelete(filterParam, filter || undefined);
+      searchParam,
+      setSearchParams,
+      sortParam,
+    ],
+  );
 
-    const normalizeEntries = (params: URLSearchParams) =>
-      Array.from(params.entries()).sort(([aKey, aVal], [bKey, bVal]) =>
-        aKey === bKey ? aVal.localeCompare(bVal) : aKey.localeCompare(bKey),
-      );
-
-    const currentEntries = normalizeEntries(currentParams);
-    const nextEntries = normalizeEntries(newParams);
-
-    const entriesChanged =
-      currentEntries.length !== nextEntries.length ||
-      currentEntries.some(
-        ([key, val], index) =>
-          key !== nextEntries[index][0] || val !== nextEntries[index][1],
-      );
-
-    if (entriesChanged) {
-      setSearchParams(newParams, { replace: true });
-    }
-  }, [
-    search,
-    page,
-    perPage,
-    sort,
-    filter,
-    setSearchParams,
-    searchParam,
-    pageParam,
-    perPageParam,
-    sortParam,
-    filterParam,
-    searchParamsString,
-    config?.defaultPerPage,
-  ]);
-
-  // API params (memoized)
   const apiParams = useMemo(
     () => ({
       page,
@@ -143,25 +189,21 @@ export function useTableQueryParams(config?: TableQueryConfig) {
       filter,
       per_page: perPage,
     }),
-    [page, search, perPage, sort, filter]
+    [page, perPage, search, sort, filter],
   );
 
   return {
-    // state
     page,
     search,
     sort,
     filter,
     perPage,
-
-    // setters
     setPage,
     setSearch,
     setSort,
     setFilter,
     setPerPage,
-
-    // api-ready params
+    clearQueryParams,
     apiParams,
   };
 }

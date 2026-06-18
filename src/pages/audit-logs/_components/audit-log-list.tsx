@@ -22,7 +22,9 @@ export default function AuditLogList() {
     setFilter,
     filter,
     search,
+    sort,
     perPage,
+    clearQueryParams,
     apiParams,
   } = useTableQueryParams();
 
@@ -49,6 +51,7 @@ export default function AuditLogList() {
           onSearch={setSearch}
           search={search}
           sortOptions={SORT_OPTIONS}
+          selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
           filterOptions={FILTER_OPTIONS}
           selectedFilter={filter || ""}
@@ -58,6 +61,7 @@ export default function AuditLogList() {
           onFilterChange={val =>
             setFilter(val === "" ? undefined : val || undefined)
           }
+          onClearFilters={clearQueryParams}
           isListOptionDisplayed={true}
         />
 
