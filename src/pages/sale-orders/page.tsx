@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
 import { toast } from "sonner";
-import { downloadSaleOrderReport, downloadSaleOrderStatisticsReport } from "@/api/sale-orders/sale-order.api";
+import {
+  downloadSaleOrderReport,
+  downloadSaleOrderStatisticsReport,
+  previewSaleOrderStatisticsReport,
+} from "@/api/sale-orders/sale-order.api";
 import type { PaymentStatus } from "@/api/sale-orders/sale-order.types";
 import { useSaleOrderRefundRecords, useSaleOrderStatistics, useSingleSaleOrder } from "@/api/sale-orders/sale-order.query";
 import { useCustomers } from "@/api/customers/customer.query";
@@ -45,6 +49,7 @@ export default function SaleOrdersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("empty");
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
+  const [isPreviewingReport, setIsPreviewingReport] = useState(false);
   const [itemValidationErrors, setItemValidationErrors] = useState<Record<string, string>>({});
 
   const selectedOrderDbId = Number(searchParams.get("sale_order_id") || 0) || null;
@@ -52,6 +57,7 @@ export default function SaleOrdersPage() {
   const statsGroupBy = parseGroupBy(searchParams.get("stats_group_by"));
   const statsCustomerId = Number(searchParams.get("stats_customer_id") || 0) || undefined;
   const statsStatus = searchParams.get("stats_status") || undefined;
+  const canPreviewStatisticsReport = import.meta.env.DEV || import.meta.env.MODE === "staging";
 
   const customersQuery = useCustomers({ page: 1, per_page: 500, sort: "fullname" });
   const productsQuery = useProducts({ page: 1, per_page: 500, sort: "product_name" });
@@ -471,30 +477,54 @@ export default function SaleOrdersPage() {
     }
   };
 
+  const getStatisticsReportParams = () => ({
+    date_from: dateRange.start || undefined,
+    date_to: dateRange.end || undefined,
+    group_by: statsGroupBy,
+    customer_id: statsCustomerId,
+    status: statsStatus,
+  });
+
   const handleDownloadReport = async () => {
     try {
       setIsDownloadingReport(true);
-      const blob = await downloadSaleOrderStatisticsReport({
-        date_from: dateRange.start || undefined,
-        date_to: dateRange.end || undefined,
-        group_by: statsGroupBy,
-        customer_id: statsCustomerId,
-        status: statsStatus,
-      });
+      const { blob, filename } = await downloadSaleOrderStatisticsReport(getStatisticsReportParams());
 
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = `sale-order-report-${new Date().toISOString().slice(0, 10)}.pdf`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success("Report download started");
+      toast.success("Sale order report downloaded successfully");
     } catch {
       toast.error("Failed to download report");
     } finally {
       setIsDownloadingReport(false);
+    }
+  };
+
+  const handlePreviewReport = async () => {
+    const previewWindow = window.open("", "_blank");
+
+    if (!previewWindow) {
+      toast.error("Please allow popups to preview the report");
+      return;
+    }
+
+    try {
+      setIsPreviewingReport(true);
+      const html = await previewSaleOrderStatisticsReport(getStatisticsReportParams());
+      const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+      previewWindow.location.href = url;
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      previewWindow.close();
+      toast.error("Failed to preview report");
+    } finally {
+      setIsPreviewingReport(false);
     }
   };
 
@@ -630,10 +660,12 @@ export default function SaleOrdersPage() {
               onOpenDateFilter={openDateModal}
               onClearDateFilter={clearDateFilter}
               onDownloadReport={handleDownloadReport}
+              onPreviewReport={canPreviewStatisticsReport ? handlePreviewReport : undefined}
               onBackToOrders={handleBackToOrdersFromStatistics}
               onViewCustomer={customerId => navigate(`/customer/view/${customerId}`)}
               onViewProduct={productId => navigate(`/products/view/${productId}`)}
               isDownloading={isDownloadingReport}
+              isPreviewing={isPreviewingReport}
             />
           </div>
         </div>

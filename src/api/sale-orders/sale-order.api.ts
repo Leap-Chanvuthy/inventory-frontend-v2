@@ -134,12 +134,35 @@ export const downloadSaleOrderStatisticsReport = async (
     customer_id?: number;
     status?: string;
   },
-): Promise<Blob> => {
+): Promise<{ blob: Blob; filename: string }> => {
   const response = await apiClient.get(`${BASE_API_URL}/sale-orders/statistics/report`, {
     params,
     responseType: "blob",
   });
-  return response.data as Blob;
+
+  const contentDisposition = response.headers["content-disposition"] as string | undefined;
+  const filenameMatch = contentDisposition?.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+
+  return {
+    blob: response.data as Blob,
+    filename: filenameMatch?.[1] ? decodeURIComponent(filenameMatch[1].replace(/"/g, "")) : "sale-order-report.pdf",
+  };
+};
+
+export const previewSaleOrderStatisticsReport = async (
+  params?: {
+    date_from?: string;
+    date_to?: string;
+    group_by?: "day" | "week" | "month" | "year";
+    customer_id?: number;
+    status?: string;
+  },
+): Promise<string> => {
+  const response = await apiClient.get(`${BASE_API_URL}/sale-orders/statistics/report/preview`, {
+    params,
+    responseType: "text",
+  });
+  return response.data as string;
 };
 
 export const downloadSaleOrderReport = async (id: number): Promise<Blob> => {

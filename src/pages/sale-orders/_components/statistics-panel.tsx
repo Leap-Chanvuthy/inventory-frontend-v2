@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Download,
+  Eye,
   FileText,
   LineChart as LineChartIcon,
   PauseCircle,
@@ -53,10 +54,12 @@ interface StatisticsPanelProps {
   onOpenDateFilter: () => void;
   onClearDateFilter: () => void;
   onDownloadReport: () => void;
+  onPreviewReport?: () => void;
   onBackToOrders: () => void;
   onViewCustomer: (customerId: number) => void;
   onViewProduct: (productId: number) => void;
   isDownloading?: boolean;
+  isPreviewing?: boolean;
   isLoading?: boolean;
 }
 
@@ -87,10 +90,12 @@ export function StatisticsPanel({
   onOpenDateFilter,
   onClearDateFilter,
   onDownloadReport,
+  onPreviewReport,
   onBackToOrders,
   onViewCustomer,
   onViewProduct,
   isDownloading,
+  isPreviewing,
   isLoading = false,
 }: StatisticsPanelProps) {
   if (isLoading) {
@@ -248,9 +253,23 @@ export function StatisticsPanel({
             </Button>
           )}
 
+          {onPreviewReport && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onPreviewReport}
+              disabled={isPreviewing}
+              className="h-8 px-3 text-xs"
+            >
+              <Eye className="mr-1.5 h-3.5 w-3.5" />
+              {isPreviewing ? "Opening..." : "Preview"}
+            </Button>
+          )}
+
           <Button type="button" size="sm" onClick={onDownloadReport} disabled={isDownloading} className="h-8 px-3 text-xs">
             <Download className="mr-1.5 h-3.5 w-3.5" />
-            {isDownloading ? "Generating..." : "Export PDF"}
+            {isDownloading ? "Generating..." : "Download PDF"}
           </Button>
         </div>
       </div>
