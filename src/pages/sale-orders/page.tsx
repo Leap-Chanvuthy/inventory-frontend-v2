@@ -151,6 +151,25 @@ export default function SaleOrdersPage() {
     () =>
       (refundRecordsQuery.data?.data?.data ?? []).map(record => {
         const saleOrder = record.sale_order ?? record.saleOrder;
+        const items = Array.isArray(record.items)
+          ? record.items.map(item => ({
+              id: Number(item.id),
+              saleOrderItemId: Number(item.sale_order_item_id),
+              quantity: Number(item.quantity ?? 0),
+              processReturn: Boolean(item.process_return),
+              processRefund: Boolean(item.process_refund),
+              isResellable: item.is_resellable ?? null,
+              returnAction: item.return_action,
+              refundPercentage: Number(item.refund_percentage ?? 0),
+              refundAmountInUsd: Number(item.refund_amount_in_usd ?? 0),
+              reason: item.reason ?? null,
+              note: item.note ?? null,
+              productName:
+                item.sale_order_item?.product?.product_name ??
+                item.saleOrderItem?.product?.product_name,
+            }))
+          : [];
+
         return {
           id: Number(record.id),
           refundNo: record.refund_no,
@@ -160,7 +179,8 @@ export default function SaleOrdersPage() {
           amountUsd: Number(record.total_refund_amount_in_usd ?? 0),
           amountRiel: Number(record.total_refund_amount_in_riel ?? 0),
           reason: record.reason,
-          refundedItemsCount: Array.isArray(record.items) ? record.items.length : 0,
+          refundedItemsCount: items.length,
+          items,
           refundType: record.refund_type,
           refundMethod: record.refund_method,
           processedAt: record.processed_at,

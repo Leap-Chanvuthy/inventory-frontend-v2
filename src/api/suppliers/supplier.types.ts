@@ -2,10 +2,12 @@ import { RawMaterialStockMovement, PaginatedData, RawMaterial } from "../raw-mat
 
 // Supplier Category Enum (common values)
 export enum SupplierCategory {
+  ELECTRONICS = "ELECTRONICS",
   PRODUCTS = "PRODUCTS",
   FOOD = "FOOD",
   CLOTHING = "CLOTHING",
   LOGISTICS = "LOGISTICS",
+  SERVICES = "SERVICES",
   OTHERS = "OTHERS",
 }
 

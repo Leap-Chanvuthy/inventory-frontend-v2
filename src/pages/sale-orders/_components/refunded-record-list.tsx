@@ -57,6 +57,23 @@ export function RefundedRecordList({
                   {record.reason && (
                     <p className="mt-0.5 line-clamp-1 text-[10px] text-muted-foreground">Reason: {record.reason}</p>
                   )}
+                  {record.items.length > 0 && (
+                    <div className="mt-1 space-y-0.5">
+                      {record.items.slice(0, 2).map(item => (
+                        <p
+                          key={item.id}
+                          className="line-clamp-1 text-[10px] font-medium text-foreground/80"
+                        >
+                          {item.productName || `Item #${item.saleOrderItemId}`} · Qty {item.quantity}
+                        </p>
+                      ))}
+                      {record.items.length > 2 && (
+                        <p className="text-[10px] text-muted-foreground">
+                          +{record.items.length - 2} more item{record.items.length - 2 > 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-right">

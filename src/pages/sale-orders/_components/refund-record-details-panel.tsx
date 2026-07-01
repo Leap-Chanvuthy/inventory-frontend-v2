@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, ReceiptText } from "lucide-react";
+import { ArrowRight, CalendarDays, Package, ReceiptText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/date-format";
 import type { RefundRecordListItem } from "../types";
@@ -69,6 +69,37 @@ export function RefundRecordDetailsPanel({ record, onOpenOrder }: RefundRecordDe
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Reason</p>
             <p className="font-semibold text-foreground">{record.reason || "-"}</p>
           </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <Package className="h-3 w-3" />
+            Refunded Products
+          </p>
+          {record.items.length > 0 ? (
+            <div className="divide-y divide-border rounded-md border border-border">
+              {record.items.map(item => (
+                <div key={item.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-foreground">
+                      {item.productName || `Item #${item.saleOrderItemId}`}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {item.processReturn ? item.returnAction.replace(/_/g, " ") : "No return"} · {item.processRefund ? `${item.refundPercentage}% refund` : "No refund"}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-semibold text-foreground">Qty {item.quantity}</p>
+                    <p className="text-[10px] text-muted-foreground">${item.refundAmountInUsd.toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
+              No refunded product lines were returned for this record.
+            </p>
+          )}
         </div>
 
         <div className="mt-4">

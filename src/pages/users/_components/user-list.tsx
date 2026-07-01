@@ -1,9 +1,10 @@
 import { GlobalPagination } from "@/components/reusable/partials/pagination";
 import { TableToolbar } from "@/components/reusable/partials/table-toolbar";
+import { useRoleSelectOptions } from "@/api/roles/role.query";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
-import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { REQUEST_PER_PAGE_OPTIONS } from "@/consts/request-per-page";
 import { UserCard } from "../utils/table-feature";
 import { ToggleableList } from "@/components/reusable/partials/toggleable-list";
@@ -26,6 +27,13 @@ export default function UserList() {
     // api ready params
     apiParams,
   } = useTableQueryParams();
+
+  const { data: roleOptionsData } = useRoleSelectOptions();
+  const roleFilterOptions =
+    roleOptionsData?.map(role => ({
+      value: role.key,
+      label: role.name,
+    })) ?? [];
 
   const { data, isLoading, isFetching, isError } = useUsers({
     ...apiParams,
@@ -53,7 +61,7 @@ export default function UserList() {
           sortOptions={SORT_OPTIONS}
           selectedSort={sort ? [sort] : []}
           onSortChange={values => setSort(values[0])}
-          filterOptions={FILTER_OPTIONS}
+          filterOptions={roleFilterOptions}
           selectedFilter={filter || ""}
           requestPerPageOptions={REQUEST_PER_PAGE_OPTIONS}
           onPerPageChange={setPerPage}

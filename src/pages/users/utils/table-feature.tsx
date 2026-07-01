@@ -8,13 +8,6 @@ import TableActions from "@/components/reusable/partials/table-actions";
 import { Text } from "@/components/ui/text/app-text";
 import { RoleBadge } from "./user-status";
 
-export const FILTER_OPTIONS = [
-  { value: " ", label: "All" },
-  { value: "ADMIN", label: "Admin" },
-  { value: "VENDER", label: "Vender" },
-  { value: "STOCK_CONTROLLER", label: "Stock Controller" },
-];
-
 export const SORT_OPTIONS = [
   { value: "name", label: "Name" },
   { value: "email", label: "Email" },

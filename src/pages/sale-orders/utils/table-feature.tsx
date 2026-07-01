@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
 import { Link } from "react-router-dom";
 import { Trash2 } from "lucide-react";
@@ -5,6 +6,68 @@ import { Input } from "@/components/ui/input";
 import { formatCurrency } from "./order-utils";
 import type { OrderItem, Product } from "../types";
 import type { SaleAllocationPreview } from "@/api/product/product.type";
+
+function QuantityInput({
+  value,
+  quantityType,
+  hasError,
+  onChange,
+}: {
+  value: number;
+  quantityType: Product["quantityType"];
+  hasError: boolean;
+  onChange: (value: number) => void;
+}) {
+  const [draftValue, setDraftValue] = useState(String(value || 1));
+  const isInteger = quantityType === "INTEGER";
+  const step = isInteger ? 1 : 0.01;
+  const min = isInteger ? 1 : 0.0001;
+
+  useEffect(() => {
+    setDraftValue(String(value || 1));
+  }, [value]);
+
+  const commitValue = (rawValue: string) => {
+    const parsed = Number(rawValue);
+
+    if (Number.isFinite(parsed) && parsed > 0) {
+      onChange(parsed);
+      return;
+    }
+
+    setDraftValue(String(value || 1));
+  };
+
+  return (
+    <Input
+      type="number"
+      min={min}
+      step={step}
+      className={`h-8 w-20 text-center ${hasError ? "border-destructive focus-visible:ring-destructive" : ""}`}
+      value={draftValue}
+      onFocus={event => event.currentTarget.select()}
+      onChange={event => {
+        const rawValue = event.target.value;
+        setDraftValue(rawValue);
+
+        if (rawValue.trim() === "" || rawValue.endsWith(".")) {
+          return;
+        }
+
+        const parsed = Number(rawValue);
+        if (Number.isFinite(parsed) && parsed > 0) {
+          onChange(parsed);
+        }
+      }}
+      onBlur={() => commitValue(draftValue)}
+      onKeyDown={event => {
+        if (event.key === "Enter") {
+          event.currentTarget.blur();
+        }
+      }}
+    />
+  );
+}
 
 export const buildOrderItemsViewColumns = (): DataTableColumn<OrderItem>[] => [
   {
@@ -144,20 +207,17 @@ export const buildOrderItemsFormColumns = ({
     render: item => {
       const product = products.find(p => p.id === item.productId);
       const quantityType = product?.quantityType ?? "DECIMAL";
-      const step = quantityType === "INTEGER" ? 1 : 0.01;
       const preview = allocationPreviewByProductId[item.productId];
       const hasStockError = preview !== undefined && !preview?.can_fulfill;
       const hasError = !!itemErrors[item.productId] || hasStockError;
 
       return (
         <div>
-          <Input
-            type="number"
-            min={1}
-            step={step}
-            className={`h-8 w-20 text-center ${hasError ? "border-destructive focus-visible:ring-destructive" : ""}`}
+          <QuantityInput
             value={item.qty}
-            onChange={event => onUpdateQty(item.productId, Number(event.target.value) || 1)}
+            quantityType={quantityType}
+            hasError={hasError}
+            onChange={value => onUpdateQty(item.productId, value)}
           />
           {itemErrors[item.productId] ? (
             <p className="mt-1 text-[11px] text-destructive">{itemErrors[item.productId]}</p>

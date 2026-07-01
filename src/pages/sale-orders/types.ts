@@ -196,6 +196,7 @@ export interface RefundRecordListItem {
   amountRiel: number;
   reason?: string;
   refundedItemsCount?: number;
+  items: OrderRefundItemRecord[];
   refundType: "CASH_REFUND" | "PARTIAL_REFUND" | "DISCOUNT_COMPENSATION";
   refundMethod: "CASH" | "BANK_TRANSFER" | "STORE_CREDIT" | "DISCOUNT_COMPENSATION";
   processedAt: string;

@@ -29,6 +29,15 @@ const CategoryBadge = ({ product }: { product: Product }) => (
   </Badge>
 );
 
+const formatProductQuantity = (product: Product) => {
+  const quantity = Number(product.current_qty_in_stock ?? 0);
+  const formatted = Number.isInteger(quantity)
+    ? quantity.toLocaleString()
+    : quantity.toLocaleString(undefined, { maximumFractionDigits: 4 });
+
+  return `${formatted} ${product.uom_name || ""}`.trim();
+};
+
 // Actions Component
 const ProductActions = ({ product }: { product: Product }) => {
   const deleteMutation = useDeleteProduct();
@@ -127,6 +136,16 @@ export const COLUMNS: DataTableColumn<Product>[] = [
       <span className="text-muted-foreground">{product.uom_name || "—"}</span>
     ),
   },
+  {
+    key: "current_qty_in_stock",
+    header: "Qty",
+    className: "whitespace-nowrap py-6 text-right",
+    render: product => (
+      <span className="font-semibold text-foreground">
+        {formatProductQuantity(product)}
+      </span>
+    ),
+  },
   // {
   //   key: "barcode",
   //   header: "Barcode",
@@ -188,6 +207,13 @@ export function ProductCard({
           <Ruler className="h-4 w-4 text-green-500 shrink-0" />
           <Text.Small color="muted" overflow="ellipsis">
             {product.uom_name || "—"}
+          </Text.Small>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Package className="h-4 w-4 text-sky-500 shrink-0" />
+          <Text.Small color="muted" overflow="ellipsis">
+            Qty: {formatProductQuantity(product)}
           </Text.Small>
         </div>
 

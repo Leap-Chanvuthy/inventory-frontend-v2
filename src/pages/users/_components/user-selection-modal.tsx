@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useRoleSelectOptions } from "@/api/roles/role.query";
 import { useUsers } from "@/api/users/user.query";
 import { User } from "@/api/users/user.types";
 import { DataSelectionModal } from "@/components/reusable/data-modal/data-selection-modal";
-import { COLUMNS, FILTER_OPTIONS, SORT_OPTIONS } from "../utils/table-feature";
+import { COLUMNS, SORT_OPTIONS } from "../utils/table-feature";
 import { useTableQueryParams } from "@/hooks/use-table-query-params";
 
 
@@ -19,6 +20,13 @@ export function UserSelectModal() {
         // api ready params
         apiParams,
     } = useTableQueryParams();
+
+    const { data: roleOptionsData } = useRoleSelectOptions();
+    const roleFilterOptions =
+        roleOptionsData?.map(role => ({
+            value: role.key,
+            label: role.name,
+        })) ?? [];
 
     const { data, isLoading } = useUsers({
         ...apiParams,
@@ -58,7 +66,7 @@ export function UserSelectModal() {
                 onSearch={setSearch}
                 sortOptions={SORT_OPTIONS}
                 onSortChange={setSort}
-                filterOptions={FILTER_OPTIONS}
+                filterOptions={roleFilterOptions}
                 onFilterChange={setFilter}
                 onClearFilters={clearQueryParams}
                 createHref="/users/create"
