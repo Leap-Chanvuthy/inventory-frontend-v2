@@ -11,4 +11,4 @@ services:
     container_name: ${FRONTEND_CONTAINER_NAME:-camsme-inventory-frontend}
     restart: unless-stopped
     ports:
-      - "${FRONTEND_PORT:-8081}:80"
+      - "${FRONTEND_BIND_IP:-127.0.0.1}:${FRONTEND_PORT:-8081}:80"

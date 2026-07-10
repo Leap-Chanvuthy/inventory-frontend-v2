@@ -167,9 +167,11 @@ docker compose logs -f
 The app will be available at **http://localhost:8081** by default for the CAMSME deployment.
 
 > To host multiple clients on one server, give each deployment unique
-> `COMPOSE_PROJECT_NAME`, `FRONTEND_CONTAINER_NAME`, and `FRONTEND_PORT`
-> values in its `.env` file. If another client already uses a port, choose a
-> free one and point the client domain or reverse proxy to that port.
+> `COMPOSE_PROJECT_NAME`, `FRONTEND_CONTAINER_NAME`, `FRONTEND_BIND_IP`, and
+> `FRONTEND_PORT` values in its `.env` file. If another client already uses a
+> port, choose a free one and point the client domain or reverse proxy to that
+> port. Keep `FRONTEND_BIND_IP=127.0.0.1` when the app is served through host
+> Nginx so the container port is not exposed publicly.
 
 ### Build the image manually
 
