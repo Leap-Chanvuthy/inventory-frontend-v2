@@ -164,13 +164,11 @@ docker compose ps
 docker compose logs -f
 ```
 
-The app will be available at **http://localhost:80**.
+The app will be available at **http://localhost:8080** by default.
 
-> To change the port, edit the `ports` mapping in `docker-compose.yml`:
-> ```yaml
-> ports:
->   - "3000:80"   # host:container
-> ```
+> To host multiple clients on one server, give each deployment unique
+> `COMPOSE_PROJECT_NAME`, `FRONTEND_CONTAINER_NAME`, and `FRONTEND_PORT`
+> values in its `.env` file.
 
 ### Build the image manually
 
@@ -225,6 +223,9 @@ Vite embeds environment variables **at build time**. They must be provided as Do
 |----------|----------|-------------|
 | `VITE_API_URL` | Yes | Full URL for API requests (e.g. `https://api.yourdomain.com/api`) |
 | `VITE_BASE_API_URL` | Yes | Base server URL without path prefix (e.g. `https://api.yourdomain.com`) |
+| `COMPOSE_PROJECT_NAME` | No | Compose namespace; defaults to `camsme-inventory` |
+| `FRONTEND_CONTAINER_NAME` | No | Container name; defaults to `camsme-inventory-frontend` |
+| `FRONTEND_PORT` | No | Unique host port mapped to Nginx port 80; defaults to `8080` |
 
 **Important:** Never commit `.env`, `.env.local`, or `.env.production` to version control. These files are listed in `.dockerignore` and should be in `.gitignore`.
 
