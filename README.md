@@ -164,11 +164,12 @@ docker compose ps
 docker compose logs -f
 ```
 
-The app will be available at **http://localhost:8080** by default.
+The app will be available at **http://localhost:8081** by default for the CAMSME deployment.
 
 > To host multiple clients on one server, give each deployment unique
 > `COMPOSE_PROJECT_NAME`, `FRONTEND_CONTAINER_NAME`, and `FRONTEND_PORT`
-> values in its `.env` file.
+> values in its `.env` file. If another client already uses a port, choose a
+> free one and point the client domain or reverse proxy to that port.
 
 ### Build the image manually
 
