@@ -1,6 +1,6 @@
 import { useCreateSupplier } from "@/api/suppliers/supplier.mutation";
 import FormFooterActions from "@/components/reusable/partials/form-footer-action";
-import { TextInput, TextAreaInput } from "@/components/reusable/partials/input";
+import { SelectInput, TextInput, TextAreaInput } from "@/components/reusable/partials/input";
 import { ImageUpload } from "@/components/reusable/partials/image-upload";
 import { AxiosError } from "axios";
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { BankPaymentSection } from "./bank-payment-section";
 import {
   BankDetails,
   CreateSupplierFormPayload,
+  SUPPLIER_CATEGORY_OPTIONS,
   ValidationErrors,
 } from "@/api/suppliers/supplier.types";
 import { Text } from "@/components/ui/text/app-text";
@@ -199,6 +200,19 @@ export const CreateSupplierForm = () => {
                   value={form.legal_business_name}
                   error={fieldErrors?.legal_business_name?.[0]}
                   onChange={handleChange}
+                />
+
+                <SelectInput
+                  id="supplier_category"
+                  label="Supplier Category"
+                  placeholder="Select supplier category"
+                  options={SUPPLIER_CATEGORY_OPTIONS}
+                  value={form.supplier_category}
+                  error={fieldErrors?.supplier_category?.[0]}
+                  onChange={value =>
+                    setForm(prev => ({ ...prev, supplier_category: value }))
+                  }
+                  required
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

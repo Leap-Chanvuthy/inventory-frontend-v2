@@ -79,7 +79,10 @@ export function RefundRecordDetailsPanel({ record, onOpenOrder }: RefundRecordDe
           {record.items.length > 0 ? (
             <div className="divide-y divide-border rounded-md border border-border">
               {record.items.map(item => (
-                <div key={item.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                <div
+                  key={`${record.id}-${item.id}-${item.saleOrderItemId}`}
+                  className="flex items-center justify-between gap-3 px-3 py-2 text-xs"
+                >
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">
                       {item.productName || `Item #${item.saleOrderItemId}`}

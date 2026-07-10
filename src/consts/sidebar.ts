@@ -2,7 +2,6 @@ import {
   Activity,
   CircleDollarSign,
   Home,
-  NotepadText,
   PackageSearch,
   PencilRuler,
   ShieldCheck,
@@ -126,18 +125,6 @@ export const SIDEBAR_CONFIG: SidebarGroup[] = [
         permissions: ["sale_orders.read_all", "sale_orders.read_own"],
         isLocked: false,
         isQuickMenu: true,
-      },
-    ],
-  },
-  {
-    label: "Report & Analytics",
-    items: [
-      {
-        title: "Financial Report",
-        url: "/financial-report",
-        icon: NotepadText,
-        permissions: ["sale_orders.read_sale_dashboard", "dashboard.read"],
-        isLocked: true,
       },
     ],
   },

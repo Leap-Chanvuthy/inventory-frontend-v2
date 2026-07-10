@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Supplier,
+  SUPPLIER_CATEGORY_OPTIONS,
   SupplierTransactionItem,
 } from "@/api/suppliers/supplier.types";
 import { DataTableColumn } from "@/components/reusable/data-table/data-table.type";
@@ -111,15 +112,7 @@ export const RecoverSupplierAction = ({ supplier }: { supplier: Supplier }) => {
   );
 };
 
-export const FILTER_OPTIONS = [
-  { value: "ELECTRONICS", label: "Electronics" },
-  { value: "PRODUCTS", label: "Products" },
-  { value: "FOOD", label: "Food" },
-  { value: "CLOTHING", label: "Clothing" },
-  { value: "LOGISTICS", label: "Logistics" },
-  { value: "SERVICES", label: "Services" },
-  { value: "OTHERS", label: "Others" },
-];
+export const FILTER_OPTIONS = SUPPLIER_CATEGORY_OPTIONS;
 
 export const SORT_OPTIONS = [
   // { value: "official_name", label: "Name" },

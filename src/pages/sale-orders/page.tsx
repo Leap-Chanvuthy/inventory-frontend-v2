@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CirclePlus } from "lucide-react";
 import { toast } from "sonner";
@@ -152,14 +152,14 @@ export default function SaleOrdersPage() {
       (refundRecordsQuery.data?.data?.data ?? []).map(record => {
         const saleOrder = record.sale_order ?? record.saleOrder;
         const items = Array.isArray(record.items)
-          ? record.items.map(item => ({
-              id: Number(item.id),
+          ? record.items.map((item, index) => ({
+              id: Number(item.id ?? item.sale_order_item_id ?? index),
               saleOrderItemId: Number(item.sale_order_item_id),
               quantity: Number(item.quantity ?? 0),
               processReturn: Boolean(item.process_return),
               processRefund: Boolean(item.process_refund),
               isResellable: item.is_resellable ?? null,
-              returnAction: item.return_action,
+              returnAction: item.return_action ?? "NO_RETURN",
               refundPercentage: Number(item.refund_percentage ?? 0),
               refundAmountInUsd: Number(item.refund_amount_in_usd ?? 0),
               reason: item.reason ?? null,
@@ -172,7 +172,7 @@ export default function SaleOrdersPage() {
 
         return {
           id: Number(record.id),
-          refundNo: record.refund_no,
+          refundNo: record.refund_no || `Refund #${record.id}`,
           saleOrderDbId: Number(record.sale_order_id ?? saleOrder?.id ?? 0),
           saleOrderNo: saleOrder?.order_no ?? `SO#${record.sale_order_id}`,
           customerName: saleOrder?.customer?.fullname,
@@ -181,9 +181,9 @@ export default function SaleOrdersPage() {
           reason: record.reason,
           refundedItemsCount: items.length,
           items,
-          refundType: record.refund_type,
-          refundMethod: record.refund_method,
-          processedAt: record.processed_at,
+          refundType: record.refund_type || "CASH_REFUND",
+          refundMethod: record.refund_method || "CASH",
+          processedAt: record.processed_at || record.created_at,
         };
       }),
     [refundRecordsQuery.data],
@@ -270,7 +270,7 @@ export default function SaleOrdersPage() {
     setViewMode("empty");
   }, [selectedOrderDbId, selectedRefundId, viewMode]);
 
-  const setWorkspaceParams = (updates: Record<string, string | undefined>) => {
+  const setWorkspaceParams = useCallback((updates: Record<string, string | undefined>) => {
     setSearchParams(
       prev => {
         const next = new URLSearchParams(prev);
@@ -285,7 +285,29 @@ export default function SaleOrdersPage() {
       },
       { replace: true },
     );
-  };
+  }, [setSearchParams]);
+
+  useEffect(() => {
+    if (
+      !isRefundedTab ||
+      refundRecordsQuery.isLoading ||
+      refundRecords.length === 0 ||
+      selectedRefundRecord
+    ) {
+      return;
+    }
+
+    setWorkspaceParams({
+      sale_order_refund_id: String(refundRecords[0].id),
+      sale_order_id: undefined,
+    });
+  }, [
+    isRefundedTab,
+    refundRecords,
+    refundRecordsQuery.isLoading,
+    selectedRefundRecord,
+    setWorkspaceParams,
+  ]);
 
   const resetRightPanel = () => {
     setViewMode("empty");
@@ -550,13 +572,12 @@ export default function SaleOrdersPage() {
 
   const handleDownloadInvoice = async (order: Order) => {
     try {
-      const blob = await downloadSaleOrderReport(order.dbId);
+      const { blob, filename } = await downloadSaleOrderReport(order.dbId);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       const isQuote = order.status === "DRAFT";
-      const baseName = isQuote ? "quote" : "invoice";
-      link.download = `${baseName}-${order.id}.pdf`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

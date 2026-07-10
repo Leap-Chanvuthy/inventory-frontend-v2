@@ -190,6 +190,14 @@ export function RefundModal({
                     </div>
                   );
                 })}
+                {refundData.items.length === 0 && (
+                  <div className="px-4 py-8 text-center">
+                    <p className="text-sm font-semibold text-foreground">No products available for refund</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      This sale order did not return any product lines. Close the dialog and reopen the order.
+                    </p>
+                  </div>
+                )}
               </div>
               {hasIntegerQuantityViolation && (
                 <div className="flex items-center gap-2 rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-xs text-destructive">

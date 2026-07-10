@@ -165,9 +165,20 @@ export const previewSaleOrderStatisticsReport = async (
   return response.data as string;
 };
 
-export const downloadSaleOrderReport = async (id: number): Promise<Blob> => {
+export const downloadSaleOrderReport = async (
+  id: number,
+): Promise<{ blob: Blob; filename: string }> => {
   const response = await apiClient.get(`${BASE_API_URL}/sale-orders/${id}/report`, {
     responseType: "blob",
   });
-  return response.data as Blob;
+
+  const contentDisposition = response.headers["content-disposition"] as string | undefined;
+  const filenameMatch = contentDisposition?.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+
+  return {
+    blob: response.data as Blob,
+    filename: filenameMatch?.[1]
+      ? decodeURIComponent(filenameMatch[1].replace(/"/g, ""))
+      : `sales-invoice-${id}.pdf`,
+  };
 };

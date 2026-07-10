@@ -11,6 +11,14 @@ export enum SupplierCategory {
   OTHERS = "OTHERS",
 }
 
+export const SUPPLIER_CATEGORY_OPTIONS = Object.values(SupplierCategory).map(value => ({
+  value,
+  label: value
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, letter => letter.toUpperCase()),
+}));
+
 // Bank Account Information
 export interface SupplierBank {
   id: number;
