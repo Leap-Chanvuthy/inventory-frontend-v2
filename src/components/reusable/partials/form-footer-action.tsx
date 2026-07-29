@@ -9,7 +9,7 @@ type FormFooterActionsProps = {
   saveAndCloseLabel?: string;
   onCancel?: () => void;
 
-  /** Loading / disable state */
+  /** Loading / disabled state */
   isSubmitting?: boolean;
 };
 
@@ -23,22 +23,32 @@ const FormFooterActions = ({
   const navigate = useNavigate();
 
   const handleCancel = () => {
-    if (onCancel) onCancel();
-    else navigate(-1);
+    if (onCancel) {
+      onCancel();
+      return;
+    }
+
+    navigate(-1);
   };
 
   return (
-    <div className="py-5 border-t border-gray-100 dark:border-gray-700 flex flex-col-reverse sm:flex-row justify-end gap-3 rounded-b-2xl">
+    <div className="flex flex-col-reverse justify-end gap-3 rounded-b-2xl border-t border-border py-5 sm:flex-row">
       {/* Cancel */}
       <Button
         type="button"
-        variant="outline_failure"
-        className="w-full sm:w-auto text-red-500"
+        variant="outline"
+        className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:w-auto"
         onClick={handleCancel}
         disabled={isSubmitting}
       >
-        <SquareX />
-        {isSubmitting ? <Loading /> : cancelLabel}
+        {isSubmitting ? (
+          <Loading />
+        ) : (
+          <>
+            <SquareX className="size-4" />
+            {cancelLabel}
+          </>
+        )}
       </Button>
 
       {/* Save & Close */}
@@ -46,11 +56,17 @@ const FormFooterActions = ({
         type="submit"
         name="action"
         value="save_and_close"
-        className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto"
+        className="w-full sm:w-auto"
         disabled={isSubmitting}
       >
-        <FolderSync />
-        {isSubmitting ? <Loading /> : saveAndCloseLabel}
+        {isSubmitting ? (
+          <Loading />
+        ) : (
+          <>
+            <FolderSync className="size-4" />
+            {saveAndCloseLabel}
+          </>
+        )}
       </Button>
 
       {/* Save */}
@@ -58,11 +74,17 @@ const FormFooterActions = ({
         type="submit"
         name="action"
         value="save"
-        className="bg-[#5c52d6] hover:bg-[#4b43b3] text-white w-full sm:w-auto"
+        className="w-full sm:w-auto"
         disabled={isSubmitting}
       >
-        <Save />
-        {isSubmitting ? <Loading /> : saveLabel}
+        {isSubmitting ? (
+          <Loading />
+        ) : (
+          <>
+            <Save className="size-4" />
+            {saveLabel}
+          </>
+        )}
       </Button>
     </div>
   );

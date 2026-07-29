@@ -16,11 +16,13 @@ export function AppSidebar() {
     <Sidebar>
       {/* Header */}
       <SidebarHeader className="flex items-center justify-center h-[72px] px-5 border-b">
-        {/* <img
-          src="https://cdn2.vectorstock.com/i/1000x1000/75/61/software-as-a-service-saas-technology-icon-logo-vector-34097561.jpg"
-          className="h-8 w-8 rounded-md"
-        /> */}
-        <h1 className="text-lg font-semibold">Inventory</h1>
+        <div className="rounded-md bg-white px-3 py-1.5">
+          <img
+            src="/assets/logo/camsme-logo-default.svg"
+            alt="CAMSME"
+            className="h-8 w-auto"
+          />
+        </div>
       </SidebarHeader>
 
       {/* Content */}
