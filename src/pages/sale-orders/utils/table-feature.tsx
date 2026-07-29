@@ -7,7 +7,7 @@ import { formatCurrency } from "./order-utils";
 import type { OrderItem, Product } from "../types";
 import type { SaleAllocationPreview } from "@/api/product/product.type";
 
-function QuantityInput({
+export function QuantityInput({
   value,
   quantityType,
   hasError,

@@ -10,6 +10,13 @@ export default function Header() {
       {/* Left */}
       <div className="flex items-center gap-6">
         <SidebarTrigger />
+        <div className="hidden md:block rounded-md bg-white px-3 py-1.5">
+          <img
+            src="/assets/logo/camsme-logo-default.svg"
+            alt="CAMSME"
+            className="h-7 w-auto"
+          />
+        </div>
         <RouteSearch />
       </div>
 
